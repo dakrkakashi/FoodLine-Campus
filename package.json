@@ -1,0 +1,19 @@
+{
+  "name": "ppt-other-taskes",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx -y serve FoodLine_Pitch_Deck -l 3000",
+    "start": "npx -y serve FoodLine_Pitch_Deck -l 3000",
+    "build": "python build_pitch_deck.py",
+    "graphify": "graphify extract . --code-only"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "motion": "^13.1.1"
+  }
+}

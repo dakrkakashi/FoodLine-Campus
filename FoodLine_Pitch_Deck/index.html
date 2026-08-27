@@ -1,0 +1,2436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FoodLine — Skip the Line, Not the Meal | Pitch Deck 2026</title>
+    <meta name="description" content="FoodLine: Next-Generation Campus Pre-Ordering, Smart Slot Throttling & 30-Second Express Counter Collection Ecosystem for Indian Universities.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           DESIGN SYSTEM — FoodLine Pitch Deck
+           ============================================ */
+        :root {
+            --bg-primary: #0A0A0F;
+            --bg-secondary: #111118;
+            --bg-card: #16161E;
+            --bg-card-hover: #1C1C28;
+            --bg-glass: rgba(22, 22, 30, 0.65);
+            --bg-glass-border: rgba(255, 255, 255, 0.06);
+
+            --accent-orange: #FF6B2C;
+            --accent-orange-glow: rgba(255, 107, 44, 0.25);
+            --accent-amber: #FFB347;
+            --accent-teal: #00D4AA;
+            --accent-red: #E94560;
+            --accent-purple: #8B5CF6;
+            --accent-blue: #3B82F6;
+
+            --text-primary: #F5F5F7;
+            --text-secondary: #A1A1AA;
+            --text-muted: #6B6B78;
+            --text-accent: var(--accent-orange);
+
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+
+            --radius-sm: 8px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+
+            --shadow-card: 0 4px 24px rgba(0,0,0,0.4);
+            --shadow-glow: 0 0 40px var(--accent-orange-glow);
+
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-spring: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ============================================
+           PRESENTATION CONTAINER
+           ============================================ */
+        .presentation {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 76px 20px 96px 20px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(80px);
+            transition: opacity 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), visibility 0.45s ease;
+            pointer-events: none;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            z-index: 1;
+        }
+
+        .slide::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (min-height: 760px) and (min-width: 1025px) {
+            .slide {
+                justify-content: center;
+                padding: 60px 80px;
+            }
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0) !important;
+            pointer-events: all;
+            z-index: 10;
+        }
+
+        .slide.to-prev {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-80px);
+            z-index: 1;
+        }
+
+        .slide.to-next {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(80px);
+            z-index: 1;
+        }
+
+        /* ============================================
+           TOP BAR & BRANDING
+           ============================================ */
+        .top-nav-bar {
+            position: fixed;
+            top: 14px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .brand-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--bg-glass-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            pointer-events: auto;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .brand-emoji {
+            font-size: 14px;
+        }
+
+        .brand-title {
+            font-family: var(--font-heading);
+            font-size: 13px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
+        }
+
+        .slide-counter {
+            font-family: var(--font-heading);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--bg-glass-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            pointer-events: auto;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .slide-counter .current {
+            color: var(--accent-orange);
+            font-weight: 700;
+        }
+
+        /* ============================================
+           BOTTOM NAVIGATION DOCK
+           ============================================ */
+        .nav-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 1000;
+            background: var(--bg-glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--bg-glass-border);
+            border-radius: 40px;
+            padding: 6px 12px;
+            max-width: calc(100vw - 28px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        .mobile-nav-btn {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            flex-shrink: 0;
+            outline: none;
+        }
+
+        .mobile-nav-btn:active {
+            background: var(--accent-orange);
+            transform: scale(0.92);
+        }
+
+        .mobile-nav-btn:disabled {
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        .dots-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding: 2px 4px;
+            max-width: 240px;
+        }
+
+        .dots-wrapper::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition-fast);
+            border: none;
+            outline: none;
+            flex-shrink: 0;
+        }
+
+        .nav-dot:hover {
+            background: var(--text-secondary);
+            transform: scale(1.3);
+        }
+
+        .nav-dot.active {
+            background: var(--accent-orange);
+            width: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--accent-orange-glow);
+        }
+
+        /* Desktop side arrow buttons */
+        .nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--bg-glass-border);
+            color: var(--text-primary);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: var(--transition-fast);
+        }
+
+        .nav-arrow:hover {
+            background: var(--accent-orange);
+            border-color: var(--accent-orange);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .nav-arrow.prev { left: 20px; }
+        .nav-arrow.next { right: 20px; }
+
+        .nav-arrow:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+
+        /* ============================================
+           TYPOGRAPHY
+           ============================================ */
+        .section-tag {
+            font-family: var(--font-heading);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--accent-orange);
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-tag::before {
+            content: '';
+            width: 16px;
+            height: 2px;
+            background: var(--accent-orange);
+            border-radius: 2px;
+        }
+
+        .slide-title {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-family: var(--font-body);
+            font-size: clamp(1rem, 1.5vw, 1.2rem);
+            font-weight: 400;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        .hero-title {
+            font-family: var(--font-heading);
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 900;
+            line-height: 1.0;
+            margin-bottom: 20px;
+        }
+
+        .hero-title .gradient-text {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-amber) 50%, var(--accent-orange) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% auto;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% center; }
+            50% { background-position: 100% center; }
+        }
+
+        /* ============================================
+           CARDS & GRID
+           ============================================ */
+        .card-grid {
+            display: grid;
+            gap: 20px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .card-grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .card-grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .card-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-glass-border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-amber));
+            opacity: 0;
+            transition: var(--transition-fast);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 107, 44, 0.2);
+            box-shadow: var(--shadow-card), 0 0 30px rgba(255, 107, 44, 0.08);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        .badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(255, 107, 44, 0.12);
+            color: var(--accent-orange);
+            border: 1px solid rgba(255, 107, 44, 0.15);
+        }
+
+        .badge.teal {
+            background: rgba(0, 212, 170, 0.12);
+            color: var(--accent-teal);
+            border-color: rgba(0, 212, 170, 0.15);
+        }
+
+        .badge.purple {
+            background: rgba(139, 92, 246, 0.12);
+            color: var(--accent-purple);
+            border-color: rgba(139, 92, 246, 0.15);
+        }
+
+        /* ============================================
+           METRIC CARDS
+           ============================================ */
+        .metric-card {
+            text-align: center;
+            padding: 40px 28px;
+        }
+
+        .metric-value {
+            font-family: var(--font-heading);
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .metric-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ============================================
+           COMPARISON TABLE
+           ============================================ */
+        .comparison-table {
+            width: 100%;
+            max-width: 1200px;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .comparison-table thead th {
+            background: var(--bg-card);
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 18px 20px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid rgba(255, 107, 44, 0.2);
+            text-align: left;
+        }
+
+        .comparison-table thead th:last-child {
+            color: var(--accent-orange);
+            background: rgba(255, 107, 44, 0.08);
+        }
+
+        .comparison-table tbody td {
+            padding: 16px 20px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--bg-glass-border);
+            background: var(--bg-secondary);
+        }
+
+        .comparison-table tbody td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .comparison-table tbody td:last-child {
+            background: rgba(255, 107, 44, 0.04);
+            color: var(--accent-teal);
+            font-weight: 600;
+        }
+
+        .comparison-table tbody tr:hover td {
+            background: var(--bg-card);
+        }
+
+        .comparison-table tbody tr:hover td:last-child {
+            background: rgba(255, 107, 44, 0.08);
+        }
+
+        /* ============================================
+           HERO SECTION SPECIFIC
+           ============================================ */
+        .hero-slide {
+            position: relative;
+            justify-content: center;
+            text-align: left;
+        }
+
+        .hero-slide .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.15;
+            filter: blur(2px);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .hero-tagline {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 36px;
+            max-width: 700px;
+        }
+
+        .hero-pills {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .hero-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 22px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--bg-glass-border);
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: var(--transition-fast);
+        }
+
+        .hero-pill:hover {
+            border-color: rgba(255, 107, 44, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .hero-pill .pill-icon {
+            font-size: 1.3rem;
+        }
+
+        /* ============================================
+           SLIDE HEADER
+           ============================================ */
+        .slide-header {
+            text-align: center;
+            margin-bottom: 36px;
+            width: 100%;
+        }
+
+        /* ============================================
+           TIMELINE
+           ============================================ */
+        .timeline {
+            display: flex;
+            gap: 0;
+            width: 100%;
+            max-width: 1100px;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 5%;
+            right: 5%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-amber), var(--accent-teal));
+            border-radius: 2px;
+        }
+
+        .timeline-phase {
+            flex: 1;
+            text-align: center;
+            padding: 0 16px;
+            position: relative;
+        }
+
+        .timeline-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-orange);
+            margin: 30px auto 24px;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 20px var(--accent-orange-glow);
+        }
+
+        .timeline-phase:nth-child(2) .timeline-dot {
+            background: var(--accent-amber);
+            box-shadow: 0 0 20px rgba(255, 179, 71, 0.3);
+        }
+
+        .timeline-phase:nth-child(3) .timeline-dot {
+            background: var(--accent-teal);
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+        }
+
+        .timeline-label {
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-orange);
+        }
+
+        .timeline-phase:nth-child(2) .timeline-label { color: var(--accent-amber); }
+        .timeline-phase:nth-child(3) .timeline-label { color: var(--accent-teal); }
+
+        .timeline-title {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .timeline-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .timeline-card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-glass-border);
+            border-radius: var(--radius-md);
+            padding: 24px 20px;
+            margin-top: 12px;
+        }
+
+        .timeline-items {
+            list-style: none;
+            text-align: left;
+            margin-top: 12px;
+        }
+
+        .timeline-items li {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            padding: 5px 0;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .timeline-items li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-orange);
+        }
+
+        /* ============================================
+           FINANCIAL CARDS
+           ============================================ */
+        .finance-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+            margin-bottom: 20px;
+        }
+
+        .finance-card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-glass-border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            text-align: center;
+        }
+
+        .finance-card .year {
+            font-family: var(--font-heading);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .finance-card .amount {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-amber));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+        }
+
+        .finance-card .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .finance-card .growth {
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(0, 212, 170, 0.12);
+            color: var(--accent-teal);
+        }
+
+        /* ============================================
+           TEAM CARDS
+           ============================================ */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        .team-card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-glass-border);
+            border-radius: var(--radius-lg);
+            padding: 36px 28px;
+            text-align: center;
+            transition: var(--transition-smooth);
+        }
+
+        .team-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 107, 44, 0.2);
+        }
+
+        .team-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-amber));
+            margin: 0 auto 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--bg-primary);
+        }
+
+        .team-name {
+            font-family: var(--font-heading);
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .team-role {
+            font-size: 0.85rem;
+            color: var(--accent-orange);
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+
+        .team-desc {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ============================================
+           CLOSING SLIDE
+           ============================================ */
+        .closing-slide {
+            text-align: center;
+        }
+
+        .closing-slide .hero-title {
+            text-align: center;
+        }
+
+        .closing-cta {
+            margin-top: 36px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 40px;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-amber));
+            border-radius: 60px;
+            font-family: var(--font-heading);
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--bg-primary);
+            text-decoration: none;
+            transition: var(--transition-smooth);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .closing-cta:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 60px var(--accent-orange-glow);
+        }
+
+        /* ============================================
+           IMAGE OVERLAYS & BACKGROUNDS
+           ============================================ */
+        .slide-bg-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.12;
+            z-index: 0;
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .split-image {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            aspect-ratio: 16/10;
+            position: relative;
+        }
+
+        .split-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .split-image::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1px solid var(--bg-glass-border);
+            border-radius: var(--radius-lg);
+            pointer-events: none;
+        }
+
+        /* ============================================
+           STEP CARDS (Payment Flow)
+           ============================================ */
+        .step-card {
+            position: relative;
+            padding-top: 44px;
+        }
+
+        .step-number {
+            position: absolute;
+            top: 12px;
+            left: 20px;
+            font-family: var(--font-heading);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-orange);
+            opacity: 0.8;
+        }
+
+        /* ============================================
+           CALLOUT BOX
+           ============================================ */
+        .callout {
+            width: 100%;
+            max-width: 1200px;
+            background: linear-gradient(135deg, rgba(255, 107, 44, 0.08) 0%, rgba(255, 179, 71, 0.04) 100%);
+            border: 1px solid rgba(255, 107, 44, 0.15);
+            border-radius: var(--radius-lg);
+            padding: 24px 32px;
+            margin-top: 24px;
+        }
+
+        .callout-title {
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            margin-bottom: 8px;
+        }
+
+        .callout-text {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ============================================
+           PILL LISTS
+           ============================================ */
+        .pilot-detail {
+            text-align: left;
+        }
+
+        .pilot-detail .detail-row {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--bg-glass-border);
+            font-size: 0.88rem;
+        }
+
+        .pilot-detail .detail-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            min-width: 130px;
+        }
+
+        .pilot-detail .detail-value {
+            color: var(--text-secondary);
+        }
+
+        .menu-list {
+            list-style: none;
+            text-align: left;
+        }
+
+        .menu-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--bg-glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .menu-list .item-name {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .menu-list .item-tag {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            margin-left: 8px;
+        }
+
+        .menu-list .item-price {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: var(--accent-amber);
+        }
+
+        /* ============================================
+           TECH STACK BADGES
+           ============================================ */
+        .tech-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 14px;
+        }
+
+        .tech-badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 6px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* ============================================
+           ANIMATION CLASSES
+           ============================================ */
+        .animate-in {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .slide.active .animate-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        .slide.active .animate-in:nth-child(1) { animation-delay: 0.1s; }
+        .slide.active .animate-in:nth-child(2) { animation-delay: 0.2s; }
+        .slide.active .animate-in:nth-child(3) { animation-delay: 0.3s; }
+        .slide.active .animate-in:nth-child(4) { animation-delay: 0.4s; }
+        .slide.active .animate-in:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* ============================================
+           DECORATIVE ELEMENTS
+           ============================================ */
+        .gradient-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .orb-orange {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--accent-orange-glow) 0%, transparent 70%);
+        }
+
+        .orb-teal {
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 212, 170, 0.12) 0%, transparent 70%);
+        }
+
+        .orb-purple {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+        }
+
+        /* Progress bar at top */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--accent-amber));
+            z-index: 1001;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px var(--accent-orange-glow);
+        }
+
+        /* ============================================
+           RESPONSIVE SYSTEM (Mobile & Tablet)
+           ============================================ */
+        .table-scroll-container {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-card);
+        }
+
+        .mobile-table-hint {
+            display: none;
+            font-size: 0.75rem;
+            color: var(--accent-orange);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 1024px) {
+            .slide { 
+                padding: 70px 32px 90px 32px;
+                justify-content: flex-start;
+            }
+            .card-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .card-grid-3 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .split-layout { grid-template-columns: 1fr; gap: 20px; }
+            .timeline { flex-direction: column; gap: 18px; }
+            .timeline::before { display: none; }
+            .finance-row { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+            .team-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 64px 16px 84px 16px;
+                justify-content: flex-start;
+                align-items: stretch;
+            }
+
+            .slide-content {
+                width: 100%;
+                align-items: stretch;
+            }
+
+            .slide-header {
+                margin-bottom: 18px;
+                text-align: left;
+                width: 100%;
+            }
+
+            .section-tag {
+                font-size: 11px;
+                letter-spacing: 1.5px;
+                margin-bottom: 6px;
+            }
+
+            .slide-title {
+                font-size: clamp(1.4rem, 6.5vw, 1.9rem);
+                text-align: left;
+                margin-bottom: 8px;
+                line-height: 1.2;
+            }
+
+            .slide-subtitle {
+                font-size: 0.85rem;
+                text-align: left;
+                margin-bottom: 16px;
+                line-height: 1.45;
+                max-width: 100%;
+            }
+
+            .hero-slide {
+                justify-content: flex-start;
+                padding-top: 68px;
+            }
+
+            .hero-content {
+                text-align: left;
+                width: 100%;
+            }
+
+            .hero-title {
+                font-size: clamp(2.2rem, 11vw, 3.2rem);
+                margin-bottom: 10px;
+                line-height: 1.05;
+            }
+
+            .hero-tagline {
+                font-size: 0.95rem;
+                margin-bottom: 18px;
+                line-height: 1.45;
+            }
+
+            .hero-pills {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 8px;
+                width: 100%;
+            }
+
+            .hero-pill {
+                padding: 10px 14px;
+                font-size: 0.8rem;
+                border-radius: 12px;
+            }
+
+            .card-grid-4, .card-grid-3, .card-grid-2, .team-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                width: 100%;
+            }
+
+            .card {
+                padding: 16px 14px;
+                border-radius: 14px;
+            }
+
+            .card-icon {
+                font-size: 1.7rem;
+                margin-bottom: 8px;
+            }
+
+            .card-title {
+                font-size: 1rem;
+                margin-bottom: 4px;
+            }
+
+            .card-text {
+                font-size: 0.82rem;
+                line-height: 1.45;
+            }
+
+            .card-badges {
+                margin-top: 10px;
+                gap: 6px;
+            }
+
+            .badge {
+                font-size: 0.68rem;
+                padding: 3px 8px;
+            }
+
+            .callout {
+                padding: 14px 14px;
+                margin-top: 12px;
+                border-radius: 12px;
+                width: 100%;
+            }
+
+            .callout-title {
+                font-size: 0.82rem;
+                margin-bottom: 4px;
+            }
+
+            .callout-text {
+                font-size: 0.8rem;
+                line-height: 1.45;
+            }
+
+            .split-layout {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                width: 100%;
+            }
+
+            .pilot-detail .detail-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 2px;
+                padding: 6px 0;
+            }
+
+            .pilot-detail .detail-label {
+                font-size: 0.78rem;
+                color: var(--accent-orange);
+            }
+
+            .pilot-detail .detail-value {
+                font-size: 0.84rem;
+            }
+
+            .menu-list li {
+                padding: 8px 0;
+                font-size: 0.8rem;
+            }
+
+            .timeline {
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+            }
+
+            .timeline::before {
+                display: none;
+            }
+
+            .timeline-phase {
+                padding: 0;
+                text-align: left;
+                width: 100%;
+            }
+
+            .timeline-dot {
+                display: none;
+            }
+
+            .timeline-card {
+                margin-top: 4px;
+                padding: 14px 12px;
+                border-radius: 12px;
+            }
+
+            .timeline-title {
+                font-size: 1rem;
+            }
+
+            .timeline-desc {
+                font-size: 0.78rem;
+            }
+
+            .timeline-items li {
+                font-size: 0.78rem;
+                padding: 3px 0 3px 14px;
+            }
+
+            .finance-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+
+            .finance-card {
+                padding: 16px 12px;
+                border-radius: 12px;
+            }
+
+            .finance-card .amount {
+                font-size: 1.6rem;
+            }
+
+            .team-card {
+                padding: 18px 14px;
+                border-radius: 12px;
+            }
+
+            .team-avatar {
+                width: 52px;
+                height: 52px;
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+            }
+
+            .mobile-table-hint {
+                display: block !important;
+                text-align: right;
+            }
+
+            .table-scroll-container {
+                border-radius: 12px;
+                border: 1px solid var(--bg-glass-border);
+            }
+
+            .comparison-table {
+                min-width: 520px;
+            }
+
+            .comparison-table th, .comparison-table td {
+                padding: 9px 11px;
+                font-size: 0.74rem;
+            }
+
+            .closing-slide .slide-content {
+                align-items: center;
+                text-align: center;
+            }
+
+            .closing-slide .hero-title {
+                text-align: center;
+            }
+
+            .closing-cta {
+                width: 100%;
+                justify-content: center;
+                padding: 15px 20px;
+                font-size: 0.95rem;
+            }
+
+            .nav-arrow {
+                display: none;
+            }
+
+            .top-nav-bar {
+                padding: 0 12px;
+                top: 10px;
+            }
+
+            .brand-pill {
+                padding: 4px 10px;
+            }
+
+            .brand-title {
+                font-size: 12px;
+            }
+
+            .slide-counter {
+                padding: 4px 10px;
+                font-size: 12px;
+            }
+
+            .nav-container {
+                bottom: 14px;
+                padding: 4px 8px;
+            }
+
+            .dots-wrapper {
+                max-width: 170px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <!-- Top Header Bar -->
+    <div class="top-nav-bar">
+        <div class="brand-pill">
+            <span class="brand-emoji">⚡</span>
+            <span class="brand-title">FoodLine</span>
+        </div>
+        <div class="slide-counter">
+            <span class="current" id="currentSlide">01</span> / <span id="totalSlides">15</span>
+        </div>
+    </div>
+
+    <!-- Desktop Side Arrows -->
+    <button class="nav-arrow prev" id="prevBtn" onclick="changeSlide(-1)">&#8592;</button>
+    <button class="nav-arrow next" id="nextBtn" onclick="changeSlide(1)">&#8594;</button>
+
+    <div class="presentation" id="presentation">
+
+        <!-- ================================
+             SLIDE 1: HERO / TITLE
+             ================================ -->
+        <div class="slide hero-slide active" data-slide="0">
+            <div class="gradient-orb orb-orange" style="top:-150px;right:-100px;"></div>
+            <div class="gradient-orb orb-teal" style="bottom:-100px;left:-100px;"></div>
+            <img src="https://images.unsplash.com/photo-1567521464027-f127ff144326?w=1920&q=80&auto=format" class="hero-bg" alt="Campus cafeteria">
+            <div class="hero-content">
+                <div class="section-tag animate-in">Startup Pitch Concept • Campus Dining 2026–2027</div>
+                <h1 class="hero-title animate-in">
+                    <span class="gradient-text">FoodLine</span>
+                </h1>
+                <p class="hero-tagline animate-in" style="font-family:var(--font-heading);font-size:clamp(1.5rem,3vw,2.2rem);font-weight:600;color:var(--text-primary);margin-bottom:12px;">
+                    Skip the Line, Not the Meal.
+                </p>
+                <p class="hero-tagline animate-in">
+                    Next-Generation Campus Pre-Ordering, Smart Slot Throttling &amp; 30-Second Express Counter Collection Ecosystem for Indian Universities.
+                </p>
+                <div class="hero-pills animate-in">
+                    <div class="hero-pill">
+                        <span class="pill-icon">📍</span>
+                        <span><strong>Target Pilot Campus</strong><br>Sanjivani University (Cafe @7)</span>
+                    </div>
+                    <div class="hero-pill">
+                        <span class="pill-icon">⚡</span>
+                        <span><strong>Express Handover</strong><br>30-Sec Counter QR Pass</span>
+                    </div>
+                    <div class="hero-pill">
+                        <span class="pill-icon">💰</span>
+                        <span><strong>0% UPI PG Fees</strong><br>Direct Merchant UTR Engine</span>
+                    </div>
+                    <div class="hero-pill">
+                        <span class="pill-icon">📡</span>
+                        <span><strong>Real-Time SSE</strong><br>Zero-Refresh Live Tracking</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 2: PROBLEM STATEMENT
+             ================================ -->
+        <div class="slide" data-slide="1">
+            <div class="gradient-orb orb-orange" style="top:-200px;left:-200px;"></div>
+            <img src="https://images.unsplash.com/photo-1567521464027-f127ff144326?w=1920&q=80&auto=format" class="slide-bg-image" alt="Campus queue">
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Problem Statement</div>
+                    <h2 class="slide-title">The Collegiate Break Bottleneck</h2>
+                    <p class="slide-subtitle">Why 4.65 million college students across Maharashtra lose valuable break time daily.</p>
+                </div>
+                <div class="card-grid card-grid-3 animate-in">
+                    <div class="card">
+                        <span class="card-icon">⏳</span>
+                        <h3 class="card-title">40% Break Time Lost</h3>
+                        <p class="card-text">Short 30-minute campus breaks are crushed by 10–15 minute billing queues before food preparation even begins. Students spend more time waiting than eating.</p>
+                        <div class="card-badges">
+                            <span class="badge">14.5 min avg wait</span>
+                            <span class="badge">20 min meal window</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🍳</span>
+                        <h3 class="card-title">Kitchen Rush Chaos</h3>
+                        <p class="card-text">Canteen operators face uncoordinated demand spikes, leading to kitchen bottlenecks, food wastage, or stockouts — with no visibility into upcoming demand.</p>
+                        <div class="card-badges">
+                            <span class="badge">Unpredictable spikes</span>
+                            <span class="badge">35% revenue loss</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">💰</span>
+                        <h3 class="card-title">Payment & Cash Friction</h3>
+                        <p class="card-text">Cash change delays, offline token slips, and high 2% PG gateway fees eat into fragile canteen operating margins on ₹20–50 items.</p>
+                        <div class="card-badges">
+                            <span class="badge">2% PG fees</span>
+                            <span class="badge">Cash bottleneck</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="callout animate-in">
+                    <div class="callout-title">📊 KEY METRIC</div>
+                    <p class="callout-text">Average student spends <strong>14.5 minutes in line</strong> for a 20-minute meal window. Result: Students skip meals, arrive late to lectures, and campus food vendors lose over <strong>35% of potential daily turnover</strong>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 3: PRODUCT SOLUTION
+             ================================ -->
+        <div class="slide" data-slide="2">
+            <div class="gradient-orb orb-purple" style="bottom:-200px;right:-200px;"></div>
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Product Solution</div>
+                    <h2 class="slide-title">The FoodLine Campus Dining Ecosystem</h2>
+                    <p class="slide-subtitle">Four interconnected pillars designed for sub-second collegiate dining efficiency.</p>
+                </div>
+                <div class="card-grid card-grid-4 animate-in">
+                    <div class="card">
+                        <span class="card-icon">📱</span>
+                        <h3 class="card-title">1. Browse & Order Ahead</h3>
+                        <p class="card-text">Students browse real-time canteen menus and customize meals directly from classrooms before breaks ring.</p>
+                        <div class="card-badges">
+                            <span class="badge teal">✔ Frictionless</span>
+                            <span class="badge teal">✔ Cloud Sync</span>
+                            <span class="badge teal">✔ Real-Time SSE</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🎯</span>
+                        <h3 class="card-title">2. Smart Slot Throttling</h3>
+                        <p class="card-text">10-minute dynamic break slots balance kitchen load and eliminate rush-hour batching delays.</p>
+                        <div class="card-badges">
+                            <span class="badge teal">✔ Load Balance</span>
+                            <span class="badge teal">✔ Smart Queue</span>
+                            <span class="badge teal">✔ Auto-Slots</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🔐</span>
+                        <h3 class="card-title">3. 0% Fee UPI QR (Option C)</h3>
+                        <p class="card-text">Direct vendor UPI scanning + 12-digit UTR validation eliminates payment gateway fees completely.</p>
+                        <div class="card-badges">
+                            <span class="badge teal">✔ Zero Fees</span>
+                            <span class="badge teal">✔ UTR Verify</span>
+                            <span class="badge teal">✔ Direct Pay</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🚀</span>
+                        <h3 class="card-title">4. 30-Sec Express Handover</h3>
+                        <p class="card-text">High-contrast dynamic optical QR pass and 4-digit token verification at the dedicated FoodLine counter.</p>
+                        <div class="card-badges">
+                            <span class="badge teal">✔ QR Pass</span>
+                            <span class="badge teal">✔ 4-Digit PIN</span>
+                            <span class="badge teal">✔ Instant</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 4: FLAGSHIP PILOT
+             ================================ -->
+        <div class="slide" data-slide="3">
+            <div class="gradient-orb orb-orange" style="top:-100px;right:-150px;"></div>
+            <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80&auto=format" class="slide-bg-image" alt="University campus">
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Flagship Pilot Plan</div>
+                    <h2 class="slide-title">Target Launch: Sanjivani University, Kopargaon</h2>
+                    <p class="slide-subtitle">Proposed deployment model at Cafe @7 designed around actual campus schedule and seed menu.</p>
+                </div>
+                <div class="split-layout animate-in">
+                    <div class="card pilot-detail">
+                        <span class="card-icon">🏫</span>
+                        <h3 class="card-title">Planned Pilot Campus & Outlet</h3>
+                        <div class="detail-row"><span class="detail-label">University</span><span class="detail-value">Sanjivani University, Kopargaon (MH)</span></div>
+                        <div class="detail-row"><span class="detail-label">Anchor Outlet</span><span class="detail-value">Cafe @7 (Main Campus Cafeteria)</span></div>
+                        <div class="detail-row"><span class="detail-label">Merchant UPI Model</span><span class="detail-value" style="font-family:monospace;color:var(--accent-teal);">Direct Merchant QR</span></div>
+                        <div class="detail-row"><span class="detail-label">Break 1 (Lunch)</span><span class="detail-value">11:50 AM – 12:30 PM</span></div>
+                        <div class="detail-row"><span class="detail-label" style="padding-left:20px;">Slot A</span><span class="detail-value">11:50 AM – 12:10 PM</span></div>
+                        <div class="detail-row"><span class="detail-label" style="padding-left:20px;">Slot B</span><span class="detail-value">12:10 PM – 12:30 PM</span></div>
+                        <div class="detail-row"><span class="detail-label">Break 2 (Eve)</span><span class="detail-value">2:30 PM – 2:50 PM</span></div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🍽️</span>
+                        <h3 class="card-title">Cafe @7 Verified Menu Highlights</h3>
+                        <ul class="menu-list">
+                            <li><span><span class="item-name">Vada Pav / Dabeli / Samosa</span><span class="item-tag">Fast Grab</span></span><span class="item-price">₹20</span></li>
+                            <li><span><span class="item-name">Special Campus Tea</span><span class="item-tag">Hot Fuel</span></span><span class="item-price">₹10</span></li>
+                            <li><span><span class="item-name">Crispy Masala Dosa</span><span class="item-tag">Bestseller</span></span><span class="item-price">₹50</span></li>
+                            <li><span><span class="item-name">Thick Iced Cold Coffee</span><span class="item-tag">Student Fav</span></span><span class="item-price">₹50</span></li>
+                            <li><span><span class="item-name">Veg. Cheese Grill Sandwich</span><span class="item-tag">Hot Grill</span></span><span class="item-price">₹100</span></li>
+                            <li><span><span class="item-name">Peri Peri French Fries</span><span class="item-tag">Snack Fav</span></span><span class="item-price">₹80</span></li>
+                            <li><span><span class="item-name">Veg Fried Momo</span><span class="item-tag">Hot Momo</span></span><span class="item-price">₹70</span></li>
+                            <li><span><span class="item-name">KitKat / Oreo Thick Shake</span><span class="item-tag">Shake</span></span><span class="item-price">₹90</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 5: PAYMENT INNOVATION
+             ================================ -->
+        <div class="slide" data-slide="4">
+            <div class="gradient-orb orb-teal" style="bottom:-150px;left:-100px;"></div>
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Payment Innovation</div>
+                    <h2 class="slide-title">Option C: Zero-Fee UPI & UTR Verification</h2>
+                    <p class="slide-subtitle">Solving the micro-transaction dilemma: 0% payment gateway fees on ₹20 campus items.</p>
+                </div>
+                <div class="card-grid card-grid-4 animate-in">
+                    <div class="card step-card">
+                        <span class="step-number">Step 1</span>
+                        <span class="card-icon">📱</span>
+                        <h3 class="card-title">Scan Standee QR</h3>
+                        <p class="card-text">Student views Cafe @7 UPI QR Standee image and UPI ID displayed in the FoodLine app.</p>
+                    </div>
+                    <div class="card step-card">
+                        <span class="step-number">Step 2</span>
+                        <span class="card-icon">⚡</span>
+                        <h3 class="card-title">Pay via Any UPI App</h3>
+                        <p class="card-text">Pays exact total directly via GPay, PhonePe, Paytm, or CRED — with zero platform fee.</p>
+                    </div>
+                    <div class="card step-card">
+                        <span class="step-number">Step 3</span>
+                        <span class="card-icon">🔑</span>
+                        <h3 class="card-title">Submit 12-Digit UTR</h3>
+                        <p class="card-text">Inputs bank UTR number (or last 6 digits) into FoodLine verification modal for validation.</p>
+                    </div>
+                    <div class="card step-card">
+                        <span class="step-number">Step 4</span>
+                        <span class="card-icon">🎟️</span>
+                        <h3 class="card-title">Generate Token & Pass</h3>
+                        <p class="card-text">Backend validates uniqueness, prevents replay, and issues verified digital token #FL-XXXX.</p>
+                    </div>
+                </div>
+                <div class="callout animate-in">
+                    <div class="callout-title">🏆 WHY OPTION C WINS ON CAMPUS</div>
+                    <p class="callout-text">Traditional Razorpay/Paytm PG charges <strong>2.0% + GST</strong> per transaction — unfeasible for low ticket ₹20–50 canteen items. Option C ensures <strong>100% merchant payout</strong> directly to the canteen's bank account with zero intermediary commissions.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 6: KITCHEN INTELLIGENCE
+             ================================ -->
+        <div class="slide" data-slide="5">
+            <div class="gradient-orb orb-purple" style="top:-100px;left:-200px;"></div>
+            <img src="https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=1920&q=80&auto=format" class="slide-bg-image" alt="Kitchen preparation">
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Kitchen Intelligence</div>
+                    <h2 class="slide-title">Live Kitchen Display System (KDS) & SSE</h2>
+                    <p class="slide-subtitle">Empowering cafeteria cooks with automated batch forecasting and real-time handovers.</p>
+                </div>
+                <div class="card-grid card-grid-2 animate-in">
+                    <div class="card">
+                        <span class="card-icon">📈</span>
+                        <h3 class="card-title">Live Slot Batching</h3>
+                        <p class="card-text">Groups incoming orders by upcoming 10-minute break slots so kitchen staff can batch-cook (e.g., 15 Dosas for 11:50 AM). Reduces waste and prep chaos.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📡</span>
+                        <h3 class="card-title">Server-Sent Events (SSE)</h3>
+                        <p class="card-text">Real-time bi-directional pipeline updates order status from PREPARING → READY with zero screen refreshes. Students see live progress.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📷</span>
+                        <h3 class="card-title">Optical QR Handover</h3>
+                        <p class="card-text">Express counter staff scan student digital QR code or enter 4-digit PIN for sub-30-second meal handovers. No paper tokens needed.</p>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📦</span>
+                        <h3 class="card-title">Live Inventory Toggle</h3>
+                        <p class="card-text">1-tap out-of-stock switcher prevents students from ordering sold-out dishes during sudden surges. Real-time menu sync across all devices.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 7: MARKET OPPORTUNITY
+             ================================ -->
+        <div class="slide" data-slide="6">
+            <div class="gradient-orb orb-orange" style="bottom:-200px;right:-200px;"></div>
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Market Opportunity</div>
+                    <h2 class="slide-title">Collegiate Foodservice Market in India</h2>
+                    <p class="slide-subtitle">Massive unorganized campus dining market ready for digital transformation.</p>
+                </div>
+                <div class="card-grid card-grid-3 animate-in">
+                    <div class="card metric-card">
+                        <div class="metric-value" data-count="18000">₹18,000+ Cr</div>
+                        <div class="metric-label">TAM — Total Addressable Market</div>
+                        <p class="metric-desc">45,000+ colleges across India with on-campus cafeterias and dining halls.</p>
+                        <div class="card-badges" style="justify-content:center;">
+                            <span class="badge">$2.2B Market</span>
+                            <span class="badge">45K+ Colleges</span>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="metric-value" data-count="2400">₹2,400 Cr</div>
+                        <div class="metric-label">SAM — Serviceable Addressable</div>
+                        <p class="metric-desc">5,380 colleges & universities in Maharashtra with 46.5 Lakh (4.65M) enrolled students.</p>
+                        <div class="card-badges" style="justify-content:center;">
+                            <span class="badge">$290M Market</span>
+                            <span class="badge">5,380 Colleges</span>
+                        </div>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="metric-value" data-count="35">₹35 Cr</div>
+                        <div class="metric-label">SOM — Year 1-2 Target</div>
+                        <p class="metric-desc">Initial university clusters across Pune, Kopargaon, Ahmednagar, Nashik, and Mumbai.</p>
+                        <div class="card-badges" style="justify-content:center;">
+                            <span class="badge">$4.2M GMV</span>
+                            <span class="badge">50 Campuses</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 8: BUSINESS MODEL
+             ================================ -->
+        <div class="slide" data-slide="7">
+            <div class="gradient-orb orb-teal" style="top:-150px;right:-100px;"></div>
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Business Model</div>
+                    <h2 class="slide-title">Multi-Stream Sustainable Revenue Model</h2>
+                    <p class="slide-subtitle">Zero barrier to vendor entry paired with scalable transaction and SaaS revenue.</p>
+                </div>
+                <div class="card-grid card-grid-4 animate-in">
+                    <div class="card">
+                        <span class="card-icon">🆓</span>
+                        <h3 class="card-title">1. Free Canteen Onboarding</h3>
+                        <p class="card-text">Zero setup fees and zero hardware requirement guarantees 100% canteen adoption across campuses. No upfront cost barrier.</p>
+                        <div class="card-badges">
+                            <span class="badge teal">₹0 Setup</span>
+                            <span class="badge teal">No Hardware</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">📊</span>
+                        <h3 class="card-title">2. Pickup Commission (3-5%)</h3>
+                        <p class="card-text">Small platform fee per successful order covering hosting, SSE infrastructure, and continuous support. Scales with transaction volume.</p>
+                        <div class="card-badges">
+                            <span class="badge">3-5% per order</span>
+                            <span class="badge">Volume-based</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🏃</span>
+                        <h3 class="card-title">3. Campus Delivery Fee</h3>
+                        <p class="card-text">Optional in-campus delivery (₹10–20) to library and hostel drop zones, powered by student runners for peer-to-peer logistics.</p>
+                        <div class="card-badges">
+                            <span class="badge">₹10-20 per delivery</span>
+                            <span class="badge">Student runners</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">💎</span>
+                        <h3 class="card-title">4. Merchant Analytics SaaS</h3>
+                        <p class="card-text">Predictive demand forecasting, wastage reduction, and menu engineering dashboards for vendors. Premium tier subscription.</p>
+                        <div class="card-badges">
+                            <span class="badge purple">AI Forecasting</span>
+                            <span class="badge purple">Menu Insights</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 9: COMPETITIVE MATRIX
+             ================================ -->
+        <div class="slide" data-slide="8">
+            <div class="gradient-orb orb-orange" style="top:-100px;left:-200px;"></div>
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Competitive Matrix</div>
+                    <h2 class="slide-title">Why Existing Delivery Apps Fail on Campus</h2>
+                    <p class="slide-subtitle">FoodLine is architected specifically for collegiate micro-breaks and low-AOV dynamics.</p>
+                </div>
+                <div class="mobile-table-hint">👉 Swipe table to compare →</div>
+                <div class="animate-in table-scroll-container">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature / Attribute</th>
+                                <th>Traditional Canteen</th>
+                                <th>Swiggy / Zomato</th>
+                                <th>FoodLine Campus ✓</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Break Window Alignment</td>
+                                <td>❌ 15-min queue chaos</td>
+                                <td>❌ 35-45 min delivery</td>
+                                <td>✅ 10-min smart slot pickup</td>
+                            </tr>
+                            <tr>
+                                <td>Average Order Value</td>
+                                <td>₹20 – ₹60</td>
+                                <td>❌ ₹200+ (High minimums)</td>
+                                <td>✅ No minimum (₹15 Chai)</td>
+                            </tr>
+                            <tr>
+                                <td>Delivery / Platform Fees</td>
+                                <td>Zero (offline only)</td>
+                                <td>❌ ₹30-60 + 25% take</td>
+                                <td>✅ 0% Fee UPI QR</td>
+                            </tr>
+                            <tr>
+                                <td>Kitchen Load Throttling</td>
+                                <td>❌ Overload & delays</td>
+                                <td>❌ Uncoordinated spikes</td>
+                                <td>✅ Algorithmic slot throttle</td>
+                            </tr>
+                            <tr>
+                                <td>Campus Integration</td>
+                                <td>❌ No digital layer</td>
+                                <td>❌ External delivery only</td>
+                                <td>✅ Native campus system</td>
+                            </tr>
+                            <tr>
+                                <td>Real-Time Order Tracking</td>
+                                <td>❌ No visibility</td>
+                                <td>✅ Delivery GPS</td>
+                                <td>✅ SSE live status</td>
+                            </tr>
+                            <tr>
+                                <td>Vendor Onboarding Cost</td>
+                                <td>N/A</td>
+                                <td>❌ Commission + listing fees</td>
+                                <td>✅ ₹0 Free onboarding</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 10: IMPACT & KPIS
+             ================================ -->
+        <div class="slide" data-slide="9">
+            <div class="gradient-orb orb-teal" style="bottom:-200px;left:-100px;"></div>
+            <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1920&q=80&auto=format" class="slide-bg-image" alt="Students with phones">
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Impact & Projected Benchmarks</div>
+                    <h2 class="slide-title">Target Operational Breakthroughs</h2>
+                    <p class="slide-subtitle">Quantifiable performance benchmarks engineered for campus cafeterias.</p>
+                </div>
+                <div class="card-grid card-grid-4 animate-in">
+                    <div class="card metric-card">
+                        <div class="metric-value">≥ 12 Min</div>
+                        <div class="metric-label">Target Time Saved</div>
+                        <p class="metric-desc">Students gain back 40%+ of their break time to socialize, study, or relax instead of standing in queues.</p>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="metric-value">2.5×</div>
+                        <div class="metric-label">Peak Capacity Boost</div>
+                        <p class="metric-desc">Canteens fulfill 2.5× more orders in the same 30-minute rush window without expanding space or staff.</p>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="metric-value">≤ 30 Sec</div>
+                        <div class="metric-label">Express Pickup Goal</div>
+                        <p class="metric-desc">Instant QR scan & 4-digit PIN verification ensures rapid pickup with zero billing delays at the counter.</p>
+                    </div>
+                    <div class="card metric-card">
+                        <div class="metric-value">≥ 65%</div>
+                        <div class="metric-label">Projected Retention</div>
+                        <p class="metric-desc">Daily campus dining habits create industry-leading organic retention rates — no marketing spend needed.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 11: TECH STACK
+             ================================ -->
+        <div class="slide" data-slide="10">
+            <div class="gradient-orb orb-purple" style="top:-200px;right:-100px;"></div>
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Engineering Architecture</div>
+                    <h2 class="slide-title">Modern Enterprise Technology Stack</h2>
+                    <p class="slide-subtitle">Engineered for high concurrency, sub-second latency, and responsive mobile experiences.</p>
+                </div>
+                <div class="card-grid card-grid-2 animate-in">
+                    <div class="card">
+                        <span class="card-icon">⚙️</span>
+                        <h3 class="card-title">Frontend Engine</h3>
+                        <p class="card-text">Production-grade frontend with server-side rendering, strict type safety, and spring-physics animations for a native-app feel.</p>
+                        <div class="tech-badges">
+                            <span class="tech-badge">Next.js 15+</span>
+                            <span class="tech-badge">React 19</span>
+                            <span class="tech-badge">TypeScript</span>
+                            <span class="tech-badge">Tailwind v4</span>
+                            <span class="tech-badge">Motion</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🧩</span>
+                        <h3 class="card-title">Component System</h3>
+                        <p class="card-text">Accessible, themeable component library with high-contrast OKLCH color tokens and custom UI primitives.</p>
+                        <div class="tech-badges">
+                            <span class="tech-badge">shadcn/ui</span>
+                            <span class="tech-badge">Radix UI</span>
+                            <span class="tech-badge">OKLCH Tokens</span>
+                            <span class="tech-badge">Nova Preset</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🔌</span>
+                        <h3 class="card-title">Backend & Real-Time</h3>
+                        <p class="card-text">Serverless API handlers with persistent SSE connections for zero-latency bi-directional order updates.</p>
+                        <div class="tech-badges">
+                            <span class="tech-badge">API Routes</span>
+                            <span class="tech-badge">SSE</span>
+                            <span class="tech-badge">Supabase</span>
+                            <span class="tech-badge">PostgreSQL</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <span class="card-icon">🧠</span>
+                        <h3 class="card-title">Knowledge Graph</h3>
+                        <p class="card-text">Graphify AST mapping for automated code intelligence, clean architecture enforcement, and dev velocity.</p>
+                        <div class="tech-badges">
+                            <span class="tech-badge">Graphify</span>
+                            <span class="tech-badge">AST Analysis</span>
+                            <span class="tech-badge">Code Intel</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 12: ROADMAP (NEW)
+             ================================ -->
+        <div class="slide" data-slide="11">
+            <div class="gradient-orb orb-orange" style="bottom:-150px;left:-150px;"></div>
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Roadmap & Timeline</div>
+                    <h2 class="slide-title">From Concept to Pan-India Scale</h2>
+                    <p class="slide-subtitle">A 3-phase execution strategy designed for rapid, capital-efficient campus expansion.</p>
+                </div>
+                <div class="timeline animate-in">
+                    <div class="timeline-phase">
+                        <div class="timeline-label">Phase 1</div>
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-card">
+                            <div class="timeline-title">Pilot Launch & Validation</div>
+                            <div class="timeline-desc">Target: Sanjivani University (Cafe @7)</div>
+                            <ul class="timeline-items">
+                                <li>Launch flagship pilot at Sanjivani University</li>
+                                <li>Target 500+ daily active student orders</li>
+                                <li>Validate Option C UPI flow with campus vendors</li>
+                                <li>Refine KDS and SSE infrastructure in real conditions</li>
+                                <li>Onboard additional campus canteens</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="timeline-phase">
+                        <div class="timeline-label">Phase 2</div>
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-card">
+                            <div class="timeline-title">City-Cluster Expansion</div>
+                            <div class="timeline-desc">Pune, Nashik & Mumbai Clusters</div>
+                            <ul class="timeline-items">
+                                <li>Expand across regional university hubs</li>
+                                <li>Target 50 campus deployments</li>
+                                <li>Launch campus delivery with student runners</li>
+                                <li>Introduce Merchant Analytics SaaS</li>
+                                <li>Target ₹35 Cr annualized GMV</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="timeline-phase">
+                        <div class="timeline-label">Phase 3</div>
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-card">
+                            <div class="timeline-title">National Standardization</div>
+                            <div class="timeline-desc">5,000+ Colleges Across India</div>
+                            <ul class="timeline-items">
+                                <li>Scale across major universities nationwide</li>
+                                <li>Partner with university administrations</li>
+                                <li>Launch FoodLine API for canteen POS systems</li>
+                                <li>AI-powered demand prediction engine</li>
+                                <li>Target ₹500 Cr+ annual GMV</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 13: FINANCIAL PROJECTIONS (NEW)
+             ================================ -->
+        <div class="slide" data-slide="12">
+            <div class="gradient-orb orb-teal" style="top:-200px;left:-100px;"></div>
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">Financial Projections</div>
+                    <h2 class="slide-title">Revenue & Growth Trajectory</h2>
+                    <p class="slide-subtitle">Projections based on target unit economics and Maharashtra campus density.</p>
+                </div>
+                <div class="finance-row animate-in">
+                    <div class="finance-card">
+                        <div class="year">Year 1 (Pilot Phase)</div>
+                        <div class="amount">₹1.2 Cr</div>
+                        <div class="label">Gross Target Revenue</div>
+                        <div class="growth">Pilot Target</div>
+                    </div>
+                    <div class="finance-card">
+                        <div class="year">Year 2 (Expansion)</div>
+                        <div class="amount">₹8.5 Cr</div>
+                        <div class="label">Gross Target Revenue</div>
+                        <div class="growth">↑ 608% YoY</div>
+                    </div>
+                    <div class="finance-card">
+                        <div class="year">Year 3 (Scale)</div>
+                        <div class="amount">₹35 Cr</div>
+                        <div class="label">Gross Target Revenue</div>
+                        <div class="growth">↑ 312% YoY</div>
+                    </div>
+                </div>
+                <div class="finance-row animate-in">
+                    <div class="finance-card">
+                        <div class="year">Avg Order Value</div>
+                        <div class="amount" style="font-size:1.8rem;">₹45</div>
+                        <div class="label">Per Transaction</div>
+                    </div>
+                    <div class="finance-card">
+                        <div class="year">Target Daily Orders (Y2)</div>
+                        <div class="amount" style="font-size:1.8rem;">12,000+</div>
+                        <div class="label">Across 50 Campuses</div>
+                    </div>
+                    <div class="finance-card">
+                        <div class="year">Target Gross Margin</div>
+                        <div class="amount" style="font-size:1.8rem;">72%</div>
+                        <div class="label">Asset-Light Model</div>
+                    </div>
+                </div>
+                <div class="callout animate-in">
+                    <div class="callout-title">💡 Unit Economics</div>
+                    <p class="callout-text"><strong>CAC: ₹0</strong> (organic campus adoption via QR standees) · <strong>LTV: ₹2,400+/year</strong> (avg student places 200+ orders/year) · <strong>LTV:CAC Ratio: ∞</strong> (zero acquisition cost model). Break-even expected within 8 months of campus deployment.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 14: TEAM (NEW)
+             ================================ -->
+        <div class="slide" data-slide="13">
+            <div class="gradient-orb orb-purple" style="bottom:-200px;right:-200px;"></div>
+            <div class="slide-content">
+                <div class="slide-header animate-in">
+                    <div class="section-tag">The Team</div>
+                    <h2 class="slide-title">Built by Students, for Students</h2>
+                    <p class="slide-subtitle">A founding team with deep campus insight and full-stack engineering capabilities.</p>
+                </div>
+                <div class="team-grid animate-in">
+                    <div class="team-card">
+                        <div class="team-avatar">SN</div>
+                        <div class="team-name">Shivam Nirmal</div>
+                        <div class="team-role">Founder & CEO</div>
+                        <p class="team-desc">Full-stack engineer and campus operations strategist. Architect of FoodLine's Option C payment engine and SSE infrastructure.</p>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-avatar" style="background:linear-gradient(135deg, var(--accent-teal), var(--accent-blue));">T</div>
+                        <div class="team-name">Technical Co-Founder</div>
+                        <div class="team-role">CTO</div>
+                        <p class="team-desc">Systems architect specializing in real-time event-driven architectures, database optimization, and mobile-first experiences.</p>
+                    </div>
+                    <div class="team-card">
+                        <div class="team-avatar" style="background:linear-gradient(135deg, var(--accent-purple), var(--accent-red));">O</div>
+                        <div class="team-name">Operations Lead</div>
+                        <div class="team-role">COO</div>
+                        <p class="team-desc">Campus engagement expert managing vendor relationships, student ambassador programs, and ground-level pilot execution.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================
+             SLIDE 15: CLOSING / CTA
+             ================================ -->
+        <div class="slide closing-slide" data-slide="14">
+            <div class="gradient-orb orb-orange" style="top:-200px;left:50%;transform:translateX(-50%);"></div>
+            <div class="gradient-orb orb-teal" style="bottom:-200px;left:-100px;"></div>
+            <div class="gradient-orb orb-purple" style="bottom:-100px;right:-100px;"></div>
+            <img src="https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80&auto=format" class="slide-bg-image" style="opacity:0.08;" alt="University campus">
+            <div class="slide-content" style="align-items:center;text-align:center;">
+                <div class="section-tag animate-in">The Future of Campus Dining</div>
+                <h2 class="hero-title animate-in" style="text-align:center;">
+                    <span class="gradient-text">The Future of Campus</span><br>
+                    <span class="gradient-text">Dining Starts Here</span>
+                </h2>
+                <p class="slide-subtitle animate-in" style="text-align:center;max-width:700px;">
+                    A Startup Concept Ready to Scale: From Sanjivani University to 5,000+ Campuses Across India.
+                </p>
+                <div style="text-align:left;max-width:600px;margin:0 auto 32px;" class="animate-in">
+                    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;color:var(--text-secondary);font-size:0.95rem;">
+                        <span style="color:var(--accent-orange);font-weight:700;">Phase 1</span> Flagship pilot deployment at Sanjivani University (Cafe @7)
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;color:var(--text-secondary);font-size:0.95rem;">
+                        <span style="color:var(--accent-amber);font-weight:700;">Phase 2</span> City-cluster expansion across Pune, Nashik, and Mumbai
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;color:var(--text-secondary);font-size:0.95rem;">
+                        <span style="color:var(--accent-teal);font-weight:700;">Phase 3</span> Standardizing collegiate dining nationwide
+                    </div>
+                </div>
+                <div class="animate-in" style="margin-bottom:28px;">
+                    <div style="font-family:var(--font-heading);font-size:clamp(1.4rem,3vw,2rem);font-weight:800;color:var(--text-primary);margin-bottom:8px;">
+                        🚀 FoodLine — Skip the Line, Not the Meal.
+                    </div>
+                    <div style="font-size:0.85rem;color:var(--text-muted);">
+                        Prototype Architecture Ready · Next.js 15 + React 19 + Supabase
+                    </div>
+                </div>
+                <a class="closing-cta animate-in" href="mailto:contact@foodline.in">
+                    Let's Talk → 
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Navigation Dock -->
+    <div class="nav-container" id="navContainer">
+        <button class="mobile-nav-btn prev" id="mobilePrevBtn" aria-label="Previous Slide">&#8249;</button>
+        <div class="dots-wrapper" id="navDots"></div>
+        <button class="mobile-nav-btn next" id="mobileNextBtn" aria-label="Next Slide">&#8250;</button>
+    </div>
+
+    <script>
+        // ============================================
+        // PRESENTATION ENGINE (Responsive & Mobile-Ready)
+        // ============================================
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let currentSlide = 0;
+
+        const navDots = document.getElementById('navDots');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const mobilePrevBtn = document.getElementById('mobilePrevBtn');
+        const mobileNextBtn = document.getElementById('mobileNextBtn');
+        const currentSlideEl = document.getElementById('currentSlide');
+        const totalSlidesEl = document.getElementById('totalSlides');
+        const progressBar = document.getElementById('progressBar');
+
+        // Build navigation dots
+        navDots.innerHTML = '';
+        slides.forEach((slide, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+            dot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                goToSlide(i);
+            });
+            navDots.appendChild(dot);
+
+            // Initialize initial slide classes
+            slide.style.transform = '';
+            if (i === 0) {
+                slide.classList.add('active');
+                slide.classList.remove('to-prev', 'to-next');
+            } else {
+                slide.classList.remove('active', 'to-prev');
+                slide.classList.add('to-next');
+            }
+        });
+
+        function updateUI() {
+            if (currentSlideEl) currentSlideEl.textContent = String(currentSlide + 1).padStart(2, '0');
+            if (totalSlidesEl) totalSlidesEl.textContent = String(totalSlides).padStart(2, '0');
+            
+            // Progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            if (progressBar) progressBar.style.width = progress + '%';
+
+            // Nav arrow buttons state (Desktop & Mobile)
+            const isFirst = currentSlide === 0;
+            const isLast = currentSlide === totalSlides - 1;
+
+            if (prevBtn) prevBtn.disabled = isFirst;
+            if (nextBtn) nextBtn.disabled = isLast;
+            if (mobilePrevBtn) mobilePrevBtn.disabled = isFirst;
+            if (mobileNextBtn) mobileNextBtn.disabled = isLast;
+
+            // Nav dots active state
+            Array.from(navDots.children).forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === currentSlide);
+            });
+
+            // Auto-scroll dots container on mobile to keep active dot visible
+            if (navDots && navDots.children[currentSlide]) {
+                const activeDot = navDots.children[currentSlide];
+                const scrollLeft = activeDot.offsetLeft - (navDots.clientWidth / 2) + (activeDot.clientWidth / 2);
+                navDots.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+            }
+        }
+
+        function goToSlide(targetIndex) {
+            if (targetIndex < 0 || targetIndex >= totalSlides || targetIndex === currentSlide) return;
+
+            currentSlide = targetIndex;
+
+            slides.forEach((slide, i) => {
+                slide.style.transform = ''; // clear any inline transform
+                if (i === currentSlide) {
+                    slide.classList.remove('to-prev', 'to-next');
+                    slide.classList.add('active');
+                    slide.scrollTop = 0; // reset scroll to top on enter
+                } else if (i < currentSlide) {
+                    slide.classList.remove('active', 'to-next');
+                    slide.classList.add('to-prev');
+                } else {
+                    slide.classList.remove('active', 'to-prev');
+                    slide.classList.add('to-next');
+                }
+            });
+
+            updateUI();
+        }
+
+        function changeSlide(direction) {
+            goToSlide(currentSlide + direction);
+        }
+
+        // Attach direct button click listeners
+        if (prevBtn) {
+            prevBtn.onclick = (e) => {
+                e.preventDefault();
+                changeSlide(-1);
+            };
+        }
+        if (nextBtn) {
+            nextBtn.onclick = (e) => {
+                e.preventDefault();
+                changeSlide(1);
+            };
+        }
+        if (mobilePrevBtn) {
+            mobilePrevBtn.onclick = (e) => {
+                e.preventDefault();
+                changeSlide(-1);
+            };
+        }
+        if (mobileNextBtn) {
+            mobileNextBtn.onclick = (e) => {
+                e.preventDefault();
+                changeSlide(1);
+            };
+        }
+
+        // Keyboard navigation (Desktop & Tablets with Keyboard)
+        document.addEventListener('keydown', (e) => {
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+
+            switch(e.key) {
+                // Next slide
+                case 'ArrowRight':
+                case 'ArrowDown':
+                case 'PageDown':
+                case ' ':
+                case 'Enter':
+                case 'n':
+                case 'N':
+                    e.preventDefault();
+                    changeSlide(1);
+                    break;
+
+                // Previous slide (Go Back)
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                case 'PageUp':
+                case 'Backspace':
+                case 'p':
+                case 'P':
+                    e.preventDefault();
+                    changeSlide(-1);
+                    break;
+
+                // Jump to first / last
+                case 'Home':
+                    e.preventDefault();
+                    goToSlide(0);
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    goToSlide(totalSlides - 1);
+                    break;
+            }
+        });
+
+        // Touch Swipe Navigation (Mobile & Tablet)
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchStartTime = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+            touchStartTime = Date.now();
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            const dx = e.changedTouches[0].screenX - touchStartX;
+            const dy = e.changedTouches[0].screenY - touchStartY;
+            const dt = Date.now() - touchStartTime;
+
+            // Horizontal swipe detection with angle and speed threshold
+            if (Math.abs(dx) > Math.abs(dy) * 1.2 && Math.abs(dx) > 35 && dt < 800) {
+                changeSlide(dx < 0 ? 1 : -1);
+            }
+        }, { passive: true });
+
+        // Wheel navigation with debounce (Desktop only)
+        let isWheelLocked = false;
+        document.addEventListener('wheel', (e) => {
+            if (isWheelLocked) return;
+            if (Math.abs(e.deltaY) > 35) {
+                isWheelLocked = true;
+                changeSlide(e.deltaY > 0 ? 1 : -1);
+                setTimeout(() => { isWheelLocked = false; }, 600);
+            }
+        }, { passive: true });
+
+        // Initial setup
+        updateUI();
+    </script>
+</body>
+</html>
