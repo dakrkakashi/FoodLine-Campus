@@ -584,6 +584,30 @@ export default function AdminAnalyticsPage() {
     }
   };
 
+  const [isSavingAllInventory, setIsSavingAllInventory] = useState(false);
+  const [saveInventoryMsg, setSaveInventoryMsg] = useState<string | null>(null);
+
+  const handleSaveAllInventory = async () => {
+    try {
+      setIsSavingAllInventory(true);
+      const res = await fetch('/api/admin/inventory/save-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: menuItems }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        fireConfettiSuccess();
+        setSaveInventoryMsg(`Saved all ${menuItems.length} dishes to campus!`);
+        setTimeout(() => setSaveInventoryMsg(null), 3500);
+      }
+    } catch (e) {
+      console.error('Save all inventory failed:', e);
+    } finally {
+      setIsSavingAllInventory(false);
+    }
+  };
+
   const handleStartEdit = (dish: MenuItemData) => {
     setEditingDishId(dish.id);
     setEditForm({
@@ -1342,7 +1366,28 @@ export default function AdminAnalyticsPage() {
                       )}
                       <span>All Out of Stock</span>
                     </button>
+
+                    {/* 💾 PRIMARY SAVE INVENTORY BUTTON */}
+                    <button
+                      onClick={handleSaveAllInventory}
+                      disabled={isSavingAllInventory}
+                      className="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-[#00D4AA] to-[#00b894] hover:scale-105 active:scale-95 text-black font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-[#00D4AA]/25 disabled:opacity-50"
+                      title="Save and broadcast all 58 dish stock changes to campus"
+                    >
+                      {isSavingAllInventory ? (
+                        <Loader2 size={13} className="animate-spin" />
+                      ) : (
+                        <Save size={13} />
+                      )}
+                      <span>{isSavingAllInventory ? 'Saving...' : '💾 Save Inventory'}</span>
+                    </button>
                   </div>
+
+                  {saveInventoryMsg && (
+                    <span className="text-emerald-400 font-black text-xs animate-bounce">
+                      ✅ {saveInventoryMsg}
+                    </span>
+                  )}
 
                   <button
                     onClick={() => setIsAddingDish(!isAddingDish)}

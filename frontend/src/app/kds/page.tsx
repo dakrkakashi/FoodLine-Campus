@@ -21,6 +21,7 @@ import {
   ChefHat,
   Ban,
   SunMedium,
+  Loader2,
 } from 'lucide-react';
 
 interface KdsOrderItem {
@@ -454,6 +455,29 @@ export default function KitchenDisplayPage() {
       });
     } catch (e) {
       console.error('KDS morning prep batch failed:', e);
+    }
+  };
+
+  const [isSavingAll, setIsSavingAll] = useState(false);
+  const [saveSuccessMsg, setSaveSuccessMsg] = useState<string | null>(null);
+
+  const handleSaveAllInventory = async () => {
+    try {
+      setIsSavingAll(true);
+      const res = await fetch('/api/admin/inventory/save-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: menuItems }),
+      });
+      const json = await res.json();
+      if (json.success) {
+        setSaveSuccessMsg(`Saved ${menuItems.length} dishes!`);
+        setTimeout(() => setSaveSuccessMsg(null), 3500);
+      }
+    } catch (e) {
+      console.error('Save all inventory failed:', e);
+    } finally {
+      setIsSavingAll(false);
     }
   };
 
@@ -896,11 +920,34 @@ export default function KitchenDisplayPage() {
                     <SunMedium size={13} />
                     <span>Morning Prep (50 Qty)</span>
                   </button>
+
+                  {/* 💾 PRIMARY SAVE INVENTORY BUTTON */}
+                  <button
+                    onClick={handleSaveAllInventory}
+                    disabled={isSavingAll}
+                    className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#00D4AA] to-[#00b894] hover:scale-105 active:scale-95 text-black font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-[#00D4AA]/25 disabled:opacity-50"
+                    title="Persist all 58 dish stock changes to memory, disk and database"
+                  >
+                    {isSavingAll ? (
+                      <Loader2 size={13} className="animate-spin" />
+                    ) : (
+                      <Save size={13} />
+                    )}
+                    <span>{isSavingAll ? 'Saving...' : '💾 Save Inventory'}</span>
+                  </button>
                 </div>
 
-                {soldOutCount > 0 && (
+                {saveSuccessMsg ? (
+                  <span className="text-emerald-400 font-black text-xs animate-bounce">
+                    ✅ {saveSuccessMsg}
+                  </span>
+                ) : soldOutCount > 0 ? (
                   <span className="text-red-400 font-bold text-xs">
                     ⚠️ {soldOutCount} dish{soldOutCount > 1 ? 'es' : ''} SOLD OUT
+                  </span>
+                ) : (
+                  <span className="text-emerald-400 font-bold text-xs">
+                    ✨ All dishes in stock
                   </span>
                 )}
               </div>
@@ -1170,20 +1217,36 @@ export default function KitchenDisplayPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex-none p-4 border-t border-white/10 bg-black/40 rounded-b-3xl flex items-center justify-between">
+            <div className="flex-none p-4 border-t border-white/10 bg-black/40 rounded-b-3xl flex items-center justify-between flex-wrap gap-3">
               <span className="text-xs text-zinc-400">
-                Changes take effect in real-time across all student menus.
+                {saveSuccessMsg ? (
+                  <span className="text-emerald-400 font-bold">✅ {saveSuccessMsg}</span>
+                ) : (
+                  'Changes take effect in real-time across all student menus.'
+                )}
               </span>
-              <button
-                onClick={() => {
-                  setShowStockoutModal(false);
-                  setEditingDishId(null);
-                  setIsAddingDish(false);
-                }}
-                className="px-6 py-2.5 rounded-xl bg-white text-black font-black text-xs hover:bg-zinc-200 transition cursor-pointer"
-              >
-                Done
-              </button>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleSaveAllInventory}
+                  disabled={isSavingAll}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#00D4AA] to-[#00b894] hover:scale-105 active:scale-95 text-black font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-[#00D4AA]/25 disabled:opacity-50"
+                >
+                  {isSavingAll ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+                  <span>{isSavingAll ? 'Saving...' : 'Save & Apply to Campus'}</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowStockoutModal(false);
+                    setEditingDishId(null);
+                    setIsAddingDish(false);
+                  }}
+                  className="px-6 py-2.5 rounded-xl bg-white text-black font-black text-xs hover:bg-zinc-200 transition cursor-pointer active:scale-95"
+                >
+                  Done
+                </button>
+              </div>
             </div>
           </div>
         </div>
