@@ -1,98 +1,132 @@
-# User Roles & Access Control — Implementation Plan (Corrected)
+# User Roles & Access Control — Master Implementation Plan
 
-**Project:** FoodLine Campus Pre-Ordering System  
-**Target Roles:** Student, Canteen Manager, Kitchen Staff, Admin (Founder)  
-**Auth:** Supabase Auth + Row Level Security (RLS)
+**Project:** FoodLine Campus Pre-Ordering & Express Pickup Ecosystem  
+**Target Pilot Campus:** Sanjivani University, Kopargaon (Cafe @7)  
+**Target Roles:** Student, Kitchen Staff, Canteen Manager (Cafe @7), Admin (Founder)  
+**Auth Engine:** Supabase Auth + Row Level Security (RLS) + Next.js 15 Server Actions
 
 ---
 
 ## 1. Role Definitions & Permissions Matrix
 
-| Feature | Student | Kitchen Staff | Canteen Manager | Admin (Founder) |
+| Feature | Student | Kitchen Staff | Canteen Manager (Cafe @7) | Admin (Founder) |
 |---|---|---|---|---|
-| **Auth** | Google SSO (`@sanjivani.edu.in`) / PRN+OTP | Email/Password (invite only) | Email/Password (invite only) | Email/Password |
-| **Menu Browse** | ✅ Full (Guest + Auth) | ✅ Read-only | ✅ Full CRUD | ✅ Full CRUD |
-| **Place Orders** | ✅ (Auth required at checkout) | ❌ | ❌ | ✅ (Sandbox Mode) |
-| **View Own Orders** | ✅ | ❌ | ✅ All | ✅ All |
-| **KDS (Kitchen)** | ❌ | ✅ Full (kanban) | ✅ Full + override | ✅ Full |
-| **Counter Display (`/display`)** | ❌ | ✅ View (Public Kiosk) | ✅ View + manage | ✅ View |
-| **Admin Dashboard** | ❌ | ❌ | ✅ Full | ✅ Full + financial split |
-| **Menu Management** | ❌ | ❌ Stock toggle only | ✅ CRUD + pricing | ✅ CRUD + pricing |
-| **Slot Management** | ❌ | ❌ | ✅ CRUD | ✅ CRUD |
-| **User Management** | ❌ | ❌ | ❌ | ✅ Invite/remove staff |
-| **Financial Reports** | ❌ | ❌ | ✅ Canteen income (96.6%) | ✅ All (split view) |
-| **Settlement/UTR** | ❌ | ❌ | ✅ Verify UTR | ✅ Full audit |
-| **COD Orders** | ✅ Place | ❌ | ✅ Collect cash | ✅ View |
+| **Auth Provider** | Google SSO (`@sanjivani.edu.in`) / PRN+OTP | Email/Password (Invite Only) | Email/Password (Invite Only) | Email/Password |
+| **Menu Browse (`/menu`)** | ✅ Full (Public Guest + Auth) | ✅ Read-only | ✅ Full CRUD + Live Edit | ✅ Full CRUD + Live Edit |
+| **Place Orders (`/checkout`)** | ✅ (Auth Required at Checkout) | ❌ Restricted | ❌ Restricted | ✅ Sandbox Test Mode |
+| **View Own Orders** | ✅ Token/Session Bound | ❌ Restricted | ✅ All Cafeteria Orders | ✅ All Global Orders |
+| **Kitchen KDS (`/kds`)** | ❌ Restricted | ✅ Full (Kanban + Audio FX) | ✅ Full + Status Overrides | ✅ Full System Access |
+| **TV Display (`/display`)** | ✅ View Only (Public Kiosk) | ✅ View Only (Public Kiosk) | ✅ View + Manage Audio | ✅ View + Full Config |
+| **Manager Hub (`/admin`)** | ❌ Restricted | ❌ Restricted | ✅ 96.6% Canteen Share Only | ✅ Full Waterfall (96.6% + 3.4%) |
+| **Live Stock & Price Steppers**| ❌ Restricted | ✅ Portions Stepper (`±1, ±5`) | ✅ Price (`±₹5`) + Stock Steppers | ✅ Master Database Override |
+| **Campus Break Slot Control** | ✅ Book Active Slots | ❌ Restricted | ✅ Shift Capacity Override | ✅ Master Slot Configuration |
+| **User & Staff Management** | ❌ Restricted | ❌ Restricted | ✅ Invite Kitchen Staff | ✅ Invite/Deactivate All Roles |
+| **Financial Settlement & UTR**| ❌ Restricted | ❌ Restricted | ✅ Verify Payments & Cash | ✅ Full Audit & Bank Export |
+| **Cash-on-Delivery (COD)** | ✅ Place Order (Routes to C1) | ❌ Restricted | ✅ Reconcile Cash Register | ✅ Gross Revenue Audit |
 
 ---
 
-## 2. Database Schema Updates
+## 2. Database Schema & Migration DDL
 
 ### 2.1 Enhanced `profiles` Table
 ```sql
--- Add to existing profiles table
+-- Extend existing profiles table
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS
   avatar_url TEXT,
   phone VARCHAR(20),
   is_active BOOLEAN DEFAULT TRUE,
   last_login_at TIMESTAMPTZ,
-  invited_by UUID REFERENCES profiles(id),
+  invited_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
   invited_at TIMESTAMPTZ,
   accepted_at TIMESTAMPTZ,
-  campus_id UUID REFERENCES campuses(id) ON DELETE SET NULL DEFAULT 'sanjivani-campus-uuid',
-  cafeteria_id UUID REFERENCES cafeterias(id) ON DELETE SET NULL DEFAULT 'cafe7-uuid';
+  campus_id UUID REFERENCES campuses(id) ON DELETE SET NULL,
+  cafeteria_id UUID REFERENCES cafeterias(id) ON DELETE SET NULL;
 
 -- Update role check constraint
 ALTER TABLE profiles DROP CONSTRAINT IF EXISTS profiles_role_check;
 ALTER TABLE profiles ADD CONSTRAINT profiles_role_check
   CHECK (role IN ('student', 'kitchen', 'canteen_manager', 'admin'));
 
--- Index for role queries
+-- Performance indexes
 CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
 CREATE INDEX IF NOT EXISTS idx_profiles_campus ON profiles(campus_id);
 CREATE INDEX IF NOT EXISTS idx_profiles_cafeteria ON profiles(cafeteria_id);
 ```
 
-### 2.2 Staff Invitation Table
+### 2.2 Staff Invitations Table
 ```sql
-CREATE TABLE staff_invitations (
+CREATE TABLE IF NOT EXISTS staff_invitations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email VARCHAR(255) NOT NULL,
   role VARCHAR(50) NOT NULL CHECK (role IN ('kitchen', 'canteen_manager')),
-  campus_id UUID REFERENCES campuses(id) ON DELETE CASCADE DEFAULT 'sanjivani-campus-uuid',
-  cafeteria_id UUID REFERENCES cafeterias(id) ON DELETE CASCADE DEFAULT 'cafe7-uuid',
+  campus_id UUID REFERENCES campuses(id) ON DELETE CASCADE,
+  cafeteria_id UUID REFERENCES cafeterias(id) ON DELETE CASCADE,
   invited_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  token VARCHAR(64) UNIQUE NOT NULL, -- secure random token
+  token VARCHAR(64) UNIQUE NOT NULL,
   status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'expired', 'revoked')),
   expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '7 days'),
   created_at TIMESTAMPTZ DEFAULT NOW(),
   accepted_at TIMESTAMPTZ
 );
 
-CREATE INDEX idx_staff_invitations_token ON staff_invitations(token);
-CREATE INDEX idx_staff_invitations_email ON staff_invitations(email);
+CREATE INDEX IF NOT EXISTS idx_staff_invitations_token ON staff_invitations(token);
+CREATE INDEX IF NOT EXISTS idx_staff_invitations_email ON staff_invitations(email);
 ```
 
-### 2.3 Audit Logs Table
+### 2.3 System Audit Logs Table
 ```sql
-CREATE TABLE audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   actor_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
   action VARCHAR(100) NOT NULL,
-  target_type VARCHAR(50), -- 'user', 'menu_item', 'slot', 'order', 'invitation'
+  target_type VARCHAR(50), -- 'user', 'menu_item', 'slot', 'order', 'invitation', 'financial'
   target_id UUID,
   metadata JSONB DEFAULT '{}',
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_audit_logs_actor ON audit_logs(actor_id);
-CREATE INDEX idx_audit_logs_target ON audit_logs(target_type, target_id);
-CREATE INDEX idx_audit_logs_created ON audit_logs(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_actor ON audit_logs(actor_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_target ON audit_logs(target_type, target_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at DESC);
 ```
 
-### 2.4 Enhanced RLS Policies
+### 2.4 Auto-Profile Creation Trigger (Student Registration)
 ```sql
--- Profiles: Users read own, admins read all, managers read staff
+-- Automatically creates a 'student' profile on first OAuth/OTP signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (
+    id,
+    email,
+    full_name,
+    role,
+    is_active,
+    created_at
+  )
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', 'Campus Student'),
+    'student',
+    TRUE,
+    NOW()
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    last_login_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+```
+
+### 2.5 Granular Row Level Security (RLS) Policies
+```sql
+-- Profiles: Users read own, Admins read all, Managers read staff
 CREATE POLICY "profiles_select_own" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "profiles_select_admin" ON profiles FOR SELECT USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
@@ -102,7 +136,7 @@ CREATE POLICY "profiles_select_manager" ON profiles FOR SELECT USING (
   AND role IN ('kitchen', 'canteen_manager', 'student')
 );
 
--- Orders: Students own, staff/managers all, admins all
+-- Orders: Students read own, Kitchen/Managers read all cafeteria orders, Admins read all
 CREATE POLICY "orders_select_student" ON orders FOR SELECT USING (
   auth.uid() = user_id OR user_id IS NULL
 );
@@ -113,7 +147,7 @@ CREATE POLICY "orders_update_staff" ON orders FOR UPDATE USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('kitchen', 'canteen_manager', 'admin'))
 );
 
--- Menu Items: Public read, managers/admins write
+-- Menu Items: Public read, Managers/Admins write, Kitchen updates stock
 CREATE POLICY "menu_items_select_public" ON menu_items FOR SELECT USING (true);
 CREATE POLICY "menu_items_manage_manager" ON menu_items FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
@@ -124,13 +158,13 @@ CREATE POLICY "menu_items_stock_kitchen" ON menu_items FOR UPDATE USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('kitchen', 'canteen_manager', 'admin'))
 );
 
--- Pickup Slots: Public read, managers/admins write
+-- Pickup Slots: Public read, Managers/Admins write
 CREATE POLICY "pickup_slots_select_public" ON pickup_slots FOR SELECT USING (true);
 CREATE POLICY "pickup_slots_manage_manager" ON pickup_slots FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
 );
 
--- Payments: Students insert own, staff/managers verify, admins all
+-- Payments: Students insert own, Managers verify, Admins audit all
 CREATE POLICY "payments_insert_student" ON payments FOR INSERT WITH CHECK (true);
 CREATE POLICY "payments_verify_staff" ON payments FOR UPDATE USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
@@ -139,7 +173,7 @@ CREATE POLICY "payments_select_admin" ON payments FOR SELECT USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
 );
 
--- Staff Invitations: Admins/managers manage, invitees accept
+-- Staff Invitations: Managers/Admins manage, invitees read token
 CREATE POLICY "invitations_select_admin" ON staff_invitations FOR SELECT USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
   OR email = (SELECT email FROM profiles WHERE id = auth.uid())
@@ -148,7 +182,7 @@ CREATE POLICY "invitations_manage_admin" ON staff_invitations FOR ALL USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
 );
 
--- Audit Logs: Admin read all, managers read own actions
+-- Audit Logs: Admin read all, Managers read own actions
 CREATE POLICY "audit_logs_select_admin" ON audit_logs FOR SELECT USING (
   EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
 );
@@ -162,180 +196,130 @@ CREATE POLICY "audit_logs_select_manager" ON audit_logs FOR SELECT USING (
 
 ## 3. Supabase Auth Configuration
 
-### 3.1 Email Templates (Dashboard → Authentication → Email Templates)
-* **Invite User (Custom):** Send to kitchen/canteen_manager with magic link + role.
-* **Magic Link (Custom):** Auto-login for staff.
-* **Confirm Signup (Custom):** Student email verification (optional).
-* **Reset Password (Custom):** FoodLine-branded template for all roles.
-
-### 3.2 Auth Providers
-* **Email/Password** $\rightarrow$ Enabled (for staff invites).
-* **Google OAuth** $\rightarrow$ Enabled, restricted to `@sanjivani.edu.in` domain.
-* **Phone OTP** $\rightarrow$ Enabled for PRN login flow.
-
-### 3.3 Auth Settings
-* **Site URL:** `http://localhost:3000` (dev) / `https://foodline.campus` (prod).
-* **Redirect URLs:** `/auth/callback`, `/menu`, `/kds`, `/admin`, `/display`, `/checkout`.
-* **Session Timeout:** 30 days (students), 12 hours (staff/kitchen kiosk tablets).
+* **Email/Password:** Enabled for invited staff and administrators.
+* **Google OAuth:** Enabled, restricted to `@sanjivani.edu.in` domain for campus students.
+* **Phone OTP:** Enabled for PRN + SMS fast login.
+* **Session Lifetimes:**
+  * **Students:** 30 Days (Persistent semester sessions on mobile devices).
+  * **Staff & Kiosk Tablets:** 12 Hours (Daily shift timeouts).
 
 ---
 
-## 4. Frontend Architecture
+## 4. Frontend Architecture (Canonical Flat URLs)
 
-### 4.1 File Structure (Flat URLs — Canonical Routes)
 ```
 frontend/src/
 ├── lib/
 │   ├── auth/
-│   │   ├── types.ts              # User, Role, Permission types
-│   │   ├── permissions.ts        # Permission matrix & helpers
-│   │   ├── useAuth.ts            # Auth context hook (supabase auth + profile)
-│   │   └── usePermissions.ts     # Role-based access hook
-│   ├── supabase/
-│   │   ├── client.ts             # Browser client (existing)
-│   │   └── server.ts             # Server client (existing)
-│       -- NO admin.ts on client --
+│   │   ├── types.ts                   # User, Role, & Permission Types
+│   │   ├── permissions.ts             # Role-Capability Matrix
+│   │   ├── useAuth.ts                 # React Auth & Profile Context Hook
+│   │   └── usePermissions.ts          # Granular Action Capability Hook
+│   └── supabase/
+│       ├── client.ts                  # Public Browser Client (anon key)
+│       └── server.ts                  # Safe Server Client (SSR cookies)
 ├── hooks/
-│   ├── useRoleRedirect.ts        # Redirect based on role
-│   └── useProfile.ts             # Fetch profile with role
-├── middleware/
-│   └── auth-middleware.ts        # Route protection (extends existing)
+│   ├── useRoleRedirect.ts             # Post-login role director
+│   └── useProfile.ts                  # Profile query & state synchronization
+├── middleware.ts                      # Edge Route Protection Guard
 ├── components/
 │   ├── auth/
-│   │   ├── RoleGate.tsx          # Wrapper for role-protected content
-│   │   ├── LoginForm.tsx         # Enhanced login with role detection
-│   │   ├── StaffInviteForm.tsx   # Admin/Manager invite staff (calls API route)
-│   │   └── UserAvatar.tsx        # Role badge + menu
-│   ├── layout/
-│   │   ├── RoleNavbar.tsx        # Role-aware navbar
-│   │   └── RoleSidebar.tsx       # Admin/Manager sidebar nav
+│   │   ├── RoleGate.tsx               # Declarative role-permission component wrapper
+│   │   ├── LoginForm.tsx              # Universal login with role auto-detection
+│   │   ├── StaffInviteModal.tsx       # Manager/Admin staff invite dialog
+│   │   └── UserAvatar.tsx             # Role badge, profile drawer, & logout trigger
 │   ├── admin/
-│   │   ├── UserManagement.tsx    # List/invite/remove staff
-│   │   ├── RoleBadge.tsx         # Visual role indicator
-│   │   └── InvitationManager.tsx # Pending/expired invites
+│   │   ├── UserManagement.tsx         # Staff directory, role switches, deactivations
+│   │   ├── RoleBadge.tsx              # Glowing status pills (Student/Staff/Manager/Admin)
+│   │   ├── ImpersonationSwitcher.tsx  # Founder 1-tap UI preview switcher
+│   │   └── InvitationManager.tsx      # Pending, accepted, and revoked invite logs
+│   ├── layout/
+│   │   ├── RoleNavbar.tsx             # Role-aware navigation bar
+│   │   └── RoleSidebar.tsx            # Manager & Admin drawer navigation
 │   └── display/
-│       └── AudioSettingsDrawer.tsx # Gated admin controls for /display
+│       └── AudioSettingsDrawer.tsx    # Gated admin settings for TV announcer
 ├── app/
-│   ├── display/page.tsx          # TV Counter Display (PUBLIC KIOSK)
-│   ├── menu/page.tsx             # Student Menu (PUBLIC BROWSE)
-│   ├── checkout/page.tsx         # Requires auth
-│   ├── order/[token]/page.tsx    # Requires auth
-│   ├── kds/page.tsx              # Kitchen staff & managers only
-│   ├── admin/                    # Admin & Manager Data Hub
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   ├── manager/                  # Canteen Manager views
-│   │   ├── layout.tsx
-│   │   ├── dashboard/page.tsx
-│   │   ├── menu/page.tsx
-│   │   ├── slots/page.tsx
-│   │   ├── orders/page.tsx
-│   │   ├── settlements/page.tsx
-│   │   └── staff/page.tsx
+│   ├── page.tsx                       # Landing Page & Order Mode Selector (Public)
+│   ├── menu/page.tsx                  # Student Menu & Cart (Public Guest Browse)
+│   ├── checkout/page.tsx              # Slot & Payment Gateway (Auth Required)
+│   ├── order/[token]/page.tsx         # Live Digital Pass & SSE Tracking (Auth Required)
+│   ├── display/page.tsx               # Big-Screen TV Counter Display (Public Kiosk)
+│   ├── kds/page.tsx                   # Kitchen Display & Live Stock Editor (Kitchen/Manager)
+│   ├── admin/page.tsx                 # Executive Manager & Founder Data Hub (Manager/Admin)
 │   ├── auth/
-│   │   ├── callback/route.ts     # OAuth callback
-│   │   ├── invite/[token]/page.tsx  # Staff invite acceptance
-│   │   └── logout/route.ts
-│   └── login/page.tsx            # Enhanced with role detection
-├── actions/
-│   └── admin/
-│       ├── invite.ts             # Server Action: create invitation
-│       ├── revoke-invitation.ts  # Server Action: revoke invitation
-│       ├── update-user-role.ts   # Server Action: change user role
-│       └── deactivate-user.ts    # Server Action: deactivate user
-└── api/
-    └── admin/
-        ├── invite/route.ts       # POST: create invitation (calls Server Action)
-        ├── invitations/route.ts  # GET: list invitations
-        ├── users/route.ts        # GET/POST: list users, invite
-        └── users/[id]/route.ts   # PATCH/DELETE: update role, deactivate
+│   │   ├── callback/route.ts          # OAuth & Magic Link Exchange Handler
+│   │   ├── invite/[token]/page.tsx    # Staff Invitation Acceptance Page
+│   │   └── logout/route.ts            # Session Termination Handler
+│   └── login/page.tsx                 # Universal Auth Screen
+├── actions/admin/                     # Secure Next.js 15 Server Actions
+│   ├── invite.ts                      # Server Action: createStaffInvitation()
+│   ├── revoke-invitation.ts           # Server Action: revokeInvitation()
+│   ├── update-user-role.ts            # Server Action: updateUserRole()
+│   └── deactivate-user.ts             # Server Action: deactivateUser()
+└── api/admin/                         # Internal Protected API Route Handlers
+    ├── invite/route.ts                # POST: create staff invitation
+    ├── invitations/route.ts           # GET: list pending invitations
+    ├── users/route.ts                 # GET: query staff roster
+    └── users/[id]/route.ts            # PATCH: modify role / DELETE: deactivate
 ```
 
-### 4.2 Role Detection & Routing Logic
+---
+
+## 5. Next.js 15 Edge Middleware Route Protection
+
 ```typescript
-// lib/auth/useAuth.ts
-interface UserProfile {
-  id: string;
-  email: string;
-  full_name: string;
-  role: 'student' | 'kitchen' | 'canteen_manager' | 'admin';
-  prn?: string;
-  department?: string;
-  avatar_url?: string;
-  is_active: boolean;
-  campus_id?: string;
-  cafeteria_id?: string;
-}
-
-const ROLE_ROUTES = {
-  student: '/menu',
-  kitchen: '/kds',
-  canteen_manager: '/manager/dashboard',
-  admin: '/admin',
-};
-
-const SESSION_DURATION = {
-  student: 30 * 24 * 60 * 60,  // 30 days
-  kitchen: 12 * 60 * 60,       // 12 hours
-  canteen_manager: 12 * 60 * 60,
-  admin: 12 * 60 * 60,
-};
-
-function getDefaultRoute(role: UserProfile['role']): string {
-  return ROLE_ROUTES[role] || '/menu';
-}
-
-function getSessionMaxAge(role: UserProfile['role']): number {
-  return SESSION_DURATION[role] || SESSION_DURATION.student;
-}
-```
-
-### 4.3 Middleware Route Protection
-```typescript
-// middleware.ts
+// frontend/src/middleware.ts
 import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 
-// ONLY these routes require authentication + role check
 const PROTECTED_ROUTES: Record<string, string[]> = {
   '/kds': ['kitchen', 'canteen_manager', 'admin'],
-  '/manager': ['canteen_manager', 'admin'],
-  '/admin': ['admin'],
-  '/checkout': ['student', 'canteen_manager', 'admin'], // auth required at checkout
-  '/order': ['student', 'canteen_manager', 'admin'],   // auth required for order tracking
+  '/admin': ['canteen_manager', 'admin'],
+  '/checkout': ['student', 'canteen_manager', 'admin'],
+  '/order': ['student', 'canteen_manager', 'admin'],
 };
 
-// PUBLIC routes (no auth, no redirect):
-// - /display (TV kiosk mode)
-// - /menu (guest browsing allowed)
-// - /login
-// - /auth/*
+// PUBLIC ROUTES (Never Redirect):
+// - / (Landing)
+// - /display (TV Kiosk Mode)
+// - /menu (Guest Browsing)
+// - /login (Auth)
+// - /auth/* (OAuth & Invites)
 
 export async function middleware(request: NextRequest) {
-  const { supabase, response } = createServerClient(request);
-  const { data: { user } } = await supabase.auth.getUser();
-  
-  const pathname = request.nextUrl.pathname;
-  
-  // Check if route is protected
-  const protectedEntry = Object.entries(PROTECTED_ROUTES).find(([route]) => 
-    pathname.startsWith(route)
+  let response = NextResponse.next({ request: { headers: request.headers } });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return request.cookies.getAll(); },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        },
+      },
+    }
   );
-  
+
+  const pathname = request.nextUrl.pathname;
+  const protectedEntry = Object.entries(PROTECTED_ROUTES).find(([route]) => pathname.startsWith(route));
+
   if (!protectedEntry) {
-    // Public route - allow through
-    return response;
+    return response; // Public route
   }
-  
+
   const [, allowedRoles] = protectedEntry;
-  
+  const { data: { user } } = await supabase.auth.getUser();
+
   if (!user) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Fetch profile for role
   const { data: profile } = await supabase
     .from('profiles')
     .select('role, is_active')
@@ -347,144 +331,94 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!allowedRoles.includes(profile.role)) {
-    // Redirect to role-appropriate dashboard
-    return NextResponse.redirect(new URL(getDefaultRoute(profile.role), request.url));
+    const defaultRoute = profile.role === 'kitchen' ? '/kds' : profile.role === 'admin' ? '/admin' : '/menu';
+    return NextResponse.redirect(new URL(defaultRoute, request.url));
   }
 
   return response;
 }
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+};
 ```
 
 ---
 
-## 5. Role-Specific UI Requirements
+## 6. Financial Split & Payout Rules
 
-### 5.1 Student (Guest Browse + Auth at Checkout)
-* `/menu`: Public browsing — no login required. Full menu, search, dietary badges, and filters work.
-* `/checkout`: Requires auth (Google SSO / PRN+OTP). Redirects to login with `?redirect=/checkout`.
-* `/order/[token]`: Live digital pass and tracking.
-* **Navbar:** Shows "Login" when guest; Cart/Orders/Profile when authenticated.
+| Revenue Dimension | Canteen Manager (Cafe @7) | Admin / Founder View |
+|---|---|---|
+| **Gross GMV** | ❌ Hidden | ✅ Visible |
+| **Canteen Net Food Sales** | ✅ Primary Metric (**96.6% Payout**) | ✅ Visible |
+| **Fast-Pass Platform Take** | ❌ Hidden | ✅ **3.4% Tech Platform Fee** |
+| **Cash-on-Delivery (COD)** | ✅ Visible (Cash Register Sum) | ✅ Visible |
+| **UPI Direct Settlements** | ✅ Verified Status | ✅ Full Bank UTR Audit Log |
+| **Kitchen Staff Invites** | ✅ Invite Kitchen Staff | ✅ Full Staff & Manager Invites |
+| **System Audit Trail** | ❌ Hidden | ✅ Full Audit Log Export |
 
-### 5.2 Kitchen Staff (`/kds`)
-* **Layout:** Full-screen KDS, sound alerts, no consumer navbar.
-* **Features:** Kanban board, live portion stock counters (`[-5]/[-1]/[+1]/[+5]`), 1-tap price adjust.
-* **Access:** Real-time orders, mark `PREPARING` $\rightarrow$ `READY` $\rightarrow$ `COLLECTED`.
-* **Restricted:** Platform financials, user management.
-
-### 5.3 Canteen Manager (`/manager/*` or `/admin`)
-* **Layout:** Operations dashboard.
-* **Tabs:**
-  * **Dashboard:** Real-time orders, slot capacity, today's stats.
-  * **Menu:** Full CRUD (add/edit/delete dishes, pricing, stock).
-  * **Slots:** Create/edit break slots, capacity management.
-  * **Orders:** Master ledger, status override, COD cash collection.
-  * **Settlements:** UTR verification, payment audit.
-  * **Staff:** Invite kitchen staff, view active staff.
-* **Financial View:** Canteen Net Food Sales only (96.6% food subtotal payout) — founder margin hidden.
-
-### 5.4 Admin / Founder (`/admin/*`)
-* **Layout:** Executive Manager & Admin Data Hub.
-* **Tabs:**
-  * **Dashboard:** Financial split waterfall (96.6% vs 3.4%), system health.
-  * **Users:** All users, invite staff, deactivate, role changes.
-  * **Financials:** Full Revenue Split Waterfall — Canteen (96.6%) + Founder Margin (3.4% Fast-Pass Tech Platform Surcharge), COD vs UPI, Bank UTR audits.
-  * **Audit:** System logs, RLS policy checks, API usage.
-  * **Settings:** Platform config, commission rates, campus setup.
-* **Permissions:** Full system access, financial split view, user management, impersonation toggle.
-
-### 5.5 TV Counter Display (`/display`) — Public Kiosk Mode
-* **No authentication required** — loads directly on TV browser.
-* Supabase Realtime streams orders via public anon key.
-* Audio Settings Drawer (voice language/mute) gated by `RoleGate` for `['kitchen', 'canteen_manager', 'admin']`.
-* Screen Wake Lock API active.
+### 🧮 Explicit Mathematical Formula:
+$$\text{Food Subtotal} = \frac{\text{Gross GMV}}{1.035}$$
+$$\text{Founder Fast-Pass Margin (3.4\%)} = \text{Gross GMV} - \text{Food Subtotal}$$
+$$\text{Canteen Payout (96.6\%)} = \text{Food Subtotal}$$
 
 ---
 
-## 6. Server Actions (No Service Role Key on Client)
+## 7. Declarative UI Component: `RoleGate.tsx`
 
-### 6.1 Admin Actions (`frontend/src/actions/admin/`)
-```typescript
-// actions/admin/invite.ts
-'use server';
-export async function createStaffInvitation(data: {
-  email: string;
-  role: 'kitchen' | 'canteen_manager';
-  campus_id: string;
-  cafeteria_id: string;
-}) {
-  const supabase = createServerActionClient(); // service role via server-only env
-  // 1. Create invitation record
-  // 2. Send magic link via supabase.auth.admin.inviteUserByEmail()
-  // 3. Log to audit_logs
+```tsx
+// frontend/src/components/auth/RoleGate.tsx
+'use client';
+
+import React from 'react';
+import { useAuth } from '@/lib/auth/useAuth';
+import { UserRole } from '@/lib/types';
+
+interface RoleGateProps {
+  children: React.ReactNode;
+  allowedRoles: UserRole[];
+  fallback?: React.ReactNode;
+}
+
+export function RoleGate({ children, allowedRoles, fallback = null }: RoleGateProps) {
+  const { profile, loading } = useAuth();
+
+  if (loading) return null;
+  if (!profile || !allowedRoles.includes(profile.role)) {
+    return <>{fallback}</>;
+  }
+
+  return <>{children}</>;
 }
 ```
 
-### 6.2 API Routes (`frontend/src/app/api/admin/`)
-* `/api/admin/invite/route.ts`: POST $\rightarrow$ create invitation.
-* `/api/admin/invitations/route.ts`: GET $\rightarrow$ list invitations.
-* `/api/admin/users/route.ts`: GET/POST $\rightarrow$ list users, invite.
-* `/api/admin/users/[id]/route.ts`: PATCH/DELETE $\rightarrow$ update role, deactivate.
+---
+
+## 8. Implementation Roadmap & Phased Execution
+
+| Phase | Milestone | Est. Time | Key Deliverables |
+|---|---|---|---|
+| **Phase 1** | Database & Schema Foundation | 4 hrs | `profiles`, `staff_invitations`, `audit_logs` DDL, triggers & RLS |
+| **Phase 2** | Auth Context & Middleware | 4 hrs | `useAuth`, `usePermissions`, Edge `middleware.ts`, `RoleGate` |
+| **Phase 3** | Navigation & Role Layouts | 3 hrs | `RoleNavbar`, `RoleSidebar`, `UserAvatar`, `ImpersonationSwitcher` |
+| **Phase 4** | Canteen Manager Dashboard | 5 hrs | 96.6% net sales view, slot overrides, order actions, kitchen invites |
+| **Phase 5** | Founder Admin & User Center | 5 hrs | User directory, 3.4% revenue waterfall, Server Actions, audit logs |
+| **Phase 6** | TV Display Kiosk & Polish | 3 hrs | Public kiosk `/display`, guest `/menu`, invite acceptance page |
+| **Total** | | **~24 hrs** | Full End-to-End Role-Based Access Control |
 
 ---
 
-## 7. Financial Split Contract (Explicit)
+## 9. Final Acceptance Checklist
 
-| Metric | Canteen Manager View | Admin / Founder View |
-|---|---|---|
-| **Gross GMV** | Hidden | ✅ Visible |
-| **Canteen Net Food Sales** | ✅ Primary metric (96.6%) | ✅ Visible |
-| **Founder Margin (3.4%)** | ❌ Hidden | ✅ "Fast-Pass Tech Platform Surcharge" |
-| **COD vs UPI Split** | ✅ Visible | ✅ Visible |
-| **UTR Verification** | ✅ Verify only | ✅ Full audit + export |
-| **Staff User Management** | ✅ Invite kitchen only | ✅ All roles + deactivate |
-| **Audit Logs** | ❌ Hidden | ✅ Full system audit |
-
-$$\text{Food Subtotal} = \frac{\text{Gross GMV}}{1.035}$$
-$$\text{Founder Margin} = \text{Gross GMV} - \text{Food Subtotal}\ (3.4\%)$$
-$$\text{Canteen Payout} = \text{Food Subtotal}\ (96.6\%)$$
+1. [x] **Public Browsing:** Students browse 44+ dishes on `/menu` without forced login.
+2. [x] **Checkout Auth:** Student identity captured at `/checkout` with 30-day session persistence.
+3. [x] **TV Display Kiosk:** `/display` operates 24/7 on cafeteria screens with zero login requirements.
+4. [x] **Kitchen Isolation:** Kitchen staff on `/kds` are locked out of financial and user management.
+5. [x] **Manager Clarity:** Canteen manager views only their 96.6% food sales payout.
+6. [x] **Founder Mastery:** Founder views full 3.4% fast-pass waterfall and manages all staff.
+7. [x] **Zero Service Key Leakage:** No `SERVICE_ROLE_KEY` in client code; all admin ops run in Server Actions.
+8. [x] **Invite Expiry:** Staff invitations expire after 7 days and are single-use.
 
 ---
 
-## 8. Implementation Phases
-
-| Phase | Description | Est. Hours |
-|---|---|---|
-| **Phase 1: Database & Auth Foundation** | Profiles table extensions, `staff_invitations` + `audit_logs` tables, RLS policies, Supabase Auth config. | 4 hrs |
-| **Phase 2: Auth Context & Middleware** | `useAuth` hook, `usePermissions` hook, `middleware.ts` (public `/display`, `/menu`), `RoleGate.tsx`. | 4 hrs |
-| **Phase 3: Public + Protected Layouts** | Canonical flat URLs, `RoleNavbar`, `RoleSidebar`. | 3 hrs |
-| **Phase 4: Manager Dashboard** | Menu CRUD, slot management, orders oversight, UTR verify, staff management. | 5 hrs |
-| **Phase 5: Admin Dashboard & User Mgmt** | Full user management, financial split dashboard (96.6% / 3.4%), audit logs, Server Actions. | 5 hrs |
-| **Phase 6: TV Display + Polish** | Public `/display` with gated AudioSettingsDrawer, guest `/menu`, invite acceptance page, avatar menu. | 3 hrs |
-| **Total** | | **~24 hrs** |
-
----
-
-## 9. Resolved Architectural Decisions
-
-| # | Decision | Resolution |
-|---|---|---|
-| **1** | **Multi-Campus** | Added `campus_id` & `cafeteria_id` to `profiles` with defaults to Sanjivani University (`Cafe @7`). Ready for multi-campus expansion. |
-| **2** | **Student Registration** | Auto-create profile with `role: 'student'` on first Google OAuth (`@sanjivani.edu.in`) or Phone OTP login. Staff roles remain invite-only. |
-| **3** | **Session Duration** | 30 days for students (semester-long); 12 hours for staff/kitchen kiosk tablets (shift-based). |
-| **4** | **Impersonation** | Add Admin "View As" toggle in `/admin` to preview Student/Kitchen/Manager UIs without altering database tokens. |
-| **5** | **Audit Logging** | Added `audit_logs` table (`actor_id`, `action`, `target_type`, `target_id`, `metadata`, `created_at`). RLS: Admin sees all, Manager sees own actions. |
-| **6** | **Password Reset** | Standard Supabase Auth reset emails with FoodLine-branded templates. |
-
----
-
-## 10. Acceptance Criteria
-
-1. **Student Flow:** Guest browses `/menu` $\rightarrow$ Auth at `/checkout` (Google SSO / PRN+OTP) $\rightarrow$ digital pass generated.
-2. **TV Display:** `/display` loads directly on TV kiosk without auth $\rightarrow$ Supabase Realtime streams orders $\rightarrow$ Audio settings gated by `RoleGate`.
-3. **Kitchen Staff:** Email invite $\rightarrow$ set password $\rightarrow$ `/kds` $\rightarrow$ kanban + stock steppers only.
-4. **Canteen Manager:** Email invite $\rightarrow$ `/manager/dashboard` $\rightarrow$ full CRUD menu/slots/orders/settlements $\rightarrow$ sees Canteen Net Food Sales (96.6%) only.
-5. **Admin:** Email invite $\rightarrow$ `/admin` $\rightarrow$ user management + Full Revenue Split (96.6% / 3.4%) + audit + impersonation.
-6. **Route Protection:** Unauthorized access redirects to role-appropriate dashboard; `/display` and `/menu` never redirect.
-7. **RLS Enforcement:** Database-level protection matches UI permissions.
-8. **No Service Role on Client:** All admin operations via Server Actions / API Routes.
-9. **Session Persistence:** 30d student, 12h staff, survives page refresh.
-10. **Invite Expiry:** 7 days, one-time use, revocable.
-
----
-
-**Plan saved to:** [`.opencode/plans/USER_ROLES_PLAN.md`](file:///run/media/darkkakashi/Laptop%20NVME%20Data%20Drive/old%20windows%2011/desktop/PPT%20OTHER%20TASKES/.opencode/plans/USER_ROLES_PLAN.md)
+**Master Plan saved to:** [`.opencode/plans/USER_ROLES_PLAN.md`](file:///run/media/darkkakashi/Laptop%20NVME%20Data%20Drive/old%20windows%2011/desktop/PPT%20OTHER%20TASKES/.opencode/plans/USER_ROLES_PLAN.md)
