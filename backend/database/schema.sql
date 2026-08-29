@@ -1,9 +1,14 @@
 -- ==============================================================================
--- 🚀 FOODLINE CAMPUS DINING ECOSYSTEM — SUPABASE POSTGRESQL SCHEMA (CLEAN RESET)
+-- 🚀 FOODLINE CAMPUS DINING ECOSYSTEM — SUPABASE POSTGRESQL SCHEMA (WITH USER ROLES)
 -- Target Campus: Sanjivani University, Kopargaon | Outlet: Cafe @7
+-- Roles: student, kitchen, canteen_manager, admin
 -- ==============================================================================
 
 -- 0. CLEAN SLATE RESET (Drop existing conflicting tables if any)
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user();
+DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TABLE IF EXISTS staff_invitations CASCADE;
 DROP TABLE IF EXISTS payments CASCADE;
 DROP TABLE IF EXISTS order_items CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
@@ -21,6 +26,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE campuses (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) NOT NULL,
+    slug VARCHAR(100) UNIQUE NOT NULL DEFAULT 'sanjivani',
     location VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -29,26 +35,73 @@ CREATE TABLE cafeterias (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     campus_id UUID REFERENCES campuses(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
+    slug VARCHAR(100) UNIQUE NOT NULL DEFAULT 'cafe7',
     upi_id VARCHAR(255) NOT NULL DEFAULT '9960091371@slc',
     fssai_license_no VARCHAR(50) DEFAULT '11522036000142',
     is_pure_veg BOOLEAN DEFAULT TRUE,
-    commission_rate NUMERIC(4, 2) DEFAULT 0.12,
+    commission_rate NUMERIC(4, 2) DEFAULT 0.035, -- 3.5% fast-pass fee
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. PROFILES (Linked to Supabase Auth)
+-- 3. PROFILES (Linked to Supabase Auth & Role-Based Access)
 CREATE TABLE profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     email VARCHAR(255) NOT NULL,
     full_name VARCHAR(255),
     prn VARCHAR(100),
     department VARCHAR(100),
-    role VARCHAR(50) DEFAULT 'student' CHECK (role IN ('student', 'staff', 'kitchen', 'admin')),
+    phone VARCHAR(20),
+    avatar_url TEXT,
+    role VARCHAR(50) DEFAULT 'student' CHECK (role IN ('student', 'kitchen', 'canteen_manager', 'admin')),
+    is_active BOOLEAN DEFAULT TRUE,
+    last_login_at TIMESTAMPTZ,
+    invited_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    invited_at TIMESTAMPTZ,
+    accepted_at TIMESTAMPTZ,
+    campus_id UUID REFERENCES campuses(id) ON DELETE SET NULL,
+    cafeteria_id UUID REFERENCES cafeterias(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. CATEGORIES & MENU (44 Verified Dishes)
+CREATE INDEX idx_profiles_role ON profiles(role);
+CREATE INDEX idx_profiles_campus ON profiles(campus_id);
+CREATE INDEX idx_profiles_cafeteria ON profiles(cafeteria_id);
+
+-- 4. STAFF INVITATIONS TABLE (7-Day Expiry)
+CREATE TABLE staff_invitations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL CHECK (role IN ('kitchen', 'canteen_manager')),
+    campus_id UUID REFERENCES campuses(id) ON DELETE CASCADE,
+    cafeteria_id UUID REFERENCES cafeterias(id) ON DELETE CASCADE,
+    invited_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    token VARCHAR(64) UNIQUE NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'expired', 'revoked')),
+    expires_at TIMESTAMPTZ DEFAULT (NOW() + INTERVAL '7 days'),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    accepted_at TIMESTAMPTZ
+);
+
+CREATE INDEX idx_staff_invitations_token ON staff_invitations(token);
+CREATE INDEX idx_staff_invitations_email ON staff_invitations(email);
+
+-- 5. AUDIT LOGS TABLE
+CREATE TABLE audit_logs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    actor_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+    action VARCHAR(100) NOT NULL,
+    target_type VARCHAR(50), -- 'user', 'menu_item', 'slot', 'order', 'invitation', 'financial'
+    target_id UUID,
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_audit_logs_actor ON audit_logs(actor_id);
+CREATE INDEX idx_audit_logs_target ON audit_logs(target_type, target_id);
+CREATE INDEX idx_audit_logs_created ON audit_logs(created_at DESC);
+
+-- 6. CATEGORIES & MENU (44 Verified Dishes)
 CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(100) NOT NULL,
@@ -73,7 +126,7 @@ CREATE TABLE menu_items (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. SLOTS & CAPACITY MANAGEMENT
+-- 7. SLOTS & CAPACITY MANAGEMENT
 CREATE TABLE pickup_slots (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     cafeteria_id UUID REFERENCES cafeterias(id) ON DELETE CASCADE,
@@ -85,7 +138,7 @@ CREATE TABLE pickup_slots (
     is_active BOOLEAN DEFAULT TRUE
 );
 
--- 6. ORDERS & ORDER ITEMS
+-- 8. ORDERS & ORDER ITEMS
 CREATE TABLE orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     order_token VARCHAR(20) UNIQUE NOT NULL,
@@ -97,9 +150,9 @@ CREATE TABLE orders (
     merchant_payout_amount NUMERIC(10, 2) DEFAULT 0.00,
     platform_fee_amount NUMERIC(10, 2) DEFAULT 0.00,
     dpdp_consent_given BOOLEAN DEFAULT TRUE,
-    status VARCHAR(50) DEFAULT 'PENDING_PAYMENT' CHECK (status IN ('PENDING_PAYMENT', 'CONFIRMED', 'PREPARING', 'READY', 'COLLECTED', 'CANCELLED')),
-    pickup_otp VARCHAR(6),
-    notes TEXT,
+    status VARCHAR(50) DEFAULT 'PENDING_PAYMENT' CHECK (status IN ('PENDING_PAYMENT', 'PAY_AT_COUNTER', 'CONFIRMED', 'PREPARING', 'READY', 'COLLECTED', 'CANCELLED')),
+    pickup_otp VARCHAR(10) NOT NULL,
+    payment_method VARCHAR(20) DEFAULT 'UPI' CHECK (payment_method IN ('UPI', 'COD')),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -114,11 +167,11 @@ CREATE TABLE order_items (
     subtotal NUMERIC(10, 2) NOT NULL
 );
 
--- 7. PAYMENTS & UTR VERIFICATION
+-- 9. PAYMENTS & UTR FRAUD PROTECTION
 CREATE TABLE payments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    order_id UUID REFERENCES orders(id) ON DELETE CASCADE,
-    utr_number VARCHAR(12) UNIQUE NOT NULL,
+    order_id UUID UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
+    utr_number VARCHAR(12) UNIQUE,
     amount NUMERIC(10, 2) NOT NULL,
     status VARCHAR(50) DEFAULT 'PENDING_VERIFICATION' CHECK (status IN ('PENDING_VERIFICATION', 'VERIFIED', 'FAILED')),
     verified_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
@@ -126,183 +179,145 @@ CREATE TABLE payments (
     verified_at TIMESTAMPTZ
 );
 
--- ==============================================================================
--- 📦 SEED DATA: SANJIVANI UNIVERSITY CAFE @7 COMPLETE 44-DISH MENU
--- ==============================================================================
-
-DO $$
-DECLARE
-    campus_uuid UUID := uuid_generate_v4();
-    cafe_uuid UUID := uuid_generate_v4();
-    cat_quick UUID := uuid_generate_v4();
-    cat_south_north UUID := uuid_generate_v4();
-    cat_sandwich UUID := uuid_generate_v4();
-    cat_momo_burger UUID := uuid_generate_v4();
-    cat_fries_pasta UUID := uuid_generate_v4();
-    cat_bread_pizza UUID := uuid_generate_v4();
-    cat_chinese_rice UUID := uuid_generate_v4();
-    cat_beverages UUID := uuid_generate_v4();
+-- 10. AUTH USER REGISTRATION TRIGGER
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
 BEGIN
-    -- 1. Campus & Cafe
-    INSERT INTO campuses (id, name, location)
-    VALUES (campus_uuid, 'Sanjivani University', 'Kopargaon, Maharashtra');
+  INSERT INTO public.profiles (
+    id,
+    email,
+    full_name,
+    role,
+    is_active,
+    created_at
+  )
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', 'Campus Student'),
+    'student',
+    TRUE,
+    NOW()
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    last_login_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
-    INSERT INTO cafeterias (id, campus_id, name, upi_id)
-    VALUES (cafe_uuid, campus_uuid, 'Cafe @7', 'cafe7.sanjivani@upi');
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
-    -- 2. Categories
-    INSERT INTO categories (id, name, icon, display_order) VALUES
-    (cat_quick, 'Quick Bites & Chaat', '🥪', 1),
-    (cat_south_north, 'South & North Indian', '🥞', 2),
-    (cat_sandwich, 'Loaded Sandwiches', '🥪', 3),
-    (cat_momo_burger, 'Momos & Burgers', '🍔', 4),
-    (cat_fries_pasta, 'Fries & Pastas', '🍟', 5),
-    (cat_bread_pizza, 'Garlic Bread & Pizzas', '🍕', 6),
-    (cat_chinese_rice, 'Maggi, Chinese & Rice', '🍜', 7),
-    (cat_beverages, 'Beverages & Desserts', '☕', 8);
-
-    -- 3. Menu Items (All 44 Dishes)
-    -- Quick Bites & Chaat
-    INSERT INTO menu_items (cafeteria_id, category_id, name, tag, price) VALUES
-    (cafe_uuid, cat_quick, 'Dabeli', 'Fast Grab', 20),
-    (cafe_uuid, cat_quick, 'Vada Pav', 'Campus Classic', 20),
-    (cafe_uuid, cat_quick, 'Poha', 'Morning Breakfast', 25),
-    (cafe_uuid, cat_quick, 'Samosa', 'Fast Grab', 20),
-    (cafe_uuid, cat_quick, 'Kachori', 'Fast Grab', 20),
-    (cafe_uuid, cat_quick, 'Pani Puri', 'Chaat Corner', 30),
-    (cafe_uuid, cat_quick, 'Sev Puri - Dahi Puri', 'Chaat Corner', 40),
-    (cafe_uuid, cat_quick, 'Mumbai Bhel', 'Chaat Corner', 40),
-    (cafe_uuid, cat_quick, 'Papdi Chat', 'Chaat Corner', 40),
-    (cafe_uuid, cat_quick, 'Cheese Grill Vada Pav', 'Special Grab', 50),
-    (cafe_uuid, cat_quick, 'Samosa Chole Tikki', 'Chaat Special', 50),
-    (cafe_uuid, cat_quick, 'Aalu Chole Tikki', 'Chaat Special', 50),
-    (cafe_uuid, cat_quick, 'Dahi Kachori', 'Chaat Special', 50);
-
-    -- South & North Indian
-    INSERT INTO menu_items (cafeteria_id, category_id, name, tag, price) VALUES
-    (cafe_uuid, cat_south_north, 'Masala Dosa', 'South Indian Bestseller', 50),
-    (cafe_uuid, cat_south_north, 'Cheese Masala Dosa', 'South Indian Special', 80),
-    (cafe_uuid, cat_south_north, 'Onion Uttapa', 'South Indian', 50),
-    (cafe_uuid, cat_south_north, 'Cheese Onion Uttapa', 'South Indian Special', 80),
-    (cafe_uuid, cat_south_north, 'Chole Bhature', 'North Indian Special', 100);
-
-    -- Sandwiches
-    INSERT INTO menu_items (cafeteria_id, category_id, name, tag, price) VALUES
-    (cafe_uuid, cat_sandwich, 'Veg. Sandwich', 'Plain / Toasted', 60),
-    (cafe_uuid, cat_sandwich, 'Veg. Cheese Sandwich', 'Cheese Loaded', 80),
-    (cafe_uuid, cat_sandwich, 'Veg. Cheese Grill Sandwich', 'Hot Grill Bestseller', 100),
-    (cafe_uuid, cat_sandwich, 'Bombay Grill Sandwich', 'Signature Grill', 110),
-    (cafe_uuid, cat_sandwich, 'Cutlet Club Sandwich', 'Triple Decker', 90);
-
-    -- Momos & Burgers
-    INSERT INTO menu_items (cafeteria_id, category_id, name, tag, price) VALUES
-    (cafe_uuid, cat_momo_burger, 'Veg Fried Momo', 'Hot Snacks', 70),
-    (cafe_uuid, cat_momo_burger, 'Paneer Fried Momo', 'Premium Snacks', 90),
-    (cafe_uuid, cat_momo_burger, 'Aalu Tikki Burger', 'Classic Burger', 70),
-    (cafe_uuid, cat_momo_burger, 'Veg Cheese Burger', 'Cheese Burger', 80),
-    (cafe_uuid, cat_momo_burger, 'Cheese Burst Burger', 'Chef Special', 90);
-
-    -- Fries & Pastas
-    INSERT INTO menu_items (cafeteria_id, category_id, name, tag, price) VALUES
-    (cafe_uuid, cat_fries_pasta, 'Salted Fries', 'Crispy Fries', 60),
-    (cafe_uuid, cat_fries_pasta, 'Peri Peri Fries', 'Student Favorite', 80),
-    (cafe_uuid, cat_fries_pasta, 'Pink Sauce Pasta', 'Italian Fusion', 100),
-    (cafe_uuid, cat_fries_pasta, 'Arrabiata Pasta', 'Red Sauce Spicy', 130),
-    (cafe_uuid, cat_fries_pasta, 'White Sauce Pasta', 'Creamy Alfredo', 150);
-
-    -- Garlic Bread & Pizzas
-    INSERT INTO menu_items (cafeteria_id, category_id, name, tag, price) VALUES
-    (cafe_uuid, cat_bread_pizza, 'Plain Garlic Bread', 'Oven Baked', 80),
-    (cafe_uuid, cat_bread_pizza, 'Cheese Chilli Toast', 'Spicy Cheese', 100),
-    (cafe_uuid, cat_bread_pizza, 'Cheese Garlic Bread', 'Melted Mozzarella', 110),
-    (cafe_uuid, cat_bread_pizza, 'Veg Loaded Pizza', '7-inch Thin Crust', 130),
-    (cafe_uuid, cat_bread_pizza, 'Cheese Corn Delight', 'Sweet Corn & Cheese', 130),
-    (cafe_uuid, cat_bread_pizza, 'Margherita Pizza', 'Classic Cheese', 140),
-    (cafe_uuid, cat_bread_pizza, 'Paneer Tandoori Pizza', 'Desi Tandoori', 150);
-
-    -- Maggi, Chinese & Rice
-    INSERT INTO menu_items (cafeteria_id, category_id, name, tag, price) VALUES
-    (cafe_uuid, cat_chinese_rice, 'Plain Maggie', 'Instant 2-Min', 40),
-    (cafe_uuid, cat_chinese_rice, 'Veg Cheese Maggie', 'Cheesy Maggi', 60),
-    (cafe_uuid, cat_chinese_rice, 'Veg Fried Maggie', 'Wok Tossed', 80),
-    (cafe_uuid, cat_chinese_rice, 'Dry Manchurian', 'Indo-Chinese', 90),
-    (cafe_uuid, cat_chinese_rice, 'Veg Fried Rice', 'Wok Fried', 90),
-    (cafe_uuid, cat_chinese_rice, 'Schezwan Fried Rice', 'Spicy Schezwan', 100),
-    (cafe_uuid, cat_chinese_rice, 'Soya Chilli', 'Protein Wok', 110),
-    (cafe_uuid, cat_chinese_rice, 'Paneer Chilli', 'Chinese Bestseller', 130);
-
-    -- Beverages & Desserts
-    INSERT INTO menu_items (cafeteria_id, category_id, name, tag, price) VALUES
-    (cafe_uuid, cat_beverages, 'Special Tea', 'Campus Fuel', 10),
-    (cafe_uuid, cat_beverages, 'Hot Coffee', 'Hot Brew', 20),
-    (cafe_uuid, cat_beverages, 'Hot Chocolate', 'Sweet Cocoa', 30),
-    (cafe_uuid, cat_beverages, 'Cold Coffee', 'Student Favorite', 50),
-    (cafe_uuid, cat_beverages, 'Cold Chocolate', 'Chilled Cocoa', 50),
-    (cafe_uuid, cat_beverages, 'Oreo Shake', 'Thick Shake', 90),
-    (cafe_uuid, cat_beverages, 'KitKat Shake', 'Thick Shake', 90),
-    (cafe_uuid, cat_beverages, 'Brownie Thick Shake', 'Gourmet Thick Shake', 110),
-    (cafe_uuid, cat_beverages, 'Hot Gulab Jamun with Ice-Cream', 'Dessert Classic', 80),
-    (cafe_uuid, cat_beverages, 'Hot Brownie with Ice-Cream', 'Sizzling Dessert', 100);
-
-    -- 4. Pickup Slots
-    INSERT INTO pickup_slots (cafeteria_id, label, start_time, end_time, max_capacity) VALUES
-    (cafe_uuid, 'Morning Break (10:15 AM - 10:35 AM)', '10:15:00', '10:35:00', 60),
-    (cafe_uuid, 'Lunch Shift 1 (11:50 AM - 12:10 PM)', '11:50:00', '12:10:00', 60),
-    (cafe_uuid, 'Lunch Shift 2 (12:10 PM - 12:30 PM)', '12:10:00', '12:30:00', 60),
-    (cafe_uuid, 'Lunch Shift 3 (12:30 PM - 12:50 PM)', '12:30:00', '12:50:00', 60),
-    (cafe_uuid, 'Afternoon Snack (03:30 PM - 03:50 PM)', '15:30:00', '15:50:00', 60);
-
-END $$;
-
--- 8. ENABLE ROW LEVEL SECURITY (RLS) & POLICIES
-ALTER TABLE campuses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE cafeterias ENABLE ROW LEVEL SECURITY;
-ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE menu_items ENABLE ROW LEVEL SECURITY;
-ALTER TABLE pickup_slots ENABLE ROW LEVEL SECURITY;
+-- 11. ROW LEVEL SECURITY (RLS) POLICIES
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE staff_invitations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE menu_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+ALTER TABLE pickup_slots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
--- Public Read Policies
-CREATE POLICY "Allow public read for campuses" ON campuses FOR SELECT USING (true);
-CREATE POLICY "Allow public read for cafeterias" ON cafeterias FOR SELECT USING (true);
-CREATE POLICY "Allow public read for categories" ON categories FOR SELECT USING (true);
-CREATE POLICY "Allow public read for menu_items" ON menu_items FOR SELECT USING (true);
-CREATE POLICY "Allow public read for pickup_slots" ON pickup_slots FOR SELECT USING (true);
-
 -- Profiles Policies
-CREATE POLICY "Allow users to read own profile" ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Allow users to update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Allow profile insert during signup" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "profiles_select_own" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "profiles_select_admin" ON profiles FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "profiles_select_manager" ON profiles FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
+  AND role IN ('kitchen', 'canteen_manager', 'student')
+);
 
 -- Orders Policies
-CREATE POLICY "Allow users to read own orders" ON orders FOR SELECT USING (auth.uid() = user_id OR user_id IS NULL);
-CREATE POLICY "Allow users to insert orders" ON orders FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow staff to update order status" ON orders FOR UPDATE USING (true);
+CREATE POLICY "orders_select_student" ON orders FOR SELECT USING (
+  auth.uid() = user_id OR user_id IS NULL
+);
+CREATE POLICY "orders_select_staff" ON orders FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('kitchen', 'canteen_manager', 'admin'))
+);
+CREATE POLICY "orders_update_staff" ON orders FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('kitchen', 'canteen_manager', 'admin'))
+);
 
--- Order Items Policies
-CREATE POLICY "Allow public read of order items" ON order_items FOR SELECT USING (true);
-CREATE POLICY "Allow inserting order items" ON order_items FOR INSERT WITH CHECK (true);
+-- Menu Items Policies
+CREATE POLICY "menu_items_select_public" ON menu_items FOR SELECT USING (true);
+CREATE POLICY "menu_items_manage_manager" ON menu_items FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
+);
+CREATE POLICY "menu_items_stock_kitchen" ON menu_items FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('kitchen', 'canteen_manager', 'admin'))
+) WITH CHECK (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('kitchen', 'canteen_manager', 'admin'))
+);
+
+-- Categories & Slots Public Policies
+CREATE POLICY "categories_select_public" ON categories FOR SELECT USING (true);
+CREATE POLICY "pickup_slots_select_public" ON pickup_slots FOR SELECT USING (true);
+CREATE POLICY "pickup_slots_manage_manager" ON pickup_slots FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
+);
 
 -- Payments Policies
-CREATE POLICY "Allow users to insert payment UTR" ON payments FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow staff to verify payment" ON payments FOR ALL USING (true);
+CREATE POLICY "payments_insert_student" ON payments FOR INSERT WITH CHECK (true);
+CREATE POLICY "payments_verify_staff" ON payments FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
+);
+CREATE POLICY "payments_select_admin" ON payments FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+);
 
--- 9. ENABLE REALTIME PUBLICATION
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'orders') THEN
-        ALTER PUBLICATION supabase_realtime ADD TABLE orders;
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'order_items') THEN
-        ALTER PUBLICATION supabase_realtime ADD TABLE order_items;
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'menu_items') THEN
-        ALTER PUBLICATION supabase_realtime ADD TABLE menu_items;
-    END IF;
-    IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'pickup_slots') THEN
-        ALTER PUBLICATION supabase_realtime ADD TABLE pickup_slots;
-    END IF;
-END $$;
+-- Staff Invitations Policies
+CREATE POLICY "invitations_select_admin" ON staff_invitations FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
+  OR email = (SELECT email FROM profiles WHERE id = auth.uid())
+);
+CREATE POLICY "invitations_manage_admin" ON staff_invitations FOR ALL USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('canteen_manager', 'admin'))
+);
+
+-- Audit Logs Policies
+CREATE POLICY "audit_logs_select_admin" ON audit_logs FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "audit_logs_select_manager" ON audit_logs FOR SELECT USING (
+  EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'canteen_manager')
+  AND actor_id = auth.uid()
+);
+
+-- ==============================================================================
+-- 12. SEED DATA (Sanjivani University Cafe @7 Pilot)
+-- ==============================================================================
+
+-- Campuses
+INSERT INTO campuses (id, name, slug, location)
+VALUES ('a1111111-1111-1111-1111-111111111111', 'Sanjivani University', 'sanjivani', 'Kopargaon, Maharashtra');
+
+-- Cafeterias
+INSERT INTO cafeterias (id, campus_id, name, slug, upi_id, fssai_license_no, is_pure_veg)
+VALUES ('b2222222-2222-2222-2222-222222222222', 'a1111111-1111-1111-1111-111111111111', 'Cafe @7', 'cafe7', '9960091371@slc', '11522036000142', TRUE);
+
+-- Categories
+INSERT INTO categories (id, name, icon, display_order) VALUES
+('c1111111-1111-1111-1111-111111111111', 'Chaat', '🥗', 1),
+('c2222222-2222-2222-2222-222222222222', 'South Indian', '🥞', 2),
+('c3333333-3333-3333-3333-333333333333', 'Rolls', '🌯', 3),
+('c4444444-4444-4444-4444-444444444444', 'Burgers & Sandwiches', '🍔', 4),
+('c5555555-5555-5555-5555-555555555555', 'Pizza', '🍕', 5),
+('c6666666-6666-6666-6666-666666666666', 'Hot Snacks', '🍟', 6),
+('c7777777-7777-7777-7777-777777777777', 'Beverages', '🥤', 7),
+('c8888888-8888-8888-8888-888888888888', 'Desserts', '🍨', 8);
+
+-- Break Slots
+INSERT INTO pickup_slots (id, cafeteria_id, label, start_time, end_time, max_capacity, current_booked) VALUES
+('d1111111-1111-1111-1111-111111111111', 'b2222222-2222-2222-2222-222222222222', 'Morning Break (10:15 - 10:30 AM)', '10:15:00', '10:30:00', 60, 0),
+('d2222222-2222-2222-2222-222222222222', 'b2222222-2222-2222-2222-222222222222', 'Lunch Break (12:30 - 01:15 PM)', '12:30:00', '13:15:00', 60, 0),
+('d3333333-3333-3333-3333-333333333333', 'b2222222-2222-2222-2222-222222222222', 'Tea Break (03:30 - 03:45 PM)', '15:30:00', '15:45:00', 60, 0),
+('d4444444-4444-4444-4444-444444444444', 'b2222222-2222-2222-2222-222222222222', 'Evening Snack (05:00 - 05:30 PM)', '17:00:00', '17:30:00', 60, 0);
+
+-- Enable Realtime for orders, menu_items, pickup_slots, audit_logs
+ALTER PUBLICATION supabase_realtime ADD TABLE orders;
+ALTER PUBLICATION supabase_realtime ADD TABLE menu_items;
+ALTER PUBLICATION supabase_realtime ADD TABLE pickup_slots;
+ALTER PUBLICATION supabase_realtime ADD TABLE audit_logs;

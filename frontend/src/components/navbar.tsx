@@ -21,6 +21,7 @@ import { useCart } from '@/context/CartContext';
 import { useTheme, THEMES, ThemeName } from '@/context/ThemeContext';
 import { useSoundFX } from '@/hooks/useSoundFX';
 import { Logo } from '@/components/ui/Logo';
+import { UserAvatar } from '@/components/auth/UserAvatar';
 
 export function Navbar() {
   const { totalCount } = useCart();
@@ -82,10 +83,6 @@ export function Navbar() {
               <BarChart3 size={16} />
               <span>Manager & Admin</span>
             </NavLink>
-            <NavLink href="/login" onClick={playTab}>
-              <LogIn size={16} />
-              <span>Login</span>
-            </NavLink>
 
             {/* Sound FX Toggle Button */}
             <button
@@ -145,6 +142,11 @@ export function Navbar() {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </div>
+
+            {/* User Profile / Auth Avatar */}
+            <div className="ml-2">
+              <UserAvatar />
             </div>
 
             {/* Cart Tray Pill */}

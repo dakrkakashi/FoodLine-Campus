@@ -211,3 +211,46 @@ export interface DisplayOrder extends Order {
   isJustReady?: boolean;
 }
 
+export type UserRole = 'student' | 'kitchen' | 'canteen_manager' | 'admin';
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  full_name?: string;
+  prn?: string;
+  department?: string;
+  phone?: string;
+  avatar_url?: string;
+  role: UserRole;
+  is_active: boolean;
+  campus_id?: string;
+  cafeteria_id?: string;
+  last_login_at?: string;
+  created_at?: string;
+}
+
+export interface StaffInvitation {
+  id: string;
+  email: string;
+  role: 'kitchen' | 'canteen_manager';
+  campus_id: string;
+  cafeteria_id: string;
+  invited_by?: string;
+  token: string;
+  status: 'pending' | 'accepted' | 'expired' | 'revoked';
+  expires_at: string;
+  created_at: string;
+  accepted_at?: string;
+}
+
+export interface AuditLog {
+  id: string;
+  actor_id?: string;
+  actor_email?: string;
+  action: string;
+  target_type?: 'user' | 'menu_item' | 'slot' | 'order' | 'invitation' | 'financial';
+  target_id?: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+}
+
