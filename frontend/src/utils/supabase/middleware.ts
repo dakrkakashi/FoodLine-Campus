@@ -15,6 +15,7 @@ const PUBLIC_ROUTES = [
   '/login',
   '/display', // Public TV counter display kiosk in cafeteria
   '/auth',
+  '/terms',
 ];
 
 export const updateSession = async (request: NextRequest) => {
@@ -47,8 +48,11 @@ export const updateSession = async (request: NextRequest) => {
 
   const pathname = request.nextUrl.pathname;
 
-  // 1. Allow public routes & API requests immediately
-  const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+  // 1. Allow public landing page, TV display, login, terms & API requests immediately
+  const isPublicRoute =
+    pathname === '/' ||
+    PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+
   if (isPublicRoute || pathname.startsWith('/api') || pathname.startsWith('/_next') || pathname.includes('.')) {
     return supabaseResponse;
   }
