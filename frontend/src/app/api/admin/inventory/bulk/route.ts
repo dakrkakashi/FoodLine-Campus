@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { setBulkInventoryState } from '@/lib/stock-store';
 import localMenu from '@/data/menu.json';
 
 const supabase = createClient(
@@ -21,6 +22,9 @@ export async function POST(request: Request) {
 
     const isAvailable = action === 'ALL_IN_STOCK';
     const defaultQty = isAvailable ? 30 : 0;
+
+    // 1. Instantly update in-memory & disk inventory store
+    setBulkInventoryState(action, defaultQty, category);
 
     let updateQuery = supabase.from('menu_items').update({
       is_available: isAvailable,

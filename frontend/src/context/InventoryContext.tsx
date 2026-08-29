@@ -37,6 +37,15 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refresh();
 
+    const interval = setInterval(() => {
+      refresh();
+    }, 3000);
+
+    const onFocus = () => {
+      refresh();
+    };
+    window.addEventListener('focus', onFocus);
+
     try {
       const supabase = createClient();
       const channel = supabase
@@ -70,10 +79,16 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
         .subscribe();
 
       return () => {
+        clearInterval(interval);
+        window.removeEventListener('focus', onFocus);
         supabase.removeChannel(channel);
       };
     } catch (e) {
       console.warn('Realtime inventory channel subscription error:', e);
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('focus', onFocus);
+      };
     }
   }, [refresh]);
 

@@ -7,6 +7,7 @@
 import fs from 'fs';
 import path from 'path';
 import { InventoryType, InventoryStatus, MenuItem } from './types';
+import localMenu from '@/data/menu.json';
 
 // Global singleton map to survive Next.js module evaluations
 const globalForStock = globalThis as unknown as {
@@ -337,5 +338,36 @@ export function resetAllStock() {
   persistentStockMap.clear();
   dailyFreshBatchIds.clear();
   globalForStock.morningBatchConfigured = false;
+  saveStateToDisk();
+}
+
+/**
+ * ⚡ Atomic Bulk Stock Update for All Dishes across Campus
+ */
+export function setBulkInventoryState(
+  action: 'ALL_IN_STOCK' | 'ALL_OUT_OF_STOCK',
+  quantity: number = 30,
+  category?: string
+) {
+  loadStateFromDisk();
+  const isAvailable = action === 'ALL_IN_STOCK';
+  const targetQty = isAvailable ? quantity : 0;
+
+  const allDishes = (localMenu as any[]).map((m) => ({ id: m.id, category: m.category }));
+
+  for (const dish of allDishes) {
+    if (category && category !== 'ALL' && dish.category !== category) {
+      continue;
+    }
+    stockOverrides.set(dish.id, isAvailable);
+    persistentStockMap.set(dish.id, targetQty);
+    if (isAvailable) {
+      dailyFreshBatchIds.add(dish.id);
+    } else {
+      dailyFreshBatchIds.delete(dish.id);
+    }
+  }
+
+  globalForStock.morningBatchConfigured = isAvailable;
   saveStateToDisk();
 }
