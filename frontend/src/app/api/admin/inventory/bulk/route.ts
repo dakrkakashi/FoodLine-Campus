@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js';
 import { setBulkInventoryState } from '@/lib/stock-store';
 import localMenu from '@/data/menu.json';
 
+export const dynamic = 'force-dynamic';
+
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

@@ -28,6 +28,7 @@ import {
   TiltCard,
   CampusVisualizer,
 } from '@/components/ui';
+import { CampusHero3D } from '@/components/3d/CampusHero3D';
 import { useSoundFX } from '@/hooks/useSoundFX';
 
 const PILLARS = [
@@ -226,9 +227,40 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
-        {/* 🌟 Campus Architecture Visualizer Embedded */}
-        <div className="w-full mb-24">
+        {/* Interactive Architecture Flow Visualizer */}
+        <div className="w-full mb-24 text-left">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">
+              <Sparkles size={14} className="text-[var(--accent-teal)]" /> Interactive Campus Architecture
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+              How FoodLine Powers Sanjivani Dining
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-400 mt-2">
+              From classroom pre-order to 30-second express pickup at Cafe @7 counter.
+            </p>
+          </div>
+
           <CampusVisualizer />
+        </div>
+
+        {/* 🚀 REALTIME 3D FOOD & EXPRESS TRAY SHOWCASE */}
+        <div className="w-full mb-24 text-left">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#FF6B2C]/10 border border-[#FF6B2C]/30 text-xs font-black text-[#FFB347] uppercase tracking-widest mb-3">
+              <Sparkles size={14} className="text-[#00D4AA]" /> Realtime WebGL 3D Food Lab
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
+              Inspect Fresh Dishes in <span className="text-[#00D4AA]">360° 3D</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-400 mt-2">
+              Drag with mouse or swipe on mobile to rotate 3D food models with live steam and lighting physics.
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto w-full">
+            <CampusHero3D />
+          </div>
         </div>
 
         {/* 🍲 3D Tilt Signature Dishes Showcase with Steam Physics */}

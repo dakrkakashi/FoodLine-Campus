@@ -13,6 +13,7 @@
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.47.0",
     "@tailwindcss/postcss": "^4.3.3",
+    "@types/three": "^0.185.4",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "lucide-react": "^0.468.0",
@@ -23,7 +24,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "recharts": "^3.10.1",
-    "tailwind-merge": "^2.5.5"
+    "tailwind-merge": "^2.5.5",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
