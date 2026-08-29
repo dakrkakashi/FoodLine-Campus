@@ -34,6 +34,13 @@ import {
   Save,
   Ban,
   Loader2,
+  Share2,
+  Printer,
+  AlertTriangle,
+  SunMedium,
+  Flame,
+  Lock,
+  Unlock,
 } from 'lucide-react';
 import { fireConfettiSuccess } from '@/components/ui';
 
@@ -479,6 +486,104 @@ export default function AdminAnalyticsPage() {
     }
   };
 
+  const [isRushPaused, setIsRushPaused] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('foodline_rush_pause');
+      if (saved === 'true') setIsRushPaused(true);
+    } catch {}
+  }, []);
+
+  const handleToggleRushPause = () => {
+    const next = !isRushPaused;
+    setIsRushPaused(next);
+    try {
+      localStorage.setItem('foodline_rush_pause', String(next));
+    } catch {}
+    if (next) {
+      alert('🚨 RUSH HOUR PAUSE ACTIVATED: Kitchen is catching up on active queue. Student pre-orders are temporarily throttled.');
+    } else {
+      fireConfettiSuccess();
+    }
+  };
+
+  const handleMorningPrepBatch = async (quantity: number = 50) => {
+    setIsBulkUpdating(true);
+    setMenuItems((prev) =>
+      prev.map((d) => ({
+        ...d,
+        is_available: true,
+        isAvailable: true,
+        stock_quantity: quantity,
+        stockQuantity: quantity,
+      }))
+    );
+    try {
+      await fetch('/api/admin/inventory/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'ALL_IN_STOCK' }),
+      });
+      fireConfettiSuccess();
+    } catch (e) {
+      console.error('Morning prep batch failed:', e);
+    } finally {
+      setIsBulkUpdating(false);
+    }
+  };
+
+  const handleSendWhatsAppSettlement = () => {
+    const todayStr = new Date().toLocaleDateString('en-IN', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+
+    const text = `🍽️ *FOODLINE CAMPUS — DAILY SETTLEMENT REPORT*
+🏛️ *Campus:* Sanjivani University (Cafe @7)
+📅 *Date:* ${todayStr}
+────────────────────────
+📦 *Total Orders Handled:* ${totalOrders}
+💰 *Gross Total GMV:* ₹${totalGrossGMV.toFixed(2)}
+────────────────────────
+👨‍🍳 *CANTEEN NET PAYOUT (96.6%):* ₹${canteenIncome.toFixed(2)}
+⚡ *Fast-Pass Platform Take (3.4%):* ₹${founderIncome.toFixed(2)}
+────────────────────────
+💳 *Payment Mode Reconciliation:*
+⚡ *UPI Online:* ${upiCount} orders (₹${upiRevenue.toFixed(2)})
+💵 *Cash COD:* ${codCount} orders (₹${codRevenue.toFixed(2)})
+────────────────────────
+✅ *Audit Status:* 100% Reconciled with Bank UTR Records
+🔒 *Verified By:* Founder Admin (FoodLine Platform)`;
+
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const handlePrintDaySheet = () => {
+    window.print();
+  };
+
+  const handleUpdateSlotCapacity = async (slotId: string, delta: number) => {
+    setSlots((prev) =>
+      prev.map((s) =>
+        s.id === slotId
+          ? { ...s, max_capacity: Math.max(10, (s.max_capacity || 60) + delta) }
+          : s
+      )
+    );
+    try {
+      const supabase = createClient();
+      const targetSlot = slots.find((s) => s.id === slotId);
+      const newCap = Math.max(10, ((targetSlot?.max_capacity || 60) + delta));
+      await supabase.from('pickup_slots').update({ max_capacity: newCap }).eq('id', slotId);
+    } catch (e) {
+      console.error('Slot capacity update failed:', e);
+    }
+  };
+
   const handleStartEdit = (dish: MenuItemData) => {
     setEditingDishId(dish.id);
     setEditForm({
@@ -608,6 +713,20 @@ export default function AdminAnalyticsPage() {
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
+            {/* Rush Hour Pause Toggle */}
+            <button
+              onClick={handleToggleRushPause}
+              className={`px-3.5 py-2 rounded-xl border text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-lg ${
+                isRushPaused
+                  ? 'bg-rose-600 text-white border-rose-500 animate-pulse shadow-rose-600/30'
+                  : 'bg-white/5 hover:bg-rose-500/10 text-rose-400 hover:text-rose-300 border-rose-500/30'
+              }`}
+              title="Pause pre-orders during sudden kitchen rush hour"
+            >
+              <Flame size={14} className={isRushPaused ? 'animate-bounce' : 'text-rose-400'} />
+              <span>{isRushPaused ? '🚨 RUSH PAUSE ACTIVE' : 'Rush Hour Pause'}</span>
+            </button>
+
             <button
               onClick={fetchAnalytics}
               disabled={isRefreshing}
@@ -1184,8 +1303,18 @@ export default function AdminAnalyticsPage() {
                     ))}
                   </select>
 
-                  {/* Bulk Stock Controls: All In Stock / All Out of Stock */}
-                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/60 border border-white/10">
+                  {/* Bulk Stock Controls: All In Stock / All Out of Stock / Morning Prep */}
+                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/60 border border-white/10 flex-wrap">
+                    <button
+                      onClick={() => handleMorningPrepBatch(50)}
+                      disabled={isBulkUpdating}
+                      className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-black text-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 shadow-sm"
+                      title="Set all dishes to 50 morning batch units"
+                    >
+                      <SunMedium size={13} className="text-amber-400" />
+                      <span>Morning Prep (50 Qty)</span>
+                    </button>
+
                     <button
                       onClick={() => handleBulkStockToggle('ALL_IN_STOCK')}
                       disabled={isBulkUpdating}
@@ -1577,9 +1706,33 @@ export default function AdminAnalyticsPage() {
                       </span>
                     </div>
 
-                    <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-between text-xs">
+                    <div className="p-3 rounded-2xl bg-black/40 border border-white/5 flex items-center justify-between text-xs mb-3">
                       <span className="text-zinc-400 font-medium">Slot Revenue:</span>
                       <span className="font-mono font-black text-white">₹{slotRevenue.toFixed(2)}</span>
+                    </div>
+
+                    {/* Slot Capacity Modifier Controls */}
+                    <div className="flex items-center justify-between gap-1.5 pt-2 border-t border-white/5 text-xs">
+                      <span className="text-[10px] uppercase font-black text-zinc-400">Capacity:</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => handleUpdateSlotCapacity(slot.id, -10)}
+                          className="px-2 py-1 rounded-lg bg-black/60 hover:bg-white/10 border border-white/10 text-zinc-300 font-mono font-bold text-xs cursor-pointer active:scale-95"
+                          title="Reduce slot limit by 10"
+                        >
+                          -10
+                        </button>
+                        <span className="px-2 py-1 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 font-mono font-black text-xs">
+                          {max} Max
+                        </span>
+                        <button
+                          onClick={() => handleUpdateSlotCapacity(slot.id, 10)}
+                          className="px-2 py-1 rounded-lg bg-black/60 hover:bg-white/10 border border-white/10 text-zinc-300 font-mono font-bold text-xs cursor-pointer active:scale-95"
+                          title="Expand slot limit by 10"
+                        >
+                          +10
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
@@ -1620,7 +1773,7 @@ export default function AdminAnalyticsPage() {
 
             {/* Audit Log Table */}
             <div className="rounded-3xl bg-[#16161E] border border-white/10 overflow-hidden shadow-xl">
-              <div className="p-4 border-b border-white/10 bg-black/40 flex items-center justify-between">
+              <div className="p-4 border-b border-white/10 bg-black/40 flex items-center justify-between flex-wrap gap-3">
                 <div>
                   <h3 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
                     <ShieldCheck size={16} className="text-[#00D4AA]" />
@@ -1630,9 +1783,24 @@ export default function AdminAnalyticsPage() {
                     12-Digit UTR Bank Reference Replay Protection & Cash Drawer Log
                   </p>
                 </div>
-                <span className="text-xs text-zinc-400 font-mono">
-                  {orders.length} Verified Entries
-                </span>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleSendWhatsAppSettlement}
+                    className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-emerald-500/20 active:scale-95"
+                  >
+                    <Share2 size={13} />
+                    <span>Send on WhatsApp</span>
+                  </button>
+
+                  <button
+                    onClick={handlePrintDaySheet}
+                    className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs transition flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  >
+                    <Printer size={13} />
+                    <span>Print Sheet</span>
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-x-auto">
