@@ -22,11 +22,13 @@ import { useTheme, THEMES, ThemeName } from '@/context/ThemeContext';
 import { useSoundFX } from '@/hooks/useSoundFX';
 import { Logo } from '@/components/ui/Logo';
 import { UserAvatar } from '@/components/auth/UserAvatar';
+import { usePermissions } from '@/lib/auth/usePermissions';
 
 export function Navbar() {
   const { totalCount } = useCart();
   const { theme, setTheme } = useTheme();
   const { muted, toggleMute, playClick, playTab } = useSoundFX();
+  const { isStaffOrAbove, isManagerOrAbove } = usePermissions();
 
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -75,14 +77,18 @@ export function Navbar() {
               <Tv size={16} />
               <span>TV Display</span>
             </NavLink>
-            <NavLink href="/kds" onClick={playTab}>
-              <ChefHat size={16} />
-              <span>Kitchen</span>
-            </NavLink>
-            <NavLink href="/admin" onClick={playTab}>
-              <BarChart3 size={16} />
-              <span>Manager & Admin</span>
-            </NavLink>
+            {isStaffOrAbove && (
+              <NavLink href="/kds" onClick={playTab}>
+                <ChefHat size={16} />
+                <span>Kitchen</span>
+              </NavLink>
+            )}
+            {isManagerOrAbove && (
+              <NavLink href="/admin" onClick={playTab}>
+                <BarChart3 size={16} />
+                <span>Manager & Admin</span>
+              </NavLink>
+            )}
 
             {/* Sound FX Toggle Button */}
             <button
@@ -214,14 +220,18 @@ export function Navbar() {
                 <Tv size={16} />
                 <span>Counter TV Display</span>
               </MobileNavLink>
-              <MobileNavLink href="/kds" onClick={() => { playTab(); setMobileOpen(false); }}>
-                <ChefHat size={16} />
-                <span>Kitchen KDS</span>
-              </MobileNavLink>
-              <MobileNavLink href="/admin" onClick={() => { playTab(); setMobileOpen(false); }}>
-                <BarChart3 size={16} />
-                <span>Manager & Admin</span>
-              </MobileNavLink>
+              {isStaffOrAbove && (
+                <MobileNavLink href="/kds" onClick={() => { playTab(); setMobileOpen(false); }}>
+                  <ChefHat size={16} />
+                  <span>Kitchen KDS</span>
+                </MobileNavLink>
+              )}
+              {isManagerOrAbove && (
+                <MobileNavLink href="/admin" onClick={() => { playTab(); setMobileOpen(false); }}>
+                  <BarChart3 size={16} />
+                  <span>Manager & Admin</span>
+                </MobileNavLink>
+              )}
               <MobileNavLink href="/login" onClick={() => { playTab(); setMobileOpen(false); }}>
                 <LogIn size={16} />
                 <span>Campus Login</span>
