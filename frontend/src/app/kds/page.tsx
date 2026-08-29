@@ -18,7 +18,9 @@ import {
   Tag,
   Save,
   DollarSign,
-  ChefHat
+  ChefHat,
+  Ban,
+  SunMedium,
 } from 'lucide-react';
 
 interface KdsOrderItem {
@@ -411,15 +413,52 @@ export default function KitchenDisplayPage() {
     }
   };
 
-  const handleResetAllStock = async () => {
-    setMenuItems((prev) => prev.map((d) => ({ ...d, is_available: true, isAvailable: true })));
-    for (const item of menuItems.filter((i) => !i.is_available)) {
-      fetch(`/api/kds/inventory/${item.id}`, {
-        method: 'PATCH',
+  const handleBulkKdsStock = async (action: 'ALL_IN_STOCK' | 'ALL_OUT_OF_STOCK') => {
+    const isAvailable = action === 'ALL_IN_STOCK';
+    const targetQty = isAvailable ? 30 : 0;
+    setMenuItems((prev) =>
+      prev.map((d) => ({
+        ...d,
+        is_available: isAvailable,
+        isAvailable: isAvailable,
+        stock_quantity: targetQty,
+        stockQuantity: targetQty,
+      }))
+    );
+    try {
+      await fetch('/api/admin/inventory/bulk', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isAvailable: true }),
-      }).catch(() => {});
+        body: JSON.stringify({ action }),
+      });
+    } catch (e) {
+      console.error('KDS bulk stock update failed:', e);
     }
+  };
+
+  const handleMorningPrepBatch = async (quantity: number = 50) => {
+    setMenuItems((prev) =>
+      prev.map((d) => ({
+        ...d,
+        is_available: true,
+        isAvailable: true,
+        stock_quantity: quantity,
+        stockQuantity: quantity,
+      }))
+    );
+    try {
+      await fetch('/api/admin/inventory/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'ALL_IN_STOCK' }),
+      });
+    } catch (e) {
+      console.error('KDS morning prep batch failed:', e);
+    }
+  };
+
+  const handleResetAllStock = async () => {
+    handleBulkKdsStock('ALL_IN_STOCK');
   };
 
   const filteredStockDishes = useMemo(() => {
@@ -794,7 +833,7 @@ export default function KitchenDisplayPage() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <button
                     onClick={() => setStockFilterTab('all')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
@@ -828,20 +867,43 @@ export default function KitchenDisplayPage() {
                 </div>
               </div>
 
-              {soldOutCount > 0 && (
-                <div className="flex items-center justify-between text-xs pt-1">
-                  <span className="text-red-400 font-bold">
-                    ⚠️ {soldOutCount} dish{soldOutCount > 1 ? 'es are' : ' is'} currently marked SOLD OUT to students.
-                  </span>
+              {/* 1-Tap Quick Bulk Controls */}
+              <div className="flex items-center justify-between gap-2 flex-wrap pt-2 border-t border-white/5">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <button
-                    onClick={handleResetAllStock}
-                    className="text-[#00D4AA] hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                    onClick={() => handleBulkKdsStock('ALL_IN_STOCK')}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-400 font-black text-xs transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm"
+                    title="Mark ALL dishes in stock (30 units)"
                   >
-                    <RotateCcw size={12} />
-                    <span>Reset All to In Stock</span>
+                    <CheckCircle2 size={13} />
+                    <span>All In Stock</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleBulkKdsStock('ALL_OUT_OF_STOCK')}
+                    className="px-3 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-400 font-black text-xs transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm"
+                    title="Mark ALL dishes out of stock (0 units)"
+                  >
+                    <Ban size={13} />
+                    <span>All Out of Stock</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleMorningPrepBatch(50)}
+                    className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-black text-xs transition flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-sm"
+                    title="Reset all dishes to 50 morning batch units"
+                  >
+                    <SunMedium size={13} />
+                    <span>Morning Prep (50 Qty)</span>
                   </button>
                 </div>
-              )}
+
+                {soldOutCount > 0 && (
+                  <span className="text-red-400 font-bold text-xs">
+                    ⚠️ {soldOutCount} dish{soldOutCount > 1 ? 'es' : ''} SOLD OUT
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Dish List with Inline Editors & Stock Qty Steppers */}
