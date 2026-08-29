@@ -31,3 +31,4 @@ inventory-state.json
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+client_secret_*.json

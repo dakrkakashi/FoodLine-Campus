@@ -32,7 +32,10 @@ import {
   Calendar,
   UtensilsCrossed,
   Save,
+  Ban,
+  Loader2,
 } from 'lucide-react';
+import { fireConfettiSuccess } from '@/components/ui';
 
 interface SlotData {
   id: string;
@@ -431,6 +434,48 @@ export default function AdminAnalyticsPage() {
       });
     } catch (e) {
       console.error('Stock toggle failed:', e);
+    }
+  };
+
+  const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+
+  const handleBulkStockToggle = async (action: 'ALL_IN_STOCK' | 'ALL_OUT_OF_STOCK') => {
+    const isAvailable = action === 'ALL_IN_STOCK';
+    const targetQty = isAvailable ? 30 : 0;
+    setIsBulkUpdating(true);
+
+    // Instant optimistic UI update
+    setMenuItems((prev) =>
+      prev.map((d) => {
+        if (menuCategoryFilter !== 'ALL' && d.category !== menuCategoryFilter) {
+          return d;
+        }
+        return {
+          ...d,
+          is_available: isAvailable,
+          isAvailable: isAvailable,
+          stock_quantity: targetQty,
+          stockQuantity: targetQty,
+        };
+      })
+    );
+
+    try {
+      await fetch('/api/admin/inventory/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          category: menuCategoryFilter !== 'ALL' ? menuCategoryFilter : undefined,
+        }),
+      });
+      if (isAvailable) {
+        fireConfettiSuccess();
+      }
+    } catch (e) {
+      console.error('Bulk stock toggle failed:', e);
+    } finally {
+      setIsBulkUpdating(false);
     }
   };
 
@@ -1138,6 +1183,37 @@ export default function AdminAnalyticsPage() {
                       </option>
                     ))}
                   </select>
+
+                  {/* Bulk Stock Controls: All In Stock / All Out of Stock */}
+                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-black/60 border border-white/10">
+                    <button
+                      onClick={() => handleBulkStockToggle('ALL_IN_STOCK')}
+                      disabled={isBulkUpdating}
+                      className="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-400 font-black text-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 shadow-sm"
+                      title={menuCategoryFilter === 'ALL' ? 'Mark ALL dishes in stock (30 units)' : `Mark all ${menuCategoryFilter} dishes in stock (30 units)`}
+                    >
+                      {isBulkUpdating ? (
+                        <Loader2 size={13} className="animate-spin text-emerald-400" />
+                      ) : (
+                        <CheckCircle2 size={13} className="text-emerald-400" />
+                      )}
+                      <span>All In Stock</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleBulkStockToggle('ALL_OUT_OF_STOCK')}
+                      disabled={isBulkUpdating}
+                      className="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-400 font-black text-xs transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 shadow-sm"
+                      title={menuCategoryFilter === 'ALL' ? 'Mark ALL dishes out of stock (0 units)' : `Mark all ${menuCategoryFilter} dishes out of stock (0 units)`}
+                    >
+                      {isBulkUpdating ? (
+                        <Loader2 size={13} className="animate-spin text-rose-400" />
+                      ) : (
+                        <Ban size={13} className="text-rose-400" />
+                      )}
+                      <span>All Out of Stock</span>
+                    </button>
+                  </div>
 
                   <button
                     onClick={() => setIsAddingDish(!isAddingDish)}
