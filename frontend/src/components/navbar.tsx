@@ -23,12 +23,14 @@ import { useSoundFX } from '@/hooks/useSoundFX';
 import { Logo } from '@/components/ui/Logo';
 import { UserAvatar } from '@/components/auth/UserAvatar';
 import { usePermissions } from '@/lib/auth/usePermissions';
+import { useAuth } from '@/lib/auth/useAuth';
 
 export function Navbar() {
   const { totalCount } = useCart();
   const { theme, setTheme } = useTheme();
   const { muted, toggleMute, playClick, playTab } = useSoundFX();
   const { isStaffOrAbove, isManagerOrAbove } = usePermissions();
+  const { user } = useAuth();
 
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -69,25 +71,29 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1.5">
-            <NavLink href="/menu" onClick={playTab}>
-              <UtensilsCrossed size={16} />
-              <span>Menu</span>
-            </NavLink>
-            <NavLink href="/display" onClick={playTab}>
-              <Tv size={16} />
-              <span>TV Display</span>
-            </NavLink>
-            {isStaffOrAbove && (
-              <NavLink href="/kds" onClick={playTab}>
-                <ChefHat size={16} />
-                <span>Kitchen</span>
-              </NavLink>
-            )}
-            {isManagerOrAbove && (
-              <NavLink href="/admin" onClick={playTab}>
-                <BarChart3 size={16} />
-                <span>Manager & Admin</span>
-              </NavLink>
+            {user && (
+              <>
+                <NavLink href="/menu" onClick={playTab}>
+                  <UtensilsCrossed size={16} />
+                  <span>Menu</span>
+                </NavLink>
+                <NavLink href="/display" onClick={playTab}>
+                  <Tv size={16} />
+                  <span>TV Display</span>
+                </NavLink>
+                {isStaffOrAbove && (
+                  <NavLink href="/kds" onClick={playTab}>
+                    <ChefHat size={16} />
+                    <span>Kitchen</span>
+                  </NavLink>
+                )}
+                {isManagerOrAbove && (
+                  <NavLink href="/admin" onClick={playTab}>
+                    <BarChart3 size={16} />
+                    <span>Manager & Admin</span>
+                  </NavLink>
+                )}
+              </>
             )}
 
             {/* Sound FX Toggle Button */}
@@ -156,19 +162,21 @@ export function Navbar() {
             </div>
 
             {/* Cart Tray Pill */}
-            <Link
-              href="/checkout"
-              onClick={playClick}
-              className="ml-2 flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[var(--accent-orange)] to-[var(--accent-amber)] text-black font-black text-xs shadow-lg shadow-[var(--accent-orange)]/25 hover:shadow-[var(--accent-orange)]/40 transition active:scale-95 cursor-pointer"
-            >
-              <ShoppingCart size={15} strokeWidth={2.5} />
-              <span>Tray</span>
-              {totalCount > 0 && (
-                <span className="px-1.5 py-0.2 rounded-full bg-black text-white text-[10px] font-black">
-                  {totalCount}
-                </span>
-              )}
-            </Link>
+            {user && (
+              <Link
+                href="/checkout"
+                onClick={playClick}
+                className="ml-2 flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[var(--accent-orange)] to-[var(--accent-amber)] text-black font-black text-xs shadow-lg shadow-[var(--accent-orange)]/25 hover:shadow-[var(--accent-orange)]/40 transition active:scale-95 cursor-pointer"
+              >
+                <ShoppingCart size={15} strokeWidth={2.5} />
+                <span>Tray</span>
+                {totalCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-black text-white text-[10px] font-black">
+                    {totalCount}
+                  </span>
+                )}
+              </Link>
+            )}
           </nav>
 
           {/* Mobile Right Controls */}
@@ -180,20 +188,22 @@ export function Navbar() {
               {muted ? <VolumeX size={16} /> : <Volume2 size={16} className="text-[var(--accent-teal)]" />}
             </button>
 
-            <Link
-              href="/checkout"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--accent-orange)] text-black font-black text-xs"
-            >
-              <ShoppingCart size={14} />
-              {totalCount > 0 && <span>{totalCount}</span>}
-            </Link>
+            {user && (
+              <Link
+                href="/checkout"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--accent-orange)] text-black font-black text-xs"
+              >
+                <ShoppingCart size={14} />
+                {totalCount > 0 && <span>{totalCount}</span>}
+              </Link>
+            )}
 
             <button
               onClick={() => {
                 setMobileOpen(!mobileOpen);
                 playClick();
               }}
-              className="p-2 rounded-xl bg-white/5 border border-white/10 text-white"
+              className="p-2 rounded-xl bg-white/5 border border-white/10 text-zinc-300 hover:text-white"
             >
               {mobileOpen ? <X size={20} /> : <MenuIcon size={20} />}
             </button>
@@ -201,7 +211,7 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* Mobile Slide-Down Drawer */}
+      {/* Mobile Navigation Drawer */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -212,30 +222,35 @@ export function Navbar() {
             className="md:hidden fixed inset-x-0 top-[58px] z-40 bg-[#07070B]/98 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/80 overflow-hidden"
           >
             <nav className="flex flex-col py-4 px-4 gap-1.5">
-              <MobileNavLink href="/menu" onClick={() => { playTab(); setMobileOpen(false); }}>
-                <UtensilsCrossed size={16} />
-                <span>Browse Menu</span>
-              </MobileNavLink>
-              <MobileNavLink href="/display" onClick={() => { playTab(); setMobileOpen(false); }}>
-                <Tv size={16} />
-                <span>Counter TV Display</span>
-              </MobileNavLink>
-              {isStaffOrAbove && (
-                <MobileNavLink href="/kds" onClick={() => { playTab(); setMobileOpen(false); }}>
-                  <ChefHat size={16} />
-                  <span>Kitchen KDS</span>
+              {user ? (
+                <>
+                  <MobileNavLink href="/menu" onClick={() => { playTab(); setMobileOpen(false); }}>
+                    <UtensilsCrossed size={16} />
+                    <span>Browse Menu</span>
+                  </MobileNavLink>
+                  <MobileNavLink href="/display" onClick={() => { playTab(); setMobileOpen(false); }}>
+                    <Tv size={16} />
+                    <span>Counter TV Display</span>
+                  </MobileNavLink>
+                  {isStaffOrAbove && (
+                    <MobileNavLink href="/kds" onClick={() => { playTab(); setMobileOpen(false); }}>
+                      <ChefHat size={16} />
+                      <span>Kitchen KDS</span>
+                    </MobileNavLink>
+                  )}
+                  {isManagerOrAbove && (
+                    <MobileNavLink href="/admin" onClick={() => { playTab(); setMobileOpen(false); }}>
+                      <BarChart3 size={16} />
+                      <span>Manager & Admin</span>
+                    </MobileNavLink>
+                  )}
+                </>
+              ) : (
+                <MobileNavLink href="/login" onClick={() => { playTab(); setMobileOpen(false); }}>
+                  <LogIn size={16} />
+                  <span>Campus Sign In</span>
                 </MobileNavLink>
               )}
-              {isManagerOrAbove && (
-                <MobileNavLink href="/admin" onClick={() => { playTab(); setMobileOpen(false); }}>
-                  <BarChart3 size={16} />
-                  <span>Manager & Admin</span>
-                </MobileNavLink>
-              )}
-              <MobileNavLink href="/login" onClick={() => { playTab(); setMobileOpen(false); }}>
-                <LogIn size={16} />
-                <span>Campus Login</span>
-              </MobileNavLink>
 
               <div className="pt-3 border-t border-white/10 flex items-center justify-between">
                 <span className="text-[11px] font-black uppercase text-zinc-400">Campus Theme:</span>
