@@ -1,3 +1,33 @@
+# Dependencies
 node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Production
+inventory-state.json
+
+# Misc
 .DS_Store
+*.pem
 *.log
+
+# Local env files
+.env*.local
+.env.local
+.env
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts

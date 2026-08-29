@@ -1,0 +1,18 @@
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Dependencies
+node_modules/
+
+# Local env
+.env*.local
+.env.local
+.env
+
+# Misc
+.DS_Store
+*.log
+inventory-state.json
