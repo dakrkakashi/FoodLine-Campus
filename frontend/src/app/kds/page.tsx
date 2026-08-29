@@ -22,6 +22,8 @@ import {
   Ban,
   SunMedium,
   Loader2,
+  Download,
+  Upload,
 } from 'lucide-react';
 
 interface KdsOrderItem {
@@ -926,7 +928,7 @@ export default function KitchenDisplayPage() {
                     onClick={handleSaveAllInventory}
                     disabled={isSavingAll}
                     className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#00D4AA] to-[#00b894] hover:scale-105 active:scale-95 text-black font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-[#00D4AA]/25 disabled:opacity-50"
-                    title="Persist all 58 dish stock changes to memory, disk and database"
+                    title="Persist all dish stock changes to memory, disk and database"
                   >
                     {isSavingAll ? (
                       <Loader2 size={13} className="animate-spin" />
@@ -935,6 +937,66 @@ export default function KitchenDisplayPage() {
                     )}
                     <span>{isSavingAll ? 'Saving...' : '💾 Save Inventory'}</span>
                   </button>
+
+                  {/* 📥📤 CSV DOWNLOAD / UPLOAD CONTROLS */}
+                  <button
+                    onClick={() => window.open('/api/admin/inventory/csv?action=sample', '_blank')}
+                    className="px-2.5 py-1.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 font-bold text-xs transition flex items-center gap-1 cursor-pointer active:scale-95"
+                    title="Download sample CSV template"
+                  >
+                    <Download size={12} />
+                    <span>Sample CSV</span>
+                  </button>
+
+                  <button
+                    onClick={() => window.open('/api/admin/inventory/csv?action=export', '_blank')}
+                    className="px-2.5 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500/30 border border-sky-500/40 text-sky-300 font-bold text-xs transition flex items-center gap-1 cursor-pointer active:scale-95"
+                    title="Export current inventory as CSV"
+                  >
+                    <Download size={12} />
+                    <span>Export CSV</span>
+                  </button>
+
+                  <label
+                    className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-xs transition flex items-center gap-1 cursor-pointer active:scale-95"
+                    title="Upload CSV to import dishes"
+                  >
+                    <Upload size={12} />
+                    <span>Upload CSV</span>
+                    <input
+                      type="file"
+                      accept=".csv"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        try {
+                          const fd = new FormData();
+                          fd.append('file', file);
+                          const res = await fetch('/api/admin/inventory/csv', {
+                            method: 'POST',
+                            body: fd,
+                          });
+                          const json = await res.json();
+                          if (json.success) {
+                            setSaveSuccessMsg(
+                              `Imported ${json.data.insertedCount} dishes! ${json.data.failedCount > 0 ? `(${json.data.failedCount} failed)` : ''}`
+                            );
+                            setTimeout(() => setSaveSuccessMsg(null), 5000);
+                            // Refresh menu list
+                            const supabase = createClient();
+                            const { data: freshItems } = await supabase.from('menu_items').select('*').order('name');
+                            if (freshItems) setMenuItems(freshItems);
+                          } else {
+                            alert('Upload failed: ' + (json.error?.message || 'Unknown error'));
+                          }
+                        } catch (err: any) {
+                          alert('Upload error: ' + err.message);
+                        }
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
                 </div>
 
                 {saveSuccessMsg ? (

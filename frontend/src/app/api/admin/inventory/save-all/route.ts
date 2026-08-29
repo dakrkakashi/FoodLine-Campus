@@ -39,21 +39,31 @@ export async function POST(request: Request) {
       });
     }
 
-    // 2. Persist batch update in Supabase
+    // 2. Persist batch update in Supabase (only send valid table columns)
     try {
-      const updatePromises = items.map((item) =>
-        supabase
+      const updatePromises = items.map((item) => {
+        const isAvailable = item.is_available !== false && item.isAvailable !== false;
+        const dbUpdate: Record<string, any> = {
+          is_available: isAvailable,
+        };
+        if (item.price !== undefined && !isNaN(Number(item.price))) {
+          dbUpdate.price = Number(item.price);
+        }
+        if (typeof item.name === 'string' && item.name.trim()) {
+          dbUpdate.name = item.name.trim();
+        }
+        if (typeof item.tag === 'string') {
+          dbUpdate.tag = item.tag.trim();
+        }
+        if (item.prep_time_mins || item.prepTime) {
+          dbUpdate.prep_time_mins = Number(item.prep_time_mins || item.prepTime || 5);
+        }
+
+        return supabase
           .from('menu_items')
-          .update({
-            is_available: item.is_available !== false && item.isAvailable !== false,
-            stock_quantity: Math.max(0, Number(item.stock_quantity ?? item.stockQuantity ?? 30)),
-            price: Number(item.price) || undefined,
-            name: item.name || undefined,
-            tag: item.tag || undefined,
-            category: item.category || undefined,
-          })
-          .eq('id', item.id)
-      );
+          .update(dbUpdate)
+          .eq('id', item.id);
+      });
 
       await Promise.allSettled(updatePromises);
     } catch (dbErr) {

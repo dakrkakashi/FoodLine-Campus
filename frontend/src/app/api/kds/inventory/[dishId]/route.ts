@@ -94,12 +94,22 @@ export async function PATCH(
     // 1. Update live in-memory & disk overrides
     setDishDetails(dishId, updates);
 
-    // 2. Best-effort Supabase PostgreSQL sync
+    // 2. Best-effort Supabase PostgreSQL sync (only send valid table columns)
     try {
-      await supabase
-        .from('menu_items')
-        .update(updates)
-        .eq('id', dishId);
+      const dbUpdates: Record<string, any> = {};
+      if (updates.is_available !== undefined) dbUpdates.is_available = updates.is_available;
+      if (updates.name !== undefined) dbUpdates.name = updates.name;
+      if (updates.price !== undefined) dbUpdates.price = updates.price;
+      if (updates.tag !== undefined) dbUpdates.tag = updates.tag;
+      if (updates.prep_time_mins !== undefined) dbUpdates.prep_time_mins = updates.prep_time_mins;
+      if (updates.image_url !== undefined) dbUpdates.image_url = updates.image_url;
+
+      if (Object.keys(dbUpdates).length > 0) {
+        await supabase
+          .from('menu_items')
+          .update(dbUpdates)
+          .eq('id', dishId);
+      }
     } catch (dbErr) {
       console.warn('Supabase DB dish update warning (using memory override):', dbErr);
     }

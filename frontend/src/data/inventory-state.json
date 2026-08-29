@@ -1,59 +1,10 @@
 {
-  "lastFreshBatchDate": "2026-08-29",
-  "morningBatchConfigured": true,
-  "dailyFreshBatchIds": [
-    "e2b928e2-4f94-4689-9093-057df9f40c77",
-    "e3ad63c3-4cfb-450c-9199-b658cd669e68",
-    "b46f01fa-6eb7-4f10-9123-b32e5db03538",
-    "item-chaat-1"
-  ],
-  "stockOverrides": {
-    "e86f6b3d-17cf-4298-afe1-dd19ac077125": false,
-    "1ae327ed-911c-4f46-9927-49df2e3f29eb": false,
-    "dd29a24d-c399-4dec-a4d1-d78a1b12b3c0": false,
-    "95985788-8c86-4d0c-b413-b5f348b9cc8e": false,
-    "960410b6-c85b-4ea8-9700-e007adcb0766": false,
-    "cdaf7ec7-7d43-4300-bd8d-5296be024da1": false,
-    "6d08d813-8c82-4a9a-ac7b-ee5a566db395": false,
-    "08943736-5f8b-4837-aa7b-c704dda375b1": false,
-    "e2b928e2-4f94-4689-9093-057df9f40c77": true,
-    "e3ad63c3-4cfb-450c-9199-b658cd669e68": true,
-    "b46f01fa-6eb7-4f10-9123-b32e5db03538": true,
-    "item-chaat-1": true
-  },
-  "dishDetailsMap": {
-    "item-chaat-1": {
-      "name": "Aalu Chole Tikki",
-      "price": 50,
-      "tag": "Chaat Special",
-      "stock_quantity": 35,
-      "is_available": true
-    },
-    "b46f01fa-6eb7-4f10-9123-b32e5db03538": {
-      "is_available": true
-    },
-    "e2b928e2-4f94-4689-9093-057df9f40c77": {
-      "price": 1,
-      "stock_quantity": 30,
-      "is_available": true,
-      "name": "Aalu Chole Tikki",
-      "tag": "Chaat Special",
-      "category": "Kitchen Specials",
-      "prep_time_mins": 5
-    }
-  },
-  "persistentStockMap": {
-    "e86f6b3d-17cf-4298-afe1-dd19ac077125": 0,
-    "1ae327ed-911c-4f46-9927-49df2e3f29eb": 0,
-    "dd29a24d-c399-4dec-a4d1-d78a1b12b3c0": 0,
-    "95985788-8c86-4d0c-b413-b5f348b9cc8e": 0,
-    "960410b6-c85b-4ea8-9700-e007adcb0766": 0,
-    "cdaf7ec7-7d43-4300-bd8d-5296be024da1": 0,
-    "6d08d813-8c82-4a9a-ac7b-ee5a566db395": 0,
-    "08943736-5f8b-4837-aa7b-c704dda375b1": 0,
-    "e2b928e2-4f94-4689-9093-057df9f40c77": 30,
-    "item-chaat-1": 35
-  },
+  "stockOverrides": {},
+  "dishDetailsMap": {},
+  "persistentStockMap": {},
   "lowStockThresholdMap": {},
-  "updatedAt": "2026-08-29T16:39:48.291Z"
+  "dailyFreshBatchIds": [],
+  "lastFreshBatchDate": "",
+  "morningBatchConfigured": false,
+  "updatedAt": ""
 }

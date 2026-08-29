@@ -85,62 +85,31 @@ export async function createOrder(payload: {
   studentPhone?: string;
   notes?: string;
 }): Promise<any> {
-  try {
-    const res = await fetch(`${API_BASE}/orders`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    if (res.ok) {
-      const json = await res.json();
-      return json.data;
-    }
-  } catch (e) {
-    console.warn('Backend API unreachable, generating simulated local order.');
+  const res = await fetch(`${API_BASE}/orders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const errJson = await res.json().catch(() => ({}));
+    throw new Error(errJson.error?.message || 'Failed to create order');
   }
-
-  // Local simulation fallback
-  const rand = Math.floor(1000 + Math.random() * 9000);
-  const otp = Math.floor(1000 + Math.random() * 9000).toString();
-  const totalAmount = payload.items.reduce((s, i) => s + i.price * i.quantity, 0);
-
-  return {
-    orderId: `ord_local_${Date.now()}`,
-    orderToken: `FL-${rand}`,
-    totalAmount,
-    pickupOtp: otp,
-    status: 'PENDING_PAYMENT'
-  };
+  const json = await res.json();
+  return json.data;
 }
 
 export async function verifyUtr(orderToken: string, utrNumber: string, amount: number): Promise<any> {
-  try {
-    const res = await fetch(`${API_BASE}/payments/verify-utr`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderToken, utrNumber, amount })
-    });
-    if (res.ok) {
-      const json = await res.json();
-      return json.data;
-    }
-    const errJson = await res.json();
-    throw new Error(errJson.error || 'Verification failed');
-  } catch (e: any) {
-    if (e.message && e.message.includes('Invalid') || e.message && e.message.includes('already')) {
-      throw e;
-    }
-    // Simulation fallback
-    if (!/^\d{12}$/.test(utrNumber)) {
-      throw new Error('Invalid UTR. Must be 12 numeric digits.');
-    }
-    return {
-      orderToken,
-      status: 'CONFIRMED',
-      utrNumber,
-      message: 'Verified successfully (Offline preview mode).'
-    };
+  const res = await fetch(`${API_BASE}/payments/verify-utr`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderToken, utrNumber, amount })
+  });
+  if (!res.ok) {
+    const errJson = await res.json().catch(() => ({}));
+    throw new Error(errJson.error?.message || 'UTR verification failed');
   }
+  const json = await res.json();
+  return json.data;
 }
 
 /**

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { setBulkInventoryState } from '@/lib/stock-store';
-import localMenu from '@/data/menu.json';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,11 +29,15 @@ export async function POST(request: Request) {
 
     let updateQuery = supabase.from('menu_items').update({
       is_available: isAvailable,
-      stock_quantity: defaultQty,
     });
 
     if (category && category !== 'ALL') {
-      updateQuery = updateQuery.eq('category', category);
+      const { data: catRow } = await supabase.from('categories').select('id').ilike('name', `%${category}%`).limit(1).single();
+      if (catRow?.id) {
+        updateQuery = updateQuery.eq('category_id', catRow.id);
+      } else {
+        updateQuery = updateQuery.neq('id', '00000000-0000-0000-0000-000000000000');
+      }
     } else {
       updateQuery = updateQuery.neq('id', '00000000-0000-0000-0000-000000000000');
     }
@@ -51,7 +54,7 @@ export async function POST(request: Request) {
         action,
         isAvailable,
         stockQuantity: defaultQty,
-        updatedCount: data?.length || localMenu.length,
+        updatedCount: data?.length || 0,
       },
       message: isAvailable
         ? `All dishes have been marked IN STOCK (30 units each)`

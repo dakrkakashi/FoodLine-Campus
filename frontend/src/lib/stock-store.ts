@@ -7,7 +7,6 @@
 import fs from 'fs';
 import path from 'path';
 import { InventoryType, InventoryStatus, MenuItem } from './types';
-import localMenu from '@/data/menu.json';
 
 // Global singleton map to survive Next.js module evaluations
 const globalForStock = globalThis as unknown as {
@@ -300,17 +299,17 @@ export function getAllInventoryStatuses(items: any[]): InventoryStatus[] {
 
     if (invType === 'persistent') {
       stockQty = getPersistentStock(item.id);
-      if (stockQty <= 0) {
-        isAvailable = false;
-      } else if (stockOverrides.has(item.id)) {
+      if (stockOverrides.has(item.id)) {
         isAvailable = stockOverrides.get(item.id)!;
+      } else if (stockQty <= 0) {
+        isAvailable = false;
       }
     } else {
       // Daily Fresh Item
-      if (globalForStock.morningBatchConfigured) {
-        isAvailable = dailyFreshBatchIds.has(item.id);
-      } else if (stockOverrides.has(item.id)) {
+      if (stockOverrides.has(item.id)) {
         isAvailable = stockOverrides.get(item.id)!;
+      } else if (globalForStock.morningBatchConfigured) {
+        isAvailable = dailyFreshBatchIds.has(item.id);
       }
     }
 
@@ -343,19 +342,28 @@ export function resetAllStock() {
 
 /**
  * ⚡ Atomic Bulk Stock Update for All Dishes across Campus
+ * Now operates on the existing override maps instead of needing localMenu.
+ * Items to update should be provided by the caller, or it will update all existing overrides.
  */
 export function setBulkInventoryState(
   action: 'ALL_IN_STOCK' | 'ALL_OUT_OF_STOCK',
   quantity: number = 30,
-  category?: string
+  category?: string,
+  items?: { id: string; category?: string }[]
 ) {
   loadStateFromDisk();
   const isAvailable = action === 'ALL_IN_STOCK';
   const targetQty = isAvailable ? quantity : 0;
 
-  const allDishes = (localMenu as any[]).map((m) => ({ id: m.id, category: m.category }));
+  // Use provided items list, or fall back to all known overrides
+  const dishIds: { id: string; category?: string }[] = items && items.length > 0
+    ? items
+    : Array.from(stockOverrides.keys()).map((id) => ({
+        id,
+        category: dishDetailsMap.get(id)?.category,
+      }));
 
-  for (const dish of allDishes) {
+  for (const dish of dishIds) {
     if (category && category !== 'ALL' && dish.category !== category) {
       continue;
     }
