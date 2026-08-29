@@ -4,9 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "npx -y serve FoodLine_Pitch_Deck -l 3000",
-    "start": "npx -y serve FoodLine_Pitch_Deck -l 3000",
-    "build": "python build_pitch_deck.py",
+    "dev": "npm --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run dev",
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build",
+    "dev:deck": "npx -y serve FoodLine_Pitch_Deck -l 3000",
+    "build:deck": "python build_pitch_deck.py",
     "graphify": "graphify extract . --code-only"
   },
   "keywords": [],
@@ -14,6 +18,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "gsap": "^3.15.0",
+    "lottie-web": "^5.13.0",
     "motion": "^13.1.1"
   }
 }

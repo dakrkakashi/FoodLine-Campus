@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <title>FoodLine — Transparent Pricing, Fees & Charges Ecosystem</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #090d16;
+      --bg-secondary: #0f172a;
+      --bg-tertiary: #1e293b;
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-glow: rgba(56, 189, 248, 0.25);
+      
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.3);
+      --accent-cyan: #06b6d4;
+      --accent-blue: #3b82f6;
+      --accent-indigo: #6366f1;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-purple: #a855f7;
+
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-subtle: #64748b;
+      
+      --font-display: 'Outfit', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      line-height: 1.6;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 25%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 80%, rgba(99, 102, 241, 0.06) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Ambient Background Glows */
+    .glow-orb {
+      position: fixed;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .orb-1 { top: -200px; left: -100px; background: var(--accent-cyan); }
+    .orb-2 { top: 40%; right: -200px; background: var(--accent-purple); }
+    .orb-3 { bottom: -200px; left: 30%; background: var(--accent-emerald); }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header & Navigation */
+    header {
+      padding: 32px 0 20px;
+      border-bottom: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9, 13, 22, 0.85);
+    }
+    .nav-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 0 20px var(--accent-emerald-glow);
+    }
+    .brand-text h1 {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-text p {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-emerald);
+      font-weight: 700;
+    }
+    .header-badges {
+      display: flex;
+      gap: 12px;
+    }
+    .pill-badge {
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+    }
+    .pill-badge.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      text-align: center;
+      padding: 60px 0 40px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      border-radius: 50px;
+      color: #38bdf8;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      animation: pulseGlow 3s infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
+      50% { box-shadow: 0 0 30px rgba(6, 182, 212, 0.4); }
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1.15;
+      letter-spacing: -1.5px;
+      margin-bottom: 18px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #38bdf8 0%, #10b981 50%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      max-width: 780px;
+      margin: 0 auto 36px;
+    }
+
+    /* Quick Summary Metric Grid */
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 50px;
+    }
+    .metric-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 24px 20px;
+      text-align: left;
+      backdrop-filter: blur(16px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent-cyan), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .metric-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    }
+    .metric-card:hover::before {
+      opacity: 1;
+    }
+    .metric-label {
+      font-size: 13px;
+      color: var(--text-subtle);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .metric-value {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+    .metric-value.emerald { color: #34d399; }
+    .metric-value.cyan { color: #38bdf8; }
+    .metric-value.amber { color: #fbbf24; }
+    .metric-value.indigo { color: #818cf8; }
+    .metric-subtext {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Stakeholder Tabs */
+    .tabs-container {
+      margin-bottom: 40px;
+    }
+    .tabs-header {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.8);
+      padding: 8px;
+      border-radius: 60px;
+      border: 1px solid var(--card-border);
+      max-width: 820px;
+      margin: 0 auto 30px;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      border-radius: 40px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.25s ease;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: var(--text-main);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    .tab-btn.active.student { color: #38bdf8; border-color: rgba(56, 189, 248, 0.4); }
+    .tab-btn.active.vendor { color: #34d399; border-color: rgba(16, 185, 129, 0.4); }
+    .tab-btn.active.runner { color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); }
+    .tab-btn.active.enterprise { color: #a78bfa; border-color: rgba(168, 85, 247, 0.4); }
+
+    /* Tab Content Cards */
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+    .tab-pane.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Interactive Charge Calculator Layout */
+    .calculator-section {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.6));
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      margin-bottom: 50px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+    .calc-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .calc-header h3 {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .calc-header p {
+      color: var(--text-muted);
+      font-size: 15px;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* Left Side: Dish Builder */
+    .dish-picker-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .dish-picker-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .dish-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .dish-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dish-item:hover {
+      background: rgba(30, 41, 59, 0.9);
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .dish-item.selected {
+      background: rgba(16, 185, 129, 0.12);
+      border-color: var(--accent-emerald);
+    }
+    .dish-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dish-icon {
+      font-size: 20px;
+    }
+    .dish-name {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .dish-price {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #34d399;
+      font-size: 14px;
+    }
+    .dish-qty-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .qty-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.05);
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .qty-btn:hover {
+      background: var(--accent-cyan);
+      color: black;
+    }
+    .qty-val {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      width: 20px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .fulfillment-toggle-box {
+      display: flex;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--card-border);
+    }
+    .f-toggle-btn {
+      flex: 1;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--card-border);
+      background: rgba(30, 41, 59, 0.4);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .f-toggle-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent-cyan);
+      color: #38bdf8;
+    }
+    .f-toggle-btn span.badge {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Right Side: Live Bill & Fee Breakdown */
+    .bill-summary-box {
+      background: #0b1120;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      position: relative;
+    }
+    .receipt-header {
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+      padding-bottom: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .receipt-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    .receipt-token {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .bill-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .bill-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+    }
+    .bill-row.highlight {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+    .bill-row.fee-row {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+    .bill-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 8px 0;
+    }
+    .bill-row.total-row {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: var(--font-display);
+      border-top: 1px dashed rgba(255, 255, 255, 0.2);
+      padding-top: 14px;
+    }
+
+    /* Comparison Box vs Swiggy/Zomato */
+    .comparison-callout {
+      background: rgba(244, 63, 94, 0.08);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-top: 18px;
+    }
+    .comp-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #fb7185;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .comp-diff {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .comp-saving-badge {
+      font-size: 14px;
+      font-weight: 800;
+      color: #34d399;
+      margin-top: 8px;
+      display: block;
+    }
+
+    /* Micro-Fee Anatomy 4-Way Breakdown */
+    .waterfall-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: 36px;
+      margin-bottom: 50px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+    .section-desc {
+      color: var(--text-muted);
+      font-size: 16px;
+      margin-bottom: 30px;
+      max-width: 800px;
+    }
+
+    .waterfall-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    .wf-step {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      position: relative;
+    }
+    .wf-step-num {
+      position: absolute;
+      top: -10px;
+      right: 14px;
+      font-size: 11px;
+      font-weight: 800;
+      background: var(--accent-indigo);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+    .wf-cost {
+      font-family: var(--font-mono);
+      font-size: 22px;
+      font-weight: 800;
+      margin: 8px 0 4px;
+      color: #38bdf8;
+    }
+    .wf-title {
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 6px;
+    }
+    .wf-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Comparison Table */
+    .table-container {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      margin-bottom: 50px;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    th, td {
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    th {
+      font-family: var(--font-display);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-subtle);
+      font-weight: 700;
+    }
+    td {
+      font-size: 14px;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tr.featured-row {
+      background: rgba(16, 185, 129, 0.05);
+    }
+    .tag-free {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .tag-bad {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(244, 63, 94, 0.2);
+      color: #fb7185;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    /* 3 Books Philosophical Matrix */
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 60px;
+    }
+    .book-card {
+      background: linear-gradient(180deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95));
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      position: relative;
+    }
+    .book-card.b1 { border-top: 4px solid var(--accent-emerald); }
+    .book-card.b2 { border-top: 4px solid var(--accent-cyan); }
+    .book-card.b3 { border-top: 4px solid var(--accent-amber); }
+    .book-tag {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .book-card.b1 .book-tag { color: var(--accent-emerald); }
+    .book-card.b2 .book-tag { color: var(--accent-cyan); }
+    .book-card.b3 .book-tag { color: var(--accent-amber); }
+    .book-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .book-quote {
+      font-style: italic;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-left: 2px solid rgba(255, 255, 255, 0.2);
+      padding-left: 12px;
+      margin-bottom: 16px;
+    }
+    .book-points {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+    .book-points li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .book-points li::before {
+      content: '✓';
+      color: #34d399;
+      font-weight: bold;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 40px 0 calc(40px + env(safe-area-inset-bottom));
+      text-align: center;
+      color: var(--text-subtle);
+      font-size: 13px;
+    }
+    footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    .runner-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    /* ==========================================================================
+       COMPREHENSIVE MOBILE RESPONSIVENESS & TOUCH OPTIMIZATIONS
+       ========================================================================== */
+
+    /* Medium Screens (Tablets / Small Laptops <= 992px) */
+    @media (max-width: 992px) {
+      .metric-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+      .waterfall-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      .books-grid { grid-template-columns: 1fr; gap: 18px; }
+      .calc-grid { grid-template-columns: 1fr; gap: 24px; }
+      .hero-title { font-size: clamp(34px, 5vw, 44px); }
+      .runner-grid { grid-template-columns: 1fr; gap: 18px; }
+    }
+
+    /* Small Screens (Mobile landscape & large phones <= 768px) */
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      header { padding: 16px 0 14px; }
+      .nav-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .header-badges {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        white-space: nowrap;
+        scrollbar-width: none;
+      }
+      .header-badges::-webkit-scrollbar { display: none; }
+      .pill-badge { font-size: 11px; padding: 4px 10px; }
+
+      .hero-section { padding: 36px 0 24px; }
+      .hero-title { font-size: clamp(28px, 6vw, 36px); letter-spacing: -0.5px; }
+      .hero-subtitle { font-size: 15px; margin-bottom: 24px; }
+      .hero-badge { font-size: 11px; padding: 6px 14px; margin-bottom: 14px; }
+
+      /* Horizontal Scrollable Tabs on Mobile */
+      .tabs-header {
+        justify-content: flex-start;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding: 6px;
+        border-radius: 40px;
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+      }
+      .tabs-header::-webkit-scrollbar { display: none; }
+      .tab-btn {
+        flex-shrink: 0;
+        padding: 10px 18px;
+        font-size: 13px;
+        min-height: 44px;
+      }
+
+      .calculator-section { padding: 20px 16px; border-radius: var(--radius-lg); margin-bottom: 30px; }
+      .calc-header h3 { font-size: 22px; }
+      .calc-header p { font-size: 13px; }
+
+      .dish-picker-box { padding: 16px; }
+      .dish-item { padding: 12px 10px; gap: 8px; }
+      .dish-info { gap: 10px; }
+      .dish-name { font-size: 13px; }
+      .dish-price { font-size: 13px; }
+      
+      /* Mobile Touch-Friendly Quantity Buttons */
+      .dish-qty-control .qty-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .dish-qty-control .qty-val {
+        width: 22px;
+        font-size: 14px;
+      }
+
+      .fulfillment-toggle-box {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .f-toggle-btn {
+        padding: 10px 12px;
+        min-height: 48px;
+      }
+
+      .bill-summary-box { padding: 18px 14px; }
+      .receipt-title { font-size: 16px; }
+      .bill-row { font-size: 13px; }
+      .bill-row.total-row { font-size: 18px; }
+      .comparison-callout { padding: 12px; }
+      .comp-diff { font-size: 12px; }
+      .comp-saving-badge { font-size: 13px; }
+
+      .waterfall-card { padding: 24px 16px; border-radius: var(--radius-lg); margin-bottom: 30px; }
+      .section-title { font-size: 22px; }
+      .section-desc { font-size: 14px; margin-bottom: 20px; }
+
+      .table-container { padding: 16px 12px; border-radius: var(--radius-lg); margin-bottom: 30px; }
+      th, td { padding: 12px 10px; font-size: 12px; }
+      th { font-size: 11px; }
+
+      .book-card { padding: 20px 16px; }
+      .book-title { font-size: 18px; }
+    }
+
+    /* Extra Small Screens (Portrait Phones <= 480px) */
+    @media (max-width: 480px) {
+      .container { padding: 0 12px; }
+      .metric-grid { grid-template-columns: 1fr; gap: 10px; }
+      .waterfall-grid { grid-template-columns: 1fr; gap: 12px; }
+      .metric-card { padding: 16px; }
+      .metric-value { font-size: 26px; }
+      .metric-label { font-size: 12px; }
+      .metric-subtext { font-size: 11px; }
+
+      .hero-title { font-size: 26px; }
+      .hero-subtitle { font-size: 13px; }
+
+      .dish-item { flex-wrap: nowrap; }
+      .dish-name { max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+      .wf-step { padding: 16px; }
+      .wf-cost { font-size: 20px; }
+
+      table { min-width: 580px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glows -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav-wrapper">
+      <a href="#" class="brand-logo">
+        <div class="logo-icon">⚡</div>
+        <div class="brand-text">
+          <h1>FoodLine</h1>
+          <p>Pricing & Charges Master Guide</p>
+        </div>
+      </a>
+      <div class="header-badges">
+        <div class="pill-badge active">
+          <span>●</span> DirectPay: 0% Gateway Fee
+        </div>
+        <div class="pill-badge">
+          <span>₹</span> Sanjivani Univ. Cafe @7 Pilot
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-badge">
+        ✨ 100% Transparent Fee & Unit Economics Model
+      </div>
+      <h2 class="hero-title">
+        How FoodLine Charges Work <br>
+        <span class="gradient-text">Zero Hidden Fees. 10x Value Multiplier.</span>
+      </h2>
+      <p class="hero-subtitle">
+        Unlike delivery apps that charge 30% restaurant commissions and ₹45 delivery fees, FoodLine is purpose-built for collegiate micro-dining: 0% payment gateway loss, ₹0 setup fees, and a tiny ~₹1.92 convenience micro-fee.
+      </p>
+    </section>
+
+    <!-- Top Key Metric Cards -->
+    <div class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-label">
+          Student Micro-Fee
+          <span>🎓</span>
+        </div>
+        <div class="metric-value cyan">3.5%</div>
+        <div class="metric-subtext">Avg ₹1.92 per order to skip 14.5-min line</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          Canteen Onboarding
+          <span>👨‍🍳</span>
+        </div>
+        <div class="metric-value emerald">₹0 FREE</div>
+        <div class="metric-subtext">Zero setup, zero expensive POS hardware</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          Payment Gateway Fee
+          <span>💳</span>
+        </div>
+        <div class="metric-value amber">0.0%</div>
+        <div class="metric-subtext">DirectPay UPI saves ₹750+/day for vendor</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-label">
+          Hostel Runner Cut
+          <span>🏃‍♂️</span>
+        </div>
+        <div class="metric-value indigo">75% Payout</div>
+        <div class="metric-subtext">Student runner earns ₹15 of ₹20 delivery fee</div>
+      </div>
+    </div>
+
+    <!-- Stakeholder Interactive Breakdown Tabs -->
+    <div class="tabs-container">
+      <div class="tabs-header">
+        <button class="tab-btn active student" onclick="switchTab('student')">🎓 1. For Students</button>
+        <button class="tab-btn vendor" onclick="switchTab('vendor')">👨‍🍳 2. For Canteen Owners</button>
+        <button class="tab-btn runner" onclick="switchTab('runner')">🏃‍♂️ 3. For Campus Runners</button>
+        <button class="tab-btn enterprise" onclick="switchTab('enterprise')">🏛️ 4. For Brands & Univ.</button>
+      </div>
+
+      <!-- TAB 1: STUDENTS -->
+      <div id="tab-student" class="tab-pane active">
+        <div class="calculator-section">
+          <div class="calc-header">
+            <h3>🎓 Interactive Student Bill & Fee Simulator</h3>
+            <p>Select dishes from Sanjivani University's Cafe @7 to test the live charges and compare against Swiggy/Zomato.</p>
+          </div>
+
+          <div class="calc-grid">
+            <!-- Left: Dish Selector -->
+            <div class="dish-picker-box">
+              <div class="dish-picker-title">
+                <span>Select Cafe @7 Dishes:</span>
+                <span style="color: var(--text-subtle); font-size: 12px;">Live 44-Dish Menu</span>
+              </div>
+              
+              <div class="dish-list">
+                <div class="dish-item" id="dish-1" onclick="toggleDish(1, 'Butter Masala Dosa', 50)">
+                  <div class="dish-info">
+                    <span class="dish-icon">🥞</span>
+                    <div>
+                      <div class="dish-name">Butter Masala Dosa</div>
+                      <div class="dish-price">₹50</div>
+                    </div>
+                  </div>
+                  <div class="dish-qty-control" onclick="event.stopPropagation()">
+                    <button class="qty-btn" onclick="changeQty(1, -1)">-</button>
+                    <span class="qty-val" id="qty-1">1</span>
+                    <button class="qty-btn" onclick="changeQty(1, 1)">+</button>
+                  </div>
+                </div>
+
+                <div class="dish-item" id="dish-2" onclick="toggleDish(2, 'Hot Masala Chai', 15)">
+                  <div class="dish-info">
+                    <span class="dish-icon">☕</span>
+                    <div>
+                      <div class="dish-name">Special Masala Chai</div>
+                      <div class="dish-price">₹15</div>
+                    </div>
+                  </div>
+                  <div class="dish-qty-control" onclick="event.stopPropagation()">
+                    <button class="qty-btn" onclick="changeQty(2, -1)">-</button>
+                    <span class="qty-val" id="qty-2">1</span>
+                    <button class="qty-btn" onclick="changeQty(2, 1)">+</button>
+                  </div>
+                </div>
+
+                <div class="dish-item" id="dish-3" onclick="toggleDish(3, 'Crispy Vada Pav', 20)">
+                  <div class="dish-info">
+                    <span class="dish-icon">🍔</span>
+                    <div>
+                      <div class="dish-name">Crispy Vada Pav (2 pcs)</div>
+                      <div class="dish-price">₹20</div>
+                    </div>
+                  </div>
+                  <div class="dish-qty-control" onclick="event.stopPropagation()">
+                    <button class="qty-btn" onclick="changeQty(3, -1)">-</button>
+                    <span class="qty-val" id="qty-3">0</span>
+                    <button class="qty-btn" onclick="changeQty(3, 1)">+</button>
+                  </div>
+                </div>
+
+                <div class="dish-item" id="dish-4" onclick="toggleDish(4, 'Thick Cold Coffee', 50)">
+                  <div class="dish-info">
+                    <span class="dish-icon">🧋</span>
+                    <div>
+                      <div class="dish-name">Thick Iced Cold Coffee</div>
+                      <div class="dish-price">₹50</div>
+                    </div>
+                  </div>
+                  <div class="dish-qty-control" onclick="event.stopPropagation()">
+                    <button class="qty-btn" onclick="changeQty(4, -1)">-</button>
+                    <span class="qty-val" id="qty-4">0</span>
+                    <button class="qty-btn" onclick="changeQty(4, 1)">+</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pickup Mode Toggle -->
+              <div class="fulfillment-toggle-box">
+                <div class="f-toggle-btn active" id="f-pickup" onclick="setFulfillment('pickup')">
+                  <span>⚡ 1-Minute Fast-Pass Pickup</span>
+                  <span class="badge" style="color: #34d399;">₹0 Delivery Fee</span>
+                </div>
+                <div class="f-toggle-btn" id="f-delivery" onclick="setFulfillment('delivery')">
+                  <span>🌙 Late-Night Hostel Drop</span>
+                  <span class="badge" style="color: #fbbf24;">+₹20 Runner Fee</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Real-Time Bill Receipt -->
+            <div class="bill-summary-box">
+              <div class="receipt-header">
+                <div>
+                  <div class="receipt-title">Digital Order Summary</div>
+                  <div style="font-size: 12px; color: var(--text-subtle);">Cafe @7 · Sanjivani University</div>
+                </div>
+                <div class="receipt-token" id="token-display">#FL-8492</div>
+              </div>
+
+              <div class="bill-rows">
+                <div class="bill-row highlight">
+                  <span>Dish Subtotal (Actual Canteen Menu Price):</span>
+                  <span id="subtotal-val" style="font-family: var(--font-mono);">₹65.00</span>
+                </div>
+                <div class="bill-row">
+                  <span>Restaurant Menu Markup:</span>
+                  <span style="color: #34d399; font-weight: bold;">₹0.00 (Zero Markup)</span>
+                </div>
+                <div class="bill-row fee-row">
+                  <span>FoodLine Fast-Pass Convenience Fee (3.5%):</span>
+                  <span id="fee-val" style="font-family: var(--font-mono);">₹2.28</span>
+                </div>
+                <div class="bill-row" id="delivery-row" style="display: none; color: #fbbf24;">
+                  <span>Hostel Peer Runner Delivery:</span>
+                  <span style="font-family: var(--font-mono);">₹20.00</span>
+                </div>
+                <div class="bill-row">
+                  <span>Payment Gateway Surcharge (DirectPay UPI):</span>
+                  <span style="color: #34d399; font-weight: bold;">₹0.00 (Free)</span>
+                </div>
+
+                <div class="bill-divider"></div>
+
+                <div class="bill-row total-row">
+                  <span>TOTAL PAYABLE:</span>
+                  <span id="total-val" style="color: #38bdf8;">₹67.28</span>
+                </div>
+              </div>
+
+              <!-- Live Comparison Card vs Swiggy -->
+              <div class="comparison-callout">
+                <div class="comp-title">
+                  <span>⚠️ External Delivery App (Swiggy/Zomato) Comparison:</span>
+                </div>
+                <div class="comp-diff">
+                  • Inflated Dish Price (+20%): <b id="swiggy-markup">₹78.00</b><br>
+                  • Packaging Fee: <b>₹15.00</b><br>
+                  • External Delivery Rider Fee: <b>₹45.00</b><br>
+                  • Gateway & Platform Fee: <b>₹9.00</b><br>
+                  • <b>Estimated Swiggy Total: <span id="swiggy-total" style="color:#fb7185; font-family:var(--font-mono);">₹147.00</span></b>
+                </div>
+                <span class="comp-saving-badge" id="saving-val">🎉 You Save ₹79.72 & 30 Minutes with FoodLine!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: VENDORS -->
+      <div id="tab-vendor" class="tab-pane">
+        <div class="calculator-section">
+          <div class="calc-header">
+            <h3>👨‍🍳 How FoodLine Empowers Canteen Owners</h3>
+            <p>100% Direct Bank Settlements with DirectPay UPI & ₹0 Commission on Food</p>
+          </div>
+
+          <div class="waterfall-grid">
+            <div class="wf-step">
+              <div class="wf-step-num">STEP 1</div>
+              <div class="wf-cost" style="color: #34d399;">₹0 Setup</div>
+              <div class="wf-title">Zero Onboarding Cost</div>
+              <div class="wf-desc">No expensive proprietary POS hardware needed. Operates seamlessly on any existing tablet or smartphone.</div>
+            </div>
+
+            <div class="wf-step">
+              <div class="wf-step-num">STEP 2</div>
+              <div class="wf-cost" style="color: #38bdf8;">100% Payout</div>
+              <div class="wf-title">Direct UPI to Bank</div>
+              <div class="wf-desc">Students scan your official merchant QR code. 100% of dish revenue lands directly in your bank account instantly.</div>
+            </div>
+
+            <div class="wf-step">
+              <div class="wf-step-num">STEP 3</div>
+              <div class="wf-cost" style="color: #fbbf24;">0% Commission</div>
+              <div class="wf-title">No 2% Gateway Cut</div>
+              <div class="wf-desc">Saves ₹746 to ₹1,200 daily by eliminating traditional payment gateway commissions on micro-transactions.</div>
+            </div>
+
+            <div class="wf-step">
+              <div class="wf-step-num">STEP 4</div>
+              <div class="wf-cost" style="color: #a78bfa;">₹1,500 / Mo</div>
+              <div class="wf-title">Optional Smart SaaS Tier</div>
+              <div class="wf-desc">Kitchen Display System (KDS) prep-batching, out-of-stock toggles, and peak-hour wastage analytics.</div>
+            </div>
+          </div>
+
+          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-lg); padding: 24px; text-align: center;">
+            <h4 style="font-size: 18px; color: #34d399; margin-bottom: 8px;">💰 Net Vendor Impact at Cafe @7</h4>
+            <p style="color: var(--text-muted); font-size: 14px; max-width: 800px; margin: 0 auto;">
+              By eliminating queue dropouts, increasing rush-hour turnover by <b>2.5x</b>, and cutting food waste from 8% to 2%, the average campus canteen expands monthly net profit from <b>₹2.36 Lakhs to ₹4.38 Lakhs (+85.3% Net Profit)</b>.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: RUNNERS -->
+      <div id="tab-runner" class="tab-pane">
+        <div class="calculator-section">
+          <div class="calc-header">
+            <h3>🏃‍♂️ Peer-to-Peer Hostel Delivery Revenue Split</h3>
+            <p>Flexible Micro-Earning for Campus Hostellers During Evening Study Hours (6:00 PM – 10:30 PM)</p>
+          </div>
+
+          <div class="runner-grid">
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px;">
+              <h4 style="font-size: 20px; font-weight: 800; margin-bottom: 16px;">The ₹20 Delivery Split:</h4>
+              
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 14px; border-radius: 10px;">
+                  <div>
+                    <div style="font-weight: 700; color: #fbbf24;">🏃‍♂️ Student Runner Payout (75%)</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Direct pocket money per successful hostel drop</div>
+                  </div>
+                  <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 800; color: #fbbf24;">₹15.00</div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 14px; border-radius: 10px;">
+                  <div>
+                    <div style="font-weight: 700; color: #38bdf8;">⚡ FoodLine Platform Take (25%)</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">Order matching, dispatch logic & verification compute</div>
+                  </div>
+                  <div style="font-family: var(--font-mono); font-size: 22px; font-weight: 800; color: #38bdf8;">₹5.00</div>
+                </div>
+              </div>
+            </div>
+
+            <div style="background: rgba(30, 41, 59, 0.5); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 24px;">
+              <h4 style="font-size: 16px; color: var(--text-main); margin-bottom: 12px;">📊 Student Runner Monthly Earning Potential:</h4>
+              <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--text-muted);">
+                <li>• <b>8 deliveries / evening</b> during hostel study hours = <b>₹120 / day</b></li>
+                <li>• <b>24 operational days / month</b> = <b>₹2,880 / month</b> pocket money</li>
+                <li>• Zero fuel or bike cost — all deliveries are within walking distance on campus</li>
+                <li>• Flexible gig: Start and stop anytime from the FoodLine Runner dashboard</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: ENTERPRISE & BRANDS -->
+      <div id="tab-enterprise" class="tab-pane">
+        <div class="calculator-section">
+          <div class="calc-header">
+            <h3>🏛️ FMCG Brand Sampling & Institutional Sponsorships</h3>
+            <p>High-Margin In-App Brand Placements Targeted at 18–24 Year Old Collegiate Audiences</p>
+          </div>
+
+          <div class="waterfall-grid">
+            <div class="wf-step">
+              <div class="wf-cost" style="color: #a78bfa;">₹15K – ₹25K</div>
+              <div class="wf-title">Annual / Campus Yield</div>
+              <div class="wf-desc">Brands sponsor "Fast-Grab Featured" slots, digital coupon banners, and targeted beverage promos.</div>
+            </div>
+
+            <div class="wf-step">
+              <div class="wf-cost" style="color: #34d399;">100% Opt-In</div>
+              <div class="wf-title">Zero Friction Sampling</div>
+              <div class="wf-desc">Students redeem sample drink coupons (Nescafe, Red Bull, Paper Boat) with 1 tap at the express counter.</div>
+            </div>
+
+            <div class="wf-step">
+              <div class="wf-cost" style="color: #38bdf8;">90%+ Margin</div>
+              <div class="wf-title">Pure Software Ads</div>
+              <div class="wf-desc">Zero physical distribution overhead for FoodLine; all sponsored items are bundled into existing merchant orders.</div>
+            </div>
+
+            <div class="wf-step">
+              <div class="wf-cost" style="color: #fbbf24;">₹3.85 Cr</div>
+              <div class="wf-title">Year 5 Network Scale</div>
+              <div class="wf-desc">Projected advertising and sampling revenue across 750 university campuses nationwide.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Micro-Fee Anatomy Section -->
+    <div class="waterfall-card">
+      <h3 class="section-title">🔬 Where Does the 3.5% (₹1.92) Convenience Fee Go?</h3>
+      <p class="section-desc">
+        We believe in radical transparency. Every fraction of a rupee charged to the student goes toward maintaining high-availability, real-time infrastructure:
+      </p>
+
+      <div class="waterfall-grid">
+        <div class="wf-step">
+          <div class="wf-step-num">0.22%</div>
+          <div class="wf-cost">₹0.12</div>
+          <div class="wf-title">Real-Time Cloud & SSE</div>
+          <div class="wf-desc">Supabase PostgreSQL queries, Server-Sent Events (SSE) live order tracking, and sub-100ms API response latency.</div>
+        </div>
+
+        <div class="wf-step">
+          <div class="wf-step-num">0.27%</div>
+          <div class="wf-cost">₹0.15</div>
+          <div class="wf-title">SMS & WhatsApp Alerts</div>
+          <div class="wf-desc">High-priority transactional SMS failover ensuring students receive instant counter pickup chimes without mobile data.</div>
+        </div>
+
+        <div class="wf-step">
+          <div class="wf-step-num">0.18%</div>
+          <div class="wf-cost">₹0.10</div>
+          <div class="wf-title">KDS Tablet Amortization</div>
+          <div class="wf-desc">Providing high-durability kitchen display tablets, thermal barcode scanners, and counter QR hardware.</div>
+        </div>
+
+        <div class="wf-step">
+          <div class="wf-step-num">2.83%</div>
+          <div class="wf-cost" style="color: #34d399;">₹1.55</div>
+          <div class="wf-title">FoodLine Gross Profit</div>
+          <div class="wf-desc">Net contribution toward campus expansion, continuous software R&D, and campus ambassador stipends (78% margin).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparative Charges Table -->
+    <div class="table-container">
+      <h3 class="section-title" style="margin-bottom: 20px;">⚔️ Comprehensive Charges Comparison Matrix</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Charge Dimension</th>
+            <th>Traditional Food Delivery (Swiggy/Zomato)</th>
+            <th>Legacy POS Systems (Petpooja/Posist)</th>
+            <th style="color: #34d399;">FoodLine Campus Ecosystem</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="featured-row">
+            <td><b>Vendor Onboarding Fee</b></td>
+            <td>₹0 – ₹1,000</td>
+            <td>₹10,000 – ₹25,000 / year</td>
+            <td><span class="tag-free">₹0 FREE</span></td>
+          </tr>
+          <tr>
+            <td><b>Vendor Food Commission</b></td>
+            <td><span class="tag-bad">18% – 30% of Bill</span></td>
+            <td>0%</td>
+            <td><span class="tag-free">0% (100% Payout to Canteen)</span></td>
+          </tr>
+          <tr>
+            <td><b>Payment Gateway Fees</b></td>
+            <td>2.0% + GST</td>
+            <td>Paid by Vendor (2%)</td>
+            <td><span class="tag-free">0.0% (DirectPay UPI)</span></td>
+          </tr>
+          <tr>
+            <td><b>Student Delivery / Surcharge</b></td>
+            <td>₹35 – ₹65 / delivery</td>
+            <td>N/A</td>
+            <td><span class="tag-free">₹0 for 1-Minute Counter Pickup</span></td>
+          </tr>
+          <tr>
+            <td><b>Student Platform Fee</b></td>
+            <td>₹5 – ₹10 flat fee</td>
+            <td>N/A</td>
+            <td><b>3.5% (Avg ₹1.92 micro-fee)</b></td>
+          </tr>
+          <tr>
+            <td><b>Order Minimum Required</b></td>
+            <td>₹150 – ₹200</td>
+            <td>N/A</td>
+            <td><span class="tag-free">₹0 (Order a ₹15 Chai freely)</span></td>
+          </tr>
+          <tr>
+            <td><b>Average Fulfillment Speed</b></td>
+            <td>35 – 45 Minutes</td>
+            <td>15 Min Queue</td>
+            <td><span class="tag-free">1 Minute Express Pickup</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- The 3 Books Philosophy Section -->
+    <div class="books-grid">
+      <!-- Book 1 -->
+      <div class="book-card b1">
+        <span class="book-tag">Book 1 · Asset Architecture</span>
+        <h4 class="book-title">Rich Dad's Guide to Investing</h4>
+        <div class="book-quote">"The rich build businesses that buy assets. Protect cash flow at the base of the B-I Triangle."</div>
+        <ul class="book-points">
+          <li><b>90/10 Capital Rule:</b> Zero delivery fleet payroll & zero gateway leakage.</li>
+          <li><b>Negative Working Capital:</b> Instant UPI collection with zero bad debts.</li>
+          <li><b>Fixed OPEX Cap:</b> Corporate overhead locked under 32% of revenue.</li>
+        </ul>
+      </div>
+
+      <!-- Book 2 -->
+      <div class="book-card b2">
+        <span class="book-tag">Book 2 · Value Science</span>
+        <h4 class="book-title">The Science of Getting Rich</h4>
+        <div class="book-quote">"Give every person more in USE VALUE than the cash value you take from them."</div>
+        <ul class="book-points">
+          <li><b>10x Value Multiplier:</b> Student pays ₹1.92 fee, saves ₹200 of recess time.</li>
+          <li><b>Creation Over Competition:</b> Dominating on-campus closed ecosystem.</li>
+          <li><b>The Impression of Increase:</b> Enriching student, cook, and vendor alike.</li>
+        </ul>
+      </div>
+
+      <!-- Book 3 -->
+      <div class="book-card b3">
+        <span class="book-tag">Book 3 · Investor Rigor</span>
+        <h4 class="book-title">Writing Winning Business Plans</h4>
+        <div class="book-quote">"Prove bottom-up unit economics, legal moats, and a clear 5-8x ARR exit."</div>
+        <ul class="book-points">
+          <li><b>Anti-1% Fallacy:</b> Verified ₹55 AOV on Cafe @7's 44-dish menu.</li>
+          <li><b>78%+ Gross Margin:</b> Defensible software unit economics.</li>
+          <li><b>Clear Exit Waterfall:</b> ₹189 Cr buyout returning 61.2x MOIC.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      <p>
+        FoodLine Campus Ecosystem · Sanjivani University Pilot Launch · Founded by Shivam Nirmal<br>
+        Document Linked: <a href="file:///c:/Users/Shivam%20Manoj%20Nirmal/Desktop/PPT%20OTHER%20TASKES/FoodLine_Master_Financial_Plan.md">FoodLine Master Financial Plan</a> · <a href="file:///c:/Users/Shivam%20Manoj%20Nirmal/Desktop/PPT%20OTHER%20TASKES/FoodLine_Margin_Structure.md">FoodLine Margin Structure</a>
+      </p>
+    </footer>
+
+  </div>
+
+  <!-- Interactive JavaScript Logic -->
+  <script>
+    // State Management
+    let selectedDishes = {
+      1: { name: 'Butter Masala Dosa', price: 50, qty: 1 },
+      2: { name: 'Special Masala Chai', price: 15, qty: 1 },
+      3: { name: 'Crispy Vada Pav', price: 20, qty: 0 },
+      4: { name: 'Thick Iced Cold Coffee', price: 50, qty: 0 }
+    };
+    let fulfillmentMode = 'pickup'; // 'pickup' or 'delivery'
+
+    function updateBill() {
+      let subtotal = 0;
+      for (let id in selectedDishes) {
+        let dish = selectedDishes[id];
+        subtotal += dish.price * dish.qty;
+        
+        let dishEl = document.getElementById('dish-' + id);
+        let qtyEl = document.getElementById('qty-' + id);
+        if (qtyEl) qtyEl.innerText = dish.qty;
+        
+        if (dishEl) {
+          if (dish.qty > 0) {
+            dishEl.classList.add('selected');
+          } else {
+            dishEl.classList.remove('selected');
+          }
+        }
+      }
+
+      // Calculate Convenience fee (3.5%)
+      let fee = Math.round(subtotal * 0.035 * 100) / 100;
+      if (subtotal > 0 && fee < 1.0) fee = 1.0; // Minimum ₹1.00 micro-fee
+
+      // Delivery fee
+      let deliveryFee = (fulfillmentMode === 'delivery' && subtotal > 0) ? 20.00 : 0.00;
+      let total = subtotal + fee + deliveryFee;
+
+      // Update DOM
+      document.getElementById('subtotal-val').innerText = '₹' + subtotal.toFixed(2);
+      document.getElementById('fee-val').innerText = '₹' + fee.toFixed(2);
+      document.getElementById('total-val').innerText = '₹' + total.toFixed(2);
+
+      let deliveryRow = document.getElementById('delivery-row');
+      if (fulfillmentMode === 'delivery' && subtotal > 0) {
+        deliveryRow.style.display = 'flex';
+      } else {
+        deliveryRow.style.display = 'none';
+      }
+
+      // Swiggy Comparison Math
+      let swiggySubtotal = subtotal * 1.20; // 20% menu markup
+      let swiggyPackaging = subtotal > 0 ? 15.00 : 0;
+      let swiggyDelivery = subtotal > 0 ? 45.00 : 0;
+      let swiggyFee = subtotal > 0 ? 9.00 : 0;
+      let swiggyTotal = swiggySubtotal + swiggyPackaging + swiggyDelivery + swiggyFee;
+
+      document.getElementById('swiggy-markup').innerText = '₹' + swiggySubtotal.toFixed(2);
+      document.getElementById('swiggy-total').innerText = '₹' + swiggyTotal.toFixed(2);
+
+      let savings = Math.max(0, swiggyTotal - total);
+      document.getElementById('saving-val').innerText = `🎉 You Save ₹${savings.toFixed(2)} & 30 Minutes with FoodLine!`;
+    }
+
+    function changeQty(id, delta) {
+      if (selectedDishes[id]) {
+        selectedDishes[id].qty = Math.max(0, selectedDishes[id].qty + delta);
+        updateBill();
+      }
+    }
+
+    function toggleDish(id, name, price) {
+      if (selectedDishes[id]) {
+        selectedDishes[id].qty = selectedDishes[id].qty === 0 ? 1 : 0;
+        updateBill();
+      }
+    }
+
+    function setFulfillment(mode) {
+      fulfillmentMode = mode;
+      document.getElementById('f-pickup').classList.toggle('active', mode === 'pickup');
+      document.getElementById('f-delivery').classList.toggle('active', mode === 'delivery');
+      updateBill();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+      let selectedBtn = document.querySelector(`.tab-btn.${tabId}`);
+      if (selectedBtn) selectedBtn.classList.add('active');
+
+      let selectedPane = document.getElementById('tab-' + tabId);
+      if (selectedPane) selectedPane.classList.add('active');
+    }
+
+    // Initialize
+    updateBill();
+  </script>
+</body>
+</html>

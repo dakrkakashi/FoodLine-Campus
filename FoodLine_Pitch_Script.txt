@@ -10,7 +10,7 @@ Normally, you waste 15 minutes standing in a boring, squished line just to get
 a samosa, and then the bell rings again! 
 FoodLine is my startup idea — a MAGIC FAST-PASS on your phone! 
 You tap what you want from your classroom, pay ₹20 with zero extra fees, walk 
-up to the special FoodLine express counter, scan a QR code in 30 seconds, grab 
+up to the special FoodLine express counter, scan a QR code in 1 minute, grab 
 your hot samosa, and enjoy your recess!"
 
 ================================================================================
@@ -26,7 +26,7 @@ Every single day, millions of college students have a tiny break to eat lunch.
 But instead of eating, they spend their whole break standing like statues in a 
 massive canteen queue. 
 FoodLine is our solution. With smart phone pre-ordering, zero-fee direct UPI payments, 
-and a lightning-fast 30-second express pickup counter, we give students their 
+and a lightning-fast 1-minute express pickup counter, we give students their 
 time back. We are preparing our flagship pilot launch right here at Sanjivani 
 University's Cafe @7!"
 
@@ -58,7 +58,7 @@ The sad result? Students skip meals or arrive late to class, and canteens lose
 SLIDE 3: THE PRODUCT SOLUTION
 ================================================================================
 📌 SLIDE TITLE: The FoodLine Campus Dining Ecosystem
-🎯 9-YEAR-OLD MEMORY HOOK: "4 easy steps: Order in class, pick your time slot, pay ₹0 fees, and grab your food in 30 seconds!"
+🎯 9-YEAR-OLD MEMORY HOOK: "4 easy steps: Order in class, pick your time slot, pay ₹0 fees, and grab your food in 1 minute!"
 
 🗣️ WHAT TO SAY ALOUD:
 "So how will FoodLine work? Through 4 smart superpowers:
@@ -66,10 +66,10 @@ Number 1: Browse & Order Ahead. While sitting in your classroom 5 minutes before
 you see the live canteen menu on your phone and place your order.
 Number 2: Smart Slot Throttling. The app divides recess into 10-minute batches so the 
 kitchen never gets flooded all at once.
-Number 3: Zero-Fee UPI (Option C). You pay directly to the canteen's QR code with 
+Number 3: Zero-Fee DirectPay UPI. You pay directly to the canteen's QR code with 
 0% middleman fees.
-Number 4: 30-Second Express Handover. You walk up to the special FoodLine express counter, 
-flash your digital QR pass, grab your tray, and walk away in under 30 seconds!"
+Number 4: 1-Minute Express Handover. You walk up to the special FoodLine express counter, 
+flash your digital QR pass, grab your tray, and walk away in under 1 minute!"
 
 --------------------------------------------------------------------------------
 
@@ -92,16 +92,16 @@ Everything is calibrated to real college prices and real hunger rush hours!"
 --------------------------------------------------------------------------------
 
 ================================================================================
-SLIDE 5: PAYMENT INNOVATION (OPTION C)
+SLIDE 5: PAYMENT INNOVATION (DIRECTPAY UPI)
 ================================================================================
-📌 SLIDE TITLE: Option C: Zero-Fee UPI & UTR Verification
+📌 SLIDE TITLE: DirectPay: Zero-Fee Direct UPI & UTR Verification
 🎯 9-YEAR-OLD MEMORY HOOK: "No credit card taxes! 100% of your ₹20 goes directly to the uncle making your samosa."
 
 🗣️ WHAT TO SAY ALOUD:
 "Why do traditional payment gateways fail on campus? 
 Because if a student buys a ₹15 cup of tea, standard gateways take 2% plus taxes. 
 Canteen owners can't afford that!
-So we designed 'Option C':
+So we designed 'DirectPay':
 1. The student sees the official Cafe @7 UPI QR code in the app.
 2. They pay the exact rupee amount directly using GPay, PhonePe, or Paytm.
 3. They enter the 12-digit bank UTR receipt number.
@@ -170,7 +170,7 @@ SLIDE 8: BUSINESS MODEL
 SLIDE 9: COMPETITIVE MATRIX
 ================================================================================
 📌 SLIDE TITLE: Why Existing Delivery Apps Fail on Campus
-🎯 9-YEAR-OLD MEMORY HOOK: "Zomato takes 40 minutes and ₹200 minimum. FoodLine takes 30 seconds and lets you buy a ₹15 Chai!"
+🎯 9-YEAR-OLD MEMORY HOOK: "Zomato takes 40 minutes and ₹200 minimum. FoodLine takes 1 minute and lets you buy a ₹15 Chai!"
 
 🗣️ WHAT TO SAY ALOUD:
 "People often ask: 'Why can't students just use Swiggy or Zomato?'
@@ -195,8 +195,8 @@ SLIDE 10: TARGET IMPACT & BENCHMARKS
 - 12+ Minutes Saved Per Meal: Students get back almost their entire break to relax and study.
 - 2.5x Peak Rush Capacity: Canteens can serve two-and-a-half times more meals during the 
   lunch rush without adding extra counter space.
-- Under 30-Second Handover: From flashing the QR code to holding your plate will take less 
-  than 30 seconds.
+- Under 1-Minute Handover: From flashing the QR code to holding your plate will take less 
+  than 1 minute.
 - 65%+ Weekly Retention: Because students eat on campus every single day, our habit-forming 
   retention will be higher than standard consumer delivery apps."
 
@@ -247,7 +247,7 @@ SLIDE 13: FINANCIAL PROJECTIONS
 - Year 3: ₹35 Crores with high 72% gross margins.
 Best of all: Our Customer Acquisition Cost is virtually ₹0! 
 When students see their classmates walking past the long line and picking up food 
-in 30 seconds, everyone downloads FoodLine immediately."
+in 1 minute, everyone downloads FoodLine immediately."
 
 --------------------------------------------------------------------------------
 
@@ -260,7 +260,7 @@ SLIDE 14: THE TEAM
 🗣️ WHAT TO SAY ALOUD:
 "Who is behind this idea?
 We are students and engineers who have stood in these exact lines and know the pain first-hand.
-- Shivam Nirmal (Founder & CEO): Leading product concept, the Option C payment architecture, 
+- Shivam Nirmal (Founder & CEO): Leading product concept, the DirectPay UPI payment architecture, 
   and campus operations.
 - Supported by our technical team specializing in real-time database systems and operations 
   leads managing ground-level campus relationships."
@@ -277,7 +277,7 @@ SLIDE 15: CLOSING & CALL TO ACTION
 "To wrap up:
 Every student deserves to enjoy their meal, recharge their brain, and spend break time 
 with friends — not standing in a suffocating queue.
-FoodLine transforms campus dining from a daily headache into a 30-second express experience.
+FoodLine transforms campus dining from a daily headache into a 1-minute express experience.
 Our prototype architecture is ready, our pilot plan is set for Sanjivani University, 
 and we are excited to scale this across 5,000 campuses in India.
 FoodLine — Skip the Line, Not the Meal.

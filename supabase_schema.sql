@@ -62,6 +62,10 @@ CREATE TABLE menu_items (
     price NUMERIC(10, 2) NOT NULL,
     prep_time_mins INT DEFAULT 5,
     is_available BOOLEAN DEFAULT TRUE,
+    inventory_type VARCHAR(20) DEFAULT 'daily_fresh',
+    stock_quantity INT DEFAULT NULL,
+    low_stock_threshold INT DEFAULT 5,
+    last_fresh_date VARCHAR(10) DEFAULT NULL,
     image_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );

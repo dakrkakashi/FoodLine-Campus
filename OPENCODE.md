@@ -42,14 +42,14 @@ graph TD
 
 | Directory / File | Primary Owner | Secondary Reviewer | Description |
 |---|---|---|---|
-| `src/app/api/**` | **Antigravity** | OpenCode | Next.js App Router API Route Handlers |
-| `src/utils/supabase/**` | **Antigravity** | OpenCode | Supabase SSR & Browser Client Helpers |
-| `supabase_schema.sql` | **Antigravity** | OpenCode | PostgreSQL Database DDL & Seed Data |
-| `src/lib/types.ts` | **Antigravity** | OpenCode | Single Source of Truth TypeScript interfaces |
-| `src/app/globals.css` | **OpenCode** | Antigravity | Global CSS Variables, Themes, Glassmorphism |
-| `src/app/**/page.tsx` | **OpenCode** | Antigravity | Frontend UI Pages & Presentation Components |
-| `src/components/**` | **OpenCode** | Antigravity | Reusable UI Components (Navbar, Cards, Badges) |
-| `src/context/CartContext.tsx` | **Shared** | Shared | Global Cart Tray & Slot Selection State |
+| `backend/src/**` | **Antigravity** | OpenCode | Express/Node.js API Route Handlers & SSE Streams |
+| `backend/database/schema.sql` | **Antigravity** | OpenCode | PostgreSQL Database DDL & Seed Data |
+| `backend/src/lib/types.ts` | **Antigravity** | OpenCode | Single Source of Truth TypeScript interfaces |
+| `frontend/src/app/globals.css` | **OpenCode** | Antigravity | Global CSS Variables, Themes, Glassmorphism |
+| `frontend/src/app/**/page.tsx` | **OpenCode** | Antigravity | Frontend UI Pages & Presentation Components |
+| `frontend/src/components/**` | **OpenCode** | Antigravity | Reusable UI Components (Navbar, Cards, Badges) |
+| `frontend/src/context/CartContext.tsx` | **OpenCode** | Antigravity | Global Cart Tray & Slot Selection State |
+| `frontend/src/lib/types.ts` | **Shared** | Shared | Shared Client TypeScript Interfaces |
 
 ---
 

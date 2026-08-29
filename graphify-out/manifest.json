@@ -8214,9 +8214,9 @@
     "semantic_hash": ""
   },
   "FoodLine_App_UI_UX_Design_System.md": {
-    "mtime": 1787849112.4446888,
-    "seen": 1787849810.6819165,
-    "ast_hash": "d8ea529be289b9aaede60a8fc2e11466",
+    "mtime": 1787889593.1057198,
+    "seen": 1787889677.8962922,
+    "ast_hash": "5816de29a74d82a9a82dd044cc762ed4",
     "semantic_hash": ""
   },
   "FoodLine_Cafe7_Full_Menu.md": {
@@ -8226,21 +8226,21 @@
     "semantic_hash": ""
   },
   "FoodLine_Design_Doc.md": {
-    "mtime": 1787847207.857785,
-    "seen": 1787849810.6819184,
-    "ast_hash": "7c7090e78a59ca7e346df1c2753c130a",
+    "mtime": 1787889582.6885192,
+    "seen": 1787889677.8964372,
+    "ast_hash": "d67245a417d80922e7937cc4be74b99e",
     "semantic_hash": ""
   },
   "FoodLine_Master_App_Plan.md": {
-    "mtime": 1787848540.9034505,
-    "seen": 1787849810.6819196,
-    "ast_hash": "c98e918e8f59025dc7ab6cf4b40ff9c1",
+    "mtime": 1787889553.2145336,
+    "seen": 1787889677.8965793,
+    "ast_hash": "873496212eeb001ccbc0f1a2e81367dc",
     "semantic_hash": ""
   },
   "FoodLine_PRD.md": {
-    "mtime": 1787847188.9274743,
-    "seen": 1787849810.6819203,
-    "ast_hash": "af4a6b0df3cab1d0a5f3aa8105e66e35",
+    "mtime": 1787889542.2415884,
+    "seen": 1787889677.8965833,
+    "ast_hash": "d1c6708bd7e3a1ffc8c2373108e2789d",
     "semantic_hash": ""
   },
   "FoodLine_Pitch_Deck/FoodLine_Pitch_Script.txt": {
@@ -8262,15 +8262,15 @@
     "semantic_hash": ""
   },
   "FoodLine_Pitch_Script.txt": {
-    "mtime": 1787844685.3411055,
-    "seen": 1787849810.6819239,
-    "ast_hash": "426b5b8ec8538b5e91da379835d16e9b",
+    "mtime": 1787889563.5163896,
+    "seen": 1787889677.8972096,
+    "ast_hash": "dc8ee296d3f7ecd6c2eebe5b5cbbd809",
     "semantic_hash": ""
   },
   "FoodLine_Short_Pitch_Script.txt": {
-    "mtime": 1787847754.0379696,
-    "seen": 1787849810.6819246,
-    "ast_hash": "d60900b9df5e071934951895b62c34c7",
+    "mtime": 1787889572.937027,
+    "seen": 1787889677.8972118,
+    "ast_hash": "e9c5e4c8792d3e4d8a8b3287dbf2db7b",
     "semantic_hash": ""
   },
   "FoodLine_Tech_Stack.md": {
@@ -8625,6 +8625,30 @@
     "mtime": 1787852378.646706,
     "seen": 1787852459.7723346,
     "ast_hash": "68b691fb9f98de406155fa203968e45e",
+    "semantic_hash": ""
+  },
+  "FoodLine_Master_Financial_Plan.md": {
+    "mtime": 1787889521.7241013,
+    "seen": 1787889677.8965814,
+    "ast_hash": "b90e2577edf3cfb72e42a980d551c72b",
+    "semantic_hash": ""
+  },
+  "OPENCODE_FRONTEND_DESIGN_PROMPT.md": {
+    "mtime": 1787852623.0795295,
+    "seen": 1787889330.0844452,
+    "ast_hash": "03bcc8316a026e83477a68472e6b0a28",
+    "semantic_hash": ""
+  },
+  "FoodLine_Margin_Structure.md": {
+    "mtime": 1787889534.681121,
+    "seen": 1787889677.8965776,
+    "ast_hash": "17c54fd9ac096992c4fe0b995c428f77",
+    "semantic_hash": ""
+  },
+  "foodline_charges_and_pricing.html": {
+    "mtime": 1787889509.153351,
+    "seen": 1787889677.8981614,
+    "ast_hash": "437098c13520b92c8f5bbcc4420a35b5",
     "semantic_hash": ""
   }
 }

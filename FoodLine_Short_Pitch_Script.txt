@@ -6,7 +6,7 @@
 ⭐ THE 3-SENTENCE STORY (Remember This Forever):
 1. When the college lunch bell rings, students waste 15 minutes stuck in a crowded line.
 2. FoodLine is a magic "Fast-Pass" on your phone to pre-order and pay with zero extra fees.
-3. You walk up to the special counter, scan your code in 30 seconds, and enjoy your food!
+3. You walk up to the special counter, scan your code in 1 minute, and enjoy your food!
 
 ================================================================================
 SLIDE-BY-SLIDE SHORT SCRIPT (Read in 3-4 Minutes Total)
@@ -40,8 +40,8 @@ SLIDE 3: OUR 4-STEP SOLUTION
 1. Browse the live menu from your classroom.
 2. Pick a 10-minute pickup slot so the kitchen isn't crowded.
 3. Pay directly with UPI — zero middleman fees.
-4. Grab your food from the express counter in 30 seconds!"
-💡 9-YEAR-OLD MEMORY: Tap on phone, pay ₹0 fees, pick up hot snack in 30 seconds.
+4. Grab your food from the express counter in 1 minute!"
+💡 9-YEAR-OLD MEMORY: Tap on phone, pay ₹0 fees, pick up hot snack in 1 minute.
 
 --------------------------------------------------------------------------------
 
@@ -55,11 +55,11 @@ Students can order verified campus favorites: ₹10 Special Tea, ₹20 Vada Pav 
 
 --------------------------------------------------------------------------------
 
-SLIDE 5: ZERO-FEE PAYMENT (OPTION C)
+SLIDE 5: ZERO-FEE PAYMENT (DIRECTPAY UPI)
 --------------------------------------------------------------------------------
 🗣️ WHAT TO SAY:
 "Normal payment apps take a 2% cut, which canteens hate on a ₹20 samosa.
-With our 'Option C', students scan the canteen's UPI QR directly and paste the UTR number.
+With our 'DirectPay', students scan the canteen's UPI QR directly and paste the UTR number.
 100% of the money goes straight to the canteen owner with zero fees!"
 💡 9-YEAR-OLD MEMORY: Every single rupee goes straight to the canteen uncle!
 
@@ -112,9 +112,9 @@ SLIDE 10: KEY GOALS & IMPACT
 "Our targets are clear:
 - 12 minutes saved for every student.
 - 2.5x more food sold during rush hours.
-- Under 30-second express pickup.
+- Under 1-minute express pickup.
 - 65% of students using it every week!"
-💡 9-YEAR-OLD MEMORY: 12 minutes saved and 30-second pickup every single day!
+💡 9-YEAR-OLD MEMORY: 12 minutes saved and 1-minute pickup every single day!
 
 --------------------------------------------------------------------------------
 
@@ -150,7 +150,7 @@ SLIDE 14: THE TEAM
 --------------------------------------------------------------------------------
 🗣️ WHAT TO SAY:
 "We are student engineers who live this problem every day.
-I'm leading the product and Option C payment engine, supported by a strong tech and operations team."
+I'm leading the product and DirectPay UPI payment engine, supported by a strong tech and operations team."
 💡 9-YEAR-OLD MEMORY: Built by students who actually eat in the canteen!
 
 --------------------------------------------------------------------------------

@@ -29,7 +29,7 @@ A **mobile-first, 60-second ordering flow**:
 - **Classroom Pre-Ordering:** Order before the bell rings from lecture halls.
 - **Capacity Throttling:** 60 orders max per 10-minute slot to prevent kitchen bottlenecks.
 - **Zero-Fee Direct UPI:** Instant QR scan with 12-digit UTR bank reference verification.
-- **30-Second Express Grab:** Flash digital QR Pass with 4-digit OTP at counter.
+- **1-Minute Express Grab:** Flash digital QR Pass with 4-digit OTP at counter.
 
 ```mermaid
 graph LR
@@ -37,7 +37,7 @@ graph LR
     B --> C[💳 Direct UPI QR Pay]
     C --> D[🎫 Get Digital Pickup Pass]
     D --> E[🍳 KDS Live Kitchen Sync]
-    E --> F[⚡ 30s Counter Collection]
+    E --> F[⚡ 1m Counter Collection]
 ```
 
 ---

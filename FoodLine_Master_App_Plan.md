@@ -14,7 +14,7 @@
 3. [Bottom-Up Unit Economics & Financial Modeling](#3-bottom-up-unit-economics--financial-modeling)
 4. [Deep 5-Stage Operational User Journeys & Technical Sequences](#4-deep-5-stage-operational-user-journeys--technical-sequences)
 5. [The "Use Value > Cash Value" Mathematical Ratio](#5-the-use-value--cash-value-mathematical-ratio)
-6. [Option C Zero-Fee UPI & Anti-Fraud Replay Guard](#6-option-c-zero-fee-upi--anti-fraud-replay-guard)
+6. [DirectPay Zero-Fee UPI & Anti-Fraud Replay Guard](#6-directpay-zero-fee-upi--anti-fraud-replay-guard)
 7. [Kitchen Display System (KDS) & Load-Throttling Algorithm](#7-kitchen-display-system-kds--load-throttling-algorithm)
 8. [Risk Mitigation, Red Flag Defenses & Legal Moats](#8-risk-mitigation-red-flag-defenses--legal-moats)
 9. [3-Phase Growth Roadmap & Investor Exit Strategy](#9-3-phase-growth-roadmap--investor-exit-strategy)
@@ -33,7 +33,7 @@ graph TD
 ### 1.1 "The Science of Getting Rich" (Wallace D. Wattles) Applied to FoodLine:
 - **Creation Over Competition:** FoodLine refuses to enter price wars with Swiggy or Zomato for off-campus deliveries. Instead, we **CREATE a captive, frictionless on-campus micro-dining ecosystem** inside university walls where external riders cannot enter.
 - **The Law of Increase:** Every screen, interaction, and touchpoint radiates speed, relief, and modern elegance to students and canteen operators.
-- **Efficient Action in the Present:** Every single user interaction is engineered for zero redundant clicks — 3 taps to order, 1 scan to pay, 30 seconds to collect.
+- **Efficient Action in the Present:** Every single user interaction is engineered for zero redundant clicks — 3 taps to order, 1 scan to pay, 1 minute to collect.
 
 ### 1.2 "Rich Dad's Guide to Investing" (Robert T. Kiyosaki) Applied to FoodLine:
 - **Building Assets That Buy Assets:** FoodLine is not a gig; it is a scalable **B-Quadrant System** producing predictable, high-margin cash flow that converts transactional revenue into long-term enterprise value.
@@ -60,7 +60,7 @@ graph TD
          /-------------\
         /       C       \    C = COMMUNICATIONS (On-Table QR Standees, Campus Ambassador Virality)
        /-----------------\
-      /        CF         \  CF = CASH FLOW (Option C 0% Fee Model + Negative Working Capital)
+      /        CF         \  CF = CASH FLOW (DirectPay 0% Fee Model + Negative Working Capital)
      -----------------------
        MISSION | TEAM | LEADERSHIP (Outer Protective Frame)
 ```
@@ -133,7 +133,7 @@ Timeline: 11:35 AM (15 Minutes Before the 11:50 AM Lunch Bell)
 
 ---
 
-### 4.2 Stage 2: Option C Zero-Fee Direct UPI & Anti-Replay Guard
+### 4.2 Stage 2: DirectPay Zero-Fee Direct UPI & Anti-Replay Guard
 ```
 Timeline: 11:37 AM
 ```
@@ -189,7 +189,7 @@ Timeline: 11:40 AM to 11:48 AM (Kitchen Preparation Window)
 
 ---
 
-### 4.4 Stage 4: Real-Time SSE Notification & 30-Second Express Handover
+### 4.4 Stage 4: Real-Time SSE Notification & 1-Minute Express Handover
 ```
 Timeline: 11:50 AM (Recess Bell Rings)
 ```
@@ -246,11 +246,11 @@ Because the student receives **10x more in real-life utility and time-wealth** t
 
 ---
 
-## 6. Option C Zero-Fee UPI & Anti-Fraud Replay Guard
+## 6. DirectPay Zero-Fee UPI & Anti-Fraud Replay Guard
 
 Traditional payment gateways (Razorpay, Paytm PG, Cashfree) charge **2.0% + GST**. On a ₹20 Samosa or ₹10 Tea, this destroys the canteen's razor-thin margins.
 
-### Option C Security Architecture:
+### DirectPay Security Architecture:
 1. **Idempotency Key:** `HASH(order_id + utr_number + amount + outlet_id)`
 2. **Regex Validation:** Bank UTR must strictly match `^[0-9]{12}$` (12 numeric digits).
 3. **Replay Cache:** Redis / Supabase unique constraint prevents any UTR from being submitted more than once across the entire network.
@@ -300,7 +300,7 @@ graph LR
 
 ### Phase 1 (Months 1–6): Prove & Perfect (Sanjivani University)
 - Full saturation at Cafe @7 (500+ daily orders).
-- Validate Option C UTR verification accuracy at scale (>99.5% automated match).
+- Validate DirectPay UTR verification accuracy at scale (>99.5% automated match).
 - Onboard 2 additional food stalls on Sanjivani campus.
 
 ### Phase 2 (Months 7–18): Regional Cluster Domination

@@ -1,0 +1,233 @@
+@import "tailwindcss";
+
+:root {
+  /* Canvas & Surfaces */
+  --bg-canvas: #07070B;
+  --bg-card: #12121A;
+  --bg-card-hover: #191924;
+  --bg-card-active: #212130;
+  --bg-glass: rgba(18, 18, 26, 0.72);
+  --bg-glass-heavy: rgba(12, 12, 18, 0.88);
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-glass-hover: rgba(255, 255, 255, 0.22);
+  --border-glass-active: rgba(255, 107, 44, 0.5);
+
+  /* Brand & Vibrant Accents */
+  --accent-orange: #FF6B2C;
+  --accent-orange-glow: rgba(255, 107, 44, 0.4);
+  --accent-amber: #FFB347;
+  --accent-amber-glow: rgba(255, 179, 71, 0.35);
+  --accent-teal: #00D4AA;
+  --accent-teal-glow: rgba(0, 212, 170, 0.4);
+  --accent-purple: #8B5CF6;
+  --accent-purple-glow: rgba(139, 92, 246, 0.35);
+  --accent-blue: #3B82F6;
+  --accent-rose: #F43F5E;
+
+  /* Typography */
+  --text-primary: #F5F5F7;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --text-inverse: #07070B;
+}
+
+body {
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .font-heading {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Glassmorphism Utilities */
+.glass-card {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+}
+
+.glass-card-heavy {
+  background: var(--bg-glass-heavy);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid var(--border-glass);
+}
+
+.glass-interactive {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-interactive:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-glass-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6);
+}
+
+.glow-orange {
+  box-shadow: 0 0 30px var(--accent-orange-glow);
+}
+
+.glow-teal {
+  box-shadow: 0 0 30px var(--accent-teal-glow);
+}
+
+.glow-amber {
+  box-shadow: 0 0 30px var(--accent-amber-glow);
+}
+
+.glow-purple {
+  box-shadow: 0 0 30px var(--accent-purple-glow);
+}
+
+/* Animated Aurora Background Mesh */
+.aurora-mesh {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.aurora-blob {
+  position: absolute;
+  filter: blur(90px);
+  border-radius: 9999px;
+  opacity: 0.22;
+  mix-blend-mode: screen;
+  animation: aurora-flow 16s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-flow {
+  0% {
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    transform: translate(80px, -60px) scale(1.15) rotate(45deg);
+  }
+  66% {
+    transform: translate(-60px, 50px) scale(0.9) rotate(-30deg);
+  }
+  100% {
+    transform: translate(40px, 80px) scale(1.1) rotate(60deg);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+}
+::-webkit-scrollbar-thumb {
+  background: #232336;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-orange);
+}
+
+/* Keyframe Animations */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.03); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float-slow 4s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 25s linear infinite;
+}
+
+.shimmer-badge {
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.04) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3.5s infinite;
+}
+
+/* 📺 Public Counter TV Display Tokens & Keyframes */
+:root {
+  --display-amber: #FFB347;
+  --display-amber-glow: rgba(255, 179, 71, 0.4);
+  --display-emerald: #00D4AA;
+  --display-emerald-glow: rgba(0, 212, 170, 0.5);
+  --display-token-font: 'JetBrains Mono', monospace;
+  --display-header-font: 'Outfit', sans-serif;
+}
+
+.display-card-preparing {
+  background: rgba(26, 17, 8, 0.65);
+  border: 1.5px solid rgba(255, 179, 71, 0.3);
+  backdrop-filter: blur(20px);
+}
+
+.display-card-ready {
+  background: rgba(4, 28, 22, 0.7);
+  border: 2px solid rgba(0, 212, 170, 0.45);
+  backdrop-filter: blur(24px);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 32s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.spotlight-flare {
+  animation: flare-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes flare-pulse {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(0, 212, 170, 0.35), inset 0 0 15px rgba(0, 212, 170, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 65px rgba(0, 212, 170, 0.7), inset 0 0 30px rgba(0, 212, 170, 0.3);
+  }
+}
+

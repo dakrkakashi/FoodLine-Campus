@@ -1,0 +1,140 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import { setDishAvailability, setDishDetails, setPersistentStock } from '@/lib/stock-store';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ dishId: string }> }
+) {
+  try {
+    const { dishId } = await params;
+    const body = await request.json();
+    const {
+      isAvailable,
+      is_available,
+      name,
+      price,
+      tag,
+      category,
+      prep_time_mins,
+      prepTime,
+      description,
+      stock_quantity,
+      stockQuantity,
+      quantity,
+    } = body;
+
+    const rawQty = stock_quantity ?? stockQuantity ?? quantity;
+    const availability =
+      typeof isAvailable === 'boolean'
+        ? isAvailable
+        : typeof is_available === 'boolean'
+        ? is_available
+        : undefined;
+
+    const updates: Record<string, any> = {};
+
+    if (rawQty !== undefined && typeof rawQty === 'number' && !isNaN(rawQty)) {
+      const safeQty = Math.max(0, rawQty);
+      updates.stock_quantity = safeQty;
+      setPersistentStock(dishId, safeQty);
+
+      if (safeQty === 0) {
+        updates.is_available = false;
+        setDishAvailability(dishId, false);
+      } else if (availability === undefined && safeQty > 0) {
+        updates.is_available = true;
+        setDishAvailability(dishId, true);
+      }
+    }
+
+    if (availability !== undefined) {
+      updates.is_available = availability;
+      setDishAvailability(dishId, availability);
+    }
+    if (typeof name === 'string' && name.trim()) {
+      updates.name = name.trim();
+    }
+    if (typeof price === 'number' && !isNaN(price)) {
+      updates.price = price;
+    }
+    if (typeof tag === 'string') {
+      updates.tag = tag.trim();
+    }
+    if (typeof category === 'string') {
+      updates.category = category.trim();
+    }
+    if (typeof prep_time_mins === 'number' && !isNaN(prep_time_mins)) {
+      updates.prep_time_mins = prep_time_mins;
+    } else if (typeof prepTime === 'number' && !isNaN(prepTime)) {
+      updates.prep_time_mins = prepTime;
+    }
+    if (typeof description === 'string') {
+      updates.description = description.trim();
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'INVALID_PAYLOAD',
+            message: 'No valid dish fields provided to update.',
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    // 1. Update live in-memory & disk overrides
+    setDishDetails(dishId, updates);
+
+    // 2. Best-effort Supabase PostgreSQL sync
+    try {
+      await supabase
+        .from('menu_items')
+        .update(updates)
+        .eq('id', dishId);
+    } catch (dbErr) {
+      console.warn('Supabase DB dish update warning (using memory override):', dbErr);
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        id: dishId,
+        ...updates,
+        isAvailable: updates.is_available !== undefined ? updates.is_available : undefined,
+        stockQuantity: updates.stock_quantity,
+        updated_at: new Date().toISOString(),
+      },
+      meta: {
+        timestamp: new Date().toISOString(),
+        message: `Dish ${dishId} updated successfully`,
+      },
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: 'INVENTORY_UPDATE_ERROR',
+          message: error.message || 'Failed to update dish',
+        },
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  context: { params: Promise<{ dishId: string }> }
+) {
+  return PATCH(request, context);
+}

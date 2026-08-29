@@ -1,0 +1,213 @@
+/**
+ * 🚀 FoodLine Shared Type Definitions & API Contracts
+ * Single source of truth for Antigravity (Backend) and OpenCode (Frontend Design)
+ */
+
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  error?: {
+    code: string;
+    message: string;
+    details?: any;
+  };
+  meta?: {
+    timestamp?: string;
+    requestId?: string;
+    totalItems?: number;
+  };
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  icon?: string;
+  display_order?: number;
+}
+
+export type InventoryType = 'daily_fresh' | 'persistent';
+
+export interface MenuItem {
+  id: string;
+  cafeteria_id?: string;
+  category_id?: string;
+  category?: string;
+  name: string;
+  tag?: string;
+  price: number;
+  prep_time_mins?: number;
+  prepTime?: number;
+  is_available?: boolean;
+  isAvailable?: boolean;
+  inventory_type?: InventoryType;
+  stock_quantity?: number | null;
+  low_stock_threshold?: number;
+  last_fresh_date?: string;
+  image_url?: string;
+  image?: string;
+  created_at?: string;
+}
+
+export interface InventoryStatus {
+  itemId: string;
+  name?: string;
+  price?: number;
+  category?: string;
+  tag?: string;
+  inventoryType: InventoryType;
+  isAvailable: boolean;
+  stockQuantity?: number | null;
+  isLowStock: boolean;
+  lowStockThreshold?: number;
+  lastFreshDate?: string;
+}
+
+export interface MorningPrepPayload {
+  date: string; // 'YYYY-MM-DD'
+  dailyFreshItemIds: string[];
+}
+
+export interface PersistentStockUpdate {
+  itemId: string;
+  stockQuantity: number;
+}
+
+export interface PickupSlot {
+  id: string;
+  label: string;
+  startTime: string;
+  endTime: string;
+  maxCapacity: number;
+  currentBooked: number;
+  availableSlots: number;
+  isFull: boolean;
+}
+
+export type PaymentMethod = 'UPI' | 'COD';
+
+export type OrderStatus =
+  | 'PENDING_PAYMENT'
+  | 'PAY_AT_COUNTER'
+  | 'CONFIRMED'
+  | 'PREPARING'
+  | 'READY'
+  | 'COLLECTED'
+  | 'CANCELLED';
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  menu_item_id?: string;
+  item_name: string;
+  quantity: number;
+  unit_price: number;
+  subtotal: number;
+}
+
+export interface Order {
+  id: string;
+  order_token?: string; // e.g. "FL-1793"
+  orderToken?: string;
+  user_id?: string;
+  studentPhone?: string;
+  cafeteria_id?: string;
+  slot_id?: string;
+  slot?: PickupSlot;
+  total_amount?: number;
+  totalAmount?: number;
+  payment_method?: PaymentMethod;
+  paymentMethod?: PaymentMethod;
+  status: OrderStatus;
+  pickup_otp?: string; // e.g. "6065"
+  pickupOtp?: string;
+  utr_number?: string;
+  utrNumber?: string;
+  notes?: string;
+  created_at?: string;
+  createdAt?: string;
+  updated_at?: string;
+  updatedAt?: string;
+  items?: CartItem[];
+  order_items?: OrderItem[];
+  financials?: {
+    itemTotal: number;
+    studentPlatformFee: number; // 3.5%
+    paymentGatewayMdr: number;   // 0%
+    totalAmountPaid: number;
+    merchantPayoutAmount: number;
+    platformShareAmount: number;
+  };
+  compliance?: {
+    dpdpConsentGiven: boolean;
+    fssaiLicense: string;
+    maxSlotHoldMinutes: number; // 20 mins
+  };
+  pickup_slots?: {
+    label: string;
+    start_time?: string;
+    end_time?: string;
+  };
+}
+
+export interface Payment {
+  id: string;
+  order_id: string;
+  utr_number: string; // 12-digit numeric
+  amount: number;
+  status: 'PENDING_VERIFICATION' | 'VERIFIED' | 'FAILED';
+  verified_by?: string;
+  created_at: string;
+  verified_at?: string;
+}
+
+export interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  category?: string;
+  tag?: string;
+}
+
+export interface CreateOrderPayload {
+  slotId?: string;
+  items: {
+    id?: string;
+    name: string;
+    price: number;
+    quantity: number;
+  }[];
+  notes?: string;
+  paymentMethod?: PaymentMethod;
+  studentName?: string;
+  studentPrn?: string;
+  utrNumber?: string;
+}
+
+export interface VerifyUtrPayload {
+  orderToken: string;
+  utrNumber: string; // 12 digits
+  amount?: number;
+}
+
+export interface UpdateOrderStatusPayload {
+  status: OrderStatus;
+}
+
+export interface ToggleInventoryPayload {
+  isAvailable: boolean;
+}
+
+export interface SoundSettings {
+  enabled: boolean;
+  volume: number;
+  lang: 'en-IN' | 'hi-IN' | 'mr-IN';
+}
+
+export interface DisplayOrder extends Order {
+  order_items: OrderItem[];
+  estimatedReadyAt?: string;
+  counter?: 1 | 2;
+  isJustReady?: boolean;
+}
+

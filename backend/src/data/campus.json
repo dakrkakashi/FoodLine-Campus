@@ -1,0 +1,68 @@
+{
+  "university": "Sanjivani University, Kopargaon (MH)",
+  "outlet": "Cafe @7 (Main Campus Cafeteria)",
+  "merchantUpiId": "sanjivanicafe7@okaxis",
+  "breaks": [
+    {
+      "id": "break-morning",
+      "label": "Morning Tea Break",
+      "window": "10:15 AM – 10:35 AM",
+      "slots": [
+        {
+          "id": "slot-morning-a",
+          "label": "Morning Break (10:15 AM - 10:35 AM)",
+          "startTime": "10:15 AM",
+          "endTime": "10:35 AM",
+          "maxCapacity": 60,
+          "currentBooked": 22
+        }
+      ]
+    },
+    {
+      "id": "break-lunch",
+      "label": "Lunch Break",
+      "window": "11:50 AM – 12:50 PM",
+      "slots": [
+        {
+          "id": "slot-lunch-a",
+          "label": "Lunch Shift 1 (11:50 AM - 12:10 PM)",
+          "startTime": "11:50 AM",
+          "endTime": "12:10 PM",
+          "maxCapacity": 60,
+          "currentBooked": 38
+        },
+        {
+          "id": "slot-lunch-b",
+          "label": "Lunch Shift 2 (12:10 PM - 12:30 PM)",
+          "startTime": "12:10 PM",
+          "endTime": "12:30 PM",
+          "maxCapacity": 60,
+          "currentBooked": 51
+        },
+        {
+          "id": "slot-lunch-c",
+          "label": "Lunch Shift 3 (12:30 PM - 12:50 PM)",
+          "startTime": "12:30 PM",
+          "endTime": "12:50 PM",
+          "maxCapacity": 60,
+          "currentBooked": 14
+        }
+      ]
+    },
+    {
+      "id": "break-evening",
+      "label": "Afternoon Snack Break",
+      "window": "03:30 PM – 03:50 PM",
+      "slots": [
+        {
+          "id": "slot-evening-a",
+          "label": "Afternoon Snack (03:30 PM - 03:50 PM)",
+          "startTime": "03:30 PM",
+          "endTime": "03:50 PM",
+          "maxCapacity": 60,
+          "currentBooked": 19
+        }
+      ]
+    }
+  ]
+}

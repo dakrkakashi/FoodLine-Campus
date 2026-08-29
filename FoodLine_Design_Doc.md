@@ -24,7 +24,7 @@ graph TD
 
     subgraph Core Services
         OrderEngine[Order Lifecycle Engine]
-        PayEngine[Option C UTR Verification Service]
+        PayEngine[DirectPay UTR Verification Service]
         SSE_Hub[Server-Sent Events SSE Broker]
     end
 
@@ -116,7 +116,7 @@ CREATE TABLE order_items (
     unit_price DECIMAL(10,2) NOT NULL
 );
 
--- 6. OPTION C UTR TRANSACTIONS
+-- 6. DIRECTPAY UTR TRANSACTIONS
 CREATE TABLE utr_transactions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     order_id UUID REFERENCES orders(id),
@@ -131,7 +131,7 @@ CREATE TABLE utr_transactions (
 
 ---
 
-## 3. Option C Payment & Idempotent Verification Sequence
+## 3. DirectPay Payment & Idempotent Verification Sequence
 
 ```mermaid
 sequenceDiagram

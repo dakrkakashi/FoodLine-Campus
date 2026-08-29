@@ -42,8 +42,8 @@ PPT OTHER TASKES/
 ### 2. The 4 Core Product Pillars
 1. **Browse & Order Ahead:** Classroom pre-ordering on mobile web.
 2. **Smart Slot Throttling:** 10-minute dynamic break slots balancing kitchen load.
-3. **Option C Zero-Fee UPI:** Direct merchant standee scanning + 12-digit bank UTR verification (100% merchant payout).
-4. **30-Second Express Handover:** Optical QR digital pass & 4-digit PIN verification at dedicated express counter.
+3. **DirectPay Zero-Fee UPI:** Direct merchant standee scanning + 12-digit bank UTR verification (100% merchant payout).
+4. **1-Minute Express Handover:** Optical QR digital pass & 4-digit PIN verification at dedicated express counter.
 
 ### 3. Pilot Deployment Blueprint
 - **Campus:** Sanjivani University, Kopargaon (MH)

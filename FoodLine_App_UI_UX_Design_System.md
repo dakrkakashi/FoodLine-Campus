@@ -174,7 +174,7 @@ graph TD
 
 ---
 
-### 💰 Screen 3: Option C Direct UPI & UTR Verification (`/payment`)
+### 💰 Screen 3: DirectPay Direct UPI & UTR Verification (`/payment`)
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  ← Change Slot                           0% Gateway Fee  │
@@ -230,7 +230,7 @@ graph TD
 │  📍 EXPRESS HANDOVER INSTRUCTIONS:                       │
 │  1. Walk to dedicated FoodLine Counter (Skip main queue) │
 │  2. Flash this optical QR code or say PIN 4921           │
-│  3. Grab pre-boxed meal in under 30 seconds!             │
+│  3. Grab pre-boxed meal in under 1 minute!               │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -241,7 +241,7 @@ graph TD
 ┌───────────────────────────────────────────────────────────────────────────────────────────┐
 │  🍳 FoodLine KDS  •  Cafe @7 Station        ● SSE Sync Online    [ 🔔 Mute Chime ]  [ ⚙️ ] │
 ├──────────────────────────────┬────────────────────────────┬───────────────────────────────┤
-│  ⏳ QUEUED (Incoming)        │  🔥 PREPARING (Cooking)    │  🎟️ READY AT COUNTER (30s)    │
+│  ⏳ QUEUED (Incoming)        │  🔥 PREPARING (Cooking)    │  🎟️ READY AT COUNTER (1m)     │
 │  Total: 3 Orders             │  Total: 2 Batches          │  Total: 4 Orders              │
 ├──────────────────────────────┼────────────────────────────┼───────────────────────────────┤
 │  ┌────────────────────────┐  │  ┌──────────────────────┐  │  ┌─────────────────────────┐  │
@@ -279,7 +279,7 @@ graph TD
 - **Slot C (2:30 PM – 2:50 PM):** Evening tea and snack break. Max capacity: 45 meals.
 
 ### 3.3 Payment Options
-1. **Option C Direct UPI QR (Default & Recommended):** 0% gateway fee, direct GPay/PhonePe scan, 12-digit UTR validation.
+1. **DirectPay Direct UPI QR (Default & Recommended):** 0% gateway fee, direct GPay/PhonePe scan, 12-digit UTR validation.
 2. **Campus Digital Wallet / Prepaid ID Card (Phase 2):** 1-tap NFC payment linked to university roll number.
 3. **Cash on Counter Backup:** For students without digital banking, reserve slot with phone number and pay exact cash at counter.
 
@@ -306,7 +306,7 @@ FoodLine App Architecture
 │   ├── Student Contact Info (Phone number for SMS token fallback)
 │   └── Order Breakdown Summary (Subtotal + 0% PG fee badge)
 │
-├── 4. Option C Payment & Verification Section
+├── 4. DirectPay Payment & Verification Section
 │   ├── Official Merchant Standee QR Display
 │   ├── One-Tap Copy UPI ID (`9960091371@slc`)
 │   ├── 12-Digit Bank UTR Input with auto-formatting

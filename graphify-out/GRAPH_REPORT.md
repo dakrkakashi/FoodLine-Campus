@@ -1,13 +1,18 @@
-# Graph Report - PPT OTHER TASKES  (2026-08-27)
+# Graph Report - PPT OTHER TASKES  (2026-08-28)
 
 ## Corpus Check
-- 1364 files · ~1,841,832 words
+- 1367 files · ~1,853,117 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 23325 nodes · 24808 edges · 1409 communities (1327 shown, 82 thin omitted)
+- 23391 nodes · 24871 edges · 1415 communities (1332 shown, 83 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 90 edges (avg confidence: 0.87)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `efee4b7b`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - init.ts
@@ -19,8 +24,8 @@
 - gray
 - BM25
 - search
-- Product
 - CancellationToken
+- Product
 - TestSkillsCLI
 - button
 - compilerOptions
@@ -117,7 +122,7 @@
 - .claude/skills/brand/scripts/validate-asset.cjs
 - assets/skills/brand/scripts/extract-colors.cjs
 - assets/skills/brand/scripts/validate-asset.cjs
-- radius
+- sm
 - keywords
 - StyleCard.tsx
 - .claude/skills/design-system/templates/design-tokens-starter.json
@@ -159,7 +164,7 @@
 - validate-baseline.test.js
 - BaseSpecification
 - .claude/skills/design-system/scripts/generate-tokens.cjs
-- primitive
+- duration
 - ._base_config
 - Memory Forensics
 - Monorepo Management
@@ -1356,7 +1361,7 @@
 - React Native Architecture
 - Tailwind Design System
 - Instructions
-- .generate
+- 📊 FoodLine: Master Financial Plan & Pro Forma Projections (2026–2030)
 - Instructions
 - Instructions
 - Automated Unit Test Generation
@@ -1384,31 +1389,37 @@
 - $type
 - radius
 - $type
-- $type
+- UnitOfWork
 - radius
 - 1.2 Time-based Media
 - 1.3 Adaptable
 - Core Concepts
 - 4.1 Compatible
-- 800
-- padding-y
-- 800
+- 50
+- 📐 FoodLine: Comprehensive Margin Structure & Profit Waterfall
+- assets/scripts/tests/test_text_layout_resilience.py
 - padding-y
 - 2.1 Keyboard Accessible
 - 3.1 Readable
 - Quick Start
-- destructive
+- src/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py
 - destructive-foreground
 - muted
 - primary-foreground
 - ring
 - secondary-foreground
 - destructive
+- radius
+- 800
+- $type
+- ring
+- padding-y
 - destructive-foreground
 - muted
+- 🎨 OpenCode Master Frontend Design & Execution Directive
 - primary-foreground
-- ring
 - secondary-foreground
+- destructive
 
 ## God Nodes (most connected - your core abstractions)
 1. `TailwindConfigGenerator` - 60 edges
@@ -1437,7 +1448,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (1409 total, 82 thin omitted)
+## Communities (1415 total, 83 thin omitted)
 
 ### Community 0 - "init.ts"
 Cohesion: 0.06
@@ -1475,13 +1486,13 @@ Nodes (42): BM25, detect_domain(), get_cip_brief(), _load_csv(), Load CSV and re
 Cohesion: 0.07
 Nodes (42): BM25, detect_domain(), get_cip_brief(), _load_csv(), Load CSV and return list of dicts, Core search function using BM25, Auto-detect the most relevant domain from query, Main search function with auto-domain detection (+34 more)
 
-### Community 9 - "Product"
-Cohesion: 0.12
-Nodes (18): CancellationToken, IDbConnection, IDbContextTransaction, IEnumerable, ILogger, IOrderRepository, IReadOnlyList, Items (+10 more)
-
-### Community 10 - "CancellationToken"
+### Community 9 - "CancellationToken"
 Cohesion: 0.11
 Nodes (16): CancellationToken, IDbConnection, IDbContextTransaction, IEnumerable, ILogger, IOrderRepository, IReadOnlyList, Items (+8 more)
+
+### Community 10 - "Product"
+Cohesion: 0.18
+Nodes (13): Product, CancellationToken, IDbConnection, IEnumerable, ILogger, IReadOnlyList, Items, ProductSearchRequest (+5 more)
 
 ### Community 11 - "TestSkillsCLI"
 Cohesion: 0.10
@@ -1580,32 +1591,32 @@ Cohesion: 0.08
 Nodes (10): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), TestSearchDomains, read_rows(), TestStyleTaxonomy, read_rows() (+2 more)
 
 ### Community 35 - "search"
-Cohesion: 0.08
-Nodes (10): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), TestSearchDomains, read_rows(), TestStyleTaxonomy, read_rows() (+2 more)
+Cohesion: 0.09
+Nodes (10): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), format_output(), Format results for Claude consumption (token-optimized), TestDiagnosticsContracts, TestSearchDomains (+2 more)
 
 ### Community 36 - "search"
-Cohesion: 0.08
-Nodes (10): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), TestSearchDomains, read_rows(), TestStyleTaxonomy, read_rows() (+2 more)
+Cohesion: 0.09
+Nodes (10): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), format_output(), Format results for Claude consumption (token-optimized), TestDiagnosticsContracts, TestSearchDomains (+2 more)
 
 ### Community 37 - "skills/ui-ux-pro-max/scripts/design_system.py"
-Cohesion: 0.11
-Nodes (25): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), _generate_intelligent_overrides(), hex_to_ansi() (+17 more)
+Cohesion: 0.08
+Nodes (30): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_master_md(), format_page_override_md(), _generate_intelligent_overrides(), hex_to_ansi(), persist_design_system() (+22 more)
 
 ### Community 38 - "DesignSystemGenerator"
-Cohesion: 0.06
-Nodes (21): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., apply_decision_rules(), _object_without_duplicates() (+13 more)
+Cohesion: 0.05
+Nodes (26): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Execute searches across multiple domains., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict. (+18 more)
 
 ### Community 39 - "assets/scripts/design_system.py"
-Cohesion: 0.08
-Nodes (30): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+22 more)
+Cohesion: 0.09
+Nodes (28): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+20 more)
 
 ### Community 40 - "DesignSystemGenerator"
 Cohesion: 0.05
 Nodes (26): DesignSystemGenerator, Generates design system recommendations from aggregated searches., Load reasoning rules from CSV., Execute searches across multiple domains., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict. (+18 more)
 
 ### Community 41 - "src/ui-ux-pro-max/scripts/design_system.py"
-Cohesion: 0.07
-Nodes (31): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+23 more)
+Cohesion: 0.09
+Nodes (28): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_markdown(), format_master_md(), format_page_override_md(), generate_design_system(), _generate_intelligent_overrides() (+20 more)
 
 ### Community 42 - "DesignSystemGenerator"
 Cohesion: 0.05
@@ -1616,12 +1627,12 @@ Cohesion: 0.11
 Nodes (19): BM25, detect_domain(), _load_csv(), Load CSV and return list of dicts, Core search function using BM25, Auto-detect the most relevant domain from query, Main search function with auto-domain detection, Search across all domains and combine results (+11 more)
 
 ### Community 44 - "BM25"
-Cohesion: 0.12
-Nodes (8): BM25, BM25 ranking algorithm for text search, Lowercase, normalize synonyms, split, remove punctuation, filter stopwords, Build BM25 index from documents, Score all documents against query, All indexed terms, for suggestion/typo-recovery purposes., TestBm25CoreBehavior, TestTokenizer
+Cohesion: 0.07
+Nodes (16): BM25, BM25 ranking algorithm for text search, Lowercase, normalize synonyms, split, remove punctuation, filter stopwords, Build BM25 index from documents, Score all documents against query, All indexed terms, for suggestion/typo-recovery purposes., format_markdown(), generate_design_system() (+8 more)
 
 ### Community 45 - "BM25"
-Cohesion: 0.11
-Nodes (9): BM25, BM25 ranking algorithm for text search, Lowercase, normalize synonyms, split, remove punctuation, filter stopwords, Build BM25 index from documents, Score all documents against query, All indexed terms, for suggestion/typo-recovery purposes., TestBm25CoreBehavior, TestDiagnosticsContracts (+1 more)
+Cohesion: 0.12
+Nodes (8): BM25, BM25 ranking algorithm for text search, Lowercase, normalize synonyms, split, remove punctuation, filter stopwords, Build BM25 index from documents, Score all documents against query, All indexed terms, for suggestion/typo-recovery purposes., TestBm25CoreBehavior, TestTokenizer
 
 ### Community 46 - "BM25"
 Cohesion: 0.11
@@ -1664,8 +1675,8 @@ Cohesion: 0.12
 Nodes (19): { computeArtifacts }, findDrift(), fs, path, readDiskArtifacts(), readJson(), ROOT, run() (+11 more)
 
 ### Community 56 - "radius"
-Cohesion: 0.11
-Nodes (27): $type, $value, lg, sm, $type, $value, $type, $value (+19 more)
+Cohesion: 0.12
+Nodes (23): $type, $value, lg, $type, $value, $type, $value, $type (+15 more)
 
 ### Community 57 - "TailwindConfigGenerator"
 Cohesion: 0.10
@@ -1792,16 +1803,16 @@ Cohesion: 0.12
 Nodes (9): Tests for shadcn_add.py, Test adding components without shadcn config., Test ShadcnInstaller class., Test adding all components in dry run mode., Test listing installed components without config., Test initialization with default project root., Test getting installed components when none exist., Test getting installed components when files exist. (+1 more)
 
 ### Community 91 - "detect_domain"
-Cohesion: 0.11
-Nodes (9): detect_domain(), Auto-detect the most relevant domain from query. Matches are weighted by…, generate_design_system(), Main entry point for design system generation. Args: query: Search query (e.g.,…, format_output(), Format results for Claude consumption (token-optimized), TestDiagnosticsContracts, TestDomainDetection (+1 more)
+Cohesion: 0.23
+Nodes (3): detect_domain(), Auto-detect the most relevant domain from query. Matches are weighted by…, TestDomainDetection
 
 ### Community 92 - "Track Management"
 Cohesion: 0.04
 Nodes (47): 1. Creation (newTrack), 2. Implementation, 3. Completion, Best Practices, bug, Bug Fix Track Pattern, chore, Common Track Patterns (+39 more)
 
 ### Community 93 - "skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py"
-Cohesion: 0.08
-Nodes (21): _contrast_ratio(), _derive_dark_palette(), _palette_is_dark(), _query_wants_dark(), WCAG relative luminance of a #RRGGBB string, or None if unparseable., True when a colors.csv row's Background is a dark surface., WCAG contrast ratio for two hex colors, or None if either is invalid., True when a styles.csv row describes itself as dark-first. (+13 more)
+Cohesion: 0.09
+Nodes (17): _contrast_ratio(), _derive_dark_palette(), _filter_anti_patterns_for_mode(), _palette_is_dark(), WCAG relative luminance of a #RRGGBB string, or None if unparseable., True when a colors.csv row's Background is a dark surface., WCAG contrast ratio for two hex colors, or None if either is invalid., Keep product brand tokens while deriving accessible dark surfaces. (+9 more)
 
 ### Community 94 - "detect_domain"
 Cohesion: 0.23
@@ -1855,9 +1866,9 @@ Nodes (11): calculateCompliance(), colorDistance(), displayPalette(), extractHex
 Cohesion: 0.25
 Nodes (13): checkManifest(), formatBytes(), formatOutput(), fs, main(), parseFilename(), path, RULES (+5 more)
 
-### Community 107 - "radius"
-Cohesion: 0.11
-Nodes (27): $type, $value, lg, sm, $type, $value, $type, $value (+19 more)
+### Community 107 - "sm"
+Cohesion: 0.60
+Nodes (5): sm, sm, sm, $type, $value
 
 ### Community 108 - "keywords"
 Cohesion: 0.13
@@ -2023,9 +2034,9 @@ Nodes (5): Expression, Func, List, BaseSpecification, ISpecification
 Cohesion: 0.36
 Nodes (9): flattenTokens(), fs, generateCSS(), generateTailwind(), main(), parseArgs(), path, resolveReference() (+1 more)
 
-### Community 149 - "primitive"
-Cohesion: 0.18
-Nodes (11): fast, normal, slow, $type, $value, $type, $value, primitive (+3 more)
+### Community 149 - "duration"
+Cohesion: 0.20
+Nodes (10): fast, normal, slow, $type, $value, $type, $value, duration (+2 more)
 
 ### Community 150 - "._base_config"
 Cohesion: 0.22
@@ -4705,7 +4716,7 @@ Nodes (12): Best Practices Summary, Command Reference, Common Issues, Essential 
 
 ### Community 882 - "3. Core Product Features & Acceptance Criteria"
 Cohesion: 0.15
-Nodes (12): 1. Executive Summary & Problem Framing, 2. Target User Personas, 3.1 Feature 1: In-Class Menu Browsing & Customization, 3.2 Feature 2: Algorithmic Slot Throttling Engine, 3.3 Feature 3: Option C — Zero-Fee UPI & Bank UTR Verification, 3.4 Feature 4: Kitchen Display System (KDS) & Real-Time Sync, 3.5 Feature 5: 30-Second Express Handover, 3. Core Product Features & Acceptance Criteria (+4 more)
+Nodes (12): 1. Executive Summary & Problem Framing, 2. Target User Personas, 3.1 Feature 1: In-Class Menu Browsing & Customization, 3.2 Feature 2: Algorithmic Slot Throttling Engine, 3.3 Feature 3: DirectPay — Zero-Fee UPI & Bank UTR Verification, 3.4 Feature 4: Kitchen Display System (KDS) & Real-Time Sync, 3.5 Feature 5: 30-Second Express Handover, 3. Core Product Features & Acceptance Criteria (+4 more)
 
 ### Community 883 - "Changelog"
 Cohesion: 0.17
@@ -5677,7 +5688,7 @@ Nodes (6): Do not use this skill when, Instructions, Resources, Safety, Use this
 
 ### Community 1125 - "📐 FoodLine: System Design & Architecture Document"
 Cohesion: 0.29
-Nodes (6): 1. High-Level System Architecture, 2. Database Schema (PostgreSQL DDL), 3. Option C Payment & Idempotent Verification Sequence, 4. Real-Time Communication Pipeline: Why SSE Over WebSockets?, 5. UI/UX Design System Tokens & Guidelines, 📐 FoodLine: System Design & Architecture Document
+Nodes (6): 1. High-Level System Architecture, 2. Database Schema (PostgreSQL DDL), 3. DirectPay Payment & Idempotent Verification Sequence, 4. Real-Time Communication Pipeline: Why SSE Over WebSockets?, 5. UI/UX Design System Tokens & Guidelines, 📐 FoodLine: System Design & Architecture Document
 
 ### Community 1126 - "antigravity-skills/skills/anti-reversing-techniques/SKILL.md"
 Cohesion: 0.33
@@ -6495,9 +6506,9 @@ Nodes (19): 1. Design Token Hierarchy, 2. Component Architecture, Best Practices
 Cohesion: 0.13
 Nodes (14): 1. Analyze Project Type, 2. Initialize Project with pnpm, 3. Generate Next.js Project Structure, 4. Generate React + Vite Project Structure, 5. Generate Node.js API Project Structure, 6. Generate TypeScript Library Structure, 7. Configure Development Tools, Context (+6 more)
 
-### Community 1356 - ".generate"
-Cohesion: 0.16
-Nodes (8): _filter_anti_patterns_for_mode(), Drop "avoid dark mode" advice once dark mode is the resolved answer., Execute searches across multiple domains., Extract results list from search result dict., Generate complete design system recommendation. variance/motion/density are…, Bucket a 1-10 dial value into its tier config. Returns None if value is None., _resolve_dial(), TestAntiPatternGating
+### Community 1356 - "📊 FoodLine: Master Financial Plan & Pro Forma Projections (2026–2030)"
+Cohesion: 0.05
+Nodes (37): 10.1 Strategic Buyer Landscape, 10. Investor Exit Strategy, Valuation & Return Multiples (MOIC / IRR), 11. Risk Governance & The 10 Rich Dad Financial Controls, 1.1 "Rich Dad's Guide to Investing" (Robert T. Kiyosaki), 1.2 "The Science of Getting Rich" (Wallace D. Wattles), 1.3 "Writing Winning Business Plans" (Garrett Sutton, Esq.), 1. Theoretical Alignment: The 3 Master Books Framework, 2. Executive Financial Summary & Key Metrics Dashboard (+29 more)
 
 ### Community 1357 - "Instructions"
 Cohesion: 0.14
@@ -6607,9 +6618,9 @@ Nodes (5): radius, radius, radius, $type, $value
 Cohesion: 0.60
 Nodes (5): $type, $value, 700, 700, 700
 
-### Community 1384 - "$type"
-Cohesion: 0.60
-Nodes (5): $type, $value, border, border, border
+### Community 1384 - "UnitOfWork"
+Cohesion: 0.14
+Nodes (5): IDbContextTransaction, IOrderRepository, IUnitOfWork, UnitOfWork, IDisposable
 
 ### Community 1385 - "radius"
 Cohesion: 0.60
@@ -6631,17 +6642,17 @@ Nodes (4): 1. WCAG Conformance Levels, 2. POUR Principles, 3. Common Violations 
 Cohesion: 0.50
 Nodes (4): 4.1.1 Parsing (Level A) - Obsolete in WCAG 2.2, 4.1.2 Name, Role, Value (Level A), 4.1.3 Status Messages (Level AA), 4.1 Compatible
 
-### Community 1390 - "800"
+### Community 1390 - "50"
 Cohesion: 0.67
-Nodes (4): $type, $value, 800, 800
+Nodes (4): $type, $value, 50, 50
 
-### Community 1391 - "padding-y"
-Cohesion: 0.67
-Nodes (4): padding-y, padding-y, $type, $value
+### Community 1391 - "📐 FoodLine: Comprehensive Margin Structure & Profit Waterfall"
+Cohesion: 0.08
+Nodes (24): 1. Executive Margin Architecture Overview, 2. Per-Order Micro-Transaction Margin Waterfall (₹55 AOV Baseline), 3. Menu Category & Dish-Level Margin Matrix (Cafe @7 Menu), 4. Single-Campus Monthly & Annual Margin Waterfall, 5. Vendor Margin Transformation (Before vs. After FoodLine), 6. Peer-to-Peer Hostel Delivery Margin Breakdown, 7. 5-Year Multi-Campus Consolidated Margin Evolution (2026–2030), 8. Comparative Margin Benchmark: FoodLine vs. Food-Tech vs. POS (+16 more)
 
-### Community 1392 - "800"
-Cohesion: 0.67
-Nodes (4): $type, $value, 800, 800
+### Community 1392 - "assets/scripts/tests/test_text_layout_resilience.py"
+Cohesion: 0.22
+Nodes (3): read_rows(), TestTextLayoutDataContracts, TestTextLayoutRetrieval
 
 ### Community 1393 - "padding-y"
 Cohesion: 0.67
@@ -6659,9 +6670,9 @@ Nodes (3): 3.1.1 Language of Page (Level A), 3.1.2 Language of Parts (Level AA),
 Cohesion: 0.67
 Nodes (3): Create a New Project, Install Dependencies, Quick Start
 
-### Community 1397 - "destructive"
-Cohesion: 0.67
-Nodes (3): destructive, $type, $value
+### Community 1397 - "src/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py"
+Cohesion: 0.22
+Nodes (3): read_rows(), TestTextLayoutDataContracts, TestTextLayoutRetrieval
 
 ### Community 1398 - "destructive-foreground"
 Cohesion: 0.67
@@ -6687,42 +6698,62 @@ Nodes (3): secondary-foreground, $type, $value
 Cohesion: 0.67
 Nodes (3): destructive, $type, $value
 
-### Community 1404 - "destructive-foreground"
-Cohesion: 0.67
-Nodes (3): destructive-foreground, $type, $value
+### Community 1404 - "radius"
+Cohesion: 0.11
+Nodes (27): $type, $value, lg, sm, $type, $value, $type, $value (+19 more)
 
-### Community 1405 - "muted"
+### Community 1405 - "800"
 Cohesion: 0.67
-Nodes (3): muted, $type, $value
+Nodes (4): $type, $value, 800, 800
 
-### Community 1406 - "primary-foreground"
-Cohesion: 0.67
-Nodes (3): primary-foreground, $type, $value
+### Community 1406 - "$type"
+Cohesion: 0.60
+Nodes (5): $type, $value, border, border, border
 
 ### Community 1407 - "ring"
 Cohesion: 0.67
 Nodes (3): ring, $type, $value
 
-### Community 1408 - "secondary-foreground"
+### Community 1408 - "padding-y"
+Cohesion: 0.67
+Nodes (4): padding-y, padding-y, $type, $value
+
+### Community 1409 - "destructive-foreground"
+Cohesion: 0.67
+Nodes (3): destructive-foreground, $type, $value
+
+### Community 1410 - "muted"
+Cohesion: 0.67
+Nodes (3): muted, $type, $value
+
+### Community 1412 - "primary-foreground"
+Cohesion: 0.67
+Nodes (3): primary-foreground, $type, $value
+
+### Community 1413 - "secondary-foreground"
 Cohesion: 0.67
 Nodes (3): secondary-foreground, $type, $value
 
+### Community 1414 - "destructive"
+Cohesion: 0.67
+Nodes (3): destructive, $type, $value
+
 ## Knowledge Gaps
-- **15613 isolated node(s):** `{ Command }`, `fs`, `path`, `chalk`, `os` (+15608 more)
+- **15655 isolated node(s):** `{ Command }`, `fs`, `path`, `chalk`, `os` (+15650 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **82 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **83 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `DesignSystemGenerator` connect `DesignSystemGenerator` to `assets/scripts/tests/test_design_system_mode.py`, `src/ui-ux-pro-max/scripts/tests/test_design_system_mode.py`, `skills/ui-ux-pro-max/scripts/design_system.py`, `DesignSystemGenerator`, `DesignSystemGenerator`, `.generate`, `evaluate-relevance.py`, `detect_domain`, `skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py`?**
+- **Why does `DesignSystemGenerator` connect `DesignSystemGenerator` to `assets/scripts/tests/test_design_system_mode.py`, `src/ui-ux-pro-max/scripts/tests/test_design_system_mode.py`, `skills/ui-ux-pro-max/scripts/design_system.py`, `DesignSystemGenerator`, `DesignSystemGenerator`, `BM25`, `evaluate-relevance.py`, `skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `search_stack()` connect `search_stack` to `skills/ui-ux-pro-max/scripts/core.py`, `search`, `detect_domain`?**
+- **Why does `search_stack()` connect `search_stack` to `skills/ui-ux-pro-max/scripts/core.py`, `search`, `BM25`?**
   _High betweenness centrality (0.000) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `TailwindConfigGenerator` (e.g. with `TestGeneratedConfigIsValidJs` and `TestTailwindConfigGenerator`) actually correct?**
   _`TailwindConfigGenerator` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `{ Command }`, `fs`, `path` to the rest of the system?**
-  _15613 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _15655 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `init.ts` be split into smaller, more focused modules?**
   _Cohesion score 0.05714285714285714 - nodes in this community are weakly interconnected._
 - **Should `Result` be split into smaller, more focused modules?**

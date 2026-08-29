@@ -1,0 +1,37 @@
+{
+  "university": "Sanjivani University, Kopargaon (MH)",
+  "outlet": "Cafe @7 (Main Campus Cafeteria)",
+  "merchantUpiId": "9960091371@slc",
+  "breaks": [
+    {
+      "label": "Lunch Break",
+      "window": "11:50 AM \u2013 12:30 PM",
+      "slots": [
+        {
+          "id": "slot-lunch-a",
+          "time": "11:50 AM \u2013 12:10 PM",
+          "capacity": 60,
+          "available": 34
+        },
+        {
+          "id": "slot-lunch-b",
+          "time": "12:10 PM \u2013 12:30 PM",
+          "capacity": 60,
+          "available": 48
+        }
+      ]
+    },
+    {
+      "label": "Evening Snack Break",
+      "window": "2:30 PM \u2013 2:50 PM",
+      "slots": [
+        {
+          "id": "slot-eve-a",
+          "time": "2:30 PM \u2013 2:50 PM",
+          "capacity": 45,
+          "available": 29
+        }
+      ]
+    }
+  ]
+}

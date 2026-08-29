@@ -13,7 +13,7 @@ College lunch and snack breaks are structurally constrained (20–30 minutes), d
 3. **Payment & Cash Friction:** Cash change delays and high payment gateway fees (**2.0% + GST**) make digital micro-transactions (₹15–₹50) unviable for cafeteria vendors.
 
 **FoodLine's Value Proposition:**  
-*"Skip the Line, Not the Meal."* A digital pre-ordering, algorithmic slot-throttling, zero-fee direct UPI, and 30-second express collection ecosystem purpose-built for Indian university campuses.
+*"Skip the Line, Not the Meal."* A digital pre-ordering, algorithmic slot-throttling, zero-fee direct UPI, and 1-minute express collection ecosystem purpose-built for Indian university campuses.
 
 ---
 
@@ -30,8 +30,8 @@ graph TD
 
 | Persona | Core Goal | Primary Pain Point | FoodLine Solution |
 |---|---|---|---|
-| **1. The Student (Rohan, 20)** | Grab hot lunch in 5 mins and hang out with friends. | 15-min queue makes him late for 12:30 PM lab. | In-class pre-order + 10-min slot selection + 30-sec express QR pickup. |
-| **2. Canteen Owner (Cafe @7)** | Maximize lunch turnover without hiring extra staff. | Loses 35% of orders due to queue dropouts; hates 2% PG fees. | Option C 0% fee UPI payment directly to bank + automated digital billing. |
+| **1. The Student (Rohan, 20)** | Grab hot lunch in 5 mins and hang out with friends. | 15-min queue makes him late for 12:30 PM lab. | In-class pre-order + 10-min slot selection + 1-min express QR pickup. |
+| **2. Canteen Owner (Cafe @7)** | Maximize lunch turnover without hiring extra staff. | Loses 35% of orders due to queue dropouts; hates 2% PG fees. | DirectPay 0% fee UPI payment directly to bank + automated digital billing. |
 | **3. Kitchen Cook (Chef Ramesh)** | Cook food in organized batches without panic. | 100 students shouting orders across the counter simultaneously. | Tablet KDS with slot batching (*"Cook 15 Dosas for 11:50 AM"*). |
 | **4. Student Runner (Hostel Peer)** | Earn pocket money during evening study hours. | Lack of flexible, on-campus micro-earning gigs. | Peer delivery pool for hostel & library drop zones (₹15-20 per drop). |
 | **5. University Admin** | Eliminate cafeteria overcrowding and campus chaos. | Crowded dining spaces, unverified cash handling, littering. | Algorithmic load balancing, verified digital receipts, zero counter congestion. |
@@ -52,7 +52,7 @@ graph TD
   - Cap maximum concurrent meal preparations per 10-minute window based on kitchen burner capacity.
   - Automatically grey out full slots and dynamically recommend the next fastest available slot.
 
-### 3.3 Feature 3: Option C — Zero-Fee UPI & Bank UTR Verification
+### 3.3 Feature 3: DirectPay — Zero-Fee UPI & Bank UTR Verification
 - **Requirement:** Eliminate 2% payment gateway commissions on micro-transactions.
 - **Workflow:**
   1. Display merchant QR standee and exact order rupee total in-app.
@@ -70,7 +70,7 @@ graph TD
   - **1-Tap Status Switch:** `QUEUED` ➔ `PREPARING` ➔ `READY_FOR_PICKUP` ➔ `COMPLETED`.
   - **Server-Sent Events (SSE):** Push instant status changes to student UI without page reload.
 
-### 3.5 Feature 5: 30-Second Express Handover
+### 3.5 Feature 5: 1-Minute Express Handover
 - **Requirement:** High-contrast optical QR code pass and 4-digit PIN verification at the dedicated FoodLine counter.
 - **Acceptance Criteria:**
   - Counter camera or tablet scans student screen in <500ms.
@@ -96,12 +96,12 @@ graph TD
 graph LR
     M1[≥12 Min Saved / Student] --> Impact
     M2[2.5x Peak Rush Capacity] --> Impact
-    M3[≤30 Sec Counter Pickup] --> Impact
+    M3[≤1 Min Counter Pickup] --> Impact
     M4[≥65% Weekly Active Retention] --> Impact
 ```
 
 - **Student Time Recovery:** > 12 minutes saved per dining cycle.
 - **Vendor Capacity Expansion:** 2.5× higher order throughput during peak 30-minute rush.
-- **Express Handover Speed:** Counter pickup under 30 seconds.
+- **Express Handover Speed:** Counter pickup under 1 minute.
 - **Organic Retention:** ≥ 65% weekly active student retention.
 - **Merchant NPS:** ≥ +70 due to 0% payment commissions and zero queue stress.
