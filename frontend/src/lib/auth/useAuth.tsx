@@ -238,6 +238,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setProfile(null);
     setImpersonatedRole(null);
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   }, [supabase, setImpersonatedRole]);
 
   const refreshProfile = useCallback(async () => {
