@@ -7,9 +7,15 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android",
+    "build:apk": "cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.47.0",
     "@tailwindcss/postcss": "^4.3.3",
