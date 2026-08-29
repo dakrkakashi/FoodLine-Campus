@@ -2,8 +2,21 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Food3DViewer } from './Food3DViewer';
-import { Sparkles, ArrowRight, Flame, ShieldCheck } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { Sparkles, ArrowRight } from 'lucide-react';
+
+const Food3DViewer = dynamic(
+  () => import('./Food3DViewer').then((mod) => mod.Food3DViewer),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[280px] flex flex-col items-center justify-center rounded-2xl bg-black/40 border border-white/5 animate-pulse">
+        <span className="text-3xl mb-2">✨</span>
+        <span className="text-xs font-bold text-zinc-400">Initializing 3D WebGL Studio...</span>
+      </div>
+    ),
+  }
+);
 
 const MODELS = [
   { id: 'burger' as const, name: 'Cafe @7 Double Cheese Burger', price: '₹90', prep: '4 mins', tag: 'Chef Special' },

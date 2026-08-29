@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:backend": "npm --prefix backend run dev",
     "build:frontend": "npm --prefix frontend run build",
