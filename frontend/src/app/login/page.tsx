@@ -13,7 +13,7 @@ function LoginFormContent() {
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get('redirect') || '/menu';
 
-  const { signInWithPassword, signInWithGoogle } = useAuth();
+  const { signInWithPassword, signInWithGoogle, signInWithPrn } = useAuth();
 
   const [authTab, setAuthTab] = useState<'STAFF_ADMIN' | 'GOOGLE_SSO' | 'STUDENT_PRN'>('STAFF_ADMIN');
   const [email, setEmail] = useState('foodlinecampus@gmail.com');
@@ -78,17 +78,23 @@ function LoginFormContent() {
     }, 700);
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length < 4) return;
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    setErrorMessage(null);
+    try {
+      await signInWithPrn(prn, phone);
       fireConfettiSuccess();
       setTimeout(() => {
-        router.push(redirectPath);
-      }, 500);
-    }, 800);
+        // If the redirect path was a staff/admin only path like /admin or /kds, redirect student to /menu
+        const targetPath = redirectPath.startsWith('/admin') || redirectPath.startsWith('/kds') ? '/menu' : redirectPath;
+        window.location.href = targetPath;
+      }, 400);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Verification failed. Please try again.');
+      setIsLoading(false);
+    }
   };
 
   return (

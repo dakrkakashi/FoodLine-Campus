@@ -57,11 +57,24 @@ export const updateSession = async (request: NextRequest) => {
     return supabaseResponse;
   }
 
-  // 2. Fetch authenticated user session
+  // 2. Fetch authenticated user session or student session cookie
   const { data: { user } } = await supabase.auth.getUser();
+  const studentCookie = request.cookies.get('foodline_student_session')?.value;
+  let studentSession: { prn?: string; phone?: string; role?: string } | null = null;
+  if (studentCookie) {
+    try {
+      studentSession = JSON.parse(decodeURIComponent(studentCookie));
+    } catch {
+      try {
+        studentSession = JSON.parse(studentCookie);
+      } catch {}
+    }
+  }
+
+  const isAuthenticated = !!user || (!!studentSession && studentSession.role === 'student');
 
   // 3. Strict Login Enforcement: If not logged in, redirect directly to /login
-  if (!user) {
+  if (!isAuthenticated) {
     const loginUrl = new URL('/login', request.url);
     if (pathname !== '/') {
       loginUrl.searchParams.set('redirect', pathname);
@@ -77,19 +90,23 @@ export const updateSession = async (request: NextRequest) => {
   if (roleRestrictedEntry) {
     const [, allowedRoles] = roleRestrictedEntry;
 
-    // Query user profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role, is_active')
-      .eq('id', user.id)
-      .single();
+    let userRole = 'student';
 
-    if (profile && !profile.is_active) {
-      const deactivatedUrl = new URL('/login?error=deactivated', request.url);
-      return NextResponse.redirect(deactivatedUrl);
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role, is_active')
+        .eq('id', user.id)
+        .single();
+
+      if (profile && !profile.is_active) {
+        const deactivatedUrl = new URL('/login?error=deactivated', request.url);
+        return NextResponse.redirect(deactivatedUrl);
+      }
+      userRole = profile?.role || 'student';
+    } else if (studentSession) {
+      userRole = studentSession.role || 'student';
     }
-
-    const userRole = profile?.role || 'student';
 
     if (!allowedRoles.includes(userRole)) {
       // Unauthorized role -> redirect to student menu

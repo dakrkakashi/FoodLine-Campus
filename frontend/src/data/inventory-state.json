@@ -1,10 +1,19 @@
 {
+  "lastFreshBatchDate": "2026-08-29",
+  "morningBatchConfigured": false,
+  "dailyFreshBatchIds": [],
   "stockOverrides": {},
   "dishDetailsMap": {},
-  "persistentStockMap": {},
+  "persistentStockMap": {
+    "e86f6b3d-17cf-4298-afe1-dd19ac077125": 30,
+    "1ae327ed-911c-4f46-9927-49df2e3f29eb": 30,
+    "dd29a24d-c399-4dec-a4d1-d78a1b12b3c0": 30,
+    "95985788-8c86-4d0c-b413-b5f348b9cc8e": 30,
+    "960410b6-c85b-4ea8-9700-e007adcb0766": 30,
+    "cdaf7ec7-7d43-4300-bd8d-5296be024da1": 30,
+    "6d08d813-8c82-4a9a-ac7b-ee5a566db395": 30,
+    "08943736-5f8b-4837-aa7b-c704dda375b1": 30
+  },
   "lowStockThresholdMap": {},
-  "dailyFreshBatchIds": [],
-  "lastFreshBatchDate": "",
-  "morningBatchConfigured": false,
-  "updatedAt": ""
+  "updatedAt": "2026-08-29T21:29:44.492Z"
 }

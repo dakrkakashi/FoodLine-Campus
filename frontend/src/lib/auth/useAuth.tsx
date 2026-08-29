@@ -16,6 +16,7 @@ interface AuthContextType {
   signInWithGoogle: (redirectTo?: string) => Promise<void>;
   signInWithPassword: (email: string, password: string) => Promise<{ error: any }>;
   signUpWithPassword: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signInWithPrn: (prn: string, phone: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -78,8 +79,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data: { session } } = await supabase.auth.getSession();
         if (mounted) {
           const currentUser = session?.user ?? null;
-          setUser(currentUser);
-          await fetchProfile(currentUser);
+          if (currentUser) {
+            setUser(currentUser);
+            await fetchProfile(currentUser);
+          } else if (typeof window !== 'undefined') {
+            // Check student session from localStorage
+            const savedStudent = localStorage.getItem('foodline_student_session');
+            if (savedStudent) {
+              try {
+                const parsed = JSON.parse(savedStudent);
+                if (parsed.prn) {
+                  setUser({
+                    id: parsed.id || `student_${parsed.prn}`,
+                    email: parsed.email || `student_${parsed.prn}@sanjivani.edu.in`,
+                    user_metadata: {
+                      full_name: parsed.full_name,
+                      prn: parsed.prn,
+                      phone: parsed.phone,
+                      role: 'student',
+                    },
+                  } as unknown as User);
+                  setProfile(parsed);
+                }
+              } catch {}
+            }
+          }
         }
       } catch (err) {
         console.error('Auth initialization error:', err);
@@ -99,8 +123,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (mounted) {
         const currentUser = session?.user ?? null;
-        setUser(currentUser);
-        await fetchProfile(currentUser);
+        if (currentUser) {
+          setUser(currentUser);
+          await fetchProfile(currentUser);
+        }
         setLoading(false);
       }
     });
@@ -162,8 +188,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   }, [supabase, fetchProfile]);
 
+  const signInWithPrn = useCallback(async (prn: string, phone: string) => {
+    const cleanPrn = prn.trim();
+    const cleanPhone = phone.trim();
+    const studentUser = {
+      id: `student_${cleanPrn}`,
+      email: `student_${cleanPrn}@sanjivani.edu.in`,
+      user_metadata: {
+        full_name: `Campus Student (${cleanPrn})`,
+        prn: cleanPrn,
+        phone: cleanPhone,
+        role: 'student',
+      },
+    } as unknown as User;
+
+    const studentProf: UserProfile = {
+      id: `student_${cleanPrn}`,
+      email: `student_${cleanPrn}@sanjivani.edu.in`,
+      full_name: `Campus Student (${cleanPrn})`,
+      role: 'student',
+      prn: cleanPrn,
+      phone: cleanPhone,
+      is_active: true,
+      created_at: new Date().toISOString(),
+    };
+
+    const cookieVal = encodeURIComponent(JSON.stringify({
+      prn: cleanPrn,
+      phone: cleanPhone,
+      role: 'student',
+      full_name: `Campus Student (${cleanPrn})`,
+    }));
+
+    if (typeof document !== 'undefined') {
+      document.cookie = `foodline_student_session=${cookieVal}; path=/; max-age=604800; SameSite=Lax`;
+      localStorage.setItem('foodline_student_session', JSON.stringify(studentProf));
+    }
+
+    setUser(studentUser);
+    setProfile(studentProf);
+  }, []);
+
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut().catch(() => {});
+    if (typeof document !== 'undefined') {
+      document.cookie = 'foodline_student_session=; path=/; max-age=0; SameSite=Lax';
+      localStorage.removeItem('foodline_student_session');
+    }
     setUser(null);
     setProfile(null);
     setImpersonatedRole(null);
@@ -190,6 +261,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithGoogle,
     signInWithPassword,
     signUpWithPassword,
+    signInWithPrn,
     signOut,
     refreshProfile,
   }), [
@@ -203,6 +275,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithGoogle,
     signInWithPassword,
     signUpWithPassword,
+    signInWithPrn,
     signOut,
     refreshProfile,
   ]);
