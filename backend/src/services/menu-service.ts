@@ -1,28 +1,97 @@
 import { MenuItem } from '../lib/types.js';
 import initialMenuData from '../data/menu.json';
+import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
 
-// In-memory active menu store
-let menuItems: MenuItem[] = [...initialMenuData];
+// In-memory local cache seeded from menu.json
+let localMenuItems: MenuItem[] = (initialMenuData as any[]).map((item) => ({
+  id: item.id,
+  name: item.name,
+  category: item.category,
+  price: item.price,
+  prepTime: item.prepTime || 5,
+  tag: item.tag || '',
+  isVeg: item.isVeg !== undefined ? item.isVeg : true,
+  isAvailable: item.isAvailable !== undefined ? item.isAvailable : true,
+  image: item.image,
+}));
 
 export class MenuService {
-  public static getAllItems(categoryId?: string): MenuItem[] {
-    if (!categoryId || categoryId === 'All') {
-      return menuItems;
+  /**
+   * Get all menu items with optional category filtering
+   */
+  public static async getAllItems(categoryId?: string): Promise<MenuItem[]> {
+    if (isSupabaseConfigured) {
+      try {
+        let query = supabase.from('menu_items').select('*, categories(name)');
+        const { data, error } = await query;
+
+        if (!error && data && data.length > 0) {
+          const dbItems: MenuItem[] = data.map((d: any) => ({
+            id: d.id,
+            name: d.name,
+            category: d.categories?.name || d.tag || 'Quick Bites',
+            price: Number(d.price),
+            prepTime: d.prep_time_mins || 5,
+            tag: d.tag || '',
+            isVeg: d.is_veg !== undefined ? d.is_veg : true,
+            isAvailable: d.is_available !== undefined ? d.is_available : true,
+            image: d.image_url,
+          }));
+
+          if (categoryId && categoryId !== 'All') {
+            return dbItems.filter((i) => i.category.toLowerCase() === categoryId.toLowerCase());
+          }
+          return dbItems;
+        }
+      } catch (err) {
+        console.warn('Supabase menu fetch fallback to local cache:', err);
+      }
     }
-    return menuItems.filter((item) => item.category.toLowerCase() === categoryId.toLowerCase());
+
+    // Fallback to local memory cache
+    if (!categoryId || categoryId === 'All') {
+      return localMenuItems;
+    }
+    return localMenuItems.filter((item) => item.category.toLowerCase() === categoryId.toLowerCase());
   }
 
-  public static getItemById(id: string): MenuItem | undefined {
-    return menuItems.find((item) => item.id === id);
+  /**
+   * Get menu item by ID
+   */
+  public static async getItemById(id: string): Promise<MenuItem | undefined> {
+    const items = await MenuService.getAllItems();
+    return items.find((item) => item.id === id);
   }
 
-  public static toggleAvailability(id: string, isAvailable?: boolean): MenuItem {
-    const item = menuItems.find((m) => m.id === id);
-    if (!item) {
+  /**
+   * 1-Tap stockout toggle for KDS
+   */
+  public static async toggleAvailability(id: string, isAvailable?: boolean): Promise<MenuItem> {
+    const currentItem = localMenuItems.find((m) => m.id === id);
+    const newStatus = isAvailable !== undefined ? isAvailable : currentItem ? !currentItem.isAvailable : false;
+
+    // Update local cache
+    if (currentItem) {
+      currentItem.isAvailable = newStatus;
+    }
+
+    // Update database if configured
+    if (isSupabaseConfigured) {
+      try {
+        await supabase
+          .from('menu_items')
+          .update({ is_available: newStatus, updated_at: new Date().toISOString() })
+          .eq('id', id);
+      } catch (err) {
+        console.warn(`Supabase toggleAvailability update skipped for ${id}:`, err);
+      }
+    }
+
+    if (!currentItem) {
       throw new Error(`Menu item with ID ${id} not found`);
     }
 
-    item.isAvailable = isAvailable !== undefined ? isAvailable : !item.isAvailable;
-    return item;
+    return currentItem;
   }
 }
+

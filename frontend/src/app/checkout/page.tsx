@@ -25,6 +25,7 @@ import { Navbar } from '@/components/navbar';
 import { useCart } from '@/context/CartContext';
 import { useInventory } from '@/context/InventoryContext';
 import { Stepper, ProgressBar, PageTransition, SpotlightCard, fireConfettiSuccess } from '@/components/ui';
+import { saveOrderToHistory } from '@/lib/order-history-store';
 
 interface Slot {
   id: string;
@@ -152,9 +153,28 @@ export default function CheckoutPage() {
       });
 
       const json = await res.json();
+
       if (!res.ok || !json.success) {
-        throw new Error(json.error?.message || 'Failed to place order.');
+        throw new Error(json.error?.message || json.error || 'Failed to place order. Please try again.');
       }
+
+      // Persist in local order history for students
+      const selectedSlot = slots.find((s) => s.id === selectedSlotId);
+      saveOrderToHistory({
+        orderId: json.data.orderId,
+        orderToken: json.data.orderToken,
+        totalAmount: json.data.totalAmount,
+        pickupOtp: json.data.pickupOtp,
+        status: json.data.status,
+        paymentMethod,
+        slotLabel: selectedSlot?.label || '',
+        slotTime: selectedSlot ? `${selectedSlot.startTime} - ${selectedSlot.endTime}` : '',
+        notes,
+        studentPrn,
+        studentName,
+        items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+        createdAt: json.data.createdAt || new Date().toISOString(),
+      });
 
       // Trigger Confetti Celebration!
       fireConfettiSuccess();

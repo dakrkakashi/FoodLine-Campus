@@ -5,25 +5,89 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuService = void 0;
 const menu_json_1 = __importDefault(require("../data/menu.json"));
-// In-memory active menu store
-let menuItems = [...menu_json_1.default];
+const supabase_js_1 = require("../lib/supabase.js");
+// In-memory local cache seeded from menu.json
+let localMenuItems = menu_json_1.default.map((item) => ({
+    id: item.id,
+    name: item.name,
+    category: item.category,
+    price: item.price,
+    prepTime: item.prepTime || 5,
+    tag: item.tag || '',
+    isVeg: item.isVeg !== undefined ? item.isVeg : true,
+    isAvailable: item.isAvailable !== undefined ? item.isAvailable : true,
+    image: item.image,
+}));
 class MenuService {
-    static getAllItems(categoryId) {
-        if (!categoryId || categoryId === 'All') {
-            return menuItems;
+    /**
+     * Get all menu items with optional category filtering
+     */
+    static async getAllItems(categoryId) {
+        if (supabase_js_1.isSupabaseConfigured) {
+            try {
+                let query = supabase_js_1.supabase.from('menu_items').select('*, categories(name)');
+                const { data, error } = await query;
+                if (!error && data && data.length > 0) {
+                    const dbItems = data.map((d) => ({
+                        id: d.id,
+                        name: d.name,
+                        category: d.categories?.name || d.tag || 'Quick Bites',
+                        price: Number(d.price),
+                        prepTime: d.prep_time_mins || 5,
+                        tag: d.tag || '',
+                        isVeg: d.is_veg !== undefined ? d.is_veg : true,
+                        isAvailable: d.is_available !== undefined ? d.is_available : true,
+                        image: d.image_url,
+                    }));
+                    if (categoryId && categoryId !== 'All') {
+                        return dbItems.filter((i) => i.category.toLowerCase() === categoryId.toLowerCase());
+                    }
+                    return dbItems;
+                }
+            }
+            catch (err) {
+                console.warn('Supabase menu fetch fallback to local cache:', err);
+            }
         }
-        return menuItems.filter((item) => item.category.toLowerCase() === categoryId.toLowerCase());
+        // Fallback to local memory cache
+        if (!categoryId || categoryId === 'All') {
+            return localMenuItems;
+        }
+        return localMenuItems.filter((item) => item.category.toLowerCase() === categoryId.toLowerCase());
     }
-    static getItemById(id) {
-        return menuItems.find((item) => item.id === id);
+    /**
+     * Get menu item by ID
+     */
+    static async getItemById(id) {
+        const items = await MenuService.getAllItems();
+        return items.find((item) => item.id === id);
     }
-    static toggleAvailability(id, isAvailable) {
-        const item = menuItems.find((m) => m.id === id);
-        if (!item) {
+    /**
+     * 1-Tap stockout toggle for KDS
+     */
+    static async toggleAvailability(id, isAvailable) {
+        const currentItem = localMenuItems.find((m) => m.id === id);
+        const newStatus = isAvailable !== undefined ? isAvailable : currentItem ? !currentItem.isAvailable : false;
+        // Update local cache
+        if (currentItem) {
+            currentItem.isAvailable = newStatus;
+        }
+        // Update database if configured
+        if (supabase_js_1.isSupabaseConfigured) {
+            try {
+                await supabase_js_1.supabase
+                    .from('menu_items')
+                    .update({ is_available: newStatus, updated_at: new Date().toISOString() })
+                    .eq('id', id);
+            }
+            catch (err) {
+                console.warn(`Supabase toggleAvailability update skipped for ${id}:`, err);
+            }
+        }
+        if (!currentItem) {
             throw new Error(`Menu item with ID ${id} not found`);
         }
-        item.isAvailable = isAvailable !== undefined ? isAvailable : !item.isAvailable;
-        return item;
+        return currentItem;
     }
 }
 exports.MenuService = MenuService;

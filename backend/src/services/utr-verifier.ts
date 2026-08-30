@@ -1,3 +1,5 @@
+import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
+
 export interface UTRVerificationResult {
   valid: boolean;
   message: string;
@@ -12,7 +14,7 @@ export class UtrVerifierService {
    * Validates Indian Bank UPI 12-digit UTR Reference Number
    * Pattern: Exactly 12 numeric digits
    */
-  public static verifyUtr(utrInput: string, orderToken: string): UTRVerificationResult {
+  public static verifyUtr(utrInput: string, orderToken?: string): UTRVerificationResult {
     if (!utrInput) {
       return { valid: false, message: 'UTR Reference number is required' };
     }
@@ -23,7 +25,7 @@ export class UtrVerifierService {
     if (!/^\d{12}$/.test(cleanedUtr)) {
       return {
         valid: false,
-        message: 'Invalid UTR format. Bank UTR must be exactly 12 numeric digits (e.g. 928374615243).'
+        message: 'Invalid UTR format. Bank UTR must be exactly 12 numeric digits (e.g. 928374615243).',
       };
     }
 
@@ -31,17 +33,17 @@ export class UtrVerifierService {
     if (usedUtrStore.has(cleanedUtr)) {
       return {
         valid: false,
-        message: 'This UTR has already been submitted for another order. Replay detected.'
+        message: 'This UTR has already been submitted for another order. Replay detected.',
       };
     }
 
-    // Mark as verified & stored
+    // Mark as verified in memory
     usedUtrStore.add(cleanedUtr);
 
     return {
       valid: true,
       utrNumber: cleanedUtr,
-      message: 'UTR payment reference verified successfully.'
+      message: 'UTR payment reference verified successfully.',
     };
   }
 
@@ -49,4 +51,47 @@ export class UtrVerifierService {
     const cleaned = utr.trim().replace(/[\s-]/g, '');
     return usedUtrStore.has(cleaned);
   }
+
+  /**
+   * Database-backed UTR submission and payment record creation
+   */
+  public static async recordPayment(
+    orderId: string,
+    utrNumber: string,
+    amount: number,
+    method: 'UTR_MANUAL' | 'SOUNDBOX_WEBHOOK' | 'CASHIER_SCAN' = 'UTR_MANUAL'
+  ): Promise<UTRVerificationResult> {
+    const verification = UtrVerifierService.verifyUtr(utrNumber);
+    if (!verification.valid) {
+      return verification;
+    }
+
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase.from('payments').insert({
+          order_id: orderId,
+          utr_number: verification.utrNumber,
+          amount,
+          status: 'VERIFIED',
+          verification_method: method,
+          verified_at: new Date().toISOString(),
+        });
+
+        if (error) {
+          if (error.code === '23505') {
+            return {
+              valid: false,
+              message: 'This UTR has already been submitted for another order today. Duplicate rejected.',
+            };
+          }
+          console.warn('Supabase payment insert warning:', error.message);
+        }
+      } catch (err: any) {
+        console.warn('Supabase payment exception:', err);
+      }
+    }
+
+    return verification;
+  }
 }
+

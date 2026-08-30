@@ -16,6 +16,7 @@ import {
   X,
   Sparkles,
   Tv,
+  Receipt,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useTheme, THEMES, ThemeName } from '@/context/ThemeContext';
@@ -76,6 +77,10 @@ export function Navbar() {
                 <NavLink href="/menu" onClick={playTab}>
                   <UtensilsCrossed size={16} />
                   <span>Menu</span>
+                </NavLink>
+                <NavLink href="/orders" onClick={playTab}>
+                  <Receipt size={16} />
+                  <span>My Orders</span>
                 </NavLink>
                 <NavLink href="/display" onClick={playTab}>
                   <Tv size={16} />
@@ -227,6 +232,10 @@ export function Navbar() {
                   <MobileNavLink href="/menu" onClick={() => { playTab(); setMobileOpen(false); }}>
                     <UtensilsCrossed size={16} />
                     <span>Browse Menu</span>
+                  </MobileNavLink>
+                  <MobileNavLink href="/orders" onClick={() => { playTab(); setMobileOpen(false); }}>
+                    <Receipt size={16} />
+                    <span>My Orders</span>
                   </MobileNavLink>
                   <MobileNavLink href="/display" onClick={() => { playTab(); setMobileOpen(false); }}>
                     <Tv size={16} />

@@ -10,12 +10,16 @@ const ROLE_RESTRICTED_ROUTES: Record<string, string[]> = {
   '/admin': ['canteen_manager', 'admin'],
 };
 
-// Routes that can be accessed without any login
+// Routes that can be accessed without forced login redirect
 const PUBLIC_ROUTES = [
   '/login',
   '/display', // Public TV counter display kiosk in cafeteria
   '/auth',
   '/terms',
+  '/orders',
+  '/order',
+  '/menu',
+  '/checkout',
 ];
 
 export const updateSession = async (request: NextRequest) => {

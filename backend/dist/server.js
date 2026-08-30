@@ -8,41 +8,39 @@ const cors_1 = __importDefault(require("cors"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const menu_service_js_1 = require("./services/menu-service.js");
 const slot_throttler_js_1 = require("./services/slot-throttler.js");
-const utr_verifier_js_1 = require("./services/utr-verifier.js");
+const order_service_js_1 = require("./services/order-service.js");
 const sse_broadcaster_js_1 = require("./services/sse-broadcaster.js");
+const supabase_js_1 = require("./lib/supabase.js");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 4000;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
-// In-memory active orders store
-const ordersStore = new Map();
-// Helper to generate 4-digit token e.g. FL-1793 & 4-digit pickup OTP e.g. 6065
-function generateOrderToken() {
-    const randNum = Math.floor(1000 + Math.random() * 9000);
-    return `FL-${randNum}`;
-}
-function generatePickupOtp() {
-    return Math.floor(1000 + Math.random() * 9000).toString();
-}
+// Background cron to release expired slot holds every 60s
+setInterval(() => {
+    slot_throttler_js_1.SlotThrottlerService.expireOldHolds();
+}, 60 * 1000);
 // -----------------------------------------------------------------------------
-// Health Check
+// Health Check (Deep with Supabase status)
 // -----------------------------------------------------------------------------
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
+    const dbHealth = supabase_js_1.isSupabaseConfigured
+        ? await (0, supabase_js_1.checkDatabaseConnection)()
+        : { connected: false, message: 'Supabase unconfigured (Local Memory Fallback Active)', latencyMs: 0 };
     res.json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
-        service: 'FoodLine Backend Engine'
+        service: 'FoodLine Backend Engine',
+        database: dbHealth,
     });
 });
 // -----------------------------------------------------------------------------
 // 1. GET /api/menu
 // -----------------------------------------------------------------------------
-app.get('/api/menu', (req, res) => {
+app.get('/api/menu', async (req, res) => {
     try {
         const category = req.query.category;
-        const items = menu_service_js_1.MenuService.getAllItems(category);
-        // Categories list
+        const items = await menu_service_js_1.MenuService.getAllItems(category);
         const categories = [
             'All',
             'Quick Bites',
@@ -55,15 +53,15 @@ app.get('/api/menu', (req, res) => {
             'Garlic Bread & Pizza',
             'Maggi & Chinese',
             'Beverages',
-            'Desserts'
+            'Desserts',
         ];
         res.json({
             success: true,
             data: {
                 categories,
-                items
+                items,
             },
-            meta: { timestamp: new Date().toISOString(), count: items.length }
+            meta: { timestamp: new Date().toISOString(), count: items.length },
         });
     }
     catch (error) {
@@ -73,13 +71,13 @@ app.get('/api/menu', (req, res) => {
 // -----------------------------------------------------------------------------
 // 2. GET /api/slots
 // -----------------------------------------------------------------------------
-app.get('/api/slots', (req, res) => {
+app.get('/api/slots', async (req, res) => {
     try {
-        const slots = slot_throttler_js_1.SlotThrottlerService.getAllSlots();
+        const slots = await slot_throttler_js_1.SlotThrottlerService.getAllSlots();
         res.json({
             success: true,
             data: slots,
-            meta: { timestamp: new Date().toISOString(), totalSlots: slots.length }
+            meta: { timestamp: new Date().toISOString(), totalSlots: slots.length },
         });
     }
     catch (error) {
@@ -89,69 +87,19 @@ app.get('/api/slots', (req, res) => {
 // -----------------------------------------------------------------------------
 // 3. POST /api/orders
 // -----------------------------------------------------------------------------
-app.post('/api/orders', (req, res) => {
+app.post('/api/orders', async (req, res) => {
     try {
-        const { slotId, items, studentPhone, notes } = req.body;
-        if (!items || !Array.isArray(items) || items.length === 0) {
-            return res.status(400).json({ success: false, error: 'Order must contain at least 1 item' });
-        }
-        // Reserve slot capacity
-        let reservedSlot;
-        if (slotId) {
-            if (!slot_throttler_js_1.SlotThrottlerService.canReserve(slotId, 1)) {
-                return res.status(409).json({
-                    success: false,
-                    error: 'Selected break slot has reached maximum capacity (60 orders limit).'
-                });
-            }
-            reservedSlot = slot_throttler_js_1.SlotThrottlerService.reserveSlot(slotId, 1);
-        }
-        else {
-            const defaultSlots = slot_throttler_js_1.SlotThrottlerService.getAllSlots();
-            reservedSlot = defaultSlots[0];
-        }
-        const orderToken = generateOrderToken();
-        const pickupOtp = generatePickupOtp();
-        const totalAmount = items.reduce((sum, item) => sum + (item.price || item.item?.price || 0) * (item.quantity || 1), 0);
-        const itemTotal = totalAmount;
-        const studentPlatformFee = 0; // ₹0
-        const paymentGatewayMdr = 0; // 0%
-        const totalAmountPaid = itemTotal;
-        const merchantPayoutAmount = Math.round(itemTotal * 0.88 * 100) / 100;
-        const platformShareAmount = Math.round(itemTotal * 0.12 * 100) / 100;
-        const now = new Date().toISOString();
-        const newOrder = {
-            id: `ord_${Date.now()}`,
-            orderToken,
-            pickupOtp,
+        const { slotId, items, studentPhone, studentName, studentPrn, notes, userId, cafeteriaId } = req.body;
+        const newOrder = await order_service_js_1.OrderService.createOrder({
+            slotId,
+            items,
             studentPhone,
-            studentName: req.body.studentName,
-            studentPrn: req.body.studentPrn,
-            items: items.map((i) => ({
-                item: i.item || { id: i.id, name: i.name, price: i.price, isVeg: true, prepTime: 5, tag: '', category: '' },
-                quantity: i.quantity || 1
-            })),
-            slot: reservedSlot,
-            totalAmount,
-            status: 'PENDING_PAYMENT',
+            studentName,
+            studentPrn,
             notes,
-            financials: {
-                itemTotal,
-                studentPlatformFee,
-                paymentGatewayMdr,
-                totalAmountPaid,
-                merchantPayoutAmount,
-                platformShareAmount,
-            },
-            compliance: {
-                dpdpConsentGiven: true,
-                fssaiLicense: '11522036000142',
-                maxSlotHoldMinutes: 20,
-            },
-            createdAt: now,
-            updatedAt: now
-        };
-        ordersStore.set(orderToken, newOrder);
+            userId,
+            cafeteriaId,
+        });
         res.status(201).json({
             success: true,
             data: {
@@ -162,39 +110,26 @@ app.post('/api/orders', (req, res) => {
                 status: newOrder.status,
                 slot: newOrder.slot,
                 financials: newOrder.financials,
-                compliance: newOrder.compliance
+                compliance: newOrder.compliance,
             },
-            meta: { timestamp: now }
+            meta: { timestamp: newOrder.createdAt },
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        const status = error.message && error.message.includes('capacity') ? 409 : 400;
+        res.status(status).json({ success: false, error: error.message });
     }
 });
 // -----------------------------------------------------------------------------
 // 4. POST /api/payments/verify-utr
 // -----------------------------------------------------------------------------
-app.post('/api/payments/verify-utr', (req, res) => {
+app.post('/api/payments/verify-utr', async (req, res) => {
     try {
         const { orderToken, utrNumber, amount } = req.body;
         if (!orderToken) {
             return res.status(400).json({ success: false, error: 'orderToken is required' });
         }
-        const order = ordersStore.get(orderToken);
-        if (!order) {
-            return res.status(404).json({ success: false, error: `Order ${orderToken} not found` });
-        }
-        const verification = utr_verifier_js_1.UtrVerifierService.verifyUtr(utrNumber, orderToken);
-        if (!verification.valid) {
-            return res.status(400).json({ success: false, error: verification.message });
-        }
-        // Update order status
-        order.utrNumber = verification.utrNumber;
-        order.status = 'CONFIRMED';
-        order.updatedAt = new Date().toISOString();
-        ordersStore.set(orderToken, order);
-        // Notify SSE streams
-        sse_broadcaster_js_1.sseBroadcaster.notifyOrderUpdate(order, 'ORDER_UPDATE');
+        const { order, message } = await order_service_js_1.OrderService.confirmUtrPayment(orderToken, utrNumber, amount);
         res.json({
             success: true,
             data: {
@@ -202,33 +137,33 @@ app.post('/api/payments/verify-utr', (req, res) => {
                 status: order.status,
                 utrNumber: order.utrNumber,
                 pickupOtp: order.pickupOtp,
-                message: verification.message
+                message,
             },
-            meta: { timestamp: new Date().toISOString() }
+            meta: { timestamp: new Date().toISOString() },
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(400).json({ success: false, error: error.message });
     }
 });
 // -----------------------------------------------------------------------------
 // 5. GET /api/order/:token & /api/order/:token/stream
 // -----------------------------------------------------------------------------
-app.get('/api/order/:token', (req, res) => {
+app.get('/api/order/:token', async (req, res) => {
     const token = req.params.token;
-    const order = ordersStore.get(token);
+    const order = await order_service_js_1.OrderService.getOrderByToken(token);
     if (!order) {
         return res.status(404).json({ success: false, error: `Order ${token} not found` });
     }
     res.json({
         success: true,
         data: order,
-        meta: { timestamp: new Date().toISOString() }
+        meta: { timestamp: new Date().toISOString() },
     });
 });
-app.get('/api/order/:token/stream', (req, res) => {
+app.get('/api/order/:token/stream', async (req, res) => {
     const token = req.params.token;
-    const order = ordersStore.get(token);
+    const order = await order_service_js_1.OrderService.getOrderByToken(token);
     const clientId = sse_broadcaster_js_1.sseBroadcaster.addClient(token, res);
     // Send initial snapshot if order exists
     if (order) {
@@ -241,47 +176,33 @@ app.get('/api/order/:token/stream', (req, res) => {
 // -----------------------------------------------------------------------------
 // 6. PATCH /api/kds/orders/:id/status
 // -----------------------------------------------------------------------------
-app.patch('/api/kds/orders/:id/status', (req, res) => {
+app.patch('/api/kds/orders/:id/status', async (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
-        let targetOrder;
-        for (const order of ordersStore.values()) {
-            if (order.id === id || order.orderToken === id) {
-                targetOrder = order;
-                break;
-            }
-        }
-        if (!targetOrder) {
-            return res.status(404).json({ success: false, error: `Order ${id} not found` });
-        }
-        targetOrder.status = status;
-        targetOrder.updatedAt = new Date().toISOString();
-        ordersStore.set(targetOrder.orderToken, targetOrder);
-        // Broadcast real-time change to student
-        sse_broadcaster_js_1.sseBroadcaster.notifyOrderUpdate(targetOrder, 'ORDER_UPDATE');
+        const updatedOrder = await order_service_js_1.OrderService.transitionStatus(id, status);
         res.json({
             success: true,
-            data: targetOrder,
-            meta: { timestamp: new Date().toISOString() }
+            data: updatedOrder,
+            meta: { timestamp: new Date().toISOString() },
         });
     }
     catch (error) {
-        res.status(500).json({ success: false, error: error.message });
+        res.status(400).json({ success: false, error: error.message });
     }
 });
 // -----------------------------------------------------------------------------
 // 7. PATCH /api/kds/inventory/:dishId
 // -----------------------------------------------------------------------------
-app.patch('/api/kds/inventory/:dishId', (req, res) => {
+app.patch('/api/kds/inventory/:dishId', async (req, res) => {
     try {
         const { dishId } = req.params;
         const { isAvailable } = req.body;
-        const updatedDish = menu_service_js_1.MenuService.toggleAvailability(dishId, isAvailable);
+        const updatedDish = await menu_service_js_1.MenuService.toggleAvailability(dishId, isAvailable);
         res.json({
             success: true,
             data: updatedDish,
-            meta: { timestamp: new Date().toISOString() }
+            meta: { timestamp: new Date().toISOString() },
         });
     }
     catch (error) {
@@ -291,14 +212,14 @@ app.patch('/api/kds/inventory/:dishId', (req, res) => {
 // -----------------------------------------------------------------------------
 // 8. GET /api/admin/metrics
 // -----------------------------------------------------------------------------
-app.get('/api/admin/metrics', (req, res) => {
+app.get('/api/admin/metrics', async (req, res) => {
     try {
-        const allOrders = Array.from(ordersStore.values());
+        const allOrders = order_service_js_1.OrderService.getAllOrders();
         const gmv = allOrders.reduce((sum, o) => sum + (o.status !== 'CANCELLED' ? o.totalAmount : 0), 0);
         const merchantNet = Math.round(gmv * 0.88 * 100) / 100;
         const platformRevenue = Math.round(gmv * 0.12 * 100) / 100;
-        const studentSavings = allOrders.length * 15; // ₹15 average surge fee savings vs commercial aggregators
-        const slots = slot_throttler_js_1.SlotThrottlerService.getAllSlots();
+        const studentSavings = allOrders.length * 15; // ₹15 average surge savings
+        const slots = await slot_throttler_js_1.SlotThrottlerService.getAllSlots();
         res.json({
             success: true,
             data: {
@@ -313,9 +234,9 @@ app.get('/api/admin/metrics', (req, res) => {
                 slotUtilization: slots,
                 fssaiStatus: 'VERIFIED_100_PERCENT_VEG',
                 fssaiLicense: '11522036000142',
-                dpdpStatus: 'ACTIVE_DATA_MINIMIZATION'
+                dpdpStatus: 'ACTIVE_DATA_MINIMIZATION',
             },
-            meta: { timestamp: new Date().toISOString() }
+            meta: { timestamp: new Date().toISOString() },
         });
     }
     catch (error) {

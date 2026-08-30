@@ -182,13 +182,22 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
       <main className="max-w-3xl mx-auto px-4 pt-6 relative z-10">
         {/* Navigation & Live Sync Pill */}
         <div className="flex items-center justify-between gap-4 mb-6">
-          <Link
-            href="/menu"
-            className="text-xs font-bold text-zinc-400 hover:text-white px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 transition cursor-pointer"
-          >
-            <ArrowLeft size={14} />
-            <span>Back to Menu</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/menu"
+              className="text-xs font-bold text-zinc-400 hover:text-white px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 transition cursor-pointer"
+            >
+              <ArrowLeft size={14} />
+              <span>Back to Menu</span>
+            </Link>
+            <Link
+              href="/orders"
+              className="text-xs font-bold text-[var(--accent-orange)] hover:text-white px-3.5 py-2 rounded-xl bg-[var(--accent-orange)]/10 hover:bg-[var(--accent-orange)]/20 border border-[var(--accent-orange)]/20 flex items-center gap-2 transition cursor-pointer"
+            >
+              <Receipt size={14} />
+              <span>My Orders</span>
+            </Link>
+          </div>
 
           <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
             <span

@@ -31,11 +31,13 @@ export interface CartItem {
 
 export type OrderStatus =
   | 'PENDING_PAYMENT'
+  | 'AWAITING_VERIFICATION'
   | 'CONFIRMED'
   | 'PREPARING'
   | 'READY'
   | 'COLLECTED'
-  | 'CANCELLED';
+  | 'CANCELLED'
+  | 'REFUNDED';
 
 export interface PickupSlot {
   id: string;
@@ -46,6 +48,8 @@ export interface PickupSlot {
   currentBooked: number;
   availableSlots: number;
   isFull: boolean;
+  cafeteriaId?: string;
+  facultyReserved?: number;
 }
 
 export interface OrderFinancials {
@@ -60,13 +64,15 @@ export interface OrderFinancials {
 export interface OrderCompliance {
   dpdpConsentGiven: boolean;
   fssaiLicense: string;
-  maxSlotHoldMinutes: number; // 20 mins
+  maxSlotHoldMinutes: number; // 10-20 mins
 }
 
 export interface Order {
   id: string;
   orderToken: string;       // e.g. "FL-1793"
   pickupOtp: string;        // e.g. "6065"
+  userId?: string;
+  cafeteriaId?: string;
   studentPhone?: string;
   studentName?: string;
   studentPrn?: string;
@@ -76,10 +82,36 @@ export interface Order {
   utrNumber?: string;
   status: OrderStatus;
   notes?: string;
+  counterId?: string;
+  isSquadOrder?: boolean;
+  squadRoomId?: string;
+  idempotencyKey?: string;
   financials?: OrderFinancials;
   compliance?: OrderCompliance;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface PaymentRecord {
+  id: string;
+  orderId: string;
+  utrNumber: string;
+  amount: number;
+  status: 'PENDING_VERIFICATION' | 'VERIFIED' | 'FAILED' | 'REFUNDED';
+  verificationMethod: 'UTR_MANUAL' | 'SOUNDBOX_WEBHOOK' | 'CASHIER_SCAN' | 'UPI_INTENT';
+  verifiedBy?: string;
+  createdAt: string;
+  verifiedAt?: string;
+}
+
+export interface SlotHoldRecord {
+  id: string;
+  orderId: string;
+  slotId: string;
+  quantity: number;
+  expiresAt: string;
+  isReleased: boolean;
+  createdAt: string;
 }
 
 export interface ApiResponse<T> {
@@ -91,3 +123,4 @@ export interface ApiResponse<T> {
   };
   error?: string;
 }
+

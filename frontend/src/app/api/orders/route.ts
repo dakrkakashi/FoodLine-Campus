@@ -6,10 +6,52 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const prn = searchParams.get('prn');
+    const token = searchParams.get('token');
+    const limit = parseInt(searchParams.get('limit') || '50', 10);
+
+    let query = supabase
+      .from('orders')
+      .select('*, order_items (*), pickup_slots (*)')
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (token) {
+      query = query.eq('order_token', token);
+    } else if (prn) {
+      query = query.ilike('notes', `%${prn}%`);
+    }
+
+    const { data: orders, error } = await query;
+
+    if (error) throw error;
+
+    return NextResponse.json({
+      success: true,
+      data: orders || [],
+      meta: { count: orders?.length || 0 }
+    });
+  } catch (error: any) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: {
+          code: 'FETCH_ORDERS_ERROR',
+          message: error.message || 'Failed to fetch order history'
+        }
+      },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { slotId, items, notes } = body;
+    const { slotId, items, notes, studentPrn, studentName, phone } = body;
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
@@ -25,37 +67,30 @@ export async function POST(request: Request) {
     }
 
     // 1. Validate slot capacity if slotId provided
-    if (slotId) {
+    const isSlotUuid = typeof slotId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slotId);
+    let resolvedSlotId: string | null = null;
+
+    if (slotId && isSlotUuid) {
       const { data: slot, error: slotErr } = await supabase
         .from('pickup_slots')
         .select('*')
         .eq('id', slotId)
         .single();
 
-      if (slotErr || !slot) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: {
-              code: 'SLOT_NOT_FOUND',
-              message: 'Selected pickup slot was not found.'
-            }
-          },
-          { status: 404 }
-        );
-      }
-
-      if (slot.current_booked >= slot.max_capacity) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: {
-              code: 'SLOT_CAPACITY_EXCEEDED',
-              message: `Slot "${slot.label}" is fully booked (60/60). Please select another slot.`
-            }
-          },
-          { status: 409 }
-        );
+      if (!slotErr && slot) {
+        resolvedSlotId = slot.id;
+        if (slot.current_booked >= slot.max_capacity) {
+          return NextResponse.json(
+            {
+              success: false,
+              error: {
+                code: 'SLOT_CAPACITY_EXCEEDED',
+                message: `Slot "${slot.label}" is fully booked (60/60). Please select another slot.`
+              }
+            },
+            { status: 409 }
+          );
+        }
       }
     }
 
@@ -98,8 +133,10 @@ export async function POST(request: Request) {
         }
       }
 
+      const isItemUuid = typeof item.id === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
+
       orderItemsToInsert.push({
-        menu_item_id: item.id || null,
+        menu_item_id: isItemUuid ? item.id : null,
         item_name: item.name,
         quantity,
         unit_price: unitPrice,
@@ -115,9 +152,21 @@ export async function POST(request: Request) {
     const isUpiWithValidUtr = paymentMethod === 'UPI' && cleanUtr && cleanUtr.length === 12;
 
     const initialStatus = (paymentMethod === 'COD' || isUpiWithValidUtr) ? 'CONFIRMED' : 'PENDING_PAYMENT';
-    const orderNotes = paymentMethod === 'COD'
-      ? (notes ? `${notes} | [💵 COD: Collect ₹${totalAmount} at Counter]` : `[💵 COD: Collect ₹${totalAmount} at Counter]`)
-      : (notes || null);
+
+    // Format comprehensive student metadata tag in notes
+    const studentTags = [
+      studentPrn ? `PRN: ${studentPrn.trim()}` : '',
+      studentName ? `Name: ${studentName.trim()}` : '',
+      phone ? `Phone: ${phone.trim()}` : '',
+    ].filter(Boolean).join(' • ');
+
+    let orderNotes = notes ? notes.trim() : '';
+    if (studentTags) {
+      orderNotes = orderNotes ? `[${studentTags}] ${orderNotes}` : `[${studentTags}]`;
+    }
+    if (paymentMethod === 'COD') {
+      orderNotes = orderNotes ? `${orderNotes} | [💵 COD: Collect ₹${totalAmount} at Counter]` : `[💵 COD: Collect ₹${totalAmount} at Counter]`;
+    }
 
     // 4. Create Order
     const { data: order, error: orderErr } = await supabase
@@ -125,11 +174,11 @@ export async function POST(request: Request) {
       .insert({
         order_token: orderToken,
         cafeteria_id: cafeteriaId,
-        slot_id: slotId || null,
+        slot_id: resolvedSlotId,
         total_amount: totalAmount,
         status: initialStatus,
         pickup_otp: pickupOtp,
-        notes: orderNotes
+        notes: orderNotes || null
       })
       .select()
       .single();
@@ -175,6 +224,8 @@ export async function POST(request: Request) {
         pickupOtp: order.pickup_otp,
         status: order.status,
         paymentMethod,
+        studentPrn,
+        studentName,
         createdAt: order.created_at
       }
     });
@@ -191,3 +242,4 @@ export async function POST(request: Request) {
     );
   }
 }
+
