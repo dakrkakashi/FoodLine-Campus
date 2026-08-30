@@ -45,8 +45,8 @@ function LoginFormContent() {
       return;
     }
 
-    if (studentPassword.length < 6) {
-      setErrorMessage('Password must be at least 6 characters.');
+    if (studentPassword.length < 4) {
+      setErrorMessage('Password must be at least 4 characters.');
       return;
     }
 
@@ -315,7 +315,7 @@ function LoginFormContent() {
               {/* Student Password */}
               <div>
                 <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Password {studentMode === 'SIGN_UP' && '(Min. 6 Characters)'}
+                  Password {studentMode === 'SIGN_UP' && '(Min. 4 Characters)'}
                 </label>
                 <div className="relative">
                   <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
