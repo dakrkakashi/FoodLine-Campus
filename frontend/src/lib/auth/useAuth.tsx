@@ -17,6 +17,8 @@ interface AuthContextType {
   signInWithPassword: (email: string, password: string) => Promise<{ error: any }>;
   signUpWithPassword: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signInWithPrn: (prn: string, phone: string) => Promise<void>;
+  signInWithPrnPassword: (prn: string, password: string) => Promise<{ error: any }>;
+  signUpWithPrnPassword: (prn: string, password: string, fullName: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -229,6 +231,77 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(studentProf);
   }, []);
 
+  const signInWithPrnPassword = useCallback(async (prn: string, password: string) => {
+    const cleanPrn = prn.trim();
+    const mappedEmail = `prn_${cleanPrn}@foodline.campus`;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: mappedEmail,
+      password: password,
+    });
+
+    if (!error && data.user) {
+      const cookieVal = encodeURIComponent(JSON.stringify({
+        prn: cleanPrn,
+        role: 'student',
+        full_name: data.user.user_metadata?.full_name || `Campus Student (${cleanPrn})`,
+      }));
+      if (typeof document !== 'undefined') {
+        document.cookie = `foodline_student_session=${cookieVal}; path=/; max-age=604800; SameSite=Lax`;
+      }
+      setUser(data.user);
+      await fetchProfile(data.user);
+      return { error: null };
+    }
+
+    return { error };
+  }, [supabase, fetchProfile]);
+
+  const signUpWithPrnPassword = useCallback(async (prn: string, password: string, fullName: string) => {
+    const cleanPrn = prn.trim();
+    const mappedEmail = `prn_${cleanPrn}@foodline.campus`;
+
+    const { data, error } = await supabase.auth.signUp({
+      email: mappedEmail,
+      password: password,
+      options: {
+        data: {
+          full_name: fullName,
+          prn: cleanPrn,
+          role: 'student',
+        },
+      },
+    });
+
+    if (!error && data.user) {
+      try {
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          email: mappedEmail,
+          full_name: fullName,
+          prn: cleanPrn,
+          role: 'student',
+          is_active: true,
+        });
+      } catch (e) {}
+
+      const cookieVal = encodeURIComponent(JSON.stringify({
+        prn: cleanPrn,
+        role: 'student',
+        full_name: fullName,
+      }));
+      if (typeof document !== 'undefined') {
+        document.cookie = `foodline_student_session=${cookieVal}; path=/; max-age=604800; SameSite=Lax`;
+      }
+
+      setUser(data.user);
+      await fetchProfile(data.user);
+      return { error: null };
+    }
+
+    return { error };
+  }, [supabase, fetchProfile]);
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut().catch(() => {});
     if (typeof document !== 'undefined') {
@@ -265,6 +338,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithPassword,
     signUpWithPassword,
     signInWithPrn,
+    signInWithPrnPassword,
+    signUpWithPrnPassword,
     signOut,
     refreshProfile,
   }), [

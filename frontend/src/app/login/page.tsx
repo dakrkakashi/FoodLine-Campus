@@ -3,8 +3,8 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'motion/react';
-import { GraduationCap, Shield, Lock, CheckCircle2, Mail, KeyRound, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { motion } from 'motion/react';
+import { GraduationCap, Shield, Lock, Mail, KeyRound, ArrowRight, Loader2, Sparkles, User as UserIcon, CheckCircle2 } from 'lucide-react';
 import { PageTransition, SpotlightCard, fireConfettiSuccess } from '@/components/ui';
 import { useAuth } from '@/lib/auth/useAuth';
 
@@ -13,35 +13,39 @@ function LoginFormContent() {
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get('redirect') || '/menu';
 
-  const { signInWithPassword, signUpWithPassword, signInWithGoogle, signInWithPrn } = useAuth();
+  const { signInWithPassword, signInWithPrnPassword, signUpWithPrnPassword, signInWithGoogle } = useAuth();
 
-  const [authTab, setAuthTab] = useState<'STAFF_ADMIN' | 'GOOGLE_SSO' | 'STUDENT_PRN'>('STAFF_ADMIN');
-  const [authMode, setAuthMode] = useState<'SIGN_IN' | 'SIGN_UP'>('SIGN_IN');
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('foodlinecampus@gmail.com');
-  const [password, setPassword] = useState('');
-  const [prn, setPrn] = useState('');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
-  const [step, setStep] = useState<'INPUT' | 'OTP'>('INPUT');
+  // Tabs: STUDENT_PRN (Default), STAFF_ADMIN, GOOGLE_SSO
+  const [authTab, setAuthTab] = useState<'STUDENT_PRN' | 'STAFF_ADMIN' | 'GOOGLE_SSO'>('STUDENT_PRN');
+  
+  // Student PRN auth states
+  const [studentMode, setStudentMode] = useState<'SIGN_IN' | 'SIGN_UP'>('SIGN_IN');
+  const [studentFullName, setStudentFullName] = useState('');
+  const [studentPrn, setStudentPrn] = useState('');
+  const [studentPassword, setStudentPassword] = useState('');
+
+  // Staff / Admin auth states (Sign in only)
+  const [staffEmail, setStaffEmail] = useState('foodlinecampus@gmail.com');
+  const [staffPassword, setStaffPassword] = useState('');
+
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // 1. Email/Password Sign In or Sign Up
-  const handleEmailAuth = async (e: React.FormEvent) => {
+  // 1. Student PRN + Password Login & Sign Up
+  const handleStudentAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      setErrorMessage('Please enter both email and password.');
+    if (!studentPrn.trim() || !studentPassword) {
+      setErrorMessage('Please enter your PRN and password.');
       return;
     }
 
-    if (authMode === 'SIGN_UP' && !fullName.trim()) {
+    if (studentMode === 'SIGN_UP' && !studentFullName.trim()) {
       setErrorMessage('Please enter your full name.');
       return;
     }
 
-    if (authMode === 'SIGN_UP' && password.length < 6) {
+    if (studentPassword.length < 6) {
       setErrorMessage('Password must be at least 6 characters.');
       return;
     }
@@ -51,30 +55,30 @@ function LoginFormContent() {
     setSuccessMessage(null);
 
     try {
-      if (authMode === 'SIGN_UP') {
-        const { error } = await signUpWithPassword(email.trim(), password, fullName.trim());
+      if (studentMode === 'SIGN_UP') {
+        const { error } = await signUpWithPrnPassword(studentPrn.trim(), studentPassword, studentFullName.trim());
         if (error) {
-          setErrorMessage(error.message || 'Failed to create account. Please try again.');
+          setErrorMessage(error.message || 'Failed to create student account. Please check if PRN is already registered.');
           setIsLoading(false);
           return;
         }
 
         fireConfettiSuccess();
-        setSuccessMessage('Account created successfully! Redirecting to campus menu...');
+        setSuccessMessage('Student account created successfully! Taking you to the menu...');
         setTimeout(() => {
-          router.push(redirectPath);
-        }, 1000);
+          window.location.href = redirectPath;
+        }, 800);
       } else {
-        const { error } = await signInWithPassword(email.trim(), password);
+        const { error } = await signInWithPrnPassword(studentPrn.trim(), studentPassword);
         if (error) {
-          setErrorMessage(error.message || 'Invalid email or password. Please try again.');
+          setErrorMessage(error.message || 'Invalid PRN or password. Please try again or create an account.');
           setIsLoading(false);
           return;
         }
 
         fireConfettiSuccess();
         setTimeout(() => {
-          router.push(redirectPath);
+          window.location.href = redirectPath;
         }, 500);
       }
     } catch (err: any) {
@@ -83,7 +87,37 @@ function LoginFormContent() {
     }
   };
 
-  // 2. Google SSO Login
+  // 2. Staff & Admin Sign In Only (Created via Supabase)
+  const handleStaffLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!staffEmail || !staffPassword) {
+      setErrorMessage('Please enter both email and password.');
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+
+    try {
+      const { error } = await signInWithPassword(staffEmail.trim(), staffPassword);
+      if (error) {
+        setErrorMessage(error.message || 'Invalid staff credentials. Access must be assigned in Supabase.');
+        setIsLoading(false);
+        return;
+      }
+
+      fireConfettiSuccess();
+      setTimeout(() => {
+        router.push(redirectPath);
+      }, 500);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'An unexpected error occurred.');
+      setIsLoading(false);
+    }
+  };
+
+  // 3. Google SSO Login
   const handleGoogleSSO = async () => {
     setIsLoading(true);
     setErrorMessage(null);
@@ -91,37 +125,6 @@ function LoginFormContent() {
       await signInWithGoogle(redirectPath);
     } catch (err: any) {
       setErrorMessage(err.message || 'Google SSO failed.');
-      setIsLoading(false);
-    }
-  };
-
-  // 3. PRN + OTP Login
-  const handleSendOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!prn || !phone) return;
-    setIsLoading(true);
-    setErrorMessage(null);
-    setTimeout(() => {
-      setIsLoading(false);
-      setStep('OTP');
-    }, 700);
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.length < 4) return;
-    setIsLoading(true);
-    setErrorMessage(null);
-    try {
-      await signInWithPrn(prn, phone);
-      fireConfettiSuccess();
-      setTimeout(() => {
-        // If the redirect path was a staff/admin only path like /admin or /kds, redirect student to /menu
-        const targetPath = redirectPath.startsWith('/admin') || redirectPath.startsWith('/kds') ? '/menu' : redirectPath;
-        window.location.href = targetPath;
-      }, 400);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Verification failed. Please try again.');
       setIsLoading(false);
     }
   };
@@ -180,20 +183,32 @@ function LoginFormContent() {
               )}
             </motion.div>
             <h1 className="text-2xl font-black tracking-tight text-white mb-1">
-              {authTab === 'STAFF_ADMIN' ? 'Staff & Admin Portal' : 'Campus Student Login'}
+              {authTab === 'STAFF_ADMIN' ? 'Staff & Admin Portal' : 'Campus Student Portal'}
             </h1>
             <p className="text-xs text-neutral-400">
               {authTab === 'STAFF_ADMIN'
-                ? 'Sign in to access KDS, live inventory, and executive management'
-                : 'Sign in to place express classroom pre-orders'}
+                ? 'Sign in to access KDS, live inventory, and manager dashboard'
+                : 'Sign in or create account with your PRN & Password'}
             </p>
           </div>
 
           {/* 3-Tab Selector */}
           <div className="p-1 rounded-2xl bg-black/50 border border-white/10 grid grid-cols-3 gap-1 mb-6 text-xs font-bold">
             <button
-              onClick={() => { setAuthTab('STAFF_ADMIN'); setErrorMessage(null); }}
-              className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 ${
+              onClick={() => { setAuthTab('STUDENT_PRN'); setErrorMessage(null); setSuccessMessage(null); }}
+              className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
+                authTab === 'STUDENT_PRN'
+                  ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FF8C42] text-white shadow-lg shadow-[#FF6B2C]/30'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              <GraduationCap size={13} />
+              <span>Student PRN</span>
+            </button>
+
+            <button
+              onClick={() => { setAuthTab('STAFF_ADMIN'); setErrorMessage(null); setSuccessMessage(null); }}
+              className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 authTab === 'STAFF_ADMIN'
                   ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-600/30'
                   : 'text-neutral-400 hover:text-white'
@@ -204,25 +219,14 @@ function LoginFormContent() {
             </button>
 
             <button
-              onClick={() => { setAuthTab('GOOGLE_SSO'); setErrorMessage(null); }}
-              className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 ${
+              onClick={() => { setAuthTab('GOOGLE_SSO'); setErrorMessage(null); setSuccessMessage(null); }}
+              className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 authTab === 'GOOGLE_SSO'
                   ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FF8C42] text-white shadow-lg shadow-[#FF6B2C]/30'
                   : 'text-neutral-400 hover:text-white'
               }`}
             >
               <span>Google</span>
-            </button>
-
-            <button
-              onClick={() => { setAuthTab('STUDENT_PRN'); setErrorMessage(null); }}
-              className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 ${
-                authTab === 'STUDENT_PRN'
-                  ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FF8C42] text-white shadow-lg shadow-[#FF6B2C]/30'
-                  : 'text-neutral-400 hover:text-white'
-              }`}
-            >
-              <span>PRN+OTP</span>
             </button>
           </div>
 
@@ -241,17 +245,17 @@ function LoginFormContent() {
             </div>
           )}
 
-          {/* Tab 1: Email/Password Sign In & Sign Up */}
-          {authTab === 'STAFF_ADMIN' && (
-            <form onSubmit={handleEmailAuth} className="space-y-4">
-              {/* Sign In vs Sign Up Sub-Toggle */}
+          {/* TAB 1: Student PRN + Password (Sign In & Sign Up) */}
+          {authTab === 'STUDENT_PRN' && (
+            <form onSubmit={handleStudentAuth} className="space-y-4">
+              {/* Sign In vs Create Account Sub-Toggle */}
               <div className="p-1 rounded-xl bg-white/5 border border-white/10 flex items-center mb-2">
                 <button
                   type="button"
-                  onClick={() => { setAuthMode('SIGN_IN'); setErrorMessage(null); }}
+                  onClick={() => { setStudentMode('SIGN_IN'); setErrorMessage(null); setSuccessMessage(null); }}
                   className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                    authMode === 'SIGN_IN'
-                      ? 'bg-purple-600 text-white shadow-md'
+                    studentMode === 'SIGN_IN'
+                      ? 'bg-[var(--accent-orange)] text-black shadow-md font-black'
                       : 'text-neutral-400 hover:text-white'
                   }`}
                 >
@@ -259,10 +263,10 @@ function LoginFormContent() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => { setAuthMode('SIGN_UP'); setErrorMessage(null); }}
+                  onClick={() => { setStudentMode('SIGN_UP'); setErrorMessage(null); setSuccessMessage(null); }}
                   className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
-                    authMode === 'SIGN_UP'
-                      ? 'bg-purple-600 text-white shadow-md'
+                    studentMode === 'SIGN_UP'
+                      ? 'bg-[var(--accent-orange)] text-black shadow-md font-black'
                       : 'text-neutral-400 hover:text-white'
                   }`}
                 >
@@ -270,35 +274,120 @@ function LoginFormContent() {
                 </button>
               </div>
 
-              {/* Full Name field for Sign Up */}
-              {authMode === 'SIGN_UP' && (
+              {/* Full Name for Student Registration */}
+              {studentMode === 'SIGN_UP' && (
                 <div>
                   <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                    Full Name
+                    Student Full Name
                   </label>
-                  <input
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    required
-                    placeholder="e.g. Rahul Sharma"
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
-                  />
+                  <div className="relative">
+                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
+                    <input
+                      type="text"
+                      value={studentFullName}
+                      onChange={(e) => setStudentFullName(e.target.value)}
+                      required
+                      placeholder="e.g. Shivam Nirmal"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
+                    />
+                  </div>
                 </div>
               )}
 
+              {/* Student PRN / Roll Number */}
               <div>
                 <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Email Address
+                  Student PRN / Roll Number
+                </label>
+                <div className="relative">
+                  <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
+                  <input
+                    type="text"
+                    value={studentPrn}
+                    onChange={(e) => setStudentPrn(e.target.value)}
+                    required
+                    placeholder="e.g. 1031 or 2102001042"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all font-mono"
+                  />
+                </div>
+              </div>
+
+              {/* Student Password */}
+              <div>
+                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                  Password {studentMode === 'SIGN_UP' && '(Min. 6 Characters)'}
+                </label>
+                <div className="relative">
+                  <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
+                  <input
+                    type="password"
+                    value={studentPassword}
+                    onChange={(e) => setStudentPassword(e.target.value)}
+                    required
+                    placeholder="••••••••••••"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FF8C42] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#FF6B2C]/30 hover:opacity-95 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>{studentMode === 'SIGN_UP' ? 'Creating Account...' : 'Signing In...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{studentMode === 'SIGN_UP' ? 'Create Student Account' : 'Sign In with PRN'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+
+              <div className="text-center pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStudentMode(studentMode === 'SIGN_IN' ? 'SIGN_UP' : 'SIGN_IN');
+                    setErrorMessage(null);
+                    setSuccessMessage(null);
+                  }}
+                  className="text-xs text-neutral-400 hover:text-orange-300 transition cursor-pointer"
+                >
+                  {studentMode === 'SIGN_IN' ? (
+                    <span>New student at campus? <strong className="text-[var(--accent-orange)] underline">Create Account</strong></span>
+                  ) : (
+                    <span>Already have a password? <strong className="text-[var(--accent-orange)] underline">Sign In</strong></span>
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* TAB 2: Staff & Admin Sign In Only (Strictly No Public Registration) */}
+          {authTab === 'STAFF_ADMIN' && (
+            <form onSubmit={handleStaffLogin} className="space-y-4">
+              <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-[11px] text-purple-300 flex items-start gap-2">
+                <Shield size={14} className="shrink-0 mt-0.5 text-purple-400" />
+                <span>Restricted to Authorized Canteen Managers & Kitchen Staff (Assigned via Supabase).</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                  Staff Email Address
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
                   <input
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={staffEmail}
+                    onChange={(e) => setStaffEmail(e.target.value)}
                     required
-                    placeholder="name@example.com"
+                    placeholder="foodlinecampus@gmail.com"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                   />
                 </div>
@@ -306,14 +395,14 @@ function LoginFormContent() {
 
               <div>
                 <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Password {authMode === 'SIGN_UP' && '(Min. 6 Characters)'}
+                  Staff Password
                 </label>
                 <div className="relative">
                   <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
                   <input
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={staffPassword}
+                    onChange={(e) => setStaffPassword(e.target.value)}
                     required
                     placeholder="••••••••••••"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
@@ -329,36 +418,19 @@ function LoginFormContent() {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>{authMode === 'SIGN_UP' ? 'Creating Account...' : 'Verifying Credentials...'}</span>
+                    <span>Verifying Staff Credentials...</span>
                   </>
                 ) : (
                   <>
-                    <span>{authMode === 'SIGN_UP' ? 'Create My FoodLine Account' : 'Sign In to Portal'}</span>
+                    <span>Sign In to Admin & Kitchen</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
-
-              <div className="text-center pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAuthMode(authMode === 'SIGN_IN' ? 'SIGN_UP' : 'SIGN_IN');
-                    setErrorMessage(null);
-                  }}
-                  className="text-xs text-neutral-400 hover:text-purple-300 transition"
-                >
-                  {authMode === 'SIGN_IN' ? (
-                    <span>Don't have an account? <strong className="text-purple-400 underline">Sign Up</strong></span>
-                  ) : (
-                    <span>Already have an account? <strong className="text-purple-400 underline">Sign In</strong></span>
-                  )}
-                </button>
-              </div>
             </form>
           )}
 
-          {/* Tab 2: Google SSO */}
+          {/* TAB 3: Google SSO */}
           {authTab === 'GOOGLE_SSO' && (
             <div className="space-y-4">
               <button
@@ -388,86 +460,17 @@ function LoginFormContent() {
                     />
                   </svg>
                 )}
-                <span>Continue with @sanjivani.edu.in</span>
+                <span>Continue with University Google Account</span>
               </button>
 
               <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-2.5 text-xs text-neutral-400">
                 <CheckCircle2 size={16} className="text-[#00D4AA] shrink-0 mt-0.5" />
-                <span>Automatically syncs your PRN, batch roll, and student profile.</span>
+                <span>Instant 1-tap sign in for students & faculty with university emails.</span>
               </div>
             </div>
           )}
 
-          {/* Tab 3: PRN + OTP */}
-          {authTab === 'STUDENT_PRN' && (
-            <div>
-              {step === 'INPUT' ? (
-                <form onSubmit={handleSendOtp} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                      Student PRN / Roll No
-                    </label>
-                    <input
-                      type="text"
-                      value={prn}
-                      onChange={(e) => setPrn(e.target.value)}
-                      required
-                      placeholder="e.g. 2102001042"
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                      Mobile Number
-                    </label>
-                    <input
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      required
-                      placeholder="+91 98765 43210"
-                      className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FF8C42] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#FF6B2C]/30 hover:opacity-95 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
-                  >
-                    <span>Send SMS OTP</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleVerifyOtp} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                      Enter 4-Digit OTP
-                    </label>
-                    <input
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      maxLength={6}
-                      required
-                      placeholder="• • • •"
-                      className="w-full text-center tracking-[0.5em] text-lg font-bold py-2.5 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-[#00D4AA] transition-all"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-[#00D4AA] to-emerald-500 text-black text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#00D4AA]/30 hover:opacity-95 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
-                  >
-                    <span>Verify & Continue</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-
-          {/* Footer note */}
+          {/* Footer Security Note */}
           <div className="mt-6 pt-4 border-t border-white/5 text-center">
             <span className="text-[11px] text-neutral-500 flex items-center justify-center gap-1.5">
               <Lock size={12} className="text-[#00D4AA]" />
