@@ -3,36 +3,35 @@ node_modules/
 /.pnp
 .pnp.js
 
-# Testing
+# Testing & Coverage
 /coverage
 
-# Next.js build output
+# Next.js & Build Output
 .next/
 out/
 build/
 dist/
+*.tsbuildinfo
+next-env.d.ts
 
-# Production
+# Production & Secrets
 inventory-state.json
-
-# Misc
-.DS_Store
-*.pem
-*.log
-
-# Local env files
+client_secret_*.json
 .env*.local
 .env.local
 .env
 
-# Vercel
+# Misc & System
+.DS_Store
+*.pem
+*.log
 .vercel
 
-# TypeScript
-*.tsbuildinfo
-next-env.d.ts
-client_secret_*.json
-
-# Editor & Agent metadata
+# AI & Workspace metadata (Kept strictly local)
+.agent/
+.agents/
+.opencode/
 .kilo/
-
+graphify-out/
+AGENTS.md
+OPENCODE.md
