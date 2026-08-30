@@ -13,9 +13,11 @@ function LoginFormContent() {
   const searchParams = useSearchParams();
   const redirectPath = searchParams.get('redirect') || '/menu';
 
-  const { signInWithPassword, signInWithGoogle, signInWithPrn } = useAuth();
+  const { signInWithPassword, signUpWithPassword, signInWithGoogle, signInWithPrn } = useAuth();
 
   const [authTab, setAuthTab] = useState<'STAFF_ADMIN' | 'GOOGLE_SSO' | 'STUDENT_PRN'>('STAFF_ADMIN');
+  const [authMode, setAuthMode] = useState<'SIGN_IN' | 'SIGN_UP'>('SIGN_IN');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('foodlinecampus@gmail.com');
   const [password, setPassword] = useState('');
   const [prn, setPrn] = useState('');
@@ -24,30 +26,57 @@ function LoginFormContent() {
   const [step, setStep] = useState<'INPUT' | 'OTP'>('INPUT');
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // 1. Staff & Admin Email/Password Login
-  const handleStaffLogin = async (e: React.FormEvent) => {
+  // 1. Email/Password Sign In or Sign Up
+  const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setErrorMessage('Please enter both email and password.');
       return;
     }
 
+    if (authMode === 'SIGN_UP' && !fullName.trim()) {
+      setErrorMessage('Please enter your full name.');
+      return;
+    }
+
+    if (authMode === 'SIGN_UP' && password.length < 6) {
+      setErrorMessage('Password must be at least 6 characters.');
+      return;
+    }
+
     setIsLoading(true);
     setErrorMessage(null);
+    setSuccessMessage(null);
 
     try {
-      const { error } = await signInWithPassword(email.trim(), password);
-      if (error) {
-        setErrorMessage(error.message || 'Invalid email or password. Please try again.');
-        setIsLoading(false);
-        return;
-      }
+      if (authMode === 'SIGN_UP') {
+        const { error } = await signUpWithPassword(email.trim(), password, fullName.trim());
+        if (error) {
+          setErrorMessage(error.message || 'Failed to create account. Please try again.');
+          setIsLoading(false);
+          return;
+        }
 
-      fireConfettiSuccess();
-      setTimeout(() => {
-        router.push(redirectPath);
-      }, 500);
+        fireConfettiSuccess();
+        setSuccessMessage('Account created successfully! Redirecting to campus menu...');
+        setTimeout(() => {
+          router.push(redirectPath);
+        }, 1000);
+      } else {
+        const { error } = await signInWithPassword(email.trim(), password);
+        if (error) {
+          setErrorMessage(error.message || 'Invalid email or password. Please try again.');
+          setIsLoading(false);
+          return;
+        }
+
+        fireConfettiSuccess();
+        setTimeout(() => {
+          router.push(redirectPath);
+        }, 500);
+      }
     } catch (err: any) {
       setErrorMessage(err.message || 'An unexpected error occurred.');
       setIsLoading(false);
@@ -197,7 +226,7 @@ function LoginFormContent() {
             </button>
           </div>
 
-          {/* Error Banner */}
+          {/* Error & Success Banners */}
           {errorMessage && (
             <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium flex items-center gap-2">
               <span className="shrink-0">⚠️</span>
@@ -205,9 +234,59 @@ function LoginFormContent() {
             </div>
           )}
 
-          {/* Tab 1: Staff & Admin Email/Password */}
+          {successMessage && (
+            <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium flex items-center gap-2">
+              <span className="shrink-0">🎉</span>
+              <span>{successMessage}</span>
+            </div>
+          )}
+
+          {/* Tab 1: Email/Password Sign In & Sign Up */}
           {authTab === 'STAFF_ADMIN' && (
-            <form onSubmit={handleStaffLogin} className="space-y-4">
+            <form onSubmit={handleEmailAuth} className="space-y-4">
+              {/* Sign In vs Sign Up Sub-Toggle */}
+              <div className="p-1 rounded-xl bg-white/5 border border-white/10 flex items-center mb-2">
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('SIGN_IN'); setErrorMessage(null); }}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    authMode === 'SIGN_IN'
+                      ? 'bg-purple-600 text-white shadow-md'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('SIGN_UP'); setErrorMessage(null); }}
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                    authMode === 'SIGN_UP'
+                      ? 'bg-purple-600 text-white shadow-md'
+                      : 'text-neutral-400 hover:text-white'
+                  }`}
+                >
+                  Create Account
+                </button>
+              </div>
+
+              {/* Full Name field for Sign Up */}
+              {authMode === 'SIGN_UP' && (
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                    placeholder="e.g. Rahul Sharma"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  />
+                </div>
+              )}
+
               <div>
                 <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
                   Email Address
@@ -219,7 +298,7 @@ function LoginFormContent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="foodlinecampus@gmail.com"
+                    placeholder="name@example.com"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                   />
                 </div>
@@ -227,7 +306,7 @@ function LoginFormContent() {
 
               <div>
                 <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
-                  Password
+                  Password {authMode === 'SIGN_UP' && '(Min. 6 Characters)'}
                 </label>
                 <div className="relative">
                   <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
@@ -250,15 +329,32 @@ function LoginFormContent() {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>Verifying Credentials...</span>
+                    <span>{authMode === 'SIGN_UP' ? 'Creating Account...' : 'Verifying Credentials...'}</span>
                   </>
                 ) : (
                   <>
-                    <span>Sign In to Portal</span>
+                    <span>{authMode === 'SIGN_UP' ? 'Create My FoodLine Account' : 'Sign In to Portal'}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
+
+              <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode(authMode === 'SIGN_IN' ? 'SIGN_UP' : 'SIGN_IN');
+                    setErrorMessage(null);
+                  }}
+                  className="text-xs text-neutral-400 hover:text-purple-300 transition"
+                >
+                  {authMode === 'SIGN_IN' ? (
+                    <span>Don't have an account? <strong className="text-purple-400 underline">Sign Up</strong></span>
+                  ) : (
+                    <span>Already have an account? <strong className="text-purple-400 underline">Sign In</strong></span>
+                  )}
+                </button>
+              </div>
             </form>
           )}
 
