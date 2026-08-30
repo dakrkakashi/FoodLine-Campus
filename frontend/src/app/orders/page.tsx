@@ -112,12 +112,14 @@ export default function OrdersHistoryPage() {
     playSuccess();
     clearCart();
     for (const item of order.items) {
-      addItem({
-        id: item.id || `reorder_${item.name}`,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-      });
+      const qty = item.quantity || 1;
+      for (let i = 0; i < qty; i++) {
+        addItem({
+          id: item.id || `reorder_${item.name}`,
+          name: item.name,
+          price: item.price,
+        });
+      }
     }
     router.push('/checkout');
   };
