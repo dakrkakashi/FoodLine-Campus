@@ -8,6 +8,7 @@
 - **Worktree Isolation:** Configured `FoodLine-Backend` (`backend` branch) and `FoodLine-Frontend` (`frontend` branch).
 - **Libraries Installed:** 
   - `motion` (motion.dev)
+  - `magic-ui` (BorderBeam, AnimatedShinyText, ShimmerButton, NumberTicker, Meteors)
   - `animejs` (Anime.js + @types/animejs)
   - `three` (3D graphics)
   - `lucide-react`
