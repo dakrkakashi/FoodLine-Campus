@@ -1,121 +1,186 @@
 ================================================================================
-🍔 FOODLINE CAMPUS — MASTER SHORTCUTS & QUICK COMMANDS CHEATSHEET
+🍔 FOODLINE CAMPUS — MASTER SHORTCUTS & EXACT USAGE GUIDE
 ================================================================================
 Target Project: FoodLine Campus (Cafe @7, Sanjivani University, Kopargaon)
 Main Repo: /home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES
 GitHub Repo: https://github.com/dakrkakashi/FoodLine-Campus.git
 Updated: September 2026
 
---------------------------------------------------------------------------------
-1. ⚡ GLOBAL "fl" COMMANDS (Run from ANY terminal directory)
---------------------------------------------------------------------------------
-The "fl" CLI is installed globally at ~/.local/bin/fl. You can run these commands
-from anywhere in your system:
-
-  fl up
-    👉 Master 1-Click Startup.
-       - Kills stale processes on port 3000 & 4000.
-       - Prints the latest checkpoint from PROJECT_MEMORY.md.
-       - Boots Backend Express API (:4000) & Frontend Next.js (:3000) in background.
-       - Launches Antigravity & OpenCode into their respective worktrees.
-
-  fl check
-    👉 Full Dual-Build Verification (The Zero-Error Guarantee).
-       - Runs "npm --prefix frontend run build" (all 27 routes).
-       - Runs "npm --prefix backend run build" (TypeScript compile).
-
-  fl memory
-    👉 Instant Session Memory.
-       - Prints PROJECT_MEMORY.md directly to your terminal so you always know
-         where you left off and what the next tasks are.
-
-  fl ports
-    👉 Check Port Status.
-       - Shows if ports 3000 (Frontend) or 4000 (Backend) are in use or free.
-
-  fl kill
-    👉 Emergency Port Killer.
-       - Instantly terminates any hanging processes occupying port 3000 or 4000.
-
-  fl health
-    👉 Deep System & Database Health Check.
-       - Pings Express Backend (:4000) and live Supabase PostgreSQL connection.
-
-  fl save "commit message"
-    👉 1-Click GitHub Sync.
-       - Stages, commits, and pushes all changes directly to GitHub remote.
+================================================================================
+1. ⚡ GLOBAL "fl" COMMANDS
+================================================================================
+📍 WHERE TO RUN:
+   Inside ANY Terminal window (Alacritty, Fish, Bash, etc.) from ANY directory!
+   (You do NOT need to be inside the project folder — it works everywhere).
 
 --------------------------------------------------------------------------------
-2. 🐟 FISH SHELL ALIASES (Super-Fast Typing Shortcuts)
+Command: fl up
 --------------------------------------------------------------------------------
-Configured in ~/.config/fish/config.fish. Just open your terminal and type:
-
-  Navigation Shortcuts:
-    cd-fl        👉 Jumps directly to Main Project Folder (PPT OTHER TASKES)
-    cd-be        👉 Jumps directly to Backend Worktree (FoodLine-Backend on branch 'backend')
-    cd-fe        👉 Jumps directly to Frontend Worktree (FoodLine-Frontend on branch 'frontend')
-
-  Dev & Build Shortcuts:
-    check        👉 Runs full dual build check (Frontend + Backend)
-    check-ports  👉 Checks if ports 3000 & 4000 are clean
-    kill-ports   👉 Forcibly frees ports 3000 and 4000 (fuser -k 3000/tcp 4000/tcp)
-    fl-save      👉 Commits & pushes all project changes to GitHub
+🎯 WHEN TO USE:
+   Subah ya session ke start mein jab kaam shuru karna ho.
+💡 WHAT IT DOES:
+   1. Purane atke huye ports (3000 aur 4000) ko automatic kill karta hai.
+   2. PROJECT_MEMORY.md se active session memory read karke terminal pe dikhata hai.
+   3. Backend Express API (:4000) aur Frontend Next.js (:3000) background mein boot karta hai.
+   4. Dono AI Agents (Antigravity aur OpenCode) ko unke respective worktrees mein launch karta hai.
 
 --------------------------------------------------------------------------------
-3. ⌨️ IN-EDITOR KEYBOARD SHORTCUTS (VS Code / Cursor / Antigravity IDE)
+Command: fl check
 --------------------------------------------------------------------------------
-  Ctrl + Shift + B
-    👉 Default Build Task (Zero-Error Verification).
-       Pressing this keyboard combo runs:
-       npm run build:frontend && npm run build:backend
-       without having to touch the mouse or open a terminal!
-
-  1-Click API Testing (No Postman Required):
-    File: test-api.http
-    - Open "test-api.http" in your editor.
-    - Click "Send Request" above any of the 10 pre-configured API calls:
-      1. Health Check (Supabase connectivity)
-      2. Menu Inventory (44 Cafe @7 items)
-      3. Break Slots & 60-Max Capacity Meter
-      4. Place Pre-Order (FL-Token + 4-Digit OTP)
-      5. Verify 12-Digit UPI Bank UTR
-      6. Order Tracking by Token
-      7. Kitchen KDS Status Transition (PREPARING -> READY)
-      8. 1-Tap Cafeteria Stockout Toggle
-      9. Admin GMV & DPDP / FSSAI Metrics
-      10. Verify 4-Digit Student Pickup OTP (Counter Handover)
+🎯 WHEN TO USE:
+   Koi bhi code change karne ke baad, ya GitHub par push karne se pehle.
+💡 WHAT IT DOES:
+   - Frontend Next.js 15 ke saare 27 routes compile karke verify karta hai.
+   - Backend Express + TypeScript ko compile karke zero error check karta hai.
+   - Agar 0 error hain, tabhi code ready maanta hai (Compilation Guarantee).
 
 --------------------------------------------------------------------------------
-4. 🖥️ DESKTOP 1-CLICK LAUNCHER (Double-Click from Desktop)
+Command: fl memory
 --------------------------------------------------------------------------------
-  Icon on Desktop: "🍔 Start FoodLine Campus"
-  Location: ~/Desktop/FoodLine_Campus.desktop
-  Target Script: ~/Desktop/START_FOODLINE.sh
-
-  How to run:
-    - Double-click the icon on your Desktop.
-    - If prompted by your Linux desktop, click "Allow Launching" or "Run".
-    - It automatically opens an Alacritty window and starts the entire ecosystem!
+🎯 WHEN TO USE:
+   Jab bhi confuse ho jao ki "Maine last time kya kiya tha aur aage kya karna hai?"
+💡 WHAT IT DOES:
+   - PROJECT_MEMORY.md ko terminal par print karta hai.
+   - Dikha deta hai ki kaunse milestone complete huye aur agla mission kya hai.
 
 --------------------------------------------------------------------------------
-5. 🌐 LIVE URLS & PORTS
+Command: fl ports
 --------------------------------------------------------------------------------
-  Frontend Student Web App:  http://localhost:3000
-  Kitchen KDS Tablet:        http://localhost:3000/kds
-  Counter TV Display Kiosk:  http://localhost:3000/display
-  Admin Business Dashboard:  http://localhost:3000/admin
-  Student Login Screen:      http://localhost:3000/login
-  Terms & DPDP Privacy:      http://localhost:3000/terms
+🎯 WHEN TO USE:
+   Check karne ke liye ki port 3000 (Frontend) aur 4000 (Backend) free hain ya busy.
+💡 WHAT IT DOES:
+   - Port 3000 aur 4000 ka live status scan karke bataata hai.
 
-  Backend API Server:        http://localhost:4000
-  Backend Health Ping:       http://localhost:4000/health
-  Live Database:             https://ylweomuodekukjjpjrgx.supabase.co
-  GitHub Cloud Repository:   https://github.com/dakrkakashi/FoodLine-Campus
+--------------------------------------------------------------------------------
+Command: fl kill
+--------------------------------------------------------------------------------
+🎯 WHEN TO USE:
+   Jab terminal mein error aaye "Port 3000 already in use" ya "EADDRINUSE: 4000".
+💡 WHAT IT DOES:
+   - 1 second ke andar dono ports ko forcibly free kar deta hai.
+
+--------------------------------------------------------------------------------
+Command: fl health
+--------------------------------------------------------------------------------
+🎯 WHEN TO USE:
+   Check karne ke liye ki Supabase PostgreSQL database aur Express backend online hain ya nahi.
+💡 WHAT IT DOES:
+   - Live backend aur Supabase server ko ping karke connection health verify karta hai.
+
+--------------------------------------------------------------------------------
+Command: fl save "tumhara commit message"
+--------------------------------------------------------------------------------
+🎯 WHEN TO USE:
+   Kaam khatam hone ke baad jab sab kuch GitHub par cloud backup karna ho.
+💡 WHAT IT DOES:
+   - Saari modified files ko stage karta hai, commit banata hai, aur GitHub `main` pe push karta hai.
 
 ================================================================================
-💡 PRO-TIP:
-Whenever you start work, simply run:
-  fl up
-And whenever you want to test everything before pushing, run:
-  fl check
+2. 🐟 FISH SHELL ALIASES (Quick Navigation & Dev Shortcuts)
+================================================================================
+📍 WHERE TO RUN:
+   Apne Fish terminal window mein (Alacritty terminal khol kar direct type karo).
+
+--------------------------------------------------------------------------------
+Navigation Shortcuts:
+--------------------------------------------------------------------------------
+  cd-fl
+    🎯 WHEN TO USE: Jab kisi doosre folder mein ho aur seedha Main Project folder mein aana ho.
+    📍 WHERE: Terminal
+    ⚡ ACTION: /home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES mein le jaata hai.
+
+  cd-be
+    🎯 WHEN TO USE: Jab Antigravity backend files dekhni ya edit karni ho.
+    📍 WHERE: Terminal
+    ⚡ ACTION: FoodLine-Backend worktree (branch: backend) mein le jaata hai.
+
+  cd-fe
+    🎯 WHEN TO USE: Jab OpenCode frontend UI files dekhni ya edit karni ho.
+    📍 WHERE: Terminal
+    ⚡ ACTION: FoodLine-Frontend worktree (branch: frontend) mein le jaata hai.
+
+--------------------------------------------------------------------------------
+Dev & Maintenance Shortcuts:
+--------------------------------------------------------------------------------
+  check
+    🎯 WHEN TO USE: Fast build check ke liye (same as fl check).
+    📍 WHERE: Terminal
+
+  check-ports
+    🎯 WHEN TO USE: Quick check karne ke liye ki ports free hain ya nahi.
+    📍 WHERE: Terminal
+
+  kill-ports
+    🎯 WHEN TO USE: Fast port release ke liye (fuser -k 3000/tcp 4000/tcp).
+    📍 WHERE: Terminal
+
+  fl-save
+    🎯 WHEN TO USE: Quick GitHub commit and push shortcut.
+    📍 WHERE: Terminal
+
+================================================================================
+3. ⌨️ IN-EDITOR KEYBOARD SHORTCUTS
+================================================================================
+📍 WHERE TO USE:
+   Inside your IDE / Code Editor (VS Code, Cursor, ya Antigravity IDE).
+
+--------------------------------------------------------------------------------
+Shortcut: Ctrl + Shift + B
+--------------------------------------------------------------------------------
+🎯 WHEN TO USE:
+   Editor mein code likhte waqt bina terminal khole ya bina mouse chhue instant test karne ke liye.
+📍 WHERE: Keyboard shortcut inside the editor.
+💡 WHAT IT DOES:
+   - Background mein dual-build task run karta hai aur neeche output panel mein bata deta hai ki code mein koi TypeScript ya Next.js error toh nahi hai.
+
+--------------------------------------------------------------------------------
+Feature: 1-Click In-Editor API Testing (test-api.http)
+--------------------------------------------------------------------------------
+🎯 WHEN TO USE:
+   Jab kisi API ko test karna ho (jaise OTP verify karna ya menu fetch karna) bina Postman download kiye.
+📍 WHERE: Editor mein "test-api.http" file kholo.
+💡 HOW TO USE:
+   - File ke andar har API request ke theek upar ek chhota link hota hai: "Send Request".
+   - Uspe click karo, aur right side mein live JSON response aa jayega!
+
+================================================================================
+4. 🖥️ DESKTOP 1-CLICK LAUNCHER
+================================================================================
+📍 WHERE TO USE:
+   Apne PC ke Desktop screen par.
+
+Icon: "🍔 Start FoodLine Campus"
+File: ~/Desktop/FoodLine_Campus.desktop
+
+🎯 WHEN TO USE:
+   Jab tum bina koi terminal command type kiye bas mouse se double-click karke pura startup chalu karna chahte ho.
+💡 WHAT IT DOES:
+   - Alacritty terminal open karta hai.
+   - Pura system boot karta hai.
+   - Dono agents aur memory load karta hai.
+
+================================================================================
+5. 🌐 LIVE DASHBOARDS & ACCESS URLS
+================================================================================
+📍 WHERE TO OPEN:
+   Apne Laptop browser (Chrome/Brave) ya phone browser mein:
+
+  • Student Pre-Order Web App:   http://localhost:3000
+  • Canteen Kitchen Tablet (KDS): http://localhost:3000/kds
+  • Counter TV Token Display:     http://localhost:3000/display
+  • Business GMV Admin Panel:     http://localhost:3000/admin
+  • Student Login / Sign Up:      http://localhost:3000/login
+  • Terms & DPDP Privacy:         http://localhost:3000/terms
+
+  • Express Backend API:          http://localhost:4000
+  • Deep Health Check API:        http://localhost:4000/health
+  • Live Supabase PostgreSQL:     https://ylweomuodekukjjpjrgx.supabase.co
+  • GitHub Remote Repository:     https://github.com/dakrkakashi/FoodLine-Campus
+
+================================================================================
+🔥 SUMMARY CHEAT-CARD:
+  1. Shuru karne ke liye:     Terminal mein likho -> fl up
+  2. Verify karne ke liye:    Editor mein dabao   -> Ctrl + Shift + B
+  3. Memory dekhne ke liye:   Terminal mein likho -> fl memory
+  4. Sab save karne ke liye:  Terminal mein likho -> fl save "my update"
 ================================================================================
