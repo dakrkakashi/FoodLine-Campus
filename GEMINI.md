@@ -1,6 +1,10 @@
 # 🛡️ FoodLine Campus — Global Standard AI Engineering Ruleset
 <!-- Battle-tested rules compiled from Cursor Directory, Anthropic Guidelines, & DeepMind Agent Patterns -->
 
+## 0. 🧠 Memory & State Persistence (Session Continuity)
+- **Always Read `PROJECT_MEMORY.md` First:** At the beginning of any session or before executing tasks, inspect `PROJECT_MEMORY.md` to restore full context on where we left off and what your assigned mission is.
+- **Update Memory Upon Milestone Completion:** When a milestone is verified, keep `PROJECT_MEMORY.md` updated so future agent sessions never lose context.
+
 ## 1. 🧠 Core Philosophy & Anti-Hallucination
 - **Verify Before Asserting:** Never assume a library, API endpoint, or file exists. Inspect `package.json`, `git status`, or run `grep_search` before importing or referencing.
 - **Never Reinvent the Wheel:** Search the codebase for existing utility functions and UI components before writing new ones from scratch.
