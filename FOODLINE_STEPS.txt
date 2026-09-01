@@ -1,0 +1,164 @@
+================================================================================
+          FOODLINE CAMPUS — COMPLETE STEP-BY-STEP MASTER GUIDE
+================================================================================
+Project: FoodLine (Campus Pre-Ordering & Express Pickup Ecosystem)
+GitHub Repo: https://github.com/dakrkakashi/FoodLine-Campus.git
+Connected GitHub Account: dakrkakashi (via GitHub CLI)
+Database: Supabase PostgreSQL (ylweomuodekukjjpjrgx.supabase.co) [ACTIVE & HEALTHY]
+Local System: CachyOS Linux (Fish Shell)
+================================================================================
+
+TABLE OF CONTENTS:
+1. Understanding Your Architecture (What is Where)
+2. How to Launch Both AI Agents (Antigravity + OpenCode)
+3. How to Talk to the Agents (Voice & Text Prompts: What To Do / Not To Do)
+4. How to Run & Test the App Locally
+5. How to Save & Push Work to GitHub (Branching & Merging)
+6. Troubleshooting & Handy Cheat Sheet
+
+================================================================================
+STEP 1: UNDERSTANDING YOUR ARCHITECTURE (WHAT IS WHERE)
+================================================================================
+
+Tumhare project mein 3 alag-alag isolated folders (Git Worktrees) hain:
+
+1. COORDINATOR / MAIN FOLDER:
+   Path: /home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES
+   Git Branch: main
+   Purpose: Main presentation, Master docs, and Production merge hub.
+
+2. BACKEND WORKTREE (Antigravity Agent):
+   Path: /home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/FoodLine-Backend
+   Git Branch: backend
+   Purpose: Express API, Supabase Database, 60-slot throttling, UTR verification.
+
+3. FRONTEND WORKTREE (OpenCode Agent):
+   Path: /home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/FoodLine-Frontend
+   Git Branch: frontend
+   Purpose: Next.js 15 UI, Cart Tray, Menu Cards, KDS kitchen screen, Sound alerts.
+
+================================================================================
+STEP 2: HOW TO LAUNCH BOTH AGENTS (ONE-CLICK)
+================================================================================
+
+Apne terminal (Fish shell) mein jao aur ye command chalao:
+
+   cd "/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES"
+   ./start.fish
+
+Kya hoga:
+- Antigravity automatically "FoodLine-Backend" folder mein open hoga.
+- OpenCode automatically "FoodLine-Frontend" folder mein open hoga.
+- Dono agents bina kisi file conflict ya git lock ke simultaneously code karenge!
+
+================================================================================
+STEP 3: HOW TO TALK TO THE AGENTS (VOICE & PROMPTS)
+================================================================================
+
+--- METHOD A: VOICE INPUT (Mic Use Karna) ---
+1. Antigravity ke chat input box ke right corner mein 🎙️ (Mic) icon hai.
+2. Us par click karo, aur directly bolo:
+   "FoodLine ke CartContext mein slot capacity check karo."
+3. Agent tumhari awaaz ko text mein convert karke task execute kar dega.
+
+--- METHOD B: AGENT PROMPTS ("WHAT TO DO" / "WHAT NOT TO DO") ---
+
+[1] ANTIGRAVITY (BACKEND SPECIALIST) KO YE PROMPT DO:
+---------------------------------------------------
+"You are Antigravity, the Backend Specialist for FoodLine Campus.
+Your workspace is FoodLine-Backend on branch 'backend'.
+
+WHAT TO DO:
+- Follow API contracts in AGENTS.md strictly.
+- Build and verify with: npm --prefix backend run build
+- Handle Supabase PostgreSQL queries, slot throttling (60 cap), and UTR fraud prevention.
+- Ask clarifying questions before making major architectural changes.
+
+WHAT NOT TO DO:
+- Do NOT delete or modify .env / .env.local without permission.
+- Do NOT touch frontend UI components (globals.css, page.tsx).
+- Do NOT push directly to 'main' branch; work only on 'backend'."
+
+
+[2] OPENCODE (FRONTEND SPECIALIST) KO YE PROMPT DO:
+--------------------------------------------------
+"You are OpenCode, the Frontend UI/UX Specialist for FoodLine Campus.
+Your workspace is FoodLine-Frontend on branch 'frontend'.
+
+WHAT TO DO:
+- Follow the design system in FoodLine_App_UI_UX_Design_System.md.
+- Create stunning, responsive Next.js 15 pages with smooth animations and glassmorphism.
+- Test frontend build with: npm --prefix frontend run build
+- Import types strictly from src/lib/types.ts as agreed in AGENTS.md.
+
+WHAT NOT TO DO:
+- Do NOT modify backend server code or database tables directly.
+- Do NOT hardcode API responses; consume endpoints from http://localhost:4000.
+- Do NOT push directly to 'main' branch; work only on 'frontend'."
+
+================================================================================
+STEP 4: HOW TO RUN & TEST THE APP LOCALLY
+================================================================================
+
+Terminal mein kisi bhi time test karne ke liye:
+
+1. FRONTEND DEV SERVER (Next.js UI):
+   cd "/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES"
+   npm run dev:frontend
+   --> Open in browser: http://localhost:3000
+
+2. BACKEND DEV SERVER (Express API):
+   npm run dev:backend
+   --> API runs on: http://localhost:4000
+   --> Health check: curl http://localhost:4000/health
+
+3. PRODUCTION BUILD CHECK (Zero Error Test):
+   npm run build:frontend
+   npm run build:backend
+
+================================================================================
+STEP 5: HOW TO SAVE & PUSH WORK TO GITHUB
+================================================================================
+
+GitHub authentication already set hai (dakrkakashi account connected).
+
+--- Jab Antigravity Backend mein kaam complete kare: ---
+cd "/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/FoodLine-Backend"
+git add .
+git commit -m "feat(backend): your feature description"
+git push origin backend
+
+--- Jab OpenCode Frontend mein kaam complete kare: ---
+cd "/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/FoodLine-Frontend"
+git add .
+git commit -m "feat(frontend): your UI update description"
+git push origin frontend
+
+--- Dono ko Master 'main' branch mein Merge karna: ---
+cd "/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES"
+git checkout main
+git merge backend
+git merge frontend
+git push origin main
+
+================================================================================
+STEP 6: QUICK TROUBLESHOOTING
+================================================================================
+
+Q1: Port 3000 ya 4000 already in use error aaye toh?
+--> Solution:
+    npx kill-port 3000
+    npx kill-port 4000
+
+Q2: Dono agents ke beech API routes match nahi ho rahe?
+--> Solution:
+    Open and check: AGENTS.md (Root folder mein)
+    Ye single source of truth hai API routes and request/response shapes ke liye.
+
+Q3: GitHub push karte waqt koi prompt aaye?
+--> Solution:
+    gh auth status check karo. Currently tumhara account dakrkakashi verified hai!
+
+================================================================================
+                      FILE GENERATED & READY FOR YOU!
+================================================================================
