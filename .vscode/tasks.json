@@ -1,0 +1,84 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🧪 Test All Builds (Zero Error Check)",
+      "type": "shell",
+      "command": "npm run build:frontend && npm run build:backend",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": true
+      },
+      "problemMatcher": ["$tsc"]
+    },
+    {
+      "label": "🚀 Start Frontend Dev Server (Next.js :3000)",
+      "type": "shell",
+      "command": "npm run dev:frontend",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "⚡ Start Backend Engine (Express :4000)",
+      "type": "shell",
+      "command": "npm run dev:backend",
+      "isBackground": true,
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧹 Clear Busy Ports (3000 & 4000)",
+      "type": "shell",
+      "command": "fuser -k 3000/tcp 4000/tcp 2>/dev/null || true; echo 'Ports 3000 and 4000 are clean!'",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "🤖 Launch Both AI Agents (Antigravity + OpenCode)",
+      "type": "shell",
+      "command": "./start.fish",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "☁️ Git Sync & Push to GitHub",
+      "type": "shell",
+      "command": "git add . && git commit -m 'update' && git push origin main",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}
