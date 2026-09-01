@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
 import { PageTransition, SpotlightCard, fireFireworks } from '@/components/ui';
+import { BorderBeam } from '@/components/magicui';
 import { createClient } from '@/utils/supabase/client';
 
 interface OrderItem {
@@ -246,11 +247,18 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
               </div>
             </div>
 
-            <div className="text-left sm:text-right bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md">
+            <div className="relative overflow-hidden text-left sm:text-right bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md shadow-lg">
+              <BorderBeam
+                size={140}
+                duration={8}
+                colorFrom={isReady ? "#00D4AA" : "#FF6B2C"}
+                colorTo={isReady ? "#3B82F6" : "#FFB347"}
+                borderWidth={2}
+              />
               <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Pickup OTP</div>
               <div
                 className={`text-4xl font-black font-mono tracking-widest ${
-                  isCollected ? 'text-zinc-500 line-through' : 'text-white'
+                  isCollected ? 'text-zinc-500 line-through' : isReady ? 'text-[#00D4AA] animate-pulse' : 'text-white'
                 }`}
               >
                 {order?.pickup_otp || '----'}

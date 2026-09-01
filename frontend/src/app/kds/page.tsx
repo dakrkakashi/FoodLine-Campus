@@ -72,6 +72,12 @@ export default function KitchenDisplayPage() {
   const [stockFilterTab, setStockFilterTab] = useState<'all' | 'instock' | 'soldout'>('all');
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
 
+  // OTP Verification Modal State
+  const [verifyingOrder, setVerifyingOrder] = useState<KdsOrder | null>(null);
+  const [enteredOtp, setEnteredOtp] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+
   // Edit State
   const [editingDishId, setEditingDishId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<{
@@ -211,6 +217,42 @@ export default function KitchenDisplayPage() {
       console.error('Update failed:', err);
     }
   };
+
+  const handleConfirmOtp = async (orderToken: string, otpToTest: string) => {
+    if (!otpToTest || otpToTest.trim().length !== 4) {
+      setOtpError('Please enter a valid 4-digit OTP');
+      return;
+    }
+    setIsVerifyingOtp(true);
+    setOtpError('');
+    try {
+      const res = await fetch('/api/orders/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderToken, pickupOtp: otpToTest.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setOrders((prev) =>
+          prev.map((o) => (o.order_token === orderToken ? { ...o, status: 'COLLECTED' } : o))
+        );
+        if (soundEnabled) {
+          new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3')
+            .play()
+            .catch(() => {});
+        }
+        setVerifyingOrder(null);
+        setEnteredOtp('');
+      } else {
+        setOtpError(data.error || 'Invalid OTP. Handover denied.');
+      }
+    } catch (err: any) {
+      setOtpError(err.message || 'Verification network error');
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
 
   const handleToggleStock = async (dishId: string, currentStatus: boolean) => {
     const nextStatus = !currentStatus;
@@ -661,10 +703,14 @@ export default function KitchenDisplayPage() {
                   ))}
                 </div>
                 <button
-                  onClick={() => handleUpdateStatus(order.id, 'COLLECTED')}
-                  className="w-full py-2 rounded-lg bg-white hover:bg-zinc-200 text-black font-black text-xs shadow transition cursor-pointer"
+                  onClick={() => {
+                    setVerifyingOrder(order);
+                    setEnteredOtp('');
+                    setOtpError('');
+                  }}
+                  className="w-full py-2 rounded-lg bg-[#00D4AA] hover:bg-[#00b894] text-black font-black text-xs shadow transition cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  Verify OTP & Release Tray ➔
+                  <span>🔐</span> Verify OTP & Release Tray ➔
                 </button>
               </div>
             ))}
@@ -691,6 +737,79 @@ export default function KitchenDisplayPage() {
           </div>
         </div>
       </main>
+
+      {/* 🔐 1-Tap OTP Verification Modal */}
+      {verifyingOrder && (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 flex items-center justify-center p-4">
+          <div className="glass-card-heavy rounded-3xl max-w-md w-full p-6 shadow-2xl border border-[#00D4AA]/40 bg-[#0F172A] relative">
+            <button
+              onClick={() => setVerifyingOrder(null)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white p-2 cursor-pointer"
+            >
+              <X size={20} />
+            </button>
+            <div className="text-center mb-6">
+              <span className="text-4xl">🔐</span>
+              <h3 className="text-xl font-black text-white mt-2">Counter Handover OTP</h3>
+              <p className="text-xs text-zinc-400 mt-1">
+                Ask student for the 4-digit OTP shown on their screen for order{' '}
+                <span className="font-mono text-[#FF6B2C] font-bold">{verifyingOrder.order_token}</span>
+              </p>
+            </div>
+
+            {/* OTP Input */}
+            <div className="mb-4">
+              <input
+                type="text"
+                maxLength={4}
+                value={enteredOtp}
+                onChange={(e) => {
+                  setEnteredOtp(e.target.value.replace(/\D/g, ''));
+                  setOtpError('');
+                }}
+                placeholder="• • • •"
+                className="w-full text-center tracking-[0.5em] text-3xl font-mono font-black py-3 rounded-2xl bg-black/50 border border-white/20 text-white focus:border-[#00D4AA] focus:outline-none"
+                autoFocus
+              />
+              {otpError && (
+                <div className="text-rose-400 text-xs font-semibold text-center mt-2 flex items-center justify-center gap-1">
+                  <AlertCircle size={14} /> {otpError}
+                </div>
+              )}
+            </div>
+
+            {/* Quick Match Helper */}
+            <div className="mb-6 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setEnteredOtp(verifyingOrder.pickup_otp || '')}
+                className="text-[11px] text-zinc-400 hover:text-[#00D4AA] underline cursor-pointer"
+              >
+                Auto-fill student OTP ({verifyingOrder.pickup_otp || '----'})
+              </button>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setVerifyingOrder(null)}
+                className="flex-1 py-2.5 rounded-xl border border-white/10 text-zinc-400 hover:text-white text-xs font-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                disabled={isVerifyingOtp || enteredOtp.length !== 4}
+                onClick={() => handleConfirmOtp(verifyingOrder.order_token, enteredOtp)}
+                className="flex-1 py-2.5 rounded-xl bg-[#00D4AA] hover:bg-[#00b894] disabled:opacity-50 text-black text-xs font-black transition cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                {isVerifyingOtp ? <Loader2 size={16} className="animate-spin" /> : 'Confirm & Handover ➔'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Live Stockout Manager Modal */}
       {showStockoutModal && (

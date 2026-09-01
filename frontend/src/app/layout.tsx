@@ -4,6 +4,7 @@ import { Providers } from '@/components/Providers';
 import { NoiseOverlay, CustomCursor } from '@/components/ui';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://foodline-campus.vercel.app'),
   title: 'FoodLine - Campus Pre-Ordering & Express Pickup Ecosystem',
   description: 'Skip the line, not the meal. Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
 };

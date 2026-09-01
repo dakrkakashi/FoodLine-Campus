@@ -147,6 +147,35 @@ app.post('/api/payments/verify-utr', async (req, res) => {
     }
 });
 // -----------------------------------------------------------------------------
+// 4b. POST /api/orders/verify-otp (Counter Staff Handover Verification)
+// -----------------------------------------------------------------------------
+app.post('/api/orders/verify-otp', async (req, res) => {
+    try {
+        const { orderToken, pickupOtp } = req.body;
+        if (!orderToken || !pickupOtp) {
+            return res.status(400).json({
+                success: false,
+                error: 'orderToken and pickupOtp are required',
+            });
+        }
+        const { order, message } = await order_service_js_1.OrderService.verifyPickupOtp(orderToken, String(pickupOtp));
+        res.json({
+            success: true,
+            data: {
+                orderToken: order.orderToken,
+                status: order.status,
+                pickupOtp: order.pickupOtp,
+                message,
+            },
+            meta: { timestamp: new Date().toISOString() },
+        });
+    }
+    catch (error) {
+        const isNotFound = error.message && error.message.includes('not found');
+        res.status(isNotFound ? 404 : 400).json({ success: false, error: error.message });
+    }
+});
+// -----------------------------------------------------------------------------
 // 5. GET /api/order/:token & /api/order/:token/stream
 // -----------------------------------------------------------------------------
 app.get('/api/order/:token', async (req, res) => {

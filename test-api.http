@@ -69,3 +69,13 @@ Content-Type: application/json
 
 ### 9. Admin Business Metrics & FSSAI / DPDP Compliance
 GET {{baseUrl}}/api/admin/metrics
+
+### 10. Verify Student 4-Digit Pickup OTP (Express Counter Handover)
+POST {{baseUrl}}/api/orders/verify-otp
+Content-Type: application/json
+
+{
+  "orderToken": "FL-3804",
+  "pickupOtp": "6065"
+}
+

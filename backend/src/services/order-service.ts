@@ -351,4 +351,50 @@ export class OrderService {
 
     return targetOrder;
   }
+
+  /**
+   * Verify pickup OTP and complete order handover (Counter Staff)
+   */
+  public static async verifyPickupOtp(
+    orderToken: string,
+    pickupOtp: string
+  ): Promise<{ order: Order; message: string }> {
+    const order = await OrderService.getOrderByToken(orderToken);
+    if (!order) {
+      throw new Error(`Order ${orderToken} not found`);
+    }
+
+    if (order.status === 'COLLECTED') {
+      throw new Error(`Order ${orderToken} has already been collected`);
+    }
+
+    if (order.pickupOtp !== pickupOtp.trim()) {
+      throw new Error('Invalid 4-digit pickup OTP. Handover denied.');
+    }
+
+    // Mark collected
+    order.status = 'COLLECTED';
+    order.updatedAt = new Date().toISOString();
+    ordersStore.set(orderToken, order);
+
+    if (isSupabaseConfigured) {
+      try {
+        await supabase
+          .from('orders')
+          .update({ status: 'COLLECTED', updated_at: order.updatedAt })
+          .eq('order_token', orderToken);
+      } catch (err) {
+        console.warn('Supabase verifyPickupOtp update failed:', err);
+      }
+    }
+
+    // Broadcast SSE update
+    sseBroadcaster.notifyOrderUpdate(order, 'ORDER_UPDATE');
+
+    return {
+      order,
+      message: `Pickup verified! Order ${orderToken} successfully handed over.`,
+    };
+  }
 }
+
