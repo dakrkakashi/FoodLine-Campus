@@ -1,0 +1,121 @@
+================================================================================
+🍔 FOODLINE CAMPUS — MASTER SHORTCUTS & QUICK COMMANDS CHEATSHEET
+================================================================================
+Target Project: FoodLine Campus (Cafe @7, Sanjivani University, Kopargaon)
+Main Repo: /home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES
+GitHub Repo: https://github.com/dakrkakashi/FoodLine-Campus.git
+Updated: September 2026
+
+--------------------------------------------------------------------------------
+1. ⚡ GLOBAL "fl" COMMANDS (Run from ANY terminal directory)
+--------------------------------------------------------------------------------
+The "fl" CLI is installed globally at ~/.local/bin/fl. You can run these commands
+from anywhere in your system:
+
+  fl up
+    👉 Master 1-Click Startup.
+       - Kills stale processes on port 3000 & 4000.
+       - Prints the latest checkpoint from PROJECT_MEMORY.md.
+       - Boots Backend Express API (:4000) & Frontend Next.js (:3000) in background.
+       - Launches Antigravity & OpenCode into their respective worktrees.
+
+  fl check
+    👉 Full Dual-Build Verification (The Zero-Error Guarantee).
+       - Runs "npm --prefix frontend run build" (all 27 routes).
+       - Runs "npm --prefix backend run build" (TypeScript compile).
+
+  fl memory
+    👉 Instant Session Memory.
+       - Prints PROJECT_MEMORY.md directly to your terminal so you always know
+         where you left off and what the next tasks are.
+
+  fl ports
+    👉 Check Port Status.
+       - Shows if ports 3000 (Frontend) or 4000 (Backend) are in use or free.
+
+  fl kill
+    👉 Emergency Port Killer.
+       - Instantly terminates any hanging processes occupying port 3000 or 4000.
+
+  fl health
+    👉 Deep System & Database Health Check.
+       - Pings Express Backend (:4000) and live Supabase PostgreSQL connection.
+
+  fl save "commit message"
+    👉 1-Click GitHub Sync.
+       - Stages, commits, and pushes all changes directly to GitHub remote.
+
+--------------------------------------------------------------------------------
+2. 🐟 FISH SHELL ALIASES (Super-Fast Typing Shortcuts)
+--------------------------------------------------------------------------------
+Configured in ~/.config/fish/config.fish. Just open your terminal and type:
+
+  Navigation Shortcuts:
+    cd-fl        👉 Jumps directly to Main Project Folder (PPT OTHER TASKES)
+    cd-be        👉 Jumps directly to Backend Worktree (FoodLine-Backend on branch 'backend')
+    cd-fe        👉 Jumps directly to Frontend Worktree (FoodLine-Frontend on branch 'frontend')
+
+  Dev & Build Shortcuts:
+    check        👉 Runs full dual build check (Frontend + Backend)
+    check-ports  👉 Checks if ports 3000 & 4000 are clean
+    kill-ports   👉 Forcibly frees ports 3000 and 4000 (fuser -k 3000/tcp 4000/tcp)
+    fl-save      👉 Commits & pushes all project changes to GitHub
+
+--------------------------------------------------------------------------------
+3. ⌨️ IN-EDITOR KEYBOARD SHORTCUTS (VS Code / Cursor / Antigravity IDE)
+--------------------------------------------------------------------------------
+  Ctrl + Shift + B
+    👉 Default Build Task (Zero-Error Verification).
+       Pressing this keyboard combo runs:
+       npm run build:frontend && npm run build:backend
+       without having to touch the mouse or open a terminal!
+
+  1-Click API Testing (No Postman Required):
+    File: test-api.http
+    - Open "test-api.http" in your editor.
+    - Click "Send Request" above any of the 10 pre-configured API calls:
+      1. Health Check (Supabase connectivity)
+      2. Menu Inventory (44 Cafe @7 items)
+      3. Break Slots & 60-Max Capacity Meter
+      4. Place Pre-Order (FL-Token + 4-Digit OTP)
+      5. Verify 12-Digit UPI Bank UTR
+      6. Order Tracking by Token
+      7. Kitchen KDS Status Transition (PREPARING -> READY)
+      8. 1-Tap Cafeteria Stockout Toggle
+      9. Admin GMV & DPDP / FSSAI Metrics
+      10. Verify 4-Digit Student Pickup OTP (Counter Handover)
+
+--------------------------------------------------------------------------------
+4. 🖥️ DESKTOP 1-CLICK LAUNCHER (Double-Click from Desktop)
+--------------------------------------------------------------------------------
+  Icon on Desktop: "🍔 Start FoodLine Campus"
+  Location: ~/Desktop/FoodLine_Campus.desktop
+  Target Script: ~/Desktop/START_FOODLINE.sh
+
+  How to run:
+    - Double-click the icon on your Desktop.
+    - If prompted by your Linux desktop, click "Allow Launching" or "Run".
+    - It automatically opens an Alacritty window and starts the entire ecosystem!
+
+--------------------------------------------------------------------------------
+5. 🌐 LIVE URLS & PORTS
+--------------------------------------------------------------------------------
+  Frontend Student Web App:  http://localhost:3000
+  Kitchen KDS Tablet:        http://localhost:3000/kds
+  Counter TV Display Kiosk:  http://localhost:3000/display
+  Admin Business Dashboard:  http://localhost:3000/admin
+  Student Login Screen:      http://localhost:3000/login
+  Terms & DPDP Privacy:      http://localhost:3000/terms
+
+  Backend API Server:        http://localhost:4000
+  Backend Health Ping:       http://localhost:4000/health
+  Live Database:             https://ylweomuodekukjjpjrgx.supabase.co
+  GitHub Cloud Repository:   https://github.com/dakrkakashi/FoodLine-Campus
+
+================================================================================
+💡 PRO-TIP:
+Whenever you start work, simply run:
+  fl up
+And whenever you want to test everything before pushing, run:
+  fl check
+================================================================================
