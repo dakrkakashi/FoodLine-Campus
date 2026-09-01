@@ -3,8 +3,8 @@
 <!-- Both Antigravity and OpenCode read this file every time they start. -->
 
 ## 📍 Where We Left Off (Last Completed Checkpoint)
-- **Date & Time:** 2026-09-01 (Night Session)
-- **GitHub Connection:** Authenticated with `@dakrkakashi` (Repo: `dakrkakashi/FoodLine-Campus`).
+- **Date & Time:** 2026-09-02 (00:07 AM - Night Session Closed / Shutdown Ready)
+- **GitHub Connection:** 100% Synchronized with `@dakrkakashi` (All branches `main`, `backend`, `frontend` up to date).
 - **20/20 Production Launch Checklist:** 100% Complete!
   - Added Next.js 15 `robots.ts` and dynamic `sitemap.ts`.
   - Added dynamic Edge `opengraph-image.tsx` social preview generator (1200x630) for WhatsApp/social sharing.
@@ -12,8 +12,14 @@
 - **Student Pickup OTP Handover System:** 100% Operational!
   - Backend: Added `POST /api/orders/verify-otp` with real-time SSE stream broadcast and Supabase persistence.
   - Frontend: Added Next.js API route `/api/orders/verify-otp`.
-  - UI/UX: Integrated Magic UI `<BorderBeam />` on `/order/[token]` with dual-state glow (orange for confirmed, emerald-cyan pulse for ready).
+  - UI/UX: Integrated Magic UI `<BorderBeam />` on `/order/[token]` with dual-state glow.
   - Kitchen KDS: Added 1-tap OTP verification modal on `/kds` with quick auto-fill helper and audio handover chime.
+- **Auth UI Polish:**
+  - Added Show/Hide Password toggle with Eye/EyeOff icons on student and staff login inputs.
+- **Vercel Cloud Resilience:**
+  - Configured safe production fallbacks in `route-client.ts`, `lib/supabase/client.ts`, `lib/supabase/server.ts`, and `utils/supabase/middleware.ts` so Vercel builds never fail from missing env keys.
+- **Master Shortcuts Cheatsheet:**
+  - Created `FOODLINE_ALL_SHORTCUTS.txt` with exact "Where to Use" and "When to Use" guidance on Desktop and Project Root.
 - **Compilation Guarantee:** 100% Zero-Error Compilation across all 27 Next.js routes and Express backend.
 
 ---
