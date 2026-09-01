@@ -35,6 +35,15 @@ Command: fl check
    - Agar 0 error hain, tabhi code ready maanta hai (Compilation Guarantee).
 
 --------------------------------------------------------------------------------
+Command: fl apk
+--------------------------------------------------------------------------------
+🎯 WHEN TO USE:
+   Jab Android phone ke liye installable APK generate karni ho.
+💡 WHAT IT DOES:
+   - Capacitor aur Android SDK Build-Tools ke through native debug APK compile karta hai.
+   - Ready `.apk` file automatically Desktop par save kar deta hai: ~/Desktop/FoodLine_Campus.apk.
+
+--------------------------------------------------------------------------------
 Command: fl memory
 --------------------------------------------------------------------------------
 🎯 WHEN TO USE:
