@@ -4,7 +4,7 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
-import { GraduationCap, Shield, Lock, Mail, KeyRound, ArrowRight, Loader2, Sparkles, User as UserIcon, CheckCircle2 } from 'lucide-react';
+import { GraduationCap, Shield, Lock, Mail, KeyRound, ArrowRight, Loader2, Sparkles, User as UserIcon, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { PageTransition, SpotlightCard, fireConfettiSuccess } from '@/components/ui';
 import { useAuth } from '@/lib/auth/useAuth';
 
@@ -23,10 +23,12 @@ function LoginFormContent() {
   const [studentFullName, setStudentFullName] = useState('');
   const [studentPrn, setStudentPrn] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
+  const [showStudentPassword, setShowStudentPassword] = useState(false);
 
   // Staff / Admin auth states (Sign in only)
   const [staffEmail, setStaffEmail] = useState('foodlinecampus@gmail.com');
   const [staffPassword, setStaffPassword] = useState('');
+  const [showStaffPassword, setShowStaffPassword] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -320,13 +322,21 @@ function LoginFormContent() {
                 <div className="relative">
                   <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
                   <input
-                    type="password"
+                    type={showStudentPassword ? "text" : "password"}
                     value={studentPassword}
                     onChange={(e) => setStudentPassword(e.target.value)}
                     required
                     placeholder="••••••••••••"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
+                    className="w-full pl-10 pr-11 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowStudentPassword(!showStudentPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors cursor-pointer p-1"
+                    aria-label={showStudentPassword ? "Hide password" : "Show password"}
+                  >
+                    {showStudentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -400,13 +410,21 @@ function LoginFormContent() {
                 <div className="relative">
                   <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
                   <input
-                    type="password"
+                    type={showStaffPassword ? "text" : "password"}
                     value={staffPassword}
                     onChange={(e) => setStaffPassword(e.target.value)}
                     required
                     placeholder="••••••••••••"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    className="w-full pl-10 pr-11 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowStaffPassword(!showStaffPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors cursor-pointer p-1"
+                    aria-label={showStaffPassword ? "Hide password" : "Show password"}
+                  >
+                    {showStaffPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
