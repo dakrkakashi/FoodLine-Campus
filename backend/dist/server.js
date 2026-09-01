@@ -11,11 +11,14 @@ const slot_throttler_js_1 = require("./services/slot-throttler.js");
 const order_service_js_1 = require("./services/order-service.js");
 const sse_broadcaster_js_1 = require("./services/sse-broadcaster.js");
 const supabase_js_1 = require("./lib/supabase.js");
+const auth_routes_js_1 = require("./routes/auth.routes.js");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 4000;
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
+// Auth & Signup Routes
+app.use('/api/auth', auth_routes_js_1.authRouter);
 // Background cron to release expired slot holds every 60s
 setInterval(() => {
     slot_throttler_js_1.SlotThrottlerService.expireOldHolds();

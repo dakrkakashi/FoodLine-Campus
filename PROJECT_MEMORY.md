@@ -20,6 +20,8 @@
   - Configured safe production fallbacks in `route-client.ts`, `lib/supabase/client.ts`, `lib/supabase/server.ts`, and `utils/supabase/middleware.ts` so Vercel builds never fail from missing env keys.
 - **Master Shortcuts Cheatsheet:**
   - Created `FOODLINE_ALL_SHORTCUTS.txt` with exact "Where to Use" and "When to Use" guidance on Desktop and Project Root.
+- **Mandatory Email & Async Google Sheets Audit Logger:**
+  - Signup now enforces mandatory email (`VALIDATION_EMAIL_REQUIRED`); new accounts auto-logged to Google Sheets (`NewAccounts` tab) with onboarding form link. Sheets failures are non-blocking.
 - **Compilation Guarantee:** 100% Zero-Error Compilation across all 27 Next.js routes and Express backend.
 
 ---

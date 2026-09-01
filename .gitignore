@@ -17,6 +17,8 @@ next-env.d.ts
 # Production & Secrets
 inventory-state.json
 client_secret_*.json
+accounts.json
+student-accounts.json
 .env*.local
 .env.local
 .env

@@ -79,3 +79,23 @@ Content-Type: application/json
   "pickupOtp": "6065"
 }
 
+### 11. Signup Validation Failure (Missing/Invalid Email -> Expect 400 VALIDATION_EMAIL_REQUIRED)
+POST {{baseUrl}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "password": "Test@1234"
+}
+
+### 12. Signup Success (Valid Email -> Expect 201 & Async Google Sheets Audit Log)
+POST {{baseUrl}}/api/auth/signup
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test.user@sanjivani.edu.in",
+  "phone": "9876543210",
+  "password": "Test@1234"
+}
+

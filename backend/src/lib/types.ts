@@ -124,3 +124,19 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
+export interface SignupRequestDTO {
+  name: string;
+  email: string;
+  phone?: string;
+  password: string;
+}
+
+export interface SheetLogRow {
+  timestamp: string;
+  name: string;
+  email: string;
+  phone: string;
+  accountId: string;
+  formLink: string;
+}
+

@@ -8,6 +8,7 @@ import { OrderService } from './services/order-service.js';
 import { sseBroadcaster } from './services/sse-broadcaster.js';
 import { OrderStatus } from './lib/types.js';
 import { checkDatabaseConnection, isSupabaseConfigured } from './lib/supabase.js';
+import { authRouter } from './routes/auth.routes.js';
 
 dotenv.config();
 
@@ -16,6 +17,9 @@ const PORT = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(express.json());
+
+// Auth & Signup Routes
+app.use('/api/auth', authRouter);
 
 // Background cron to release expired slot holds every 60s
 setInterval(() => {
