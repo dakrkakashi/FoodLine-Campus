@@ -1,0 +1,145 @@
+================================================================================
+          FOODLINE CAMPUS — 10-YEAR-OLD EXPLANATION & PRO MASTER GUIDE
+================================================================================
+Project: FoodLine Campus
+Boss / Captain: Shivam Nirmal (@dakrkakashi)
+Your 2 Workers: ⚡ Antigravity (Engine/Backend) & 🎨 OpenCode (Artist/Frontend)
+================================================================================
+
+TABLE OF CONTENTS:
+1. HOW TO RUN THEM (Explained Like You Are 10 Years Old!)
+2. HOW TO GIVE ORDERS LIKE A PRO BOSS (Quality & Management)
+3. SUPERCHARGE YOUR SETUP (Best Extensions, Plugins & Tools)
+4. THE 5-STEP DAILY WORKFLOW (Daily Habit for 10x Speed)
+
+================================================================================
+PART 1: HOW TO RUN THEM (EXPLAINED LIKE YOU ARE 10 YEARS OLD!)
+================================================================================
+
+Imagine you are playing Minecraft or GTA. You have 2 robot buddies:
+- ROBOT 1 (Antigravity): The Mechanic. He only works inside the engine room
+  (database, calculations, bill generation, passwords).
+- ROBOT 2 (OpenCode): The Artist. He only paints the screens, colors the buttons,
+  and makes smooth animations that students see on their phones.
+
+HOW TO TURN THEM ON (Just 3 Simple Steps):
+------------------------------------------
+STEP 1: Open your Terminal (Fish shell).
+STEP 2: Type this magic spell and press Enter:
+        ./start.fish
+
+        *BOOM!* Antigravity opens in the Backend room.
+        OpenCode opens in the Frontend room.
+
+STEP 3: Give each robot his job prompt:
+        - In Antigravity chat, paste the "Backend Prompt" (from FOODLINE_STEPS.txt)
+        - In OpenCode chat, paste the "Frontend Prompt" (from FOODLINE_STEPS.txt)
+
+Now both robots are standing by, waiting for your voice or typed command!
+
+================================================================================
+PART 2: HOW TO IMPROVE QUALITY OF WORK & MANAGEMENT
+================================================================================
+
+The #1 mistake beginners make is saying: "Hey AI, build my entire startup!"
+The AI gets confused and writes messy code.
+
+Here is how smart Startup Founders manage their AI agents:
+
+RULE 1: THE "ONE LEGO BRICK AT A TIME" RULE
+-------------------------------------------
+Never ask for 5 things together. Give ONE clear mission:
+BAD PROMPT:  "Make payment page, add database table, fix css, and add sounds."
+GOOD PROMPT: "Step 1: First just make the UPI QR Code popup look amazing."
+Once done and tested, then say: "Step 2: Now add sound when payment succeeds."
+
+RULE 2: THE "ASK BEFORE YOU CODE" RULE
+--------------------------------------
+Before letting the agent edit 10 files, tell it:
+"Give me a quick 3-bullet plan of what files you will change before writing code."
+This stops the AI from breaking existing working features!
+
+RULE 3: THE "NEVER LEAVE A BROKEN TOY" RULE
+-------------------------------------------
+After every feature an agent builds, immediately run in terminal:
+  npm run build:frontend
+  npm run build:backend
+If it says "Compiled successfully", you WIN!
+If there is an error, tell the agent: "Fix this error right now before moving on."
+
+RULE 4: THE 5-POINT QUALITY CHECKLIST FOR EVERY SCREEN
+------------------------------------------------------
+Whenever OpenCode creates a new page, check these 5 things in your browser:
+[ ] Does it look good on Mobile Phone screen size? (Press Ctrl+Shift+M in Chrome)
+[ ] Is the text clearly readable (dark mode / high contrast)?
+[ ] Does the button show a loading spinner when clicked?
+[ ] Does it give a green success popup if it works, or red if it fails?
+[ ] Does it feel fast (less than 1 second to load)?
+
+================================================================================
+PART 3: WHAT WE REQUIRE FOR SUPERCHARGED PRODUCTIVITY (EXTENSIONS & PLUGINS)
+================================================================================
+
+To make your coding 10x faster and look ultra-clean, install these tools:
+
+1. ESSENTIAL EXTENSIONS (Install from Extensions Tab in your IDE):
+-----------------------------------------------------------------
+a) "Tailwind CSS IntelliSense" (by Tailwind Labs)
+   - Why: When styling frontend pages, it auto-suggests colors, borders,
+     padding, and shadows automatically so you never have to guess CSS names.
+
+b) "Error Lens" (by Alexander)
+   - Why: Instead of hiding errors in a tiny console tab, it highlights
+     the mistake directly next to the code line in bold red/yellow!
+
+c) "Prettier - Code Formatter" (by Prettier)
+   - Why: Press Ctrl+S (Save), and it instantly cleans up messy spacing,
+     indentation, and brackets into world-class neat code.
+
+d) "REST Client" or "Thunder Client"
+   - Why: Test your backend APIs (like /api/menu or /api/orders) with 1 click
+     directly inside the editor without opening Postman.
+
+e) "GitLens — Git supercharged"
+   - Why: Shows you exactly which agent or person modified which line of code
+     and when, so you can trace any bug in 2 seconds.
+
+2. SPEED SHORTCUTS FOR YOUR TERMINAL (Fish Shell Aliases):
+----------------------------------------------------------
+Instead of typing long commands, add these shortcuts to your ~/.config/fish/config.fish:
+
+   alias dev="cd '/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES' && npm run dev:frontend"
+   alias api="cd '/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES' && npm run dev:backend"
+   alias check="cd '/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES' && npm run build:frontend && npm run build:backend"
+   alias save="git add . && git commit -m 'update' && git push"
+
+Now, whenever you want to test the app, you just type 3 letters:
+`dev`   --> Starts Frontend!
+`api`   --> Starts Backend!
+`check` --> Tests both for zero bugs!
+
+3. HARDWARE & BROWSER HELPERS:
+------------------------------
+- Browser: Keep Chrome / Brave open on `http://localhost:3000` with DevTools
+  open (F12) on "Network" tab so you can see live API requests and responses.
+- Sound check: Turn on laptop audio to test the KDS kitchen bell alert when
+  orders move to "READY".
+
+================================================================================
+PART 4: THE 5-STEP DAILY WORKFLOW (FOUNDER'S ROUTINE)
+================================================================================
+
+Every day when you sit down to work on FoodLine Campus:
+
+1. LAUNCH: Open terminal, run `./start.fish`.
+2. MISSION: Decide today's 1 goal (e.g. "Today we add student OTP pickup screen").
+3. BACKEND FIRST: Ask Antigravity: "Create the API endpoint for OTP verification."
+   Check with: `curl http://localhost:4000/api/...`
+4. FRONTEND NEXT: Ask OpenCode: "Connect the OTP keypad on the screen to that API."
+   Check on: `http://localhost:3000`
+5. SYNC: Commit your work and push to GitHub so your progress is 100% safe in the cloud:
+   `git add . && git commit -m "feat: complete OTP pickup screen" && git push`
+
+================================================================================
+                       YOU ARE READY TO BUILD! 🚀
+================================================================================
