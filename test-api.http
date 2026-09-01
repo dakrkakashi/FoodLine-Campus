@@ -1,0 +1,71 @@
+### FoodLine Campus — 1-Click In-Editor API Testing Suite
+### Install "REST Client" or "Thunder Client" in Extensions (Ctrl+Shift+X) to run these with 1 click!
+
+@baseUrl = http://localhost:4000
+
+### 1. Health & Database Connectivity Check
+GET {{baseUrl}}/health
+
+### 2. Fetch Menu & Categories (Cafe @7)
+GET {{baseUrl}}/api/menu
+
+### 3. Fetch Campus Break Slots & Capacity Meters (60 Cap)
+GET {{baseUrl}}/api/slots
+
+### 4. Create Pre-Order (Reserves Slot & Generates Token + OTP)
+POST {{baseUrl}}/api/orders
+Content-Type: application/json
+
+{
+  "slotId": "slot-1",
+  "items": [
+    {
+      "id": "dish-1",
+      "name": "Dabeli",
+      "price": 25,
+      "quantity": 2
+    },
+    {
+      "id": "dish-2",
+      "name": "Masala Chai",
+      "price": 15,
+      "quantity": 1
+    }
+  ],
+  "studentName": "Shivam Nirmal",
+  "studentPhone": "9876543210",
+  "studentPrn": "SU2026CS01",
+  "notes": "Extra spicy please"
+}
+
+### 5. Verify 12-Digit UTR Bank Reference (Fraud Shield)
+POST {{baseUrl}}/api/payments/verify-utr
+Content-Type: application/json
+
+{
+  "orderToken": "FL-3804",
+  "utrNumber": "928374615243",
+  "amount": 65
+}
+
+### 6. Get Order Details by Token
+GET {{baseUrl}}/api/order/FL-3804
+
+### 7. Kitchen Status Transition (Kitchen Tablet KDS)
+PATCH {{baseUrl}}/api/kds/orders/sample-order-id/status
+Content-Type: application/json
+
+{
+  "status": "READY"
+}
+
+### 8. Quick Stockout Toggle (1-Tap Cafeteria Staff)
+PATCH {{baseUrl}}/api/kds/inventory/sample-dish-id
+Content-Type: application/json
+
+{
+  "isAvailable": false
+}
+
+### 9. Admin Business Metrics & FSSAI / DPDP Compliance
+GET {{baseUrl}}/api/admin/metrics

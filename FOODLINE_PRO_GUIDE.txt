@@ -11,6 +11,10 @@ TABLE OF CONTENTS:
 2. HOW TO GIVE ORDERS LIKE A PRO BOSS (Quality & Management)
 3. SUPERCHARGE YOUR SETUP (Best Extensions, Plugins & Tools)
 4. THE 5-STEP DAILY WORKFLOW (Daily Habit for 10x Speed)
+5. 5 MAGIC AI PROMPTS FOR DAILY CODING (Copy & Paste)
+6. FRONTEND VS BACKEND TOOLING CHECKLIST
+7. CAMPUS WI-FI & EDGE-CASE SIMULATION (The 3 Acid Tests)
+8. 1-CLICK API TESTING SUITE (Using test-api.http)
 
 ================================================================================
 PART 1: HOW TO RUN THEM (EXPLAINED LIKE YOU ARE 10 YEARS OLD!)
@@ -82,27 +86,33 @@ PART 3: WHAT WE REQUIRE FOR SUPERCHARGED PRODUCTIVITY (EXTENSIONS & PLUGINS)
 
 To make your coding 10x faster and look ultra-clean, install these tools:
 
-1. ESSENTIAL EXTENSIONS (Install from Extensions Tab in your IDE):
------------------------------------------------------------------
-a) "Tailwind CSS IntelliSense" (by Tailwind Labs)
-   - Why: When styling frontend pages, it auto-suggests colors, borders,
-     padding, and shadows automatically so you never have to guess CSS names.
+1. ESSENTIAL EXTENSIONS (Install from Extensions Tab in your IDE - Ctrl+Shift+X):
+--------------------------------------------------------------------------------
+a) "Tailwind CSS IntelliSense" (by Tailwind Labs) [FRONTEND]
+   - Auto-suggests colors, borders, padding, and shadows automatically.
 
-b) "Error Lens" (by Alexander)
-   - Why: Instead of hiding errors in a tiny console tab, it highlights
-     the mistake directly next to the code line in bold red/yellow!
+b) "Error Lens" (by Alexander) [UNIVERSAL]
+   - Highlights syntax and type errors directly on the exact line in bold red!
 
-c) "Prettier - Code Formatter" (by Prettier)
-   - Why: Press Ctrl+S (Save), and it instantly cleans up messy spacing,
-     indentation, and brackets into world-class neat code.
+c) "Prettier - Code Formatter" (by Prettier) [UNIVERSAL]
+   - Press Ctrl+S (Save), and it instantly cleans up messy spacing and brackets.
 
-d) "REST Client" or "Thunder Client"
-   - Why: Test your backend APIs (like /api/menu or /api/orders) with 1 click
-     directly inside the editor without opening Postman.
+d) "REST Client" or "Thunder Client" [BACKEND]
+   - Test backend APIs (like /api/menu or /api/orders) with 1 click directly
+     inside the editor without opening Postman or writing curl commands.
 
-e) "GitLens — Git supercharged"
-   - Why: Shows you exactly which agent or person modified which line of code
-     and when, so you can trace any bug in 2 seconds.
+e) "GitLens — Git supercharged" [UNIVERSAL]
+   - Shows you exactly which agent modified which line of code and when.
+
+f) "Auto Rename Tag" + "Auto Close Tag" [FRONTEND]
+   - When you rename an HTML/JSX tag (like <div> to <button>), it automatically
+     renames the closing tag so you never have unclosed tag errors.
+
+g) "Color Highlight" [FRONTEND]
+   - Directly shows the actual color box next to hex codes in CSS/Tailwind.
+
+h) "DotENV" [BACKEND/SECURITY]
+   - Syntax highlights .env files and protects you from displaying raw secrets.
 
 2. SPEED SHORTCUTS FOR YOUR TERMINAL (Fish Shell Aliases):
 ----------------------------------------------------------
@@ -111,19 +121,13 @@ Instead of typing long commands, add these shortcuts to your ~/.config/fish/conf
    alias dev="cd '/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES' && npm run dev:frontend"
    alias api="cd '/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES' && npm run dev:backend"
    alias check="cd '/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES' && npm run build:frontend && npm run build:backend"
-   alias save="git add . && git commit -m 'update' && git push"
+   alias save="git add . && git commit -m 'update' && git push origin main"
 
 Now, whenever you want to test the app, you just type 3 letters:
-`dev`   --> Starts Frontend!
-`api`   --> Starts Backend!
-`check` --> Tests both for zero bugs!
-
-3. HARDWARE & BROWSER HELPERS:
-------------------------------
-- Browser: Keep Chrome / Brave open on `http://localhost:3000` with DevTools
-  open (F12) on "Network" tab so you can see live API requests and responses.
-- Sound check: Turn on laptop audio to test the KDS kitchen bell alert when
-  orders move to "READY".
+`dev`   --> Starts Frontend on port 3000!
+`api`   --> Starts Backend on port 4000!
+`check` --> Tests both for zero compilation bugs!
+`save`  --> Syncs everything to GitHub in 2 seconds!
 
 ================================================================================
 PART 4: THE 5-STEP DAILY WORKFLOW (FOUNDER'S ROUTINE)
@@ -138,7 +142,96 @@ Every day when you sit down to work on FoodLine Campus:
 4. FRONTEND NEXT: Ask OpenCode: "Connect the OTP keypad on the screen to that API."
    Check on: `http://localhost:3000`
 5. SYNC: Commit your work and push to GitHub so your progress is 100% safe in the cloud:
-   `git add . && git commit -m "feat: complete OTP pickup screen" && git push`
+   `save` (or `git add . && git commit -m "feat: complete OTP pickup" && git push`)
+
+================================================================================
+PART 5: 5 MAGIC AI PROMPTS FOR DAILY CODING (COPY & PASTE)
+================================================================================
+
+PROMPT 1: THE "BUG HUNTER" PROMPT (Jab koi cheez toot jaye)
+-----------------------------------------------------------
+"Look at this terminal error: [PASTE ERROR HERE].
+Diagnose the root cause first. Explain what went wrong in 2 sentences,
+and fix it with the minimal necessary code edit. Do NOT touch unrelated files."
+
+PROMPT 2: THE "MAKE IT WOW" UI PROMPT (OpenCode ke liye)
+--------------------------------------------------------
+"Polish the UI of [PAGE_NAME].
+Add subtle glassmorphism, responsive mobile touch targets (min 44px), smooth
+micro-transitions on hover/click, and a friendly empty state if no items exist.
+Ensure zero layout shift on mobile view."
+
+PROMPT 3: THE "NEW API ENDPOINT" PROMPT (Antigravity ke liye)
+-------------------------------------------------------------
+"Create a new API endpoint: [METHOD] /api/[ROUTE].
+Input payload: [PASTE JSON SHAPE].
+Handle all 4 cases: Success (200/201), Invalid Input (400), Not Found (404),
+and Conflict/Slot Full (409). Return standard JSON envelope as defined in AGENTS.md."
+
+PROMPT 4: THE "TEST EVERYTHING" PROMPT (Self-Verification)
+----------------------------------------------------------
+"Run a full compilation check on both frontend and backend. Inspect every warning
+or deprecation notice. If anything fails or warns, fix it immediately so we have
+a 100% clean zero-warning build."
+
+PROMPT 5: THE "EXPLAIN LIKE I'M 10" PROMPT
+------------------------------------------
+"Explain how [FEATURE_NAME] works under the hood like I am 10 years old.
+Use a real-life analogy (like a school canteen or video game) and show
+the step-by-step path that data takes from student click to cafeteria tablet."
+
+================================================================================
+PART 6: FRONTEND VS BACKEND TOOLING CHECKLIST
+================================================================================
+
+🎨 FRONTEND TOOLBOX (OpenCode):
+- Framework: Next.js 15 App Router (Server Components + Client Components)
+- Styling: Tailwind CSS + Glassmorphism tokens
+- Icons: Lucide React (Clean, modern SVG icons)
+- Audio: Web Audio API synth tones for instant counter bell alerts
+- Mobile: Capacitor for Android native APK compilation
+- Device Preview: Chrome DevTools Responsive Mode (Ctrl+Shift+M)
+
+⚡ BACKEND TOOLBOX (Antigravity):
+- Engine: Node.js + Express + TypeScript
+- Database: Supabase PostgreSQL (Parameterized queries & Row Level Security)
+- Real-time: Server-Sent Events (SSE) for live order state broadcast
+- Protection: 60-Order Slot Throttling Engine + 12-Digit UTR Replay Fraud Shield
+- Testing: test-api.http (1-click in-editor HTTP requests)
+
+================================================================================
+PART 7: CAMPUS WI-FI & EDGE-CASE SIMULATION (THE 3 ACID TESTS)
+================================================================================
+
+Before you deploy to Sanjivani University, run these 3 Acid Tests:
+
+TEST 1: THE "SLOW CAMPUS 3G" TEST
+- In Chrome DevTools (F12) -> Network tab -> Change "No Throttling" to "Slow 3G".
+- Now click around the app. Does it show smooth skeletons or does the screen freeze?
+  (OpenCode must ensure loading skeletons are always shown!)
+
+TEST 2: THE "61ST ORDER OVERFLOW" TEST
+- Create orders until slot capacity hits 60/60.
+- Try to place the 61st order.
+- Result MUST be: HTTP 409 Conflict, "Slot is fully booked, please select next break."
+
+TEST 3: THE "FAKE / REPLAY UTR" TEST
+- Submit a valid 12-digit UTR payment (e.g. `928374615243`).
+- Try to submit the EXACT same UTR number again for another order.
+- Result MUST be: Replay Protection blocks it with "Duplicate transaction reference".
+
+================================================================================
+PART 8: 1-CLICK API TESTING SUITE (USING test-api.http)
+================================================================================
+
+In your workspace, open `test-api.http`.
+With the "REST Client" extension installed, you will see a small "Send Request"
+button above every single endpoint!
+Click it, and you get live JSON responses right inside your editor window:
+- [Click] GET http://localhost:4000/health
+- [Click] GET http://localhost:4000/api/menu
+- [Click] GET http://localhost:4000/api/slots
+- [Click] POST http://localhost:4000/api/orders
 
 ================================================================================
                        YOU ARE READY TO BUILD! 🚀
