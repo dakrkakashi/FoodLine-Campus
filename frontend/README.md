@@ -1,6 +1,6 @@
 # 🎨 FoodLine Frontend Application
 
-Specialist Owner: **OpenCode (Frontend Design Specialist)**  
+Specialist Owner: **Antigravity CLI ('agy') (Frontend Specialist)**  
 Target Campus: **Sanjivani University, Kopargaon (Cafe @7 Pilot)**
 
 ## 🚀 Overview

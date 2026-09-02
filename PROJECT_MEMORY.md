@@ -1,6 +1,6 @@
 # 🧠 FoodLine Campus — Active Project State & Agent Memory
 <!-- This file is the single source of truth for agent memory persistence. -->
-<!-- Both Antigravity and OpenCode read this file every time they start. -->
+<!-- Both Antigravity IDE (Backend) and Antigravity CLI 'agy' (Frontend) read this file. -->
 
 ## 📍 Where We Left Off (Last Completed Checkpoint)
 - **Date & Time:** 2026-09-02 (Evening Session — Backend Concurrency & Retention Milestone Verified)
@@ -40,13 +40,13 @@
 
 ## 🎯 Current Active Sprint & Next Missions
 
-### ⚡ Mission for Antigravity (Backend Specialist):
+### ⚡ Mission for Antigravity IDE (Backend Specialist):
 1. **Pilot Deployment Monitoring & Telemetry Dashboard:**
    - Monitor live memory usage and slot throughput under prolonged break simulation.
 2. **Push Notification / Sound Trigger Integration:**
    - Add push / webhook dispatch when order transitions to `READY` for counter staff alert.
 
-### 🎨 Mission for OpenCode (Frontend Specialist):
+### 🎨 Mission for Antigravity CLI 'agy' (Frontend Specialist):
 1. **Interactive Cafe 3D Dish View or Particle Confetti Polish:**
    - Add Three.js canvas or Magic UI `Meteors` / `ShimmerButton` on the checkout confirmation screen.
 2. **Offline Resilience / PWA Offline Banner:**

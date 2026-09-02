@@ -10,7 +10,7 @@ Local System: CachyOS Linux (Fish Shell)
 
 TABLE OF CONTENTS:
 1. Understanding Your Architecture (What is Where)
-2. How to Launch Both AI Agents (Antigravity + OpenCode)
+2. How to Launch Both AI Agents (Antigravity IDE + Antigravity CLI 'agy')
 3. How to Talk to the Agents (Voice & Text Prompts: What To Do / Not To Do)
 4. How to Run & Test the App Locally
 5. How to Save & Push Work to GitHub (Branching & Merging)
@@ -32,7 +32,7 @@ Tumhare project mein 3 alag-alag isolated folders (Git Worktrees) hain:
    Git Branch: backend
    Purpose: Express API, Supabase Database, 60-slot throttling, UTR verification.
 
-3. FRONTEND WORKTREE (OpenCode Agent):
+3. FRONTEND WORKTREE (Antigravity CLI 'agy' Agent):
    Path: /home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/FoodLine-Frontend
    Git Branch: frontend
    Purpose: Next.js 15 UI, Cart Tray, Menu Cards, KDS kitchen screen, Sound alerts.
@@ -47,8 +47,8 @@ Apne terminal (Fish shell) mein jao aur ye command chalao:
    ./start.fish
 
 Kya hoga:
-- Antigravity automatically "FoodLine-Backend" folder mein open hoga.
-- OpenCode automatically "FoodLine-Frontend" folder mein open hoga.
+- Antigravity IDE automatically "FoodLine-Backend" folder mein open hoga.
+- Antigravity CLI (agy) "FoodLine-Frontend" folder mein open hoga.
 - Dono agents bina kisi file conflict ya git lock ke simultaneously code karenge!
 
 ================================================================================
@@ -80,9 +80,9 @@ WHAT NOT TO DO:
 - Do NOT push directly to 'main' branch; work only on 'backend'."
 
 
-[2] OPENCODE (FRONTEND SPECIALIST) KO YE PROMPT DO:
+[2] ANTIGRAVITY CLI 'agy' (FRONTEND SPECIALIST) KO YE PROMPT DO:
 --------------------------------------------------
-"You are OpenCode, the Frontend UI/UX Specialist for FoodLine Campus.
+"You are Antigravity CLI (agy), the Frontend UI/UX Specialist for FoodLine Campus.
 Your workspace is FoodLine-Frontend on branch 'frontend'.
 
 WHAT TO DO:
@@ -128,7 +128,7 @@ git add .
 git commit -m "feat(backend): your feature description"
 git push origin backend
 
---- Jab OpenCode Frontend mein kaam complete kare: ---
+--- Jab Antigravity CLI (agy) Frontend mein kaam complete kare: ---
 cd "/home/darkkakashi/Desktop/StartUp Project (FOODLINE CAMPUS)/FoodLine-Frontend"
 git add .
 git commit -m "feat(frontend): your UI update description"

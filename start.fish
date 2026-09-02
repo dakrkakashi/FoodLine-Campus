@@ -46,11 +46,11 @@ else
 end
 
 if test -d "$FRONTEND_DIR"
-    echo "🎨 Launching OpenCode in:    $FRONTEND_DIR (branch: frontend)"
-    opencode "$FRONTEND_DIR" &
+    echo "🎨 Launching Antigravity CLI (agy) in: $FRONTEND_DIR (branch: frontend)"
+    agy "$FRONTEND_DIR" &
 else
-    echo "🎨 Launching OpenCode in:    $SCRIPT_DIR/frontend"
-    opencode "$SCRIPT_DIR/frontend" &
+    echo "🎨 Launching Antigravity CLI (agy) in: $SCRIPT_DIR/frontend"
+    agy "$SCRIPT_DIR/frontend" &
 end
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

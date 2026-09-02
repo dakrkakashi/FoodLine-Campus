@@ -22,7 +22,7 @@ Command: fl up
    1. Purane atke huye ports (3000 aur 4000) ko automatic kill karta hai.
    2. PROJECT_MEMORY.md se active session memory read karke terminal pe dikhata hai.
    3. Backend Express API (:4000) aur Frontend Next.js (:3000) background mein boot karta hai.
-   4. Dono AI Agents (Antigravity aur OpenCode) ko unke respective worktrees mein launch karta hai.
+   4. Dono AI Agents (Antigravity IDE Backend aur Antigravity CLI agy Frontend) ko unke respective worktrees mein launch karta hai.
 
 --------------------------------------------------------------------------------
 Command: fl check
@@ -104,7 +104,7 @@ Navigation Shortcuts:
     ⚡ ACTION: FoodLine-Backend worktree (branch: backend) mein le jaata hai.
 
   cd-fe
-    🎯 WHEN TO USE: Jab OpenCode frontend UI files dekhni ya edit karni ho.
+    🎯 WHEN TO USE: Jab Antigravity CLI (agy) frontend UI files dekhni ya edit karni ho.
     📍 WHERE: Terminal
     ⚡ ACTION: FoodLine-Frontend worktree (branch: frontend) mein le jaata hai.
 

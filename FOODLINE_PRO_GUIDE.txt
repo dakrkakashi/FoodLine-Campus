@@ -3,7 +3,7 @@
 ================================================================================
 Project: FoodLine Campus
 Boss / Captain: Shivam Nirmal (@dakrkakashi)
-Your 2 Workers: ⚡ Antigravity (Engine/Backend) & 🎨 OpenCode (Artist/Frontend)
+Your 2 Workers: ⚡ Antigravity IDE (Engine/Backend) & 🎨 Antigravity CLI 'agy' (Artist/Frontend)
 ================================================================================
 
 TABLE OF CONTENTS:
@@ -21,9 +21,9 @@ PART 1: HOW TO RUN THEM (EXPLAINED LIKE YOU ARE 10 YEARS OLD!)
 ================================================================================
 
 Imagine you are playing Minecraft or GTA. You have 2 robot buddies:
-- ROBOT 1 (Antigravity): The Mechanic. He only works inside the engine room
+- ROBOT 1 (Antigravity IDE): The Mechanic. He only works inside the engine room
   (database, calculations, bill generation, passwords).
-- ROBOT 2 (OpenCode): The Artist. He only paints the screens, colors the buttons,
+- ROBOT 2 (Antigravity CLI 'agy'): The Artist. He only paints the screens, colors the buttons,
   and makes smooth animations that students see on their phones.
 
 HOW TO TURN THEM ON (Just 3 Simple Steps):
@@ -32,12 +32,12 @@ STEP 1: Open your Terminal (Fish shell).
 STEP 2: Type this magic spell and press Enter:
         ./start.fish
 
-        *BOOM!* Antigravity opens in the Backend room.
-        OpenCode opens in the Frontend room.
+        *BOOM!* Antigravity IDE opens in the Backend room.
+        Antigravity CLI 'agy' opens in the Frontend room.
 
 STEP 3: Give each robot his job prompt:
-        - In Antigravity chat, paste the "Backend Prompt" (from FOODLINE_STEPS.txt)
-        - In OpenCode chat, paste the "Frontend Prompt" (from FOODLINE_STEPS.txt)
+        - In Antigravity IDE chat, paste the "Backend Prompt" (from FOODLINE_STEPS.txt)
+        - In Antigravity CLI 'agy' chat, paste the "Frontend Prompt" (from FOODLINE_STEPS.txt)
 
 Now both robots are standing by, waiting for your voice or typed command!
 
@@ -73,7 +73,7 @@ If there is an error, tell the agent: "Fix this error right now before moving on
 
 RULE 4: THE 5-POINT QUALITY CHECKLIST FOR EVERY SCREEN
 ------------------------------------------------------
-Whenever OpenCode creates a new page, check these 5 things in your browser:
+Whenever Antigravity CLI 'agy' creates a new page, check these 5 things in your browser:
 [ ] Does it look good on Mobile Phone screen size? (Press Ctrl+Shift+M in Chrome)
 [ ] Is the text clearly readable (dark mode / high contrast)?
 [ ] Does the button show a loading spinner when clicked?
@@ -137,9 +137,9 @@ Every day when you sit down to work on FoodLine Campus:
 
 1. LAUNCH: Open terminal, run `./start.fish`.
 2. MISSION: Decide today's 1 goal (e.g. "Today we add student OTP pickup screen").
-3. BACKEND FIRST: Ask Antigravity: "Create the API endpoint for OTP verification."
+3. BACKEND FIRST: Ask Antigravity IDE: "Create the API endpoint for OTP verification."
    Check with: `curl http://localhost:4000/api/...`
-4. FRONTEND NEXT: Ask OpenCode: "Connect the OTP keypad on the screen to that API."
+4. FRONTEND NEXT: Ask Antigravity CLI (agy): "Connect the OTP keypad on the screen to that API."
    Check on: `http://localhost:3000`
 5. SYNC: Commit your work and push to GitHub so your progress is 100% safe in the cloud:
    `save` (or `git add . && git commit -m "feat: complete OTP pickup" && git push`)
@@ -154,14 +154,14 @@ PROMPT 1: THE "BUG HUNTER" PROMPT (Jab koi cheez toot jaye)
 Diagnose the root cause first. Explain what went wrong in 2 sentences,
 and fix it with the minimal necessary code edit. Do NOT touch unrelated files."
 
-PROMPT 2: THE "MAKE IT WOW" UI PROMPT (OpenCode ke liye)
+PROMPT 2: THE "MAKE IT WOW" UI PROMPT (Antigravity CLI 'agy' ke liye)
 --------------------------------------------------------
 "Polish the UI of [PAGE_NAME].
 Add subtle glassmorphism, responsive mobile touch targets (min 44px), smooth
 micro-transitions on hover/click, and a friendly empty state if no items exist.
 Ensure zero layout shift on mobile view."
 
-PROMPT 3: THE "NEW API ENDPOINT" PROMPT (Antigravity ke liye)
+PROMPT 3: THE "NEW API ENDPOINT" PROMPT (Antigravity IDE ke liye)
 -------------------------------------------------------------
 "Create a new API endpoint: [METHOD] /api/[ROUTE].
 Input payload: [PASTE JSON SHAPE].
@@ -184,7 +184,7 @@ the step-by-step path that data takes from student click to cafeteria tablet."
 PART 6: FRONTEND VS BACKEND TOOLING CHECKLIST
 ================================================================================
 
-🎨 FRONTEND TOOLBOX (OpenCode):
+🎨 FRONTEND TOOLBOX (Antigravity CLI 'agy'):
 - Framework: Next.js 15 App Router (Server Components + Client Components)
 - Styling: Tailwind CSS + Glassmorphism tokens
 - Icons: Lucide React (Clean, modern SVG icons)
@@ -192,7 +192,7 @@ PART 6: FRONTEND VS BACKEND TOOLING CHECKLIST
 - Mobile: Capacitor for Android native APK compilation
 - Device Preview: Chrome DevTools Responsive Mode (Ctrl+Shift+M)
 
-⚡ BACKEND TOOLBOX (Antigravity):
+⚡ BACKEND TOOLBOX (Antigravity IDE):
 - Engine: Node.js + Express + TypeScript
 - Database: Supabase PostgreSQL (Parameterized queries & Row Level Security)
 - Real-time: Server-Sent Events (SSE) for live order state broadcast
@@ -208,7 +208,7 @@ Before you deploy to Sanjivani University, run these 3 Acid Tests:
 TEST 1: THE "SLOW CAMPUS 3G" TEST
 - In Chrome DevTools (F12) -> Network tab -> Change "No Throttling" to "Slow 3G".
 - Now click around the app. Does it show smooth skeletons or does the screen freeze?
-  (OpenCode must ensure loading skeletons are always shown!)
+  (Antigravity CLI 'agy' must ensure loading skeletons are always shown!)
 
 TEST 2: THE "61ST ORDER OVERFLOW" TEST
 - Create orders until slot capacity hits 60/60.

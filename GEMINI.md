@@ -28,7 +28,7 @@
 
 ---
 
-## 4. 🎨 Modern Frontend Standards (OpenCode Agent)
+## 4. 🎨 Modern Frontend Standards (Antigravity CLI 'agy' Agent)
 - **Strict Typing:** No `any`. All props, API response hooks, and state slices must have explicit TypeScript interfaces imported from `src/lib/types.ts`.
 - **Aesthetic Excellence:** Adhere to `FoodLine_App_UI_UX_Design_System.md`. Use Tailwind CSS utility tokens, subtle glassmorphism, responsive breakpoints (`sm`, `md`, `lg`), and smooth micro-animations.
 - **Defensive UI States:** Every interactive component must handle:
@@ -39,7 +39,7 @@
 
 ---
 
-## 5. 🛠️ Robust Backend Standards (Antigravity Agent)
+## 5. 🛠️ Robust Backend Standards (Antigravity IDE Agent)
 - **Idempotency & Race Protection:**
   - Enforce the 60-order slot throttling limit strictly before creating an order record.
   - Implement 12-digit UTR replay protection to prevent duplicate transaction entries.
@@ -50,7 +50,7 @@
 
 ## 6. 🌲 Multi-Agent Worktree Hygiene
 - **Branch Ownership:**
-  - Antigravity works exclusively in `FoodLine-Backend` on branch `backend`.
-  - OpenCode works exclusively in `FoodLine-Frontend` on branch `frontend`.
+  - Antigravity IDE works on `FoodLine-Backend` on branch `backend` (and backend engine APIs).
+  - Antigravity CLI (`agy`) works on `FoodLine-Frontend` on branch `frontend` (and frontend UI).
   - Master merges happen only into `PPT OTHER TASKES` on branch `main`.
 - **Clean Git Commits:** Write conventional commits (`feat:`, `fix:`, `refactor:`, `docs:`). Never use `git reset --hard` or destructive operations without explicit confirmation.

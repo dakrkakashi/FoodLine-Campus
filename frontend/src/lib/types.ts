@@ -1,6 +1,6 @@
 /**
  * 🚀 FoodLine Shared Type Definitions & API Contracts
- * Single source of truth for Antigravity (Backend) and OpenCode (Frontend Design)
+ * Single source of truth for Antigravity IDE (Backend) and Antigravity CLI 'agy' (Frontend)
  */
 
 export interface ApiResponse<T = any> {
