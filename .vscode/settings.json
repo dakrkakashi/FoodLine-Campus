@@ -1,6 +1,6 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.jdt.ls.java.home": "/opt/android-studio/jbr",
-    "gradle.java.home": "/opt/android-studio/jbr",
-    "java.home": "/opt/android-studio/jbr"
+    "java.jdt.ls.java.home": "/usr/lib/jvm/java-21-openjdk",
+    "java.import.gradle.java.home": "/usr/lib/jvm/java-21-openjdk",
+    "gradle.java.home": "/usr/lib/jvm/java-21-openjdk"
 }
