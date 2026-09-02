@@ -273,3 +273,26 @@ While **Antigravity IDE** implements the backend migrations and endpoints:
   > 5. Expanded API audit to 11/11 endpoints passing (`npm --prefix backend run test:api`).
   > 6. Both builds verified 100% clean: backend 0 errors, frontend 40/40 routes 0 errors."
 
+- **[2026-09-02 23:46] Antigravity IDE (Backend Specialist)**:
+  > "Live Google Sheets API Integration Verified & Android JDK Configured! 📊⚡
+  > 1. Connected live spreadsheet `Foodline Campus Master` (`1UjpWRpsDuBx6aCsZLREx__zSapeEdICM3o7WosWZCW8`) via Service Account (`foodline-backend@foodline-campus-07.iam.gserviceaccount.com`).
+  > 2. End-to-end Verified: Successfully created order `FL-8389` via `POST /api/orders` and verified it live in the `Orders` tab in Google Sheets.
+  > 3. Verified JDK 21 environment for Android Gradle wrapper builds (`assembleDebug` PASS).
+  > 4. `curl http://localhost:4000/health` reports `googleSheets.connected: true` with all 4 tabs detected."
+
+- **[2026-09-02 23:53] Antigravity IDE (Backend Specialist) & Antigravity CLI ('agy')**:
+  > "🚨 Issue Diagnosed & 100% Resolved: Port 4000 'Cannot GET /' & Port 3000 Blank Screen Fixed! 🛠️🎉
+  > 1. Root Causes:
+  >    - Port 4000: Express backend had no root `GET /` route defined, causing Express to display default 'Cannot GET /'.
+  >    - Port 3000: Next.js dev server was referencing stale chunk hashes obliterated during `next build`, resulting in 404 for all CSS and JS chunks (causing an unstyled blank white screen). Additionally, `/select-campus` and `/canteens` were missing from middleware `PUBLIC_ROUTES`.
+  > 2. Implementations:
+  >    - Backend: Added root `GET /` route in `backend/src/server.ts` serving a sleek dark-themed HTML landing dashboard (with direct links to `/health`, `/api/telemetry`, `/api/menu`, `/api/slots`, and `localhost:3000`) or JSON overview.
+  >    - Frontend Middleware: Added `/`, `/select-campus`, `/canteens`, `/onboarding`, and `/debug` to `PUBLIC_ROUTES` in `frontend/src/utils/supabase/middleware.ts`.
+  >    - Frontend Dev Server: Purged stale `.next` cache and cleanly restarted dev server.
+  > 3. Verification:
+  >    - All 11 tested routes return HTTP 200 OK (including `http://localhost:3000/`, `/select-campus`, `/canteens`, `/menu`, `/login`, `http://localhost:4000/`, `/health`, `/api/menu`, `/api/slots`, `/api/campuses/geo`).
+  >    - `npm --prefix backend run build` compiled with 0 errors."
+
+
+
+

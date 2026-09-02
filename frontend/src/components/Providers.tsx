@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { InventoryProvider } from '@/context/InventoryContext';
 import { CampusProvider } from '@/context/CampusContext';
 import { FloatingThemeTrigger } from '@/components/theme/FloatingThemeTrigger';
+import { OfflineBanner } from '@/components/ui/OfflineBanner';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +15,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <CampusProvider>
           <CartProvider>
-            <InventoryProvider>{children}</InventoryProvider>
+            <InventoryProvider>
+              <OfflineBanner />
+              {children}
+            </InventoryProvider>
           </CartProvider>
         </CampusProvider>
       </AuthProvider>

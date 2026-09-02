@@ -16,6 +16,7 @@ const auth_routes_js_1 = require("./routes/auth.routes.js");
 const campus_service_js_1 = require("./services/campus-service.js");
 const googleSheets_js_1 = require("./config/googleSheets.js");
 const sheets_db_service_js_1 = require("./services/sheets-db.service.js");
+const notification_service_js_1 = require("./services/notification-service.js");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 exports.app = app;
@@ -34,6 +35,227 @@ setInterval(() => {
         console.warn('Hourly order retention cleanup error:', err);
     });
 }, 60 * 60 * 1000);
+// -----------------------------------------------------------------------------
+// Root Landing Dashboard & API Discovery
+// -----------------------------------------------------------------------------
+app.get('/', (req, res) => {
+    if (req.accepts('html')) {
+        res.type('html').send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoodLine Campus — Backend Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07070B;
+      --card: #12121A;
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #FF6B2C;
+      --teal: #00D4AA;
+      --text: #F5F5F7;
+      --muted: #A1A1AA;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+    .container {
+      max-width: 680px;
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 212, 170, 0.12);
+      border: 1px solid rgba(0, 212, 170, 0.3);
+      color: var(--teal);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--teal);
+      box-shadow: 0 0 10px var(--teal);
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, #FF6B2C, #FFB347, #FFFFFF);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.subtitle {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 540px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .link-card {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s ease;
+    }
+    .link-card:hover {
+      background: rgba(255, 107, 44, 0.08);
+      border-color: rgba(255, 107, 44, 0.4);
+      transform: translateY(-2px);
+    }
+    .link-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .link-path {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .btn-frontend {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #FF6B2C, #FF8A3D);
+      color: #000;
+      font-weight: 800;
+      font-size: 14px;
+      text-decoration: none;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(255, 107, 44, 0.3);
+      transition: all 0.2s;
+    }
+    .btn-frontend:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(255, 107, 44, 0.45);
+    }
+    .footer {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      color: #71717A;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge">
+      <span class="dot"></span>
+      Backend Engine Running • Port 4000
+    </div>
+    <h1>FoodLine Campus API</h1>
+    <p class="subtitle">Express API, Slot Throttling Engine, Supabase PostgreSQL, and Google Sheets Sync for Sanjivani University.</p>
+
+    <div class="grid">
+      <a class="link-card" href="/health">
+        <div class="link-title">🩺 Deep Health Check</div>
+        <div class="link-path">GET /health</div>
+      </a>
+      <a class="link-card" href="/api/telemetry">
+        <div class="link-title">📊 Live Telemetry</div>
+        <div class="link-path">GET /api/telemetry</div>
+      </a>
+      <a class="link-card" href="/api/campuses/geo">
+        <div class="link-title">🗺️ Geo Campus Hierarchy</div>
+        <div class="link-path">GET /api/campuses/geo</div>
+      </a>
+      <a class="link-card" href="/api/menu">
+        <div class="link-title">🍽️ Menu Items (94 Dishes)</div>
+        <div class="link-path">GET /api/menu</div>
+      </a>
+      <a class="link-card" href="/api/slots">
+        <div class="link-title">⏱️ Pickup Slots & Capacity</div>
+        <div class="link-path">GET /api/slots</div>
+      </a>
+      <a class="link-card" href="/api/campuses/a1111111-1111-1111-1111-111111111111/canteens">
+        <div class="link-title">🏬 5 Sanjivani Canteens</div>
+        <div class="link-path">GET /api/campuses/:id/canteens</div>
+      </a>
+    </div>
+
+    <a class="btn-frontend" href="http://localhost:3000" target="_blank" rel="noopener noreferrer">
+      🚀 Open Frontend Application (localhost:3000) →
+    </a>
+
+    <div class="footer">
+      <span>Pilot Campus: Sanjivani University</span>
+      <span>Express + Supabase + Google Sheets</span>
+    </div>
+  </div>
+</body>
+</html>`);
+        return;
+    }
+    res.json({
+        service: 'FoodLine Backend Engine',
+        status: 'healthy',
+        port: PORT,
+        frontendUrl: 'http://localhost:3000',
+        endpoints: {
+            health: '/health',
+            telemetry: '/api/telemetry',
+            geo: '/api/campuses/geo',
+            canteens: '/api/campuses/:campusId/canteens',
+            menu: '/api/menu',
+            slots: '/api/slots',
+            orders: '/api/orders',
+            verifyUtr: '/api/payments/verify-utr',
+            verifyOtp: '/api/orders/verify-otp',
+        },
+        timestamp: new Date().toISOString(),
+    });
+});
 // -----------------------------------------------------------------------------
 // Health Check (Deep with Supabase status)
 // -----------------------------------------------------------------------------
@@ -399,6 +621,7 @@ app.get('/api/telemetry', async (req, res) => {
                 realtime: {
                     activeSseClients: sse_broadcaster_js_1.sseBroadcaster.getActiveConnectionsCount(),
                     activeWatchedTokens: sse_broadcaster_js_1.sseBroadcaster.getActiveOrderTokens(),
+                    recentNotifications: notification_service_js_1.NotificationService.getRecentNotificationLogs().slice(0, 10),
                 },
                 orders: {
                     totalTracked: allOrders.length,
@@ -424,3 +647,11 @@ const server = app.listen(PORT, () => {
     console.log(`⚡ FoodLine Backend Engine running on http://localhost:${PORT}`);
 });
 exports.server = server;
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.log(`⚡ Notice: Port ${PORT} already active, attaching to existing engine instance.`);
+    }
+    else {
+        throw err;
+    }
+});

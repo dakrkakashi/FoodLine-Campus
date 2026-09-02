@@ -15,6 +15,10 @@ const ROLE_RESTRICTED_ROUTES: Record<string, string[]> = {
 
 // Routes that can be accessed without forced login redirect
 const PUBLIC_ROUTES = [
+  '/',
+  '/select-campus',
+  '/canteens',
+  '/onboarding',
   '/login',
   '/display', // Public TV counter display kiosk in cafeteria
   '/auth',
@@ -23,6 +27,7 @@ const PUBLIC_ROUTES = [
   '/order',
   '/menu',
   '/checkout',
+  '/debug',
 ];
 
 export const updateSession = async (request: NextRequest) => {

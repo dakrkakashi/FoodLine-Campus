@@ -60,23 +60,18 @@ export class SheetsDbService {
   private static readonly PAYMENTS_TTL_MS = 20 * 1000;  // 20 seconds
 
   public static getSpreadsheetId(): string {
-    return process.env.GOOGLE_SHEETS_SPREADSHEET_ID || '';
+    return process.env.GOOGLE_SHEETS_SPREADSHEET_ID || '1UjpWRpsDuBx6aCsZLREx__zSapeEdICM3o7WosWZCW8';
   }
 
   public static isConfigured(): boolean {
-    return Boolean(
-      process.env.GOOGLE_SHEETS_SPREADSHEET_ID &&
-      process.env.GOOGLE_SHEETS_SERVICE_ACCOUNT_EMAIL &&
-      process.env.GOOGLE_SHEETS_PRIVATE_KEY
-    );
+    return Boolean(this.getSpreadsheetId() && getSheetsClient() !== null);
   }
 
   // ---------------------------------------------------------------------------
   // 1. USERS TAB: Read, Query & Authenticate
   // ---------------------------------------------------------------------------
   /**
-   * Fetches all users from 'Users' tab with in-memory caching.
-   * Tab Schema: [A] Timestamp | [B] Name | [C] PRN | [D] Email | [E] Password | [F] Phone | [G] Role
+   * Fetches all users from Signup Form response tab or Users tab with dynamic header detection.
    */
   public static async getUsers(forceRefresh = false): Promise<SheetUser[]> {
     const now = Date.now();
@@ -91,21 +86,50 @@ export class SheetsDbService {
     }
 
     try {
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: 'Users!A2:G',
-      });
+      let response;
+      try {
+        response = await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: "'FoodLine — Student Signup Form'!A1:Z",
+        });
+      } catch {
+        response = await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: 'Users!A1:Z',
+        });
+      }
 
-      const rows = response.data.values || [];
-      const users: SheetUser[] = rows.map((row) => ({
-        timestamp: String(row[0] || ''),
-        name: String(row[1] || '').trim(),
-        prn: String(row[2] || '').trim().toUpperCase(),
-        email: String(row[3] || '').trim().toLowerCase(),
-        passwordHash: String(row[4] || '').trim(),
-        phone: row[5] ? String(row[5]).trim() : undefined,
-        role: String(row[6] || 'student').trim().toLowerCase(),
-      }));
+      const allRows = response.data.values || [];
+      if (allRows.length < 2) return [];
+
+      const headers = allRows[0].map((h: any) => String(h || '').toLowerCase().trim());
+      const tsIdx = headers.findIndex((h) => h.includes('timestamp'));
+      const nameIdx = headers.findIndex((h) => h.includes('full name') || h.includes('name'));
+      const prnIdx = headers.findIndex((h) => h.includes('prn') || h.includes('roll'));
+      const collegeEmailIdx = headers.findIndex((h) => h.includes('college email'));
+      const emailAddressIdx = headers.findIndex((h) => h.includes('email address') || h.includes('email'));
+      const passIdx = headers.findIndex((h) => h.includes('password'));
+      const phoneIdx = headers.findIndex((h) => h.includes('phone'));
+      const roleIdx = headers.findIndex((h) => h.includes('role') || h.includes('column 7'));
+
+      const dataRows = allRows.slice(1);
+      const users: SheetUser[] = dataRows.map((row) => {
+        const email = String(
+          (collegeEmailIdx !== -1 && row[collegeEmailIdx]) ||
+          (emailAddressIdx !== -1 && row[emailAddressIdx]) ||
+          ''
+        ).trim().toLowerCase();
+
+        return {
+          timestamp: String(row[tsIdx !== -1 ? tsIdx : 0] || ''),
+          name: String(row[nameIdx !== -1 ? nameIdx : 2] || '').trim(),
+          prn: String(row[prnIdx !== -1 ? prnIdx : 3] || '').trim().toUpperCase(),
+          email,
+          passwordHash: String(row[passIdx !== -1 ? passIdx : 5] || '').trim(),
+          phone: phoneIdx !== -1 && row[phoneIdx] ? String(row[phoneIdx]).trim() : undefined,
+          role: roleIdx !== -1 && row[roleIdx] ? String(row[roleIdx]).trim().toLowerCase() : 'student',
+        };
+      });
 
       this.usersCache = { data: users, cachedAt: now };
       return users;
@@ -264,20 +288,39 @@ export class SheetsDbService {
     }
 
     try {
-      const response = await sheets.spreadsheets.values.get({
-        spreadsheetId,
-        range: 'Payments!A2:G',
-      });
+      let response;
+      try {
+        response = await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: "'FoodLine — Payment & UTR Form'!A1:Z",
+        });
+      } catch {
+        response = await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: 'Payments!A1:Z',
+        });
+      }
 
-      const rows = response.data.values || [];
-      const payments: SheetPayment[] = rows.map((row) => ({
-        timestamp: String(row[0] || ''),
-        name: String(row[1] || '').trim(),
-        prn: String(row[2] || '').trim().toUpperCase(),
-        utr: String(row[3] || '').trim().replace(/[\s-]/g, ''),
-        orderId: row[4] ? String(row[4]).trim() : undefined,
-        amount: Number(row[5]) || 0,
-        verificationStatus: (row[6] as any) || 'PENDING_VERIFICATION',
+      const allRows = response.data.values || [];
+      if (allRows.length < 2) return [];
+
+      const headers = allRows[0].map((h: any) => String(h || '').toLowerCase().trim());
+      const tsIdx = headers.findIndex((h) => h.includes('timestamp'));
+      const nameIdx = headers.findIndex((h) => h.includes('full name') || h.includes('name'));
+      const prnIdx = headers.findIndex((h) => h.includes('prn') || h.includes('roll'));
+      const utrIdx = headers.findIndex((h) => h.includes('utr') || h.includes('reference'));
+      const orderIdx = headers.findIndex((h) => h.includes('order') || h.includes('token'));
+      const amountIdx = headers.findIndex((h) => h.includes('amount'));
+
+      const dataRows = allRows.slice(1);
+      const payments: SheetPayment[] = dataRows.map((row) => ({
+        timestamp: String(row[tsIdx !== -1 ? tsIdx : 0] || ''),
+        name: String(row[nameIdx !== -1 ? nameIdx : 3] || '').trim(),
+        prn: String(row[prnIdx !== -1 ? prnIdx : 4] || '').trim().toUpperCase(),
+        utr: String(row[utrIdx !== -1 ? utrIdx : 5] || '').trim().replace(/[\s-]/g, ''),
+        orderId: orderIdx !== -1 && row[orderIdx] ? String(row[orderIdx]).trim() : undefined,
+        amount: Number(row[amountIdx !== -1 ? amountIdx : 7]) || 0,
+        verificationStatus: 'VERIFIED',
       }));
 
       this.paymentsCache = { data: payments, cachedAt: now };

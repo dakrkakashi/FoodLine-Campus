@@ -58,27 +58,26 @@ export function Navbar() {
         }`}
       >
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Brand Logo */}
-          <Link
-            href="/"
-            onClick={playClick}
-            className="flex items-center gap-2.5 group cursor-pointer"
-          >
-            <Logo size={38} />
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/"
+              onClick={playClick}
+              className="flex items-center gap-2.5 group cursor-pointer"
+            >
+              <Logo size={38} />
               <span className="font-black text-xl tracking-tight bg-linear-to-r from-(--accent-orange) via-(--accent-amber) to-white bg-clip-text text-transparent">
                 FoodLine
               </span>
-              <Link
-                href="/canteens"
-                title={`Active: ${selectedCanteen.name} (${selectedCampus.name}) — Tap to switch outlet`}
-                className="hidden sm:inline-flex items-center gap-1 text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#FF6B2C]/40 text-[#00D4AA] font-extrabold tracking-wider transition cursor-pointer"
-              >
-                <span>{selectedCanteen.name}</span>
-                <span className="text-[9px] text-[#FFB347]">▾</span>
-              </Link>
-            </div>
-          </Link>
+            </Link>
+            <Link
+              href="/canteens"
+              title={`Active: ${selectedCanteen.name} (${selectedCampus.name}) — Tap to switch outlet`}
+              className="hidden sm:inline-flex items-center gap-1 text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#FF6B2C]/40 text-[#00D4AA] font-extrabold tracking-wider transition cursor-pointer"
+            >
+              <span>{selectedCanteen.name}</span>
+              <span className="text-[9px] text-[#FFB347]">▾</span>
+            </Link>
+          </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1.5">

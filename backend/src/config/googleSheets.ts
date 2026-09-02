@@ -52,11 +52,18 @@ export function getSheetsClient(): sheets_v4.Sheets | null {
   privateKey = privateKey.replace(/\\n/g, '\n');
 
   try {
-    const auth = new google.auth.JWT({
-      email: clientEmail,
-      key: privateKey,
-      scopes: SCOPES,
-    });
+    const auth = fs.existsSync(credentialsPath)
+      ? new google.auth.GoogleAuth({
+          keyFile: credentialsPath,
+          scopes: SCOPES,
+        })
+      : new google.auth.GoogleAuth({
+          credentials: {
+            client_email: clientEmail,
+            private_key: privateKey,
+          },
+          scopes: SCOPES,
+        });
 
     cachedSheetsClient = google.sheets({ version: 'v4', auth });
     return cachedSheetsClient;
@@ -97,6 +104,9 @@ export async function checkGoogleSheetsConnection(): Promise<{
       latencyMs: Date.now() - start,
     };
   } catch (err: any) {
+    if (err.response?.data) {
+      console.error('Google Sheets Error Detail:', JSON.stringify(err.response.data, null, 2));
+    }
     return {
       connected: false,
       message: `Google Sheets connection failed: ${err.message}`,

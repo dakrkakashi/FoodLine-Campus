@@ -19,6 +19,8 @@ inventory-state.json
 client_secret_*.json
 accounts.json
 student-accounts.json
+credentials.json
+*credentials*.json
 .env*.local
 .env.local
 .env

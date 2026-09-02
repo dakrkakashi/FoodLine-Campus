@@ -172,12 +172,16 @@ async function runApiAudit() {
   console.log(`  📊 AUDIT RESULT: ${passed} Passed | ${failed} Failed`);
   console.log('━'.repeat(65) + '\n');
 
-  server.close();
+  if (server.listening) {
+    server.close();
+  }
   process.exit(failed > 0 ? 1 : 0);
 }
 
 runApiAudit().catch((err) => {
   console.error('Fatal audit error:', err);
-  server.close();
+  if (server.listening) {
+    server.close();
+  }
   process.exit(1);
 });

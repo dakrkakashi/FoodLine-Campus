@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from '@/components/Providers';
-import { NoiseOverlay, CustomCursor } from '@/components/ui';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://foodline-campus.vercel.app'),
@@ -24,9 +23,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-[var(--bg-canvas,#07070B)] text-[#F5F5F7] antialiased selection:bg-[var(--accent-orange,#FF6B2C)] selection:text-white font-sans relative overflow-x-hidden transition-colors duration-500">
-        <NoiseOverlay />
-        <CustomCursor />
+      <body className="min-h-screen bg-[var(--bg-canvas,#07070B)] text-[#F5F5F7] antialiased selection:bg-[var(--accent-orange,#FF6B2C)] selection:text-white font-sans relative overflow-x-hidden">
         <Providers>{children}</Providers>
       </body>
     </html>

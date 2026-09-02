@@ -12,6 +12,7 @@ import { DishCardSkeleton } from '@/components/ui/Skeleton';
 import { Badge } from '@/components/ui/Badge';
 import { InventoryBadge } from '@/components/ui/InventoryBadge';
 import { PageTransition, SpotlightCard, SteamEffect, AnimatedCounter, FoodParticles } from '@/components/ui';
+import { DishInspectModal, DishInspectItem } from '@/components/3d/DishInspectModal';
 
 interface MenuItem {
   id: string;
@@ -36,30 +37,6 @@ const TAG_VARIANT: Record<string, 'bestseller' | 'studentFav' | 'fastGrab' | 'sp
   'Spicy': 'spicy',
 };
 
-const gridContainerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-      delayChildren: 0.04,
-    },
-  },
-};
-
-const cardEntranceVariants = {
-  hidden: { opacity: 0, y: 22, scale: 0.97 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      type: 'spring' as const,
-      stiffness: 320,
-      damping: 24,
-    },
-  },
-};
 
 const CANTEEN_SPECIFIC_DISHES: Record<string, MenuItem[]> = {
   'south-corner': [
@@ -102,6 +79,7 @@ export default function MenuPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [inspectingDish, setInspectingDish] = useState<DishInspectItem | null>(null);
 
   useEffect(() => {
     async function loadMenu() {
@@ -315,47 +293,39 @@ export default function MenuPage() {
             </motion.button>
           </motion.div>
         ) : (
-          <motion.div
-            key={selectedCategory + '_' + search}
-            variants={gridContainerVariants}
-            initial="hidden"
-            animate="show"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredItems.map((dish) => {
-                const qty = getCartQuantity(dish.id);
-                const isAvailable = getEffectiveAvailability(dish);
-                const stockQty = getStockQuantity(dish.id);
-                const isMaxStockReached = stockQty !== null && stockQty !== undefined && qty >= stockQty;
-                const tagVariant = dish.tag ? TAG_VARIANT[dish.tag] || 'custom' : null;
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {filteredItems.map((dish) => {
+              const qty = getCartQuantity(dish.id);
+              const isAvailable = getEffectiveAvailability(dish);
+              const stockQty = getStockQuantity(dish.id);
+              const isMaxStockReached = stockQty !== null && stockQty !== undefined && qty >= stockQty;
+              const tagVariant = dish.tag ? TAG_VARIANT[dish.tag] || 'custom' : null;
 
-                return (
-                  <motion.div
-                    key={dish.id}
-                    variants={cardEntranceVariants}
-                    layout
-                    whileHover={isAvailable ? { y: -4, transition: { type: 'spring', stiffness: 400, damping: 20 } } : {}}
-                    className="h-full"
+              return (
+                <div
+                  key={dish.id}
+                  className={`h-full transition-transform duration-200 ${isAvailable ? 'hover:-translate-y-1' : ''}`}
+                >
+                  <SpotlightCard
+                    spotlightColor="rgba(255, 107, 44, 0.18)"
+                    className={`h-full p-6 flex flex-col justify-between group relative rounded-[2rem] border border-white/10 hover:border-[#FF6B2C]/50 hover:shadow-[0_0_24px_rgba(255,107,44,0.18)] transition-all duration-200 bg-[#16161E]/85 backdrop-blur-md ${
+                      !isAvailable ? 'opacity-50 grayscale pointer-events-none' : ''
+                    }`}
                   >
-                    <SpotlightCard
-                      spotlightColor="rgba(255, 107, 44, 0.22)"
-                      className={`h-full p-6 flex flex-col justify-between group relative rounded-[2rem] border border-white/10 hover:border-[#FF6B2C]/50 hover:shadow-[0_0_35px_rgba(255,107,44,0.22)] transition-all duration-300 bg-[#16161E]/85 backdrop-blur-xl ${
-                        !isAvailable ? 'opacity-50 grayscale pointer-events-none' : ''
-                      }`}
-                    >
-                      <InventoryBadge item={dish} size="sm" position="top-right" />
-                      {/* Culinary Steam Effect on hot fresh items */}
-                      {(dish.prep_time_mins || dish.name.toLowerCase().includes('dosa') || dish.name.toLowerCase().includes('chai') || dish.name.toLowerCase().includes('tea') || dish.name.toLowerCase().includes('maggi') || dish.name.toLowerCase().includes('thali') || dish.name.toLowerCase().includes('pav')) && (
-                        <SteamEffect count={3} />
-                      )}
-                      {!isAvailable && (
-                        <div className="absolute inset-0 z-20 bg-black/60 rounded-[2rem] flex items-center justify-center backdrop-blur-[2px]">
-                          <span className="px-4 py-2 rounded-2xl bg-red-950 border border-red-500/40 text-red-400 text-xs font-black uppercase tracking-wider flex items-center gap-1.5">
-                            <Info size={14} /> Sold Out
-                          </span>
-                        </div>
-                      )}
+                    <InventoryBadge item={dish} size="sm" position="top-right" />
+                    {/* Zero-Lag Culinary Steam Effect (shows on hover) */}
+                    {isAvailable && (dish.prep_time_mins || dish.name.toLowerCase().includes('dosa') || dish.name.toLowerCase().includes('chai') || dish.name.toLowerCase().includes('maggi') || dish.name.toLowerCase().includes('thali') || dish.name.toLowerCase().includes('pav')) && (
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <SteamEffect count={2} />
+                      </div>
+                    )}
+                    {!isAvailable && (
+                      <div className="absolute inset-0 z-20 bg-black/60 rounded-[2rem] flex items-center justify-center backdrop-blur-[2px]">
+                        <span className="px-4 py-2 rounded-2xl bg-red-950 border border-red-500/40 text-red-400 text-xs font-black uppercase tracking-wider flex items-center gap-1.5">
+                          <Info size={14} /> Sold Out
+                        </span>
+                      </div>
+                    )}
 
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-4">
@@ -363,11 +333,33 @@ export default function MenuPage() {
                             <Badge variant="veg" />
                             {tagVariant && <Badge variant={tagVariant}>{dish.tag}</Badge>}
                           </div>
-                          {dish.prep_time_mins && (
-                            <span className="text-[11px] font-bold text-zinc-400 flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg">
-                              ⏱ {dish.prep_time_mins}m
-                            </span>
-                          )}
+                          <div className="flex items-center gap-1.5">
+                            {dish.prep_time_mins && (
+                              <span className="text-[11px] font-bold text-zinc-400 flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg">
+                                ⏱ {dish.prep_time_mins}m
+                              </span>
+                            )}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setInspectingDish({
+                                  id: dish.id,
+                                  name: dish.name,
+                                  tag: dish.tag,
+                                  price: Number(dish.price),
+                                  prep_time_mins: dish.prep_time_mins,
+                                  category: getCategoryName(dish.category_id),
+                                  is_available: isAvailable,
+                                });
+                              }}
+                              className="text-[10px] font-bold text-[#FFB347] bg-[#FF6B2C]/10 hover:bg-[#FF6B2C]/25 border border-[#FF6B2C]/30 px-2 py-1 rounded-lg transition active:scale-95 cursor-pointer flex items-center gap-1 shrink-0"
+                              title="Inspect dish in 3D"
+                            >
+                              <span>3D</span>
+                              <Sparkles size={11} className="text-[#FFB347]" />
+                            </button>
+                          </div>
                         </div>
 
                         <h3 className="text-lg font-black text-white group-hover:text-[#FFB347] transition-colors leading-tight mb-1">
@@ -441,11 +433,10 @@ export default function MenuPage() {
                         )}
                       </div>
                     </SpotlightCard>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </motion.div>
+                </div>
+              );
+            })}
+          </div>
         )}
       </main>
 
@@ -511,6 +502,9 @@ export default function MenuPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Interactive 3D Dish Inspection Modal */}
+      <DishInspectModal item={inspectingDish} onClose={() => setInspectingDish(null)} />
     </PageTransition>
   );
 }

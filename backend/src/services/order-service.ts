@@ -5,6 +5,7 @@ import { UtrVerifierService } from './utr-verifier.js';
 import { sseBroadcaster } from './sse-broadcaster.js';
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
 import { SheetsDbService } from './sheets-db.service.js';
+import { NotificationService } from './notification-service.js';
 
 // In-memory active orders store
 const ordersStore: Map<string, Order> = new Map();
@@ -410,6 +411,13 @@ export class OrderService {
 
     // Broadcast real-time change to student
     sseBroadcaster.notifyOrderUpdate(targetOrder, 'ORDER_UPDATE');
+
+    // Trigger push notification, webhook, and sound alert if transitioning to READY
+    if (newStatus === 'READY') {
+      NotificationService.dispatchOrderReadyAlert(targetOrder).catch((err) => {
+        console.warn(`[OrderService] Ready alert dispatch error:`, err);
+      });
+    }
 
     return targetOrder;
   }
