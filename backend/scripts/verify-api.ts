@@ -97,6 +97,21 @@ async function runApiAudit() {
     if (!data.success || data.data.campus.slug !== 'sanjivani') throw new Error('Failed to resolve campus');
   });
 
+  // 7b. Auth Login (PRN / Email + Password / Resolver with JWT)
+  await check('POST /api/auth/login (JWT Session Authentication)', async () => {
+    const res = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emailOrPrn: '2023SUCS0142',
+        password: 'TestPassword123',
+      }),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (!data.success || !data.data.token) throw new Error('No JWT token returned');
+  });
+
   // 8. Order Creation & Slot Throttling
   let orderToken = '';
   let orderId = '';

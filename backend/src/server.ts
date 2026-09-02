@@ -10,6 +10,8 @@ import { OrderStatus } from './lib/types.js';
 import { checkDatabaseConnection, isSupabaseConfigured } from './lib/supabase.js';
 import { authRouter } from './routes/auth.routes.js';
 import { CampusService } from './services/campus-service.js';
+import { checkGoogleSheetsConnection } from './config/googleSheets.js';
+import { SheetsDbService } from './services/sheets-db.service.js';
 
 dotenv.config();
 
@@ -42,11 +44,16 @@ app.get('/health', async (req: Request, res: Response) => {
     ? await checkDatabaseConnection()
     : { connected: false, message: 'Supabase unconfigured (Local Memory Fallback Active)', latencyMs: 0 };
 
+  const sheetsHealth = SheetsDbService.isConfigured()
+    ? await checkGoogleSheetsConnection()
+    : { connected: false, message: 'Google Sheets DB not configured (Awaiting Spreadsheet ID & Service Account)', latencyMs: 0 };
+
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
     service: 'FoodLine Backend Engine',
     database: dbHealth,
+    googleSheets: sheetsHealth,
   });
 });
 

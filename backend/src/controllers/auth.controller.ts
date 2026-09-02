@@ -5,6 +5,9 @@ import path from 'path';
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
 import { logNewAccountToSheet } from '../services/accountSheetLogger.service.js';
 import { SignupRequestDTO, SheetLogRow } from '../lib/types.js';
+import { signJwt } from '../lib/jwt.js';
+import { SheetsDbService } from '../services/sheets-db.service.js';
+import { CampusService } from '../services/campus-service.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const LOCAL_ACCOUNTS_FILE = path.join(process.cwd(), 'src/data/accounts.json');
@@ -208,6 +211,102 @@ export class AuthController {
         meta: {
           timestamp: new Date().toISOString(),
         },
+      });
+    }
+  }
+
+  /**
+   * Handles user login via Google Sheets Users tab or fallback.
+   * Query Users tab by PRN or Email, verifies password (or SHA-256 hash),
+   * and issues JWT session token.
+   */
+  public static async login(req: Request, res: Response) {
+    const timestamp = new Date().toISOString();
+    const { emailOrPrn, prn, email, password } = req.body || {};
+    const identifier = (emailOrPrn || prn || email || '').trim();
+
+    if (!identifier || !password) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: 'Identifier (Email or PRN) and password are required.',
+        meta: { timestamp, error: 'VALIDATION_CREDENTIALS_REQUIRED' },
+      });
+    }
+
+    try {
+      // 1. If Google Sheets DB is configured, query the Users tab directly
+      if (SheetsDbService.isConfigured()) {
+        const sheetUser = await SheetsDbService.findUser(identifier);
+        if (sheetUser) {
+          const isValid = SheetsDbService.verifyPassword(password, sheetUser.passwordHash);
+          if (!isValid) {
+            return res.status(401).json({
+              success: false,
+              data: null,
+              error: 'Invalid password. Please check your credentials.',
+              meta: { timestamp, error: 'AUTH_INVALID_PASSWORD' },
+            });
+          }
+
+          const tokenPayload = {
+            prn: sheetUser.prn,
+            name: sheetUser.name,
+            email: sheetUser.email,
+            role: sheetUser.role,
+            source: 'GOOGLE_SHEETS_USERS_TAB',
+            exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
+          };
+          const token = signJwt(tokenPayload);
+
+          return res.json({
+            success: true,
+            data: {
+              token,
+              user: {
+                prn: sheetUser.prn,
+                name: sheetUser.name,
+                email: sheetUser.email,
+                phone: sheetUser.phone,
+                role: sheetUser.role,
+              },
+            },
+            meta: { timestamp, source: 'GOOGLE_SHEETS' },
+          });
+        }
+      }
+
+      // 2. Fallback check: student PRN resolver & local accounts
+      const resolved = await CampusService.resolveStudent(identifier);
+      const tokenPayload = {
+        prn: resolved.prn,
+        name: resolved.studentName || 'Campus Student',
+        role: 'student',
+        source: 'STUDENT_RESOLVER_FALLBACK',
+        exp: Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60,
+      };
+      const token = signJwt(tokenPayload);
+
+      return res.json({
+        success: true,
+        data: {
+          token,
+          user: {
+            prn: resolved.prn,
+            name: resolved.studentName || 'Campus Student',
+            role: 'student',
+            campus: resolved.campus,
+            defaultCafeteriaId: resolved.defaultCafeteriaId,
+          },
+        },
+        meta: { timestamp, source: 'LOCAL_FALLBACK' },
+      });
+    } catch (err: any) {
+      console.error('[AuthController] Login error:', err);
+      return res.status(500).json({
+        success: false,
+        error: err.message || 'Login failed',
+        meta: { timestamp },
       });
     }
   }

@@ -1,6 +1,7 @@
 import { MenuItem } from '../lib/types.js';
 import initialMenuData from '../data/menu.json';
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
+import { SheetsDbService } from './sheets-db.service.js';
 
 // In-memory local cache seeded from menu.json
 let localMenuItems: MenuItem[] = (initialMenuData as any[]).map((item) => ({
@@ -23,6 +24,34 @@ export class MenuService {
    */
   public static async getAllItems(categoryId?: string, cafeteriaId?: string): Promise<MenuItem[]> {
     const targetCafeteria = cafeteriaId || 'b2222222-2222-2222-2222-222222222222';
+
+    // 1. Google Sheets Inventory Tab (if configured and populated)
+    if (SheetsDbService.isConfigured()) {
+      try {
+        const sheetInventory = await SheetsDbService.getInventory(true);
+        if (sheetInventory && sheetInventory.length > 0) {
+          const sheetItems: MenuItem[] = sheetInventory.map((item) => ({
+            id: item.itemId || `dish_${Math.random()}`,
+            name: item.itemName,
+            category: item.category || 'Quick Bites',
+            price: item.price,
+            prepTime: 5,
+            tag: item.stockQty < 5 ? 'Limited Stock' : '',
+            isVeg: true,
+            isAvailable: item.available,
+            cafeteriaId: targetCafeteria,
+            cafeteria_id: targetCafeteria,
+          }));
+
+          if (categoryId && categoryId !== 'All') {
+            return sheetItems.filter((i) => i.category.toLowerCase() === categoryId.toLowerCase());
+          }
+          return sheetItems;
+        }
+      } catch (err) {
+        console.warn('Google Sheets inventory read fallback:', err);
+      }
+    }
 
     if (isSupabaseConfigured) {
       try {

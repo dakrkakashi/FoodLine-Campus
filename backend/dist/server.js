@@ -14,6 +14,8 @@ const sse_broadcaster_js_1 = require("./services/sse-broadcaster.js");
 const supabase_js_1 = require("./lib/supabase.js");
 const auth_routes_js_1 = require("./routes/auth.routes.js");
 const campus_service_js_1 = require("./services/campus-service.js");
+const googleSheets_js_1 = require("./config/googleSheets.js");
+const sheets_db_service_js_1 = require("./services/sheets-db.service.js");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 exports.app = app;
@@ -39,11 +41,15 @@ app.get('/health', async (req, res) => {
     const dbHealth = supabase_js_1.isSupabaseConfigured
         ? await (0, supabase_js_1.checkDatabaseConnection)()
         : { connected: false, message: 'Supabase unconfigured (Local Memory Fallback Active)', latencyMs: 0 };
+    const sheetsHealth = sheets_db_service_js_1.SheetsDbService.isConfigured()
+        ? await (0, googleSheets_js_1.checkGoogleSheetsConnection)()
+        : { connected: false, message: 'Google Sheets DB not configured (Awaiting Spreadsheet ID & Service Account)', latencyMs: 0 };
     res.json({
         status: 'healthy',
         timestamp: new Date().toISOString(),
         service: 'FoodLine Backend Engine',
         database: dbHealth,
+        googleSheets: sheetsHealth,
     });
 });
 // -----------------------------------------------------------------------------

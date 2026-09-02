@@ -4,6 +4,7 @@ import { SlotThrottlerService } from './slot-throttler.js';
 import { UtrVerifierService } from './utr-verifier.js';
 import { sseBroadcaster } from './sse-broadcaster.js';
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
+import { SheetsDbService } from './sheets-db.service.js';
 
 // In-memory active orders store
 const ordersStore: Map<string, Order> = new Map();
@@ -190,6 +191,26 @@ export class OrderService {
       }
     }
 
+    // 3. Persist directly to Google Sheets Orders Tab (No Google Form)
+    if (SheetsDbService.isConfigured()) {
+      const itemsSummary = formattedItems
+        .map((fi) => `${fi.quantity}x ${fi.item.name} (₹${fi.item.price})`)
+        .join(', ');
+
+      SheetsDbService.appendOrder({
+        orderId: orderToken,
+        timestamp: now,
+        prn: studentPrn || 'WALK_IN',
+        name: studentName || 'Campus Student',
+        items: itemsSummary,
+        quantity: formattedItems.reduce((acc, curr) => acc + curr.quantity, 0),
+        totalAmount,
+        status: 'PENDING_PAYMENT',
+      }).catch((err) => {
+        console.warn('Google Sheets Orders append warning:', err);
+      });
+    }
+
     return newOrder;
   }
 
@@ -325,6 +346,21 @@ export class OrderService {
       } catch (err) {
         console.warn('Supabase confirm order update failed:', err);
       }
+    }
+
+    // Record verified payment to Google Sheets Payments tab
+    if (SheetsDbService.isConfigured()) {
+      SheetsDbService.recordPayment({
+        timestamp: order.updatedAt,
+        name: order.studentName || 'Campus Student',
+        prn: order.studentPrn || 'PRN',
+        utr: verification.utrNumber || utrNumber,
+        orderId: orderToken,
+        amount: amount || order.totalAmount,
+        verificationStatus: 'VERIFIED',
+      }).catch((err) => {
+        console.warn('Google Sheets payment record warning:', err);
+      });
     }
 
     // Notify SSE streams

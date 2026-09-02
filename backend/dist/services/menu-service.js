@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MenuService = void 0;
 const menu_json_1 = __importDefault(require("../data/menu.json"));
 const supabase_js_1 = require("../lib/supabase.js");
+const sheets_db_service_js_1 = require("./sheets-db.service.js");
 // In-memory local cache seeded from menu.json
 let localMenuItems = menu_json_1.default.map((item) => ({
     id: item.id,
@@ -26,6 +27,33 @@ class MenuService {
      */
     static async getAllItems(categoryId, cafeteriaId) {
         const targetCafeteria = cafeteriaId || 'b2222222-2222-2222-2222-222222222222';
+        // 1. Google Sheets Inventory Tab (if configured and populated)
+        if (sheets_db_service_js_1.SheetsDbService.isConfigured()) {
+            try {
+                const sheetInventory = await sheets_db_service_js_1.SheetsDbService.getInventory(true);
+                if (sheetInventory && sheetInventory.length > 0) {
+                    const sheetItems = sheetInventory.map((item) => ({
+                        id: item.itemId || `dish_${Math.random()}`,
+                        name: item.itemName,
+                        category: item.category || 'Quick Bites',
+                        price: item.price,
+                        prepTime: 5,
+                        tag: item.stockQty < 5 ? 'Limited Stock' : '',
+                        isVeg: true,
+                        isAvailable: item.available,
+                        cafeteriaId: targetCafeteria,
+                        cafeteria_id: targetCafeteria,
+                    }));
+                    if (categoryId && categoryId !== 'All') {
+                        return sheetItems.filter((i) => i.category.toLowerCase() === categoryId.toLowerCase());
+                    }
+                    return sheetItems;
+                }
+            }
+            catch (err) {
+                console.warn('Google Sheets inventory read fallback:', err);
+            }
+        }
         if (supabase_js_1.isSupabaseConfigured) {
             try {
                 let query = supabase_js_1.supabase.from('menu_items').select('*, categories(name)');

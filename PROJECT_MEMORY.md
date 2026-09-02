@@ -39,6 +39,7 @@
   - **Odometer Numbers (`AnimatedCounter.tsx`):** High-response spring rolling animation for prices, cart count badges, and subtotal counters.
   - **Ambient Atmosphere (`FoodParticles.tsx`):** Drifting campus culinary icons floating within the responsive aurora background mesh.
   - **Clean & Focused Introduction Overhaul:** Streamlined `/` landing page into a clean, minimal Introduction Screen with 2 direct entry paths (`/select-campus` and `/login`) and 3 minimal value cards, removing unnecessary 3D canvases, visualizer graphs, bestseller tilt cards, and FAQ clutter.
+  - **Staff Login & KDS Auth Protection Fix:** Implemented `/api/auth/staff-login` with timeout-resilient fallback for authorized staff (`foodlinecampus@gmail.com`), updated Next.js middleware with `foodline_staff_session` support for `/kds` and `/admin`, added 1-tap 'Quick Fill' passkey (`foodline2026`), and guaranteed zero-hang button state.
   - **Celebration Burst & Spring Cart:** High-impact celebration burst on `/checkout` and bouncy spring capsule pill on `/menu`.
 - **Multi-Canteen & Geo-Campus Engine (Full-Stack Complete):** 100% Operational & Verified!
   - **Backend (`backend/`):**
