@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function Error503Page() {
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas,#07070B)] flex flex-col justify-center py-10">
+    <div className="min-h-screen bg-(--bg-canvas,#07070B) flex flex-col justify-center py-10">
       <ErrorView error={HTTP_ERRORS_CATALOG[503]} />
     </div>
   );

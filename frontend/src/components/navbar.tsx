@@ -62,10 +62,10 @@ export function Navbar() {
           >
             <Logo size={38} />
             <div className="flex items-center gap-2">
-              <span className="font-black text-xl tracking-tight bg-gradient-to-r from-[var(--accent-orange)] via-[var(--accent-amber)] to-white bg-clip-text text-transparent">
+              <span className="font-black text-xl tracking-tight bg-linear-to-r from-(--accent-orange) via-(--accent-amber) to-white bg-clip-text text-transparent">
                 FoodLine
               </span>
-              <span className="hidden sm:inline-block text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-[var(--accent-teal)] font-extrabold tracking-wider">
+              <span className="hidden sm:inline-block text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-(--accent-teal) font-extrabold tracking-wider">
                 Cafe @7
               </span>
             </div>
@@ -114,7 +114,7 @@ export function Navbar() {
               title={muted ? 'Unmute Web Audio FX' : 'Mute Sound FX'}
               className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 transition cursor-pointer ml-1"
             >
-              {muted ? <VolumeX size={16} className="text-zinc-500" /> : <Volume2 size={16} className="text-[var(--accent-teal)]" />}
+              {muted ? <VolumeX size={16} className="text-zinc-500" /> : <Volume2 size={16} className="text-(--accent-teal)" />}
             </button>
 
             {/* Theme Selector Dropdown */}
@@ -152,7 +152,7 @@ export function Navbar() {
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                           theme === t.id
-                            ? 'bg-[var(--accent-orange)] text-black'
+                            ? 'bg-(--accent-orange) text-black'
                             : 'text-zinc-300 hover:text-white hover:bg-white/5'
                         }`}
                       >
@@ -178,7 +178,7 @@ export function Navbar() {
               <Link
                 href="/checkout"
                 onClick={playClick}
-                className="ml-2 flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[var(--accent-orange)] to-[var(--accent-amber)] text-black font-black text-xs shadow-lg shadow-[var(--accent-orange)]/25 hover:shadow-[var(--accent-orange)]/40 transition active:scale-95 cursor-pointer"
+                className="ml-2 flex items-center gap-2 px-3.5 py-2 rounded-xl bg-linear-to-r from-(--accent-orange) to-(--accent-amber) text-black font-black text-xs shadow-lg shadow-(--accent-orange)/25 hover:shadow-(--accent-orange)/40 transition active:scale-95 cursor-pointer"
               >
                 <ShoppingCart size={15} strokeWidth={2.5} />
                 <span>Tray</span>
@@ -197,13 +197,13 @@ export function Navbar() {
               onClick={toggleMute}
               className="p-2 rounded-xl bg-white/5 border border-white/10 text-zinc-300"
             >
-              {muted ? <VolumeX size={16} /> : <Volume2 size={16} className="text-[var(--accent-teal)]" />}
+              {muted ? <VolumeX size={16} /> : <Volume2 size={16} className="text-(--accent-teal)" />}
             </button>
 
             {user && (
               <Link
                 href="/checkout"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[var(--accent-orange)] text-black font-black text-xs"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-(--accent-orange) text-black font-black text-xs"
               >
                 <ShoppingCart size={14} />
                 {totalCount > 0 && <span>{totalCount}</span>}
@@ -231,7 +231,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden fixed inset-x-0 top-[58px] z-40 bg-[#07070B]/98 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/80 overflow-hidden"
+            className="md:hidden fixed inset-x-0 top-14.5 z-40 bg-[#07070B]/98 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/80 overflow-hidden"
           >
             <nav className="flex flex-col py-4 px-4 gap-1.5">
               {user ? (
@@ -285,7 +285,7 @@ export function Navbar() {
                         playClick();
                       }}
                       className={`p-2 rounded-xl text-xs font-black transition ${
-                        theme === t.id ? 'bg-[var(--accent-orange)] text-black' : 'bg-white/5 text-white'
+                        theme === t.id ? 'bg-(--accent-orange) text-black' : 'bg-white/5 text-white'
                       }`}
                     >
                       {t.emoji}

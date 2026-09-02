@@ -21,7 +21,7 @@ export default async function DynamicErrorPage({ params }: PageProps) {
   const error = getErrorMetadata(code);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas,#07070B)] flex flex-col justify-center py-10">
+    <div className="min-h-screen bg-(--bg-canvas,#07070B) flex flex-col justify-center py-10">
       <ErrorView error={error} />
     </div>
   );

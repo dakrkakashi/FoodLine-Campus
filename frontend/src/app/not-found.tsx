@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas,#07070B)] flex flex-col justify-center">
+    <div className="min-h-screen bg-(--bg-canvas,#07070B) flex flex-col justify-center">
       <ErrorView
         error={HTTP_ERRORS_CATALOG[404]}
         customSubtitle="The page, order token, or dish you are looking for has been moved or eaten! Browse today's live menu at Cafe @7."

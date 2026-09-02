@@ -17,7 +17,7 @@ export default function ErrorBoundary({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas,#07070B)] flex flex-col justify-center">
+    <div className="min-h-screen bg-(--bg-canvas,#07070B) flex flex-col justify-center">
       <ErrorView
         error={HTTP_ERRORS_CATALOG[500]}
         customTitle="Unexpected Kitchen Exception"

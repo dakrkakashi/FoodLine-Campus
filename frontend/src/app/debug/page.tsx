@@ -168,7 +168,7 @@ export default function DebugDashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-canvas,#07070B)] text-[#F5F5F7] p-4 sm:p-6 lg:p-10">
+    <div className="min-h-screen bg-(--bg-canvas,#07070B) text-[#F5F5F7] p-4 sm:p-6 lg:p-10">
       {/* Top Banner Header */}
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-white/10">
@@ -198,7 +198,7 @@ export default function DebugDashboardPage() {
             </button>
             <Link
               href="/"
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-[var(--accent-orange,#FF6B2C)] hover:brightness-110 text-white transition-all shadow-md shadow-orange-500/20 flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-(--accent-orange,#FF6B2C) hover:brightness-110 text-white transition-all shadow-md shadow-orange-500/20 flex items-center gap-1.5"
             >
               <Home className="w-3.5 h-3.5" />
               Return to App
@@ -321,7 +321,7 @@ export default function DebugDashboardPage() {
                     </p>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-[11px] text-zinc-300 italic line-clamp-2">
+                  <div className="p-2.5 rounded-xl bg-white/2 border border-white/5 text-[11px] text-zinc-300 italic line-clamp-2">
                     &ldquo;{err.canteenMetaphor}&rdquo;
                   </div>
                 </div>
@@ -435,7 +435,7 @@ export default function DebugDashboardPage() {
                   href={rt.path}
                   className="p-4 rounded-2xl bg-[#0E0E15]/60 hover:bg-[#0E0E15] border border-white/5 hover:border-white/20 transition-all duration-200 group"
                 >
-                  <div className="p-2 rounded-xl bg-white/[0.04] w-fit text-zinc-400 group-hover:text-orange-400 transition-colors mb-2">
+                  <div className="p-2 rounded-xl bg-white/4 w-fit text-zinc-400 group-hover:text-orange-400 transition-colors mb-2">
                     <IconComp className="w-4 h-4" />
                   </div>
                   <h4 className="text-xs font-bold text-white group-hover:text-orange-400 transition-colors truncate">

@@ -135,14 +135,14 @@ export function ErrorView({
     <div className="relative min-h-[85vh] flex items-center justify-center p-4 sm:p-6 lg:p-8">
       {/* Dynamic Ambient Background Glow */}
       <div
-        className={`absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 sm:w-[500px] sm:h-[500px] bg-gradient-to-br ${errorData.glowColor} rounded-full blur-3xl pointer-events-none opacity-40 animate-pulse`}
+        className={`absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 sm:w-125 sm:h-125 bg-linear-to-br ${errorData.glowColor} rounded-full blur-3xl pointer-events-none opacity-40 animate-pulse`}
       />
 
       <div className="relative w-full max-w-2xl bg-[#0E0E15]/80 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl transition-all duration-300">
         {/* Top Status Header */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-white/[0.04] border border-white/10 text-white shadow-inner">
+            <div className="p-3 rounded-2xl bg-white/4 border border-white/10 text-white shadow-inner">
               {renderIcon(errorData.iconName)}
             </div>
             <div>
@@ -159,7 +159,7 @@ export function ErrorView({
 
           <Link
             href="/"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg bg-white/[0.03] border border-white/5 hover:border-white/20 transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg bg-white/3 border border-white/5 hover:border-white/20 transition-colors"
           >
             <Home className="w-3.5 h-3.5" />
             Home
@@ -176,10 +176,10 @@ export function ErrorView({
           </p>
 
           {/* Campus Metaphor Alert Banner */}
-          <div className="mt-4 p-4 rounded-2xl bg-white/[0.03] border border-white/10 flex items-start gap-3">
-            <Utensils className="w-5 h-5 text-[var(--accent-orange,#FF6B2C)] shrink-0 mt-0.5" />
+          <div className="mt-4 p-4 rounded-2xl bg-white/3 border border-white/10 flex items-start gap-3">
+            <Utensils className="w-5 h-5 text-(--accent-orange,#FF6B2C) shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <span className="text-xs font-semibold text-[var(--accent-orange,#FF6B2C)] uppercase tracking-wider">
+              <span className="text-xs font-semibold text-(--accent-orange,#FF6B2C) uppercase tracking-wider">
                 Kitchen Canteen Log
               </span>
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed italic">
@@ -202,7 +202,7 @@ export function ErrorView({
                   onClick={() => handleAction(act.onClickAction)}
                   className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 cursor-pointer ${
                     isPrimary
-                      ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FF8F3D] text-white hover:brightness-110 shadow-lg shadow-orange-500/20 active:scale-95'
+                      ? 'bg-linear-to-r from-[#FF6B2C] to-[#FF8F3D] text-white hover:brightness-110 shadow-lg shadow-orange-500/20 active:scale-95'
                       : isOutline
                       ? 'bg-transparent text-zinc-400 hover:text-white border border-white/10 hover:border-white/25 active:scale-95'
                       : 'bg-white/10 text-white hover:bg-white/15 border border-white/10 active:scale-95'
@@ -222,7 +222,7 @@ export function ErrorView({
                 href={act.href || '/'}
                 className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
                   isPrimary
-                    ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FF8F3D] text-white hover:brightness-110 shadow-lg shadow-orange-500/20 active:scale-95'
+                    ? 'bg-linear-to-r from-[#FF6B2C] to-[#FF8F3D] text-white hover:brightness-110 shadow-lg shadow-orange-500/20 active:scale-95'
                     : isOutline
                     ? 'bg-transparent text-zinc-400 hover:text-white border border-white/10 hover:border-white/25 active:scale-95'
                     : 'bg-white/10 text-white hover:bg-white/15 border border-white/10 active:scale-95'
