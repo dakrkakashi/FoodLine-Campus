@@ -87,7 +87,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } else if (typeof window !== 'undefined') {
             // Check student session from localStorage
             const savedStudent = localStorage.getItem('foodline_student_session');
-            if (savedStudent) {
+            const savedStaff = localStorage.getItem('foodline_staff_session');
+
+            if (savedStaff) {
+              try {
+                const parsedStaff = JSON.parse(savedStaff);
+                if (parsedStaff.email && parsedStaff.role) {
+                  setUser({
+                    id: parsedStaff.id || `staff_${parsedStaff.email}`,
+                    email: parsedStaff.email,
+                    user_metadata: {
+                      full_name: parsedStaff.full_name,
+                      role: parsedStaff.role,
+                      cafeteria_id: parsedStaff.cafeteria_id,
+                    },
+                  } as unknown as User);
+                  setProfile(parsedStaff);
+                }
+              } catch {}
+            } else if (savedStudent) {
               try {
                 const parsed = JSON.parse(savedStudent);
                 if (parsed.prn) {
@@ -164,12 +182,69 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   const signInWithPassword = useCallback(async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (!error && data.user) {
-      setUser(data.user);
-      await fetchProfile(data.user);
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    try {
+      // 1. Call robust server-side staff auth with an 8-second safety timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+      const res = await fetch('/api/auth/staff-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password: cleanPass }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        return { error: { message: json.error || 'Invalid staff credentials.' } };
+      }
+
+      const staffUserObj = {
+        id: json.user.id,
+        email: json.user.email,
+        user_metadata: {
+          full_name: json.user.full_name,
+          role: json.user.role,
+          cafeteria_id: json.user.cafeteria_id,
+        },
+      } as unknown as User;
+
+      const staffProfile: UserProfile = {
+        id: json.user.id,
+        email: json.user.email,
+        full_name: json.user.full_name,
+        role: json.user.role,
+        is_active: true,
+        created_at: new Date().toISOString(),
+      };
+
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('foodline_staff_session', JSON.stringify(staffProfile));
+      }
+
+      setUser(staffUserObj);
+      setProfile(staffProfile);
+
+      return { error: null };
+    } catch (err: any) {
+      // 2. Client-side fallback if server route was unreachable
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password: cleanPass });
+        if (!error && data.user) {
+          setUser(data.user);
+          await fetchProfile(data.user);
+          return { error: null };
+        }
+        return { error: error || { message: 'Authentication timed out. Please check credentials.' } };
+      } catch (fallbackErr: any) {
+        return { error: { message: err.name === 'AbortError' ? 'Staff auth request timed out. Please retry.' : (err.message || 'Staff login error.') } };
+      }
     }
-    return { error };
   }, [supabase, fetchProfile]);
 
   const signUpWithPassword = useCallback(async (email: string, password: string, fullName: string) => {
@@ -325,7 +400,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase.auth.signOut().catch(() => {});
     if (typeof document !== 'undefined') {
       document.cookie = 'foodline_student_session=; path=/; max-age=0; SameSite=Lax';
+      document.cookie = 'foodline_staff_session=; path=/; max-age=0; SameSite=Lax';
       localStorage.removeItem('foodline_student_session');
+      localStorage.removeItem('foodline_staff_session');
     }
     setUser(null);
     setProfile(null);

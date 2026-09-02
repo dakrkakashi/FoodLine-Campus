@@ -1,18 +1,24 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import path from 'path';
 
+// Multi-path dotenv resolution (supports root, backend, and frontend env files)
 dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), 'backend/.env') });
+dotenv.config({ path: path.resolve(process.cwd(), 'frontend/.env.local') });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ylweomuodekukjjpjrgx.supabase.co';
-const supabaseKey =
+const rawKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   '';
 
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey);
+export const isSupabaseConfigured = Boolean(rawKey && rawKey.length > 10);
 
-export const supabase = createClient(supabaseUrl, supabaseKey, {
+// Crash-proof client initialization with fallback dummy token
+const fallbackKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.dummy_fallback';
+export const supabase: SupabaseClient = createClient(supabaseUrl, isSupabaseConfigured ? rawKey : fallbackKey, {
   auth: {
     persistSession: false,
     autoRefreshToken: false,

@@ -7,14 +7,20 @@ exports.supabase = exports.isSupabaseConfigured = void 0;
 exports.checkDatabaseConnection = checkDatabaseConnection;
 const supabase_js_1 = require("@supabase/supabase-js");
 const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
+// Multi-path dotenv resolution (supports root, backend, and frontend env files)
 dotenv_1.default.config();
+dotenv_1.default.config({ path: path_1.default.resolve(process.cwd(), 'backend/.env') });
+dotenv_1.default.config({ path: path_1.default.resolve(process.cwd(), 'frontend/.env.local') });
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ylweomuodekukjjpjrgx.supabase.co';
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
+const rawKey = process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
     '';
-exports.isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey);
-exports.supabase = (0, supabase_js_1.createClient)(supabaseUrl, supabaseKey, {
+exports.isSupabaseConfigured = Boolean(rawKey && rawKey.length > 10);
+// Crash-proof client initialization with fallback dummy token
+const fallbackKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.dummy_fallback';
+exports.supabase = (0, supabase_js_1.createClient)(supabaseUrl, exports.isSupabaseConfigured ? rawKey : fallbackKey, {
     auth: {
         persistSession: false,
         autoRefreshToken: false,

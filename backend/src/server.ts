@@ -441,7 +441,9 @@ app.get('/api/telemetry', async (req: Request, res: Response) => {
   }
 });
 
-// Start listening
-app.listen(PORT, () => {
+// Start listening if run directly
+const server = app.listen(PORT, () => {
   console.log(`⚡ FoodLine Backend Engine running on http://localhost:${PORT}`);
 });
+
+export { app, server };

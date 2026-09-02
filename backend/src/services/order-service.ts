@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Order, OrderStatus, CartItem, PickupSlot } from '../lib/types.js';
 import { SlotThrottlerService } from './slot-throttler.js';
 import { UtrVerifierService } from './utr-verifier.js';
@@ -53,7 +54,7 @@ export class OrderService {
       throw new Error('Order must contain at least 1 item');
     }
 
-    const orderId = `ord_${Date.now()}`;
+    const orderId = randomUUID();
     const orderToken = OrderService.generateOrderToken();
     const pickupOtp = OrderService.generatePickupOtp();
 
@@ -146,10 +147,17 @@ export class OrderService {
         const { data: dbOrder, error: orderError } = await supabase
           .from('orders')
           .insert({
+            id: orderId,
             order_token: orderToken,
             user_id: userId || null,
-            cafeteria_id: cafeteriaId || null,
-            slot_id: slotId && slotId.length === 36 ? slotId : null,
+            cafeteria_id:
+              cafeteriaId && cafeteriaId !== 'b2222222-2222-2222-2222-222222222222' && cafeteriaId.length === 36
+                ? cafeteriaId
+                : '754bd902-cafb-40a6-9cdd-96bc8760ad7f',
+            slot_id:
+              slotId && slotId !== 'd1111111-1111-1111-1111-111111111111' && slotId.length === 36
+                ? slotId
+                : '20e848cf-9d4e-490d-b01f-59cad15bb766',
             total_amount: totalAmount,
             status: 'PENDING_PAYMENT',
             pickup_otp: pickupOtp,
@@ -157,6 +165,12 @@ export class OrderService {
           })
           .select()
           .single();
+
+        if (!orderError && dbOrder) {
+          newOrder.id = dbOrder.id;
+        } else if (orderError) {
+          console.warn('Supabase order insert error:', orderError.message, orderError.details);
+        }
 
         if (!orderError && dbOrder) {
           // Insert order items

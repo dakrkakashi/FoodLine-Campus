@@ -68,14 +68,15 @@ export class UtrVerifierService {
 
     if (isSupabaseConfigured) {
       try {
-        const { error } = await supabase.from('payments').insert({
+        const paymentRecord: any = {
           order_id: orderId,
           utr_number: verification.utrNumber,
           amount,
           status: 'VERIFIED',
-          verification_method: method,
           verified_at: new Date().toISOString(),
-        });
+        };
+
+        const { error } = await supabase.from('payments').insert(paymentRecord);
 
         if (error) {
           if (error.code === '23505') {

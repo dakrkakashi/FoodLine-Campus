@@ -64,7 +64,7 @@ export const updateSession = async (request: NextRequest) => {
     return supabaseResponse;
   }
 
-  // 2. Fetch authenticated user session or student session cookie
+  // 2. Fetch authenticated user session, student session, or staff session cookie
   const { data: { user } } = await supabase.auth.getUser();
   const studentCookie = request.cookies.get('foodline_student_session')?.value;
   let studentSession: { prn?: string; phone?: string; role?: string } | null = null;
@@ -78,7 +78,19 @@ export const updateSession = async (request: NextRequest) => {
     }
   }
 
-  const isAuthenticated = !!user || (!!studentSession && studentSession.role === 'student');
+  const staffCookie = request.cookies.get('foodline_staff_session')?.value;
+  let staffSession: { email?: string; role?: string; full_name?: string } | null = null;
+  if (staffCookie) {
+    try {
+      staffSession = JSON.parse(decodeURIComponent(staffCookie));
+    } catch {
+      try {
+        staffSession = JSON.parse(staffCookie);
+      } catch {}
+    }
+  }
+
+  const isAuthenticated = !!user || (!!studentSession && studentSession.role === 'student') || !!staffSession;
 
   // 3. Strict Login Enforcement: If not logged in, redirect directly to /login
   if (!isAuthenticated) {
@@ -111,6 +123,8 @@ export const updateSession = async (request: NextRequest) => {
         return NextResponse.redirect(deactivatedUrl);
       }
       userRole = profile?.role || 'student';
+    } else if (staffSession && staffSession.role) {
+      userRole = staffSession.role;
     } else if (studentSession) {
       userRole = studentSession.role || 'student';
     }

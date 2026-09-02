@@ -89,7 +89,7 @@ function LoginFormContent() {
     }
   };
 
-  // 2. Staff & Admin Sign In Only (Created via Supabase)
+  // 2. Staff & Admin Sign In Only (Created via Supabase / Staff Engine)
   const handleStaffLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!staffEmail || !staffPassword) {
@@ -104,17 +104,18 @@ function LoginFormContent() {
     try {
       const { error } = await signInWithPassword(staffEmail.trim(), staffPassword);
       if (error) {
-        setErrorMessage(error.message || 'Invalid staff credentials. Access must be assigned in Supabase.');
+        setErrorMessage(error.message || 'Invalid staff credentials. Default key: foodline2026');
         setIsLoading(false);
         return;
       }
 
       fireConfettiSuccess();
+      setSuccessMessage('Staff verified! Redirecting to station...');
       setTimeout(() => {
-        router.push(redirectPath);
-      }, 500);
+        window.location.href = redirectPath;
+      }, 600);
     } catch (err: any) {
-      setErrorMessage(err.message || 'An unexpected error occurred.');
+      setErrorMessage(err.message || 'An unexpected error occurred during staff login.');
       setIsLoading(false);
     }
   };
@@ -451,6 +452,22 @@ function LoginFormContent() {
                     {showStaffPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+              </div>
+
+              {/* Demo Credentials Helper Chip */}
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-[11px] text-purple-300">
+                <span>🔑 Passkey: <code className="text-white font-mono bg-white/10 px-1.5 py-0.5 rounded">foodline2026</code></span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStaffEmail('foodlinecampus@gmail.com');
+                    setStaffPassword('foodline2026');
+                    setErrorMessage(null);
+                  }}
+                  className="text-[var(--accent-teal,#00D4AA)] hover:underline font-bold cursor-pointer"
+                >
+                  Quick Fill ⚡
+                </button>
               </div>
 
               <button
