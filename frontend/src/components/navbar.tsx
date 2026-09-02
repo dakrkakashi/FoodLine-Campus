@@ -17,6 +17,7 @@ import {
   Sparkles,
   Tv,
   Receipt,
+  Bug,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useTheme, THEMES, ThemeName } from '@/context/ThemeContext';
@@ -93,10 +94,16 @@ export function Navbar() {
                   </NavLink>
                 )}
                 {isManagerOrAbove && (
-                  <NavLink href="/admin" onClick={playTab}>
-                    <BarChart3 size={16} />
-                    <span>Manager & Admin</span>
-                  </NavLink>
+                  <>
+                    <NavLink href="/admin" onClick={playTab}>
+                      <BarChart3 size={16} />
+                      <span>Manager & Admin</span>
+                    </NavLink>
+                    <NavLink href="/debug" onClick={playTab}>
+                      <Bug size={16} />
+                      <span>Debug</span>
+                    </NavLink>
+                  </>
                 )}
               </>
             )}
@@ -248,10 +255,16 @@ export function Navbar() {
                     </MobileNavLink>
                   )}
                   {isManagerOrAbove && (
-                    <MobileNavLink href="/admin" onClick={() => { playTab(); setMobileOpen(false); }}>
-                      <BarChart3 size={16} />
-                      <span>Manager & Admin</span>
-                    </MobileNavLink>
+                    <>
+                      <MobileNavLink href="/admin" onClick={() => { playTab(); setMobileOpen(false); }}>
+                        <BarChart3 size={16} />
+                        <span>Manager & Admin</span>
+                      </MobileNavLink>
+                      <MobileNavLink href="/debug" onClick={() => { playTab(); setMobileOpen(false); }}>
+                        <Bug size={16} />
+                        <span>Debug & Error Suite</span>
+                      </MobileNavLink>
+                    </>
                   )}
                 </>
               ) : (

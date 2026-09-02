@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "FoodLine-Campus Docs": {
+      "type": "sse",
+      "url": "https://gitmcp.io/dakrkakashi/FoodLine-Campus"
+    }
+  }
+}
