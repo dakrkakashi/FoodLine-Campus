@@ -9,6 +9,22 @@
   - Added dedicated dark-themed HTML status landing dashboard to `GET /` on Express backend (`http://localhost:4000`).
   - Added `/`, `/select-campus`, `/canteens`, `/onboarding`, and `/debug` to Next.js middleware `PUBLIC_ROUTES`.
   - Cleared stale `.next` build cache collision that caused 404 on CSS/JS chunks and restored full Next.js dev server on `http://localhost:3000`.
+- **Frozen Bottom Floating Cart Tray:** 100% Operational & Verified!
+  - Portaled the floating cart pill directly to `document.body` via `createPortal` with `z-[999]` and mobile safe area insets.
+  - Removed persistent CSS `transform: translateZ(0)` on `PageTransition` wrapper, ensuring the cart pill stays permanently frozen at the bottom of the viewport across all scroll depths.
+  - Resolved Motion 12+ spring keyframe restriction on cart count badge and checkout celebration popper by switching to natural 2-state physics overshoots (`initial={{ scale: 0.5 }}`, `animate={{ scale: 1 }}` with `stiffness: 550, damping: 14`).
+- **Expanded Visual Design Suite, 12 Themes & Vector Illustrations:** 100% Operational & Verified!
+  - Added 4 new premium campus themes: `obsidian` (OLED pitch & violet), `synthwave` (80s neon grid), `chai` (masala cinnamon & mint), and `galaxy` (starlight purple & cyan) — bringing the total to 12 dynamic presets with real-time swatches in `ThemeCustomizerModal`.
+  - Hand-crafted 5 modular vector SVG illustrations in `components/illustrations/`: `EmptyCartIllustration`, `ChefExpressIllustration`, `CampusExpressIllustration`, `EmptyMenuIllustration`, and `SlotClockIllustration`.
+  - Built `Magnetic` spring wrapper for CTAs/pills and `MeshGradientBackground` for fluid ambient hardware-accelerated aurora glows.
+  - Integrated illustrations and magnetic interactions into `/`, `/menu`, `/checkout`, and `/order/[token]`.
+- **Kitchen Display System (KDS) Touch UI/UX Suite:** 100% Operational & Verified!
+  - Empty state illustrations for Column 2 (`ChefExpressIllustration`) and Column 3 (`CampusExpressIllustration`).
+  - Live real-time kitchen clock, shift metrics strip, and automated ticket elapsed timers (`⏱️ 2m`, `⚠️ 8m RUSH`, `🚨 15m DELAY`).
+  - High-visibility Cash-on-Delivery warning box (`💵 COLLECT CASH: ₹XX.XX`) preventing unpaid food dispatch.
+  - Touchscreen 3x4 numeric keypad inside OTP verification modal for cafeteria staff with kitchen gloves.
+  - Direct 1-tap tray release button and 1-tap browser fullscreen kiosk mode (`⛶`).
+  - Disabled custom spring cursor on `/kds` and `/display` kiosk screens to prevent distraction on tablet screens.
 - **FoodLine Debugging & HTTP Error Suite:** 100% Operational & Verified!
   - Added Next.js standard error boundaries: `not-found.tsx` (404), `error.tsx` (client boundary), `global-error.tsx` (root boundary).
   - Created centralized `HTTP_ERRORS_CATALOG` (`errors-catalog.ts`) covering 13 HTTP status codes with campus-canteen analogies, technical descriptions, and recovery paths.

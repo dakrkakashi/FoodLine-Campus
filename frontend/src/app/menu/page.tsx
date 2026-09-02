@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, X, ShoppingCart, Info, Sparkles, Flame, ArrowRight, ChevronRight, Store, MapPin } from 'lucide-react';
@@ -11,8 +12,9 @@ import { useCampus } from '@/context/CampusContext';
 import { DishCardSkeleton } from '@/components/ui/Skeleton';
 import { Badge } from '@/components/ui/Badge';
 import { InventoryBadge } from '@/components/ui/InventoryBadge';
-import { PageTransition, SpotlightCard, SteamEffect, AnimatedCounter, FoodParticles } from '@/components/ui';
+import { PageTransition, SpotlightCard, SteamEffect, AnimatedCounter, FoodParticles, Magnetic } from '@/components/ui';
 import { DishInspectModal, DishInspectItem } from '@/components/3d/DishInspectModal';
+import { ChefExpressIllustration, EmptyMenuIllustration } from '@/components/illustrations';
 
 interface MenuItem {
   id: string;
@@ -80,6 +82,11 @@ export default function MenuPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [inspectingDish, setInspectingDish] = useState<DishInspectItem | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function loadMenu() {
@@ -204,6 +211,11 @@ export default function MenuPage() {
               100% Pure Vegetarian campus cuisine at <strong className="text-white">{selectedCanteen.name}</strong> ({selectedCanteen.location}). Pre-order before the break bell rings and pick up hot!
             </p>
           </div>
+
+          {/* Dynamic Illustrated Express Wok Accent */}
+          <div className="hidden md:flex absolute right-6 bottom-3 pointer-events-none z-10">
+            <ChefExpressIllustration size={160} />
+          </div>
         </motion.div>
 
         {/* Search + Category Pills */}
@@ -235,31 +247,34 @@ export default function MenuPage() {
 
           {/* Category Filter Pills */}
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setSelectedCategory('All')}
-              className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide transition-all cursor-pointer ${
-                selectedCategory === 'All'
-                  ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black shadow-lg shadow-[#FF6B2C]/25'
-                  : 'bg-[#12121A] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
-              }`}
-            >
-              🍽 All Items
-            </motion.button>
-            {categories.map((cat) => (
+            <Magnetic strength={0.15}>
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                key={cat.id}
-                onClick={() => setSelectedCategory(cat.name)}
-                className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide flex items-center gap-2 transition-all cursor-pointer ${
-                  selectedCategory === cat.name
+                onClick={() => setSelectedCategory('All')}
+                className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide transition-all cursor-pointer ${
+                  selectedCategory === 'All'
                     ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black shadow-lg shadow-[#FF6B2C]/25'
                     : 'bg-[#12121A] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
                 }`}
               >
-                <span>{cat.icon || '🍽'}</span>
-                <span>{cat.name}</span>
+                🍽 All Items
               </motion.button>
+            </Magnetic>
+            {categories.map((cat) => (
+              <Magnetic key={cat.id} strength={0.15}>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedCategory(cat.name)}
+                  className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide flex items-center gap-2 transition-all cursor-pointer ${
+                    selectedCategory === cat.name
+                      ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black shadow-lg shadow-[#FF6B2C]/25'
+                      : 'bg-[#12121A] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
+                  }`}
+                >
+                  <span>{cat.icon || '🍽'}</span>
+                  <span>{cat.name}</span>
+                </motion.button>
+              </Magnetic>
             ))}
           </div>
         </div>
@@ -275,11 +290,11 @@ export default function MenuPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-20 glass-card rounded-[2.5rem] border-dashed border-white/15"
+            className="text-center py-16 px-4 glass-card rounded-[2.5rem] border-dashed border-white/15"
           >
-            <Search className="w-12 h-12 mx-auto text-zinc-600 mb-4" />
+            <EmptyMenuIllustration size={160} className="mx-auto mb-2" />
             <h3 className="text-xl font-bold text-white mb-2">No dishes found</h3>
-            <p className="text-sm text-zinc-400 mb-6">Try searching for something else or reset your active filters.</p>
+            <p className="text-sm text-zinc-400 mb-6 max-w-sm mx-auto">Try searching for something else or reset your active filters.</p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -440,68 +455,73 @@ export default function MenuPage() {
         )}
       </main>
 
-      {/* Spring-Physics Floating Cart Pill */}
-      <AnimatePresence>
-        {totalCount > 0 && (
-          <motion.div
-            initial={{ y: 90, scale: 0.88, opacity: 0 }}
-            animate={{ y: 0, scale: 1, opacity: 1 }}
-            exit={{ y: 90, scale: 0.88, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 420, damping: 26 }}
-            className="fixed bottom-6 inset-x-0 z-40 px-4 flex justify-center pointer-events-none"
-          >
-            <div className="pointer-events-auto w-full max-w-lg rounded-full glass-card-heavy backdrop-blur-2xl bg-[#16161E]/95 border-2 border-[#FF6B2C]/50 shadow-[0_12px_45px_rgba(0,0,0,0.85),0_0_30px_rgba(255,107,44,0.25)] p-2 sm:p-2.5 flex items-center justify-between gap-3 relative overflow-hidden">
-              {/* Ambient radial glows */}
-              <div className="absolute -left-10 -top-10 w-28 h-28 bg-[#FF6B2C]/20 rounded-full blur-xl pointer-events-none" />
-              <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-[#00D4AA]/15 rounded-full blur-xl pointer-events-none" />
+      {/* Spring-Physics Floating / Freeze Bottom Cart Pill (Portaled directly to body to bypass any transform or overflow restrictions) */}
+      {mounted && typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {totalCount > 0 && (
+            <motion.div
+              initial={{ y: 90, scale: 0.88, opacity: 0 }}
+              animate={{ y: 0, scale: 1, opacity: 1 }}
+              exit={{ y: 90, scale: 0.88, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 26 }}
+              className="fixed bottom-6 sm:bottom-8 inset-x-0 z-[999] px-4 flex justify-center pointer-events-none pb-[env(safe-area-inset-bottom)]"
+            >
+              <div className="pointer-events-auto w-full max-w-lg rounded-full glass-card-heavy backdrop-blur-2xl bg-[#16161E]/95 border-2 border-[#FF6B2C]/60 shadow-[0_16px_50px_rgba(0,0,0,0.95),0_0_35px_rgba(255,107,44,0.35)] p-2 sm:p-2.5 flex items-center justify-between gap-3 relative overflow-hidden">
+                {/* Ambient radial glows */}
+                <div className="absolute -left-10 -top-10 w-28 h-28 bg-[#FF6B2C]/25 rounded-full blur-xl pointer-events-none" />
+                <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-[#00D4AA]/20 rounded-full blur-xl pointer-events-none" />
 
-              {/* Left Info: Animated Cart Icon with Pop Badge + Total */}
-              <div className="flex items-center gap-3 pl-2 sm:pl-3 relative z-10">
-                <div className="relative">
-                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] text-black flex items-center justify-center shadow-lg shadow-[#FF6B2C]/35">
-                    <ShoppingCart size={20} strokeWidth={2.5} />
+                {/* Left Info: Animated Cart Icon with Pop Badge + Total */}
+                <div className="flex items-center gap-3 pl-2 sm:pl-3 relative z-10">
+                  <div className="relative">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] text-black flex items-center justify-center shadow-lg shadow-[#FF6B2C]/35">
+                      <ShoppingCart size={20} strokeWidth={2.5} />
+                    </div>
+                    {/* Bouncy live count badge with AnimatedCounter */}
+                    <motion.span
+                      key={totalCount}
+                      initial={{ scale: 0.5, rotate: -12 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: 'spring', stiffness: 550, damping: 14 }}
+                      className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-[#00D4AA] text-black text-[10px] font-black flex items-center justify-center shadow-md border-2 border-[#16161E]"
+                    >
+                      <AnimatedCounter value={totalCount} />
+                    </motion.span>
                   </div>
-                  {/* Bouncy live count badge with AnimatedCounter */}
-                  <motion.span
-                    key={totalCount}
-                    initial={{ scale: 0.5, rotate: -15 }}
-                    animate={{ scale: [0.5, 1.35, 1], rotate: [0, 8, 0] }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-                    className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-[#00D4AA] text-black text-[10px] font-black flex items-center justify-center shadow-md border-2 border-[#16161E]"
-                  >
-                    <AnimatedCounter value={totalCount} />
-                  </motion.span>
+
+                  <div className="leading-tight">
+                    <div className="text-[10px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>Tray Subtotal</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] inline-block animate-pulse" />
+                    </div>
+                    <div className="text-lg sm:text-xl font-black text-white font-mono flex items-baseline gap-1">
+                      <AnimatedCounter value={totalAmount} prefix="₹" />
+                      <span className="text-[10px] font-sans font-medium text-zinc-400">
+                        ({totalCount} {totalCount === 1 ? 'item' : 'items'})
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="leading-tight">
-                  <div className="text-[10px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-                    <span>Tray Subtotal</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] inline-block animate-pulse" />
-                  </div>
-                  <div className="text-lg sm:text-xl font-black text-white font-mono flex items-baseline gap-1">
-                    <AnimatedCounter value={totalAmount} prefix="₹" />
-                    <span className="text-[10px] font-sans font-medium text-zinc-400">
-                      ({totalCount} {totalCount === 1 ? 'item' : 'items'})
-                    </span>
-                  </div>
-                </div>
+                {/* Right CTA Button with Magnetic Pull */}
+                <Link href="/checkout" className="relative z-10 flex-shrink-0">
+                  <Magnetic strength={0.25}>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.94 }}
+                      className="px-5 sm:px-7 py-3 rounded-full bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-xs sm:text-sm shadow-xl shadow-[#FF6B2C]/35 flex items-center gap-2 cursor-pointer border border-white/20 uppercase tracking-wider"
+                    >
+                      <span>Select Slot</span>
+                      <ArrowRight size={16} strokeWidth={3} className="text-black" />
+                    </motion.button>
+                  </Magnetic>
+                </Link>
               </div>
-
-              {/* Right CTA Button */}
-              <Link href="/checkout" className="relative z-10 flex-shrink-0">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.94 }}
-                  className="px-5 sm:px-7 py-3 rounded-full bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-xs sm:text-sm shadow-xl shadow-[#FF6B2C]/35 flex items-center gap-2 cursor-pointer border border-white/20 uppercase tracking-wider"
-                >
-                  <span>Select Slot</span>
-                  <ArrowRight size={16} strokeWidth={3} className="text-black" />
-                </motion.button>
-              </Link>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       {/* Interactive 3D Dish Inspection Modal */}
       <DishInspectModal item={inspectingDish} onClose={() => setInspectingDish(null)} />

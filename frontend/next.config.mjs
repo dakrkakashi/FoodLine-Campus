@@ -2,7 +2,16 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    unoptimized: true
+    unoptimized: true,
+  },
+  async redirects() {
+    return [
+      {
+        source: '/account',
+        destination: '/profile',
+        permanent: false,
+      },
+    ];
   },
   async rewrites() {
     return [

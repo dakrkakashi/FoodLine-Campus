@@ -9,6 +9,11 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.
 
 // Authorized staff accounts and roles for campus operations
 const AUTHORIZED_STAFF: Record<string, { role: 'canteen_manager' | 'kitchen' | 'admin'; name: string; cafeteriaId: string }> = {
+  'foodlinecampus07@gmail.com': {
+    role: 'canteen_manager',
+    name: 'Cafe @7 General Manager',
+    cafeteriaId: 'b2222222-2222-2222-2222-222222222222',
+  },
   'foodlinecampus@gmail.com': {
     role: 'canteen_manager',
     name: 'Cafe @7 General Manager',
@@ -113,7 +118,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             success: false,
-            error: `Email "${cleanEmail}" is not an authorized staff account. Use foodlinecampus@gmail.com`,
+            error: `Email "${cleanEmail}" is not an authorized staff account. Use foodlinecampus07@gmail.com`,
           },
           { status: 403 }
         );

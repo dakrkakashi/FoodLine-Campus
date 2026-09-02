@@ -17,8 +17,9 @@ import {
   QrCode,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
-import { PageTransition, SpotlightCard, fireFireworks } from '@/components/ui';
+import { PageTransition, SpotlightCard, fireFireworks, Magnetic } from '@/components/ui';
 import { BorderBeam } from '@/components/magicui';
+import { ChefExpressIllustration, CampusExpressIllustration } from '@/components/illustrations';
 import { createClient } from '@/utils/supabase/client';
 
 interface OrderItem {
@@ -155,6 +156,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
   };
 
   const currentStep = getStepIndex(order?.status);
+  const isPreparing = order?.status === 'PREPARING';
   const isReady = order?.status === 'READY';
   const isCollected = order?.status === 'COLLECTED';
 
@@ -349,11 +351,28 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
         </SpotlightCard>
 
         {/* Live Stepper Tracker */}
-        <SpotlightCard className="p-6 md:p-8 rounded-[2.5rem] shadow-2xl mb-8">
-          <h2 className="text-base font-black text-white mb-6 flex items-center gap-2.5">
-            <Utensils size={18} className="text-[#FF6B2C]" />
-            <span>Live Kitchen Status Tracker</span>
-          </h2>
+        <SpotlightCard className="p-6 md:p-8 rounded-[2.5rem] shadow-2xl mb-8 relative overflow-hidden">
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <h2 className="text-base font-black text-white flex items-center gap-2.5">
+              <Utensils size={18} className="text-[#FF6B2C]" />
+              <span>Live Kitchen Status Tracker</span>
+            </h2>
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-zinc-300">
+              <span className="w-2 h-2 rounded-full bg-[#00D4AA] animate-pulse" />
+              <span>SSE Real-Time</span>
+            </div>
+          </div>
+
+          {/* Dynamic Kitchen Stage Illustration */}
+          <div className="py-2 flex justify-center border-b border-white/5 mb-6">
+            {isReady ? (
+              <CampusExpressIllustration size={140} />
+            ) : isPreparing ? (
+              <ChefExpressIllustration size={140} />
+            ) : (
+              <CampusExpressIllustration size={130} />
+            )}
+          </div>
 
           <div className="space-y-6">
             {steps.map((step, index) => {
@@ -437,7 +456,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-zinc-400">
             <div>
               <span>Need help or wrong item? </span>
-              <span className="text-zinc-300 font-bold">Ask Level 1 Counter Lead</span> or email <a href="mailto:foodlinecampus@gmail.com" className="text-[#00D4AA] font-bold hover:underline">foodlinecampus@gmail.com</a>
+              <span className="text-zinc-300 font-bold">Ask Level 1 Counter Lead</span> or email <a href="mailto:foodlinecampus07@gmail.com" className="text-[#00D4AA] font-bold hover:underline">foodlinecampus07@gmail.com</a>
             </div>
             <div className="flex items-center gap-4 text-xs font-bold">
               <Link href="/terms" className="text-zinc-400 hover:text-[var(--accent-orange)] transition">Terms & Conditions</Link>

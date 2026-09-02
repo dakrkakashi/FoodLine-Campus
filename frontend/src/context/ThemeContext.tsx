@@ -10,7 +10,11 @@ export type ThemeName =
   | 'midnight'
   | 'matcha'
   | 'crimson'
-  | 'aurora';
+  | 'aurora'
+  | 'obsidian'
+  | 'synthwave'
+  | 'chai'
+  | 'galaxy';
 
 interface ThemeConfig {
   id: ThemeName;
@@ -112,6 +116,50 @@ export const THEMES: Record<ThemeName, ThemeConfig> = {
     accent: '#E879F9',
     bgCanvas: '#060713',
     bgCard: '#111329',
+  },
+  obsidian: {
+    id: 'obsidian',
+    name: 'Obsidian Velvet',
+    emoji: '🔮',
+    tagline: 'Pure OLED Pitch & Electric Violet',
+    primary: '#8B5CF6',
+    secondary: '#A78BFA',
+    accent: '#06B6D4',
+    bgCanvas: '#000000',
+    bgCard: '#0A0A10',
+  },
+  synthwave: {
+    id: 'synthwave',
+    name: '80s Synthwave',
+    emoji: '🕹️',
+    tagline: 'Laser Magenta & Neon Grid Gold',
+    primary: '#FF007F',
+    secondary: '#00F0FF',
+    accent: '#FFE600',
+    bgCanvas: '#090417',
+    bgCard: '#15092E',
+  },
+  chai: {
+    id: 'chai',
+    name: 'Campus Masala Chai',
+    emoji: '☕',
+    tagline: 'Warm Spiced Cinnamon & Mint Leaf',
+    primary: '#D97706',
+    secondary: '#F59E0B',
+    accent: '#10B981',
+    bgCanvas: '#0C0A09',
+    bgCard: '#1C1614',
+  },
+  galaxy: {
+    id: 'galaxy',
+    name: 'Starlight Nebula',
+    emoji: '🪐',
+    tagline: 'Deep Cosmic Purple & Astral Cyan',
+    primary: '#7C3AED',
+    secondary: '#EC4899',
+    accent: '#38BDF8',
+    bgCanvas: '#04040C',
+    bgCard: '#0E0C22',
   },
 };
 

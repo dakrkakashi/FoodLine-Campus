@@ -108,6 +108,15 @@ export function UserAvatar() {
 
           {/* Navigation Links */}
           <div className="space-y-1 text-xs">
+            <Link
+              href="/profile"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-neutral-200 hover:text-white hover:bg-white/10 transition-colors font-semibold bg-white/5 border border-white/5"
+            >
+              <User className="w-4 h-4 text-[#00D4AA]" />
+              <span>My Account & Profile</span>
+            </Link>
+
             {(effectiveRole === 'canteen_manager' || effectiveRole === 'admin') && (
               <Link
                 href="/admin"

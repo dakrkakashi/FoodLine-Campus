@@ -55,7 +55,7 @@ export function ThemeCustomizerModal({ isOpen, onClose }: ThemeCustomizerModalPr
                   <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
                     <span>Campus Color Themes</span>
                     <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-[#FFB347] font-bold">
-                      8 Presets
+                      {Object.keys(THEMES).length} Presets
                     </span>
                   </h2>
                   <p className="text-xs text-zinc-400 font-medium">

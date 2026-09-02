@@ -20,6 +20,7 @@ import {
   Bug,
   Store,
   Building2,
+  User,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useTheme, THEMES, ThemeName } from '@/context/ThemeContext';
@@ -94,6 +95,10 @@ export function Navbar() {
                 <NavLink href="/orders" onClick={playTab}>
                   <Receipt size={16} />
                   <span>My Orders</span>
+                </NavLink>
+                <NavLink href="/profile" onClick={playTab}>
+                  <User size={16} />
+                  <span>Account</span>
                 </NavLink>
                 <NavLink href="/display" onClick={playTab}>
                   <Tv size={16} />
@@ -264,6 +269,10 @@ export function Navbar() {
                   <MobileNavLink href="/orders" onClick={() => { playTab(); setMobileOpen(false); }}>
                     <Receipt size={16} />
                     <span>My Orders</span>
+                  </MobileNavLink>
+                  <MobileNavLink href="/profile" onClick={() => { playTab(); setMobileOpen(false); }}>
+                    <User size={16} />
+                    <span>My Account & Profile</span>
                   </MobileNavLink>
                   <MobileNavLink href="/display" onClick={() => { playTab(); setMobileOpen(false); }}>
                     <Tv size={16} />

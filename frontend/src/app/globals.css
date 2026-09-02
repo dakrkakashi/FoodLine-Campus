@@ -356,4 +356,130 @@ h1, h2, h3, .font-heading {
   animation: meteor 5s linear infinite;
 }
 
+/* =============================================================================
+   Interactive Click Ripple & Spark Particles
+   ============================================================================= */
+@keyframes click-ring {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@keyframes click-dot {
+  0% {
+    transform: scale(0.4);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes click-spark-1 {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-18px, -18px) scale(0); opacity: 0; }
+}
+
+@keyframes click-spark-2 {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(18px, -18px) scale(0); opacity: 0; }
+}
+
+@keyframes click-spark-3 {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-18px, 18px) scale(0); opacity: 0; }
+}
+
+@keyframes click-spark-4 {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(18px, 18px) scale(0); opacity: 0; }
+}
+
+.animate-click-ring {
+  animation: click-ring 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-click-dot {
+  animation: click-dot 0.32s ease-out forwards;
+}
+
+.animate-click-spark-1 {
+  animation: click-spark-1 0.38s ease-out forwards;
+}
+
+.animate-click-spark-2 {
+  animation: click-spark-2 0.38s ease-out forwards;
+}
+
+.animate-click-spark-3 {
+  animation: click-spark-3 0.38s ease-out forwards;
+}
+
+.animate-click-spark-4 {
+  animation: click-spark-4 0.38s ease-out forwards;
+}
+
+/* =============================================================================
+   Hardware-Accelerated Ambient Mesh Aurora Keyframes
+   ============================================================================= */
+@keyframes blob-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -40px) scale(1.08);
+  }
+  66% {
+    transform: translate(-25px, 20px) scale(0.95);
+  }
+}
+
+@keyframes blob-slow-reverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-35px, 30px) scale(1.06);
+  }
+  66% {
+    transform: translate(25px, -25px) scale(0.96);
+  }
+}
+
+@keyframes blob-drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(25px, -35px) scale(1.1);
+  }
+}
+
+.animate-blob-slow {
+  animation: blob-slow 16s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-blob-slow-reverse {
+  animation: blob-slow-reverse 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-blob-drift {
+  animation: blob-drift 20s ease-in-out infinite;
+  will-change: transform;
+}
+
+
+
 

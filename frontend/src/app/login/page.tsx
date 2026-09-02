@@ -26,7 +26,7 @@ function LoginFormContent() {
   const [showStudentPassword, setShowStudentPassword] = useState(false);
 
   // Staff / Admin auth states (Sign in only)
-  const [staffEmail, setStaffEmail] = useState('foodlinecampus@gmail.com');
+  const [staffEmail, setStaffEmail] = useState('foodlinecampus07@gmail.com');
   const [staffPassword, setStaffPassword] = useState('');
   const [showStaffPassword, setShowStaffPassword] = useState(false);
 
@@ -423,7 +423,7 @@ function LoginFormContent() {
                     value={staffEmail}
                     onChange={(e) => setStaffEmail(e.target.value)}
                     required
-                    placeholder="foodlinecampus@gmail.com"
+                    placeholder="foodlinecampus07@gmail.com"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                   />
                 </div>
@@ -460,7 +460,7 @@ function LoginFormContent() {
                 <button
                   type="button"
                   onClick={() => {
-                    setStaffEmail('foodlinecampus@gmail.com');
+                    setStaffEmail('foodlinecampus07@gmail.com');
                     setStaffPassword('foodline2026');
                     setErrorMessage(null);
                   }}

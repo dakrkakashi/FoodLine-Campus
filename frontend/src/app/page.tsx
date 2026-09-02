@@ -13,7 +13,8 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
-import { PageTransition } from '@/components/ui';
+import { PageTransition, Magnetic } from '@/components/ui';
+import { ChefExpressIllustration, CampusExpressIllustration } from '@/components/illustrations';
 import { useSoundFX } from '@/hooks/useSoundFX';
 
 export default function IntroductionPage() {
@@ -74,7 +75,7 @@ export default function IntroductionPage() {
           FoodLine connects college students with all on-campus canteens. Pre-order fresh meals straight from your lecture hall, skip long break lines, and pick up hot food at the dedicated express counter.
         </motion.p>
 
-        {/* Primary Action Buttons (2 Clear Entry Paths) */}
+        {/* Primary Action Buttons (2 Clear Entry Paths with Magnetic Pull) */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -82,26 +83,30 @@ export default function IntroductionPage() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-xl mx-auto mb-14"
         >
           <Link href="/select-campus" onClick={playClick} className="w-full sm:w-auto flex-1">
-            <motion.button
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.96 }}
-              className="w-full px-7 py-4.5 bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-[#FF6B2C]/30 flex items-center justify-center gap-2.5 cursor-pointer group transition-all"
-            >
-              <MapPin size={18} className="text-black" />
-              <span>Select Campus & Canteen</span>
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </motion.button>
+            <Magnetic strength={0.2} className="w-full">
+              <motion.button
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                className="w-full px-7 py-4.5 bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-[#FF6B2C]/30 flex items-center justify-center gap-2.5 cursor-pointer group transition-all"
+              >
+                <MapPin size={18} className="text-black" />
+                <span>Select Campus & Canteen</span>
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </motion.button>
+            </Magnetic>
           </Link>
 
           <Link href="/login" onClick={playClick} className="w-full sm:w-auto flex-1">
-            <motion.button
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.96 }}
-              className="w-full px-7 py-4.5 bg-[#16161E]/90 hover:bg-[#1C1C26] border border-white/15 hover:border-[#FF6B2C]/50 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl flex items-center justify-center gap-2.5 cursor-pointer transition-all"
-            >
-              <GraduationCap size={18} className="text-[#00D4AA]" />
-              <span>Student PRN Login</span>
-            </motion.button>
+            <Magnetic strength={0.2} className="w-full">
+              <motion.button
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.96 }}
+                className="w-full px-7 py-4.5 bg-[#16161E]/90 hover:bg-[#1C1C26] border border-white/15 hover:border-[#FF6B2C]/50 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl flex items-center justify-center gap-2.5 cursor-pointer transition-all"
+              >
+                <GraduationCap size={18} className="text-[#00D4AA]" />
+                <span>Student PRN Login</span>
+              </motion.button>
+            </Magnetic>
           </Link>
         </motion.div>
 

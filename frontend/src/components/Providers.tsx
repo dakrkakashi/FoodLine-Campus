@@ -8,6 +8,9 @@ import { InventoryProvider } from '@/context/InventoryContext';
 import { CampusProvider } from '@/context/CampusContext';
 import { FloatingThemeTrigger } from '@/components/theme/FloatingThemeTrigger';
 import { OfflineBanner } from '@/components/ui/OfflineBanner';
+import { CustomCursor } from '@/components/ui/CustomCursor';
+import { GlobalClickEffect } from '@/components/ui/GlobalClickEffect';
+import { MeshGradientBackground } from '@/components/ui/MeshGradientBackground';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -16,6 +19,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <CampusProvider>
           <CartProvider>
             <InventoryProvider>
+              <MeshGradientBackground opacity={0.65} />
+              <CustomCursor />
+              <GlobalClickEffect />
               <OfflineBanner />
               {children}
             </InventoryProvider>

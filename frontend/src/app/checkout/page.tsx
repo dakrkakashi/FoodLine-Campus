@@ -25,9 +25,10 @@ import {
 import { Navbar } from '@/components/navbar';
 import { useCart } from '@/context/CartContext';
 import { useInventory } from '@/context/InventoryContext';
-import { Stepper, ProgressBar, PageTransition, SpotlightCard, fireConfettiSuccess, fireFireworks } from '@/components/ui';
+import { Stepper, ProgressBar, PageTransition, SpotlightCard, fireConfettiSuccess, fireFireworks, Magnetic } from '@/components/ui';
 import { Meteors } from '@/components/magicui/meteors';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
+import { EmptyCartIllustration, SlotClockIllustration, CampusExpressIllustration } from '@/components/illustrations';
 import { saveOrderToHistory } from '@/lib/order-history-store';
 
 interface Slot {
@@ -228,22 +229,22 @@ export default function CheckoutPage() {
       <PageTransition className="min-h-screen bg-[#07070B] text-[#F5F5F7] pb-24">
         <Navbar />
         <main className="max-w-xl mx-auto px-4 pt-20 text-center">
-          <SpotlightCard className="p-10 rounded-[2.5rem] text-center border-dashed border-white/20">
-            <div className="w-20 h-20 mx-auto rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center text-4xl mb-6 shadow-inner">
-              🍽
-            </div>
+          <SpotlightCard className="p-8 sm:p-10 rounded-[2.5rem] text-center border-dashed border-white/20">
+            <EmptyCartIllustration size={180} className="mx-auto mb-2" />
             <h1 className="text-2xl sm:text-3xl font-black text-white mb-2">Your Tray is Empty</h1>
             <p className="text-sm text-zinc-400 mb-8 max-w-sm mx-auto">
               Explore 44+ freshly prepared campus dishes from Cafe @7 and reserve your express pickup slot.
             </p>
             <Link href="/menu">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-sm shadow-xl shadow-[#FF6B2C]/30 cursor-pointer"
-              >
-                Browse Cafe @7 Menu →
-              </motion.button>
+              <Magnetic strength={0.25}>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-sm shadow-xl shadow-[#FF6B2C]/30 cursor-pointer"
+                >
+                  Browse Cafe @7 Menu →
+                </motion.button>
+              </Magnetic>
             </Link>
           </SpotlightCard>
         </main>
@@ -412,19 +413,22 @@ export default function CheckoutPage() {
             </SpotlightCard>
 
             {/* Campus Break Slot Selection */}
-            <SpotlightCard className="p-6 md:p-7">
-              <div className="flex items-center justify-between gap-4 mb-2">
-                <div className="flex items-center gap-2.5">
-                  <Clock size={20} className="text-[#FFB347]" />
-                  <h2 className="text-lg font-black text-white">Campus Break Pickup Slot</h2>
+            <SpotlightCard className="p-6 md:p-7 relative overflow-hidden">
+              <div className="flex items-center justify-between gap-4 mb-5 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-2xl bg-[#FFB347]/15 border border-[#FFB347]/30 flex items-center justify-center text-[#FFB347] shadow-inner flex-shrink-0">
+                    <Clock size={22} strokeWidth={2.4} />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-black text-white leading-tight">Campus Break Pickup Slot</h2>
+                    <p className="text-xs text-zinc-400 font-medium mt-0.5">Reserve your 15-min express collection window to avoid queue delays</p>
+                  </div>
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2.5 py-1 rounded-full">
-                  60-Order Cap
-                </span>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 text-[10px] font-black uppercase tracking-wider shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>60-Order Cap Safe</span>
+                </div>
               </div>
-              <p className="text-xs text-zinc-400 mb-5 font-medium">
-                Reserve your 15-minute express collection window to avoid queue delays.
-              </p>
 
               <div className="space-y-3">
                 {slots.map((slot) => {
@@ -791,15 +795,10 @@ export default function CheckoutPage() {
               transition={{ type: 'spring', stiffness: 360, damping: 24 }}
               className="relative max-w-md w-full glass-card-heavy rounded-[2.5rem] border-2 border-[#00D4AA]/50 p-6 sm:p-8 text-center shadow-[0_0_60px_rgba(0,212,170,0.3)] overflow-hidden"
             >
-              {/* Party Popper Badge with Spring Bounce */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: [0, 1.3, 1] }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 450, damping: 18 }}
-                className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-[#00D4AA] to-[#00E5BC] text-black flex items-center justify-center shadow-2xl shadow-[#00D4AA]/40 mb-5"
-              >
-                <PartyPopper size={38} strokeWidth={2.5} />
-              </motion.div>
+              {/* Dynamic Campus Express Station Illustration */}
+              <div className="flex justify-center -mt-2 mb-2">
+                <CampusExpressIllustration size={135} />
+              </div>
 
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#00D4AA]/15 border border-[#00D4AA]/30 text-[#00D4AA] text-xs font-black uppercase tracking-wider mb-2">
                 <CheckCircle2 size={14} className="text-[#00D4AA]" />

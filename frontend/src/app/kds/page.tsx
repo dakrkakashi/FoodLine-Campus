@@ -24,7 +24,16 @@ import {
   Loader2,
   Download,
   Upload,
+  Flame,
+  Maximize2,
+  Minimize2,
+  Volume2,
+  VolumeX,
+  Banknote,
+  Utensils,
+  ShieldCheck,
 } from 'lucide-react';
+import { ChefExpressIllustration, CampusExpressIllustration, EmptyCartIllustration } from '@/components/illustrations';
 
 interface KdsOrderItem {
   id: string;
@@ -71,6 +80,44 @@ export default function KitchenDisplayPage() {
   const [stockSearch, setStockSearch] = useState('');
   const [stockFilterTab, setStockFilterTab] = useState<'all' | 'instock' | 'soldout'>('all');
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
+
+  // KDS UI State: Live Clock, Fullscreen & Ticket Search
+  const [currentTime, setCurrentTime] = useState('');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [kdsSearch, setKdsSearch] = useState('');
+
+  useEffect(() => {
+    const update = () => {
+      const now = new Date();
+      setCurrentTime(
+        now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })
+      );
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (typeof document === 'undefined') return;
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+    }
+  };
+
+  const getUrgencyBadge = (createdAt: string) => {
+    const diffMs = Date.now() - new Date(createdAt).getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if (mins >= 15) {
+      return { label: `🚨 ${mins}m DELAY`, color: 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse' };
+    }
+    if (mins >= 8) {
+      return { label: `⚠️ ${mins}m RUSH`, color: 'bg-amber-500/20 text-amber-400 border-amber-500/40' };
+    }
+    return { label: `⏱️ ${mins < 1 ? 'Just now' : `${mins}m`}`, color: 'bg-white/10 text-zinc-300 border-white/10' };
+  };
 
   // OTP Verification Modal State
   const [verifyingOrder, setVerifyingOrder] = useState<KdsOrder | null>(null);
@@ -545,49 +592,122 @@ export default function KitchenDisplayPage() {
   const soldOutCount = menuItems.filter((m) => !m.is_available).length;
   const inStockCount = menuItems.filter((m) => m.is_available).length;
 
-  const pendingOrders = orders.filter((o) => o.status === 'CONFIRMED');
-  const preparingOrders = orders.filter((o) => o.status === 'PREPARING');
-  const readyOrders = orders.filter((o) => o.status === 'READY');
-  const collectedOrders = orders.filter((o) => o.status === 'COLLECTED');
+  const filteredOrders = useMemo(() => {
+    if (!kdsSearch.trim()) return orders;
+    const q = kdsSearch.toLowerCase().trim();
+    return orders.filter(
+      (o) =>
+        o.order_token?.toLowerCase().includes(q) ||
+        o.pickup_otp?.includes(q) ||
+        o.order_items?.some((i) => i.item_name.toLowerCase().includes(q))
+    );
+  }, [orders, kdsSearch]);
+
+  const pendingOrders = filteredOrders.filter((o) => o.status === 'CONFIRMED');
+  const preparingOrders = filteredOrders.filter((o) => o.status === 'PREPARING');
+  const readyOrders = filteredOrders.filter((o) => o.status === 'READY');
+  const collectedOrders = filteredOrders.filter((o) => o.status === 'COLLECTED');
+
+  const totalCollectedAmount = useMemo(() => {
+    return collectedOrders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+  }, [collectedOrders]);
+
+  const handleDirectRelease = async (orderId: string, orderToken: string) => {
+    if (!window.confirm(`Directly release order ${orderToken} without OTP? (Ensure student is present at counter)`)) return;
+    await handleUpdateStatus(orderId, 'COLLECTED');
+  };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-[#F5F5F7] flex flex-col h-screen overflow-hidden">
-      {/* Header */}
-      <header className="flex-none bg-[#16161E] border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] flex items-center justify-center font-black text-xl text-black shadow-lg shadow-[#FF6B2C]/20 hover:scale-110 transition cursor-pointer">
+    <div className="min-h-screen bg-[#0A0A0F] text-[#F5F5F7] flex flex-col h-screen overflow-hidden select-none">
+      {/* Top Staff & Kiosk Header */}
+      <header className="flex-none bg-[#14141E]/95 backdrop-blur-xl border-b border-white/10 px-5 py-3.5 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] flex items-center justify-center font-black text-xl text-black shadow-lg shadow-[#FF6B2C]/25 hover:scale-105 active:scale-95 transition cursor-pointer"
+          >
             🍽
           </Link>
           <div>
-            <h1 className="text-xl font-black text-white leading-tight">Cafe @7 KDS</h1>
-            <div className="flex items-center gap-2 text-xs font-bold text-zinc-400">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D4AA] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D4AA]" />
+            <div className="flex items-center gap-2">
+              <h1 className="text-lg sm:text-xl font-black text-white leading-tight">Cafe @7 KDS</h1>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                Live Sync
               </span>
-              Live Realtime Sync Active
+            </div>
+            <div className="text-[11px] font-semibold text-zinc-400 flex items-center gap-2 mt-0.5">
+              <span>Sanjivani University</span>
+              <span>•</span>
+              <span className="font-mono text-white font-bold">{currentTime || '12:00:00 AM'}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Center: Shift Order Metrics Strip */}
+        <div className="hidden xl:flex items-center gap-2 bg-black/40 border border-white/10 rounded-2xl p-1.5 px-3">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400 px-2.5 py-1 rounded-xl bg-amber-500/10">
+            <span>🔥</span>
+            <span>{pendingOrders.length} New</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#FF8A3D] px-2.5 py-1 rounded-xl bg-[#FF8A3D]/10">
+            <span>🍳</span>
+            <span>{preparingOrders.length} Cooking</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 px-2.5 py-1 rounded-xl bg-emerald-500/10">
+            <span>⚡</span>
+            <span>{readyOrders.length} Ready</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400 px-2.5 py-1 rounded-xl bg-white/5">
+            <span>📦</span>
+            <span>{collectedOrders.length} Done</span>
+          </div>
+        </div>
+
+        {/* Right Action Tools */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Quick Search */}
+          <div className="relative max-w-[150px] sm:max-w-[180px]">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <input
+              type="text"
+              placeholder="Search token / OTP..."
+              value={kdsSearch}
+              onChange={(e) => setKdsSearch(e.target.value)}
+              className="w-full bg-[#1A1A26] border border-white/10 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-[#FF6B2C]"
+            />
+          </div>
+
+          {/* Fullscreen Button */}
+          <button
+            onClick={toggleFullscreen}
+            className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-zinc-300 hover:text-white transition cursor-pointer"
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Kiosk Fullscreen'}
+          >
+            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+          </button>
+
+          {/* Sound Toggle */}
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition cursor-pointer border ${
+            className={`px-3 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition cursor-pointer border ${
               soundEnabled ? 'bg-white/10 text-white border-white/20' : 'bg-red-950/50 text-red-400 border-red-500/30'
             }`}
           >
-            {soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF'}
+            {soundEnabled ? <Volume2 size={14} className="text-emerald-400" /> : <VolumeX size={14} className="text-red-400" />}
+            <span className="hidden sm:inline">{soundEnabled ? 'Sound ON' : 'Sound OFF'}</span>
           </button>
+
+          {/* Stock Manager */}
           <button
             onClick={() => setShowStockoutModal(true)}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black text-xs font-black shadow-lg shadow-[#FF6B2C]/20 hover:scale-105 active:scale-95 transition cursor-pointer flex items-center gap-2"
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black text-xs font-black shadow-lg shadow-[#FF6B2C]/20 hover:scale-105 active:scale-95 transition cursor-pointer flex items-center gap-1.5"
           >
             <span>📦</span>
-            <span>Stock Manager</span>
+            <span className="hidden sm:inline">Stock Manager</span>
             {soldOutCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-black/40 text-white text-[10px] font-black">
-                {soldOutCount} Sold Out
+              <span className="px-1.5 py-0.5 rounded-full bg-black/40 text-white text-[10px] font-black">
+                {soldOutCount}
               </span>
             )}
           </button>
@@ -596,144 +716,322 @@ export default function KitchenDisplayPage() {
 
       {/* Kanban Board */}
       <main className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 p-4 overflow-hidden h-full">
-        {/* NEW ORDERS */}
-        <div className="flex flex-col bg-[#12121A] rounded-2xl border border-white/5 overflow-hidden">
-          <div className="p-3 bg-[#FF6B2C]/10 border-b border-[#FF6B2C]/20 flex items-center justify-between">
-            <span className="font-extrabold text-xs text-[#FF6B2C] uppercase tracking-wider">
-              1. Incoming Confirmed ({pendingOrders.length})
+        {/* COLUMN 1: INCOMING CONFIRMED */}
+        <div className="flex flex-col bg-[#12121A] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+          <div className="p-3 bg-gradient-to-r from-[#FF6B2C]/20 to-transparent border-b border-[#FF6B2C]/30 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-base">🔥</span>
+              <span className="font-black text-xs text-[#FF8A3D] uppercase tracking-wider">
+                1. Incoming Confirmed
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-[#FF6B2C] text-black text-xs font-black">
+              {pendingOrders.length}
             </span>
           </div>
+
           <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin">
-            {pendingOrders.map((order) => (
-              <div key={order.id} className="bg-[#1C1C28] border border-white/10 p-4 rounded-xl shadow-md space-y-3">
-                <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="font-black text-lg text-white">{order.order_token}</span>
-                  <span className="text-xs px-2 py-0.5 rounded-md bg-[#FF6B2C]/20 text-[#FF6B2C] font-extrabold">
-                    {order.pickup_slots?.label || 'Next Break'}
-                  </span>
+            {pendingOrders.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2">
+                <div className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-xl">
+                  ✨
                 </div>
-                <div className="space-y-1.5 text-xs text-zinc-300">
-                  {order.order_items?.map((item) => (
-                    <div key={item.id} className="flex justify-between font-bold">
-                      <span>{item.quantity}x {item.item_name}</span>
-                      <span className="text-zinc-500">₹{item.subtotal}</span>
-                    </div>
-                  ))}
-                </div>
-                {order.notes && (
-                  <div className="text-[11px] bg-black/40 text-[#FFB347] p-2 rounded-lg border border-[#FFB347]/20 font-medium">
-                    Note: {order.notes}
-                  </div>
-                )}
-                <button
-                  onClick={() => handleUpdateStatus(order.id, 'PREPARING')}
-                  className="w-full py-2 rounded-lg bg-[#FF6B2C] hover:bg-[#FF6B2C]/90 text-white font-extrabold text-xs shadow transition cursor-pointer"
-                >
-                  Start Preparing →
-                </button>
+                <div className="text-sm font-bold text-zinc-300">All Clear</div>
+                <p className="text-xs text-zinc-500">No incoming orders waiting</p>
               </div>
-            ))}
+            ) : (
+              pendingOrders.map((order) => {
+                const urgency = getUrgencyBadge(order.created_at);
+                const isCod = order.notes?.includes('COD');
+
+                return (
+                  <div
+                    key={order.id}
+                    className="bg-[#1C1C28] border border-white/15 hover:border-[#FF6B2C]/50 p-4 rounded-2xl shadow-lg space-y-3 transition-all duration-300"
+                  >
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                      <div>
+                        <span className="font-black text-xl text-white tracking-tight">{order.order_token}</span>
+                        <div className="text-[10px] text-zinc-400 font-bold mt-0.5">
+                          {order.pickup_slots?.label || 'Next Break'}
+                        </div>
+                      </div>
+                      <span className={`text-[10px] font-black px-2 py-1 rounded-lg border ${urgency.color}`}>
+                        {urgency.label}
+                      </span>
+                    </div>
+
+                    {/* Items List */}
+                    <div className="space-y-1.5 text-xs text-zinc-200">
+                      {order.order_items?.map((item) => (
+                        <div key={item.id} className="flex justify-between items-center font-bold">
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-1.5 py-0.5 rounded-md bg-white/15 text-white font-black text-[11px]">
+                              {item.quantity}x
+                            </span>
+                            <span>{item.item_name}</span>
+                          </div>
+                          <span className="text-zinc-400 font-mono text-[11px]">₹{item.subtotal}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* High-Visibility COD Alert Box */}
+                    {isCod && (
+                      <div className="bg-amber-950/80 border-2 border-amber-500/80 rounded-xl p-2.5 text-amber-200 flex items-center justify-between shadow-lg shadow-amber-950/60">
+                        <div className="flex items-center gap-1.5 text-xs font-black">
+                          <span className="text-sm">💵</span>
+                          <span>COLLECT CASH:</span>
+                        </div>
+                        <span className="font-mono text-sm font-black text-amber-300">
+                          ₹{order.total_amount?.toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+
+                    {order.notes && !isCod && (
+                      <div className="text-[11px] bg-black/40 text-[#FFB347] p-2 rounded-lg border border-[#FFB347]/20 font-medium">
+                        Note: {order.notes}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => handleUpdateStatus(order.id, 'PREPARING')}
+                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FF8A3D] hover:opacity-95 text-black font-black text-xs shadow-lg shadow-[#FF6B2C]/30 transition cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Start Preparing</span>
+                      <span>➔</span>
+                    </button>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 
-        {/* PREPARING */}
-        <div className="flex flex-col bg-[#12121A] rounded-2xl border border-white/5 overflow-hidden">
-          <div className="p-3 bg-[#FFB347]/10 border-b border-[#FFB347]/20 flex items-center justify-between">
-            <span className="font-extrabold text-xs text-[#FFB347] uppercase tracking-wider">
-              2. On Stove / Prep ({preparingOrders.length})
+        {/* COLUMN 2: ON STOVE / PREPARATION */}
+        <div className="flex flex-col bg-[#12121A] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+          <div className="p-3 bg-gradient-to-r from-[#FFB347]/20 to-transparent border-b border-[#FFB347]/30 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-base">🍳</span>
+              <span className="font-black text-xs text-[#FFB347] uppercase tracking-wider">
+                2. On Stove / Prep
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-[#FFB347] text-black text-xs font-black">
+              {preparingOrders.length}
             </span>
           </div>
+
           <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin">
-            {preparingOrders.map((order) => (
-              <div key={order.id} className="bg-[#1C1C28] border border-[#FFB347]/30 p-4 rounded-xl shadow-md space-y-3">
-                <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="font-black text-lg text-white">{order.order_token}</span>
-                  <span className="text-xs px-2 py-0.5 rounded-md bg-[#FFB347]/20 text-[#FFB347] font-extrabold">
-                    Cooking
-                  </span>
-                </div>
-                <div className="space-y-1.5 text-xs text-zinc-300">
-                  {order.order_items?.map((item) => (
-                    <div key={item.id} className="flex justify-between font-bold">
-                      <span>{item.quantity}x {item.item_name}</span>
-                      <span className="text-zinc-500">₹{item.subtotal}</span>
-                    </div>
-                  ))}
-                </div>
-                {order.notes && (
-                  <div className="text-[11px] bg-black/40 text-[#FFB347] p-2 rounded-lg border border-[#FFB347]/20 font-medium">
-                    Note: {order.notes}
-                  </div>
-                )}
-                <button
-                  onClick={() => handleUpdateStatus(order.id, 'READY')}
-                  className="w-full py-2 rounded-lg bg-[#00D4AA] hover:bg-[#00D4AA]/90 text-black font-extrabold text-xs shadow transition cursor-pointer"
-                >
-                  Mark Ready for Pickup ✓
-                </button>
+            {preparingOrders.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
+                <ChefExpressIllustration size={120} />
+                <div className="text-sm font-black text-white">Stoves Are Free</div>
+                <p className="text-xs text-zinc-400 max-w-[200px] leading-relaxed">
+                  Tap <strong className="text-[#FF6B2C]">"Start Preparing ➔"</strong> on incoming tickets to queue cooking.
+                </p>
               </div>
-            ))}
+            ) : (
+              preparingOrders.map((order) => {
+                const urgency = getUrgencyBadge(order.created_at);
+                const isCod = order.notes?.includes('COD');
+
+                return (
+                  <div
+                    key={order.id}
+                    className="bg-[#1C1C28] border-2 border-[#FFB347]/40 p-4 rounded-2xl shadow-lg space-y-3 transition-all duration-300"
+                  >
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                      <div>
+                        <span className="font-black text-xl text-white tracking-tight">{order.order_token}</span>
+                        <div className="text-[10px] text-amber-400 font-bold mt-0.5 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                          <span>Active on Stove</span>
+                        </div>
+                      </div>
+                      <span className={`text-[10px] font-black px-2 py-1 rounded-lg border ${urgency.color}`}>
+                        {urgency.label}
+                      </span>
+                    </div>
+
+                    {/* Items List */}
+                    <div className="space-y-1.5 text-xs text-zinc-200">
+                      {order.order_items?.map((item) => (
+                        <div key={item.id} className="flex justify-between items-center font-bold">
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-1.5 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-black text-[11px]">
+                              {item.quantity}x
+                            </span>
+                            <span>{item.item_name}</span>
+                          </div>
+                          <span className="text-zinc-400 font-mono text-[11px]">₹{item.subtotal}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {isCod && (
+                      <div className="bg-amber-950/60 border border-amber-500/40 rounded-xl p-2 text-amber-200 flex items-center justify-between text-xs font-bold">
+                        <span>💵 Cash to collect:</span>
+                        <span className="font-mono font-black text-amber-300">₹{order.total_amount?.toFixed(2)}</span>
+                      </div>
+                    )}
+
+                    {order.notes && !isCod && (
+                      <div className="text-[11px] bg-black/40 text-[#FFB347] p-2 rounded-lg border border-[#FFB347]/20 font-medium">
+                        Note: {order.notes}
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => handleUpdateStatus(order.id, 'READY')}
+                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#00D4AA] to-[#00b894] hover:opacity-95 text-black font-black text-xs shadow-lg shadow-[#00D4AA]/30 transition cursor-pointer flex items-center justify-center gap-1.5"
+                    >
+                      <span>Mark Ready for Pickup</span>
+                      <span>✓</span>
+                    </button>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 
-        {/* READY FOR PICKUP */}
-        <div className="flex flex-col bg-[#12121A] rounded-2xl border border-white/5 overflow-hidden">
-          <div className="p-3 bg-[#00D4AA]/10 border-b border-[#00D4AA]/20 flex items-center justify-between">
-            <span className="font-extrabold text-xs text-[#00D4AA] uppercase tracking-wider">
-              3. Ready at Counter ({readyOrders.length})
+        {/* COLUMN 3: READY AT COUNTER */}
+        <div className="flex flex-col bg-[#12121A] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+          <div className="p-3 bg-gradient-to-r from-[#00D4AA]/20 to-transparent border-b border-[#00D4AA]/30 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-base">⚡</span>
+              <span className="font-black text-xs text-[#00D4AA] uppercase tracking-wider">
+                3. Ready at Counter
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-[#00D4AA] text-black text-xs font-black">
+              {readyOrders.length}
             </span>
           </div>
+
           <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin">
-            {readyOrders.map((order) => (
-              <div key={order.id} className="bg-[#1C1C28] border border-[#00D4AA]/30 p-4 rounded-xl shadow-md space-y-3">
-                <div className="flex items-center justify-between border-b border-white/5 pb-2">
-                  <span className="font-black text-xl text-[#00D4AA]">{order.order_token}</span>
-                  <div className="text-right">
-                    <span className="text-[10px] text-zinc-400 block font-bold">Required OTP:</span>
-                    <span className="font-mono text-sm font-black text-white px-2 py-0.5 bg-black/50 rounded border border-white/10">
-                      {order.pickup_otp || '----'}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-1 text-xs text-zinc-300">
-                  {order.order_items?.map((item) => (
-                    <div key={item.id} className="flex justify-between">
-                      <span>{item.quantity}x {item.item_name}</span>
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={() => {
-                    setVerifyingOrder(order);
-                    setEnteredOtp('');
-                    setOtpError('');
-                  }}
-                  className="w-full py-2 rounded-lg bg-[#00D4AA] hover:bg-[#00b894] text-black font-black text-xs shadow transition cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <span>🔐</span> Verify OTP & Release Tray ➔
-                </button>
+            {readyOrders.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
+                <CampusExpressIllustration size={120} />
+                <div className="text-sm font-black text-white">Counter Clear</div>
+                <p className="text-xs text-zinc-400 max-w-[200px] leading-relaxed">
+                  All prepared trays have been collected by students.
+                </p>
               </div>
-            ))}
+            ) : (
+              readyOrders.map((order) => {
+                const isCod = order.notes?.includes('COD');
+
+                return (
+                  <div
+                    key={order.id}
+                    className="bg-[#1C1C28] border-2 border-[#00D4AA]/40 p-4 rounded-2xl shadow-lg space-y-3 transition-all duration-300"
+                  >
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                      <div>
+                        <span className="font-black text-2xl text-[#00D4AA] tracking-tight">{order.order_token}</span>
+                        <div className="text-[10px] text-zinc-400 font-bold mt-0.5">
+                          Slot: {order.pickup_slots?.label || 'General'}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[9px] text-zinc-400 block font-bold uppercase tracking-wider">
+                          Required OTP
+                        </span>
+                        <span className="font-mono text-base font-black text-white px-2.5 py-0.5 bg-black/60 rounded-lg border border-[#00D4AA]/30 tracking-widest">
+                          {order.pickup_otp || '----'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Items List */}
+                    <div className="space-y-1 text-xs text-zinc-300">
+                      {order.order_items?.map((item) => (
+                        <div key={item.id} className="flex justify-between items-center">
+                          <span className="font-bold">{item.quantity}x {item.item_name}</span>
+                          <span className="text-zinc-500 font-mono text-[11px]">₹{item.subtotal}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {isCod && (
+                      <div className="bg-amber-950/70 border border-amber-500/50 rounded-xl p-2 text-amber-200 flex items-center justify-between text-xs font-bold">
+                        <span>💵 Collect Cash:</span>
+                        <span className="font-mono font-black text-amber-300">₹{order.total_amount?.toFixed(2)}</span>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-3 gap-2 pt-1">
+                      <button
+                        onClick={() => {
+                          setVerifyingOrder(order);
+                          setEnteredOtp('');
+                          setOtpError('');
+                        }}
+                        className="col-span-2 py-2.5 rounded-xl bg-gradient-to-r from-[#00D4AA] to-[#00b894] hover:opacity-95 text-black font-black text-xs shadow-lg shadow-[#00D4AA]/30 transition cursor-pointer flex items-center justify-center gap-1.5"
+                      >
+                        <span>🔐</span>
+                        <span>Verify OTP & Release</span>
+                      </button>
+
+                      <button
+                        onClick={() => handleDirectRelease(order.id, order.order_token)}
+                        className="col-span-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white font-bold text-[11px] transition cursor-pointer"
+                        title="Direct release if student phone died"
+                      >
+                        Direct ➔
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 
-        {/* RECENTLY COLLECTED */}
-        <div className="flex flex-col bg-[#12121A] rounded-2xl border border-white/5 overflow-hidden">
+        {/* COLUMN 4: COMPLETED & COLLECTED */}
+        <div className="flex flex-col bg-[#12121A] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
           <div className="p-3 bg-white/5 border-b border-white/10 flex items-center justify-between">
-            <span className="font-extrabold text-xs text-zinc-400 uppercase tracking-wider">
-              4. Completed ({collectedOrders.length})
+            <div className="flex items-center gap-2">
+              <span className="text-base">📦</span>
+              <span className="font-black text-xs text-zinc-400 uppercase tracking-wider">
+                4. Completed
+              </span>
+            </div>
+            <span className="px-2 py-0.5 rounded-full bg-white/10 text-zinc-300 text-xs font-black">
+              {collectedOrders.length}
             </span>
           </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 opacity-60 scrollbar-thin">
-            {collectedOrders.map((order) => (
-              <div key={order.id} className="bg-[#16161E] border border-white/5 p-3 rounded-xl flex items-center justify-between">
-                <div>
-                  <span className="font-bold text-zinc-400 text-sm">{order.order_token}</span>
-                  <div className="text-[10px] text-zinc-500 font-medium">₹{order.total_amount}</div>
-                </div>
-                <span className="text-[10px] uppercase font-black text-emerald-500/70">Collected</span>
+
+          {/* Revenue and summary ticker */}
+          <div className="px-3 py-2 bg-black/40 border-b border-white/5 flex items-center justify-between text-[11px] text-zinc-400 font-bold">
+            <span>Shift Revenue:</span>
+            <span className="font-mono font-black text-emerald-400">₹{totalCollectedAmount.toFixed(0)}</span>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-3 space-y-2 opacity-75 scrollbar-thin">
+            {collectedOrders.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-zinc-500">
+                <div className="text-sm font-bold">No completed orders yet</div>
               </div>
-            ))}
+            ) : (
+              collectedOrders.map((order) => (
+                <div
+                  key={order.id}
+                  className="bg-[#16161E] border border-white/5 p-3 rounded-xl flex items-center justify-between hover:opacity-100 transition"
+                >
+                  <div>
+                    <span className="font-bold text-white text-sm">{order.order_token}</span>
+                    <div className="text-[10px] text-zinc-400 font-medium">₹{order.total_amount}</div>
+                  </div>
+                  <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-emerald-950/80 border border-emerald-500/30 text-emerald-400">
+                    Collected ✓
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </main>
@@ -778,12 +1076,63 @@ export default function KitchenDisplayPage() {
               )}
             </div>
 
+            {/* Touch-Friendly Numeric Keypad for Counter Tablets */}
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => {
+                    if (enteredOtp.length < 4) {
+                      setEnteredOtp((prev) => prev + num);
+                      setOtpError('');
+                    }
+                  }}
+                  className="py-3 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-white font-mono text-xl font-bold transition cursor-pointer"
+                >
+                  {num}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setEnteredOtp('');
+                  setOtpError('');
+                }}
+                className="py-3 rounded-xl bg-red-950/40 hover:bg-red-950/60 active:scale-95 border border-red-500/30 text-red-400 font-bold text-xs transition cursor-pointer"
+              >
+                Clear
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (enteredOtp.length < 4) {
+                    setEnteredOtp((prev) => prev + '0');
+                    setOtpError('');
+                  }
+                }}
+                className="py-3 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-white font-mono text-xl font-bold transition cursor-pointer"
+              >
+                0
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEnteredOtp((prev) => prev.slice(0, -1));
+                  setOtpError('');
+                }}
+                className="py-3 rounded-xl bg-white/5 hover:bg-white/10 active:scale-95 border border-white/10 text-zinc-300 font-bold text-sm transition cursor-pointer"
+              >
+                ⌫
+              </button>
+            </div>
+
             {/* Quick Match Helper */}
-            <div className="mb-6 flex justify-center">
+            <div className="mb-5 flex justify-center">
               <button
                 type="button"
                 onClick={() => setEnteredOtp(verifyingOrder.pickup_otp || '')}
-                className="text-[11px] text-zinc-400 hover:text-[#00D4AA] underline cursor-pointer"
+                className="text-xs text-zinc-400 hover:text-[#00D4AA] font-bold underline cursor-pointer"
               >
                 Auto-fill student OTP ({verifyingOrder.pickup_otp || '----'})
               </button>

@@ -128,7 +128,7 @@ export default function TermsAndConditionsPage() {
     },
     {
       q: 'How do I escalate an unresolved dispute or payment mismatch?',
-      a: 'Follow our 3-Tier Grievance Matrix: First speak with the Cafe @7 Counter Lead (< 2 mins). If unresolved, email foodlinecampus@gmail.com (< 2 hours). For institutional policy issues, contact the Sanjivani University Dean of Student Welfare (< 24 hours).',
+      a: 'Follow our 3-Tier Grievance Matrix: First speak with the Cafe @7 Counter Lead (< 2 mins). If unresolved, email foodlinecampus07@gmail.com (< 2 hours). For institutional policy issues, contact the Sanjivani University Dean of Student Welfare (< 24 hours).',
     },
   ];
 
@@ -558,7 +558,7 @@ export default function TermsAndConditionsPage() {
               <ul className="list-disc list-inside space-y-1.5 text-zinc-400 text-xs">
                 <li>Orders containing <strong>more than 10 total portions</strong> must be placed at least <strong>2 hours prior</strong> to the requested break slot.</li>
                 <li>This ensures kitchen staff can prepare specialized bulk batches without starving the 60-order automated slot capacity reserved for individual peer orders.</li>
-                <li>For custom event bulk orders exceeding 50 portions, contact Cafe @7 management directly or email <code className="text-[#F59E0B]">foodlinecampus@gmail.com</code>.</li>
+                <li>For custom event bulk orders exceeding 50 portions, contact Cafe @7 management directly or email <code className="text-[#F59E0B]">foodlinecampus07@gmail.com</code>.</li>
               </ul>
             </div>
           </div>
@@ -1073,8 +1073,8 @@ export default function TermsAndConditionsPage() {
               </div>
               <p className="text-xs text-zinc-300 leading-relaxed">
                 For contract interpretations, data access requests, or official cafeteria inquiries, contact the FoodLine Student Welfare Desk at{' '}
-                <a href="mailto:foodlinecampus@gmail.com" className="text-[#00D4AA] font-bold underline">
-                  foodlinecampus@gmail.com
+                <a href="mailto:foodlinecampus07@gmail.com" className="text-[#00D4AA] font-bold underline">
+                  foodlinecampus07@gmail.com
                 </a>{' '}
                 or visit the Student Welfare Administrative Office, Sanjivani University, Kopargaon.
               </p>

@@ -16,3 +16,6 @@ export { Logo } from './Logo';
 export { SteamEffect } from './SteamEffect';
 export { AnimatedCounter } from './AnimatedCounter';
 export { FoodParticles } from './FoodParticles';
+export { GlobalClickEffect } from './GlobalClickEffect';
+export { Magnetic } from './Magnetic';
+export { MeshGradientBackground } from './MeshGradientBackground';
