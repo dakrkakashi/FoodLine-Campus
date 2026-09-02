@@ -5,7 +5,7 @@ build/
 dist/
 
 # Dependencies
-node_modules/
+node_modules
 
 # Local env
 .env*.local
