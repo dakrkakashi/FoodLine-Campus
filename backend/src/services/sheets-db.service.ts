@@ -59,6 +59,11 @@ export class SheetsDbService {
   private static readonly USERS_TTL_MS = 60 * 1000;     // 60 seconds
   private static readonly PAYMENTS_TTL_MS = 20 * 1000;  // 20 seconds
 
+  // Asynchronous Write Queue for Orders to strictly respect Google Sheets write quotas (max 60/min)
+  private static pendingOrdersQueue: any[][] = [];
+  private static orderFlushTimer: NodeJS.Timeout | null = null;
+  private static isFlushingOrders = false;
+
   public static getSpreadsheetId(): string {
     return process.env.GOOGLE_SHEETS_SPREADSHEET_ID || '1UjpWRpsDuBx6aCsZLREx__zSapeEdICM3o7WosWZCW8';
   }
@@ -252,19 +257,72 @@ export class SheetsDbService {
       order.paymentUtr || '',
     ];
 
+    // Enqueue order for batched asynchronous persistence
+    this.pendingOrdersQueue.push(rowValues);
+
+    // If buffer reaches 25 rows, trigger immediate batch flush
+    if (this.pendingOrdersQueue.length >= 25) {
+      this.flushOrdersQueue().catch((err) => {
+        console.warn('[SheetsDbService] Immediate batch flush error:', err?.message || err);
+      });
+    } else if (!this.orderFlushTimer) {
+      // Debounce flush by 1200ms to consolidate rapid bursts into a single API call
+      this.orderFlushTimer = setTimeout(() => {
+        this.orderFlushTimer = null;
+        this.flushOrdersQueue().catch((err) => {
+          console.warn('[SheetsDbService] Scheduled batch flush error:', err?.message || err);
+        });
+      }, 1200);
+      if (this.orderFlushTimer.unref) this.orderFlushTimer.unref();
+    }
+
+    return true;
+  }
+
+  /**
+   * Flushes batched orders from in-memory queue to Google Sheets in a single API call.
+   * Eliminates the 60 write req/min quota limit failure during peak student rush breaks.
+   */
+  public static async flushOrdersQueue(): Promise<boolean> {
+    if (this.isFlushingOrders || this.pendingOrdersQueue.length === 0) {
+      return true;
+    }
+
+    const sheets = getSheetsClient();
+    const spreadsheetId = this.getSpreadsheetId();
+    if (!sheets || !spreadsheetId) {
+      return false;
+    }
+
+    this.isFlushingOrders = true;
+    // Drain up to 50 rows per batch append
+    const batch = this.pendingOrdersQueue.splice(0, 50);
+
     try {
       await sheets.spreadsheets.values.append({
         spreadsheetId,
         range: 'Orders!A:I',
         valueInputOption: 'USER_ENTERED',
         requestBody: {
-          values: [rowValues],
+          values: batch,
         },
       });
       return true;
     } catch (err: any) {
-      console.error('[SheetsDbService] Error appending order to Orders tab:', err?.message || err);
+      console.warn('[SheetsDbService] Error batch-appending orders to Orders tab (re-queueing):', err?.message || err);
+      // Put batch back to head of queue so no orders are lost
+      this.pendingOrdersQueue.unshift(...batch);
       return false;
+    } finally {
+      this.isFlushingOrders = false;
+      // If items remain in queue, schedule follow-up flush
+      if (this.pendingOrdersQueue.length > 0 && !this.orderFlushTimer) {
+        this.orderFlushTimer = setTimeout(() => {
+          this.orderFlushTimer = null;
+          this.flushOrdersQueue().catch(() => {});
+        }, 2000);
+        if (this.orderFlushTimer.unref) this.orderFlushTimer.unref();
+      }
     }
   }
 

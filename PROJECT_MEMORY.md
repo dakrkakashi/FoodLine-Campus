@@ -3,8 +3,17 @@
 <!-- Both Antigravity IDE (Backend) and Antigravity CLI 'agy' (Frontend) read this file. -->
 
 ## 📍 Where We Left Off (Last Completed Checkpoint)
-- **Date & Time:** 2026-09-02 (Late Night Session — Port 4000 & 3000 Dev Recovery Complete)
-- **GitHub Connection:** 100% Synchronized with `@dakrkakashi` (All branches `main`, `backend`, `frontend` up to date).
+- **Date & Time:** 2026-09-03 (Midnight Hive Session — Backend Stabilization, Concurrency Quota Optimization & Zero-Collision Engine)
+- **Backend Concurrency & Google Sheets Quota Immunity:** 100% Operational & Verified!
+  - Built an asynchronous in-memory write buffer queue in `SheetsDbService.ts` (`pendingOrdersQueue`) with debounced (1200ms) and threshold (>=25 items) batching.
+  - Flushes up to 50 orders in a single API call to strictly eliminate Google Sheets 60 req/min write quota exhaustion during peak break-time rushes.
+  - Added 30s background flush and graceful process termination flush handlers in `server.ts`.
+- **Order Token Collision Immunity & DB Recovery:** 100% Operational & Verified!
+  - Enhanced `generateOrderToken()` in `OrderService.ts` to check active in-memory and pruned token stores with high-entropy 5-digit fallback.
+  - Added atomic 3-attempt retry loop on Supabase `orders` insertion to automatically recover from database token collisions (`23505`) without failing student orders.
+- **Stress Test & API Audit:** 100% Success!
+  - `npm --prefix backend run test:stress`: 65 concurrent requests (50 break rush + 15 overload) pass with 0 duplicate key violations, 0 Google Sheets quota warnings, exactly 60 accepted and 5 gracefully throttled at capacity.
+  - `npm --prefix backend run test:api`: 11/11 endpoints passing cleanly.
 - **Port 4000 API Dashboard & Port 3000 Dev Server Restored:** 100% Operational & Verified!
   - Added dedicated dark-themed HTML status landing dashboard to `GET /` on Express backend (`http://localhost:4000`).
   - Added `/`, `/select-campus`, `/canteens`, `/onboarding`, and `/debug` to Next.js middleware `PUBLIC_ROUTES`.

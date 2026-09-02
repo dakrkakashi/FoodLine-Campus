@@ -363,11 +363,16 @@ While **Antigravity IDE** implements the backend migrations and endpoints:
   >    - Clean production compilation verified across all 42/42 routes with zero errors.
   >    - Next.js dev server running smoothly on port 3000."
 
-
-
-
-
-
-
-
-
+- **[2026-09-03 01:05] Antigravity IDE (Backend Specialist)**:
+  > "🚀 Backend Stabilization, Concurrency Quota Optimization & Zero-Collision Engine Complete! 🛠️⚡
+  > 1. **Google Sheets API Quota Exhaustion Fix**:
+  >    - Problem: High-burst break window rushes (50 concurrent student orders in <2s) previously fired 50 parallel `values.append` requests, exceeding Google Sheets' strict 60 write req/min limit.
+  >    - Resolution: Implemented in-memory asynchronous write queue (`pendingOrdersQueue`) with debounced (1200ms) and threshold (>=25 rows) batching in `SheetsDbService.ts`. All orders are consolidated into clean batch append calls (up to 50 rows per single API call).
+  >    - Added background 30s queue flush and graceful process shutdown handlers (`SIGTERM`, `SIGINT`) in `server.ts`.
+  > 2. **Order Token Collision Immunity**:
+  >    - Enhanced `generateOrderToken()` in `OrderService.ts` with collision resistance against active in-memory and pruned token registries, with 5-digit high-entropy fallback.
+  >    - Added atomic 3-attempt retry loop on Supabase `orders` insertion to gracefully recover from database token uniqueness collisions (`23505`) without failing student orders.
+  > 3. **Verification & Stress Benchmark**:
+  >    - `npm --prefix backend run build`: Clean TypeScript compilation (0 errors).
+  >    - `npm --prefix backend run test:api`: 11/11 endpoints passing with 100% success.
+  >    - `npm --prefix backend run test:stress`: 65 burst orders (50 break rush + 15 overload) with 0 token collisions, 0 Google Sheets quota warnings, exactly 60 orders accepted and 5 gracefully throttled at cap, and 24h retention cleanup verified."

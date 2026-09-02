@@ -35,8 +35,19 @@ export class OrderService {
    * Helper to generate 4-digit token e.g. FL-1793
    */
   public static generateOrderToken(): string {
-    const randNum = Math.floor(1000 + Math.random() * 9000);
-    return `FL-${randNum}`;
+    let token = '';
+    let attempts = 0;
+    do {
+      const randNum = Math.floor(1000 + Math.random() * 9000);
+      token = `FL-${randNum}`;
+      attempts++;
+      if (attempts > 30) {
+        const highEntropyNum = Math.floor(10000 + Math.random() * 90000);
+        token = `FL-${highEntropyNum}`;
+        break;
+      }
+    } while (ordersStore.has(token) || prunedOrderTokens.has(token));
+    return token;
   }
 
   /**
@@ -146,35 +157,60 @@ export class OrderService {
     // Persist to Supabase if configured
     if (isSupabaseConfigured) {
       try {
-        const { data: dbOrder, error: orderError } = await supabase
-          .from('orders')
-          .insert({
-            id: orderId,
-            order_token: orderToken,
-            user_id: userId || null,
-            cafeteria_id:
-              cafeteriaId && cafeteriaId !== 'b2222222-2222-2222-2222-222222222222' && cafeteriaId.length === 36
-                ? cafeteriaId
-                : '754bd902-cafb-40a6-9cdd-96bc8760ad7f',
-            slot_id:
-              slotId && slotId !== 'd1111111-1111-1111-1111-111111111111' && slotId.length === 36
-                ? slotId
-                : '20e848cf-9d4e-490d-b01f-59cad15bb766',
-            total_amount: totalAmount,
-            status: 'PENDING_PAYMENT',
-            pickup_otp: pickupOtp,
-            notes: notes || null,
-          })
-          .select()
-          .single();
+        let dbOrder: any = null;
+        let orderError: any = null;
+        let activeToken = orderToken;
 
-        if (!orderError && dbOrder) {
-          newOrder.id = dbOrder.id;
-        } else if (orderError) {
-          console.warn('Supabase order insert error:', orderError.message, orderError.details);
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const res = await supabase
+            .from('orders')
+            .insert({
+              id: orderId,
+              order_token: activeToken,
+              user_id: userId || null,
+              cafeteria_id:
+                cafeteriaId && cafeteriaId !== 'b2222222-2222-2222-2222-222222222222' && cafeteriaId.length === 36
+                  ? cafeteriaId
+                  : '754bd902-cafb-40a6-9cdd-96bc8760ad7f',
+              slot_id:
+                slotId && slotId !== 'd1111111-1111-1111-1111-111111111111' && slotId.length === 36
+                  ? slotId
+                  : '20e848cf-9d4e-490d-b01f-59cad15bb766',
+              total_amount: totalAmount,
+              status: 'PENDING_PAYMENT',
+              pickup_otp: pickupOtp,
+              notes: notes || null,
+            })
+            .select()
+            .single();
+
+          dbOrder = res.data;
+          orderError = res.error;
+
+          if (!orderError) {
+            if (activeToken !== orderToken) {
+              ordersStore.delete(orderToken);
+              newOrder.orderToken = activeToken;
+              ordersStore.set(activeToken, newOrder);
+            }
+            break;
+          }
+
+          // If unique constraint violation on order_token, regenerate token and retry
+          if (
+            orderError.message?.includes('orders_order_token_key') ||
+            orderError.code === '23505'
+          ) {
+            activeToken = OrderService.generateOrderToken();
+            continue;
+          }
+
+          // Other non-collision error
+          break;
         }
 
         if (!orderError && dbOrder) {
+          newOrder.id = dbOrder.id;
           // Insert order items
           const orderItemsToInsert = formattedItems.map((fi) => ({
             order_id: dbOrder.id,
@@ -186,6 +222,8 @@ export class OrderService {
           }));
 
           await supabase.from('order_items').insert(orderItemsToInsert);
+        } else if (orderError) {
+          console.warn('Supabase order insert error:', orderError.message, orderError.details);
         }
       } catch (err) {
         console.warn('Supabase order creation fallback:', err);

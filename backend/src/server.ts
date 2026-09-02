@@ -37,6 +37,21 @@ setInterval(() => {
   });
 }, 60 * 60 * 1000);
 
+// Background flush for queued Google Sheets orders every 30s
+setInterval(() => {
+  SheetsDbService.flushOrdersQueue().catch((err) => {
+    console.warn('Google Sheets periodic queue flush error:', err);
+  });
+}, 30 * 1000);
+
+// Graceful process shutdown flushes pending order write buffer
+const handleGracefulShutdown = async () => {
+  await SheetsDbService.flushOrdersQueue().catch(() => {});
+  process.exit(0);
+};
+process.on('SIGTERM', handleGracefulShutdown);
+process.on('SIGINT', handleGracefulShutdown);
+
 // -----------------------------------------------------------------------------
 // Root Landing Dashboard & API Discovery
 // -----------------------------------------------------------------------------
