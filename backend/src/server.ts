@@ -388,6 +388,58 @@ app.post('/api/admin/orders/cleanup', async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+// -----------------------------------------------------------------------------
+// 10. GET /api/telemetry (Real-Time System, Memory, SSE & Slot Monitor)
+// -----------------------------------------------------------------------------
+app.get('/api/telemetry', async (req: Request, res: Response) => {
+  try {
+    const memory = process.memoryUsage();
+    const uptimeSec = Math.floor(process.uptime());
+    const dbHealth = isSupabaseConfigured
+      ? await checkDatabaseConnection()
+      : { connected: false, message: 'Local Memory Cache Active', latencyMs: 0 };
+    const allOrders = OrderService.getAllOrders();
+    const activeCooking = allOrders.filter((o) => o.status === 'PREPARING').length;
+    const readyAtCounter = allOrders.filter((o) => o.status === 'READY').length;
+    const slots = await SlotThrottlerService.getAllSlots();
+
+    res.json({
+      success: true,
+      data: {
+        system: {
+          status: 'healthy',
+          uptimeSeconds: uptimeSec,
+          uptimeHuman: `${Math.floor(uptimeSec / 3600)}h ${Math.floor((uptimeSec % 3600) / 60)}m ${uptimeSec % 60}s`,
+          nodeVersion: process.version,
+          platform: process.platform,
+          memory: {
+            rssMb: Math.round((memory.rss / (1024 * 1024)) * 100) / 100,
+            heapUsedMb: Math.round((memory.heapUsed / (1024 * 1024)) * 100) / 100,
+            heapTotalMb: Math.round((memory.heapTotal / (1024 * 1024)) * 100) / 100,
+          },
+        },
+        realtime: {
+          activeSseClients: sseBroadcaster.getActiveConnectionsCount(),
+          activeWatchedTokens: sseBroadcaster.getActiveOrderTokens(),
+        },
+        orders: {
+          totalTracked: allOrders.length,
+          cookingQueue: activeCooking,
+          readyCounter: readyAtCounter,
+        },
+        slots: {
+          totalSlots: slots.length,
+          totalCapacity: slots.reduce((acc, s) => acc + s.maxCapacity, 0),
+          totalBooked: slots.reduce((acc, s) => acc + s.currentBooked, 0),
+        },
+        database: dbHealth,
+      },
+      meta: { timestamp: new Date().toISOString() },
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // Start listening
 app.listen(PORT, () => {

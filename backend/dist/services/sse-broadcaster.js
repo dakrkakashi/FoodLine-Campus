@@ -39,5 +39,11 @@ class SseBroadcaster {
             }
         });
     }
+    getActiveConnectionsCount() {
+        return this.clients.length;
+    }
+    getActiveOrderTokens() {
+        return [...new Set(this.clients.map((c) => c.orderToken))];
+    }
 }
 exports.sseBroadcaster = new SseBroadcaster();

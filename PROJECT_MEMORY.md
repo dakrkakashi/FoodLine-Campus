@@ -38,7 +38,7 @@
   - **Culinary Steam Physics (`SteamEffect.tsx`):** Multi-particle animated steam rising from hot dosas, cutting chai, samosas, and thalis.
   - **Odometer Numbers (`AnimatedCounter.tsx`):** High-response spring rolling animation for prices, cart count badges, and subtotal counters.
   - **Ambient Atmosphere (`FoodParticles.tsx`):** Drifting campus culinary icons floating within the responsive aurora background mesh.
-  - **Global Keyframe Utilities (`globals.css`):** Added `animate-steam`, `animate-ripple`, `animate-float-gentle`, `animate-gradient-flow`, and body background transitions.
+  - **Clean & Focused Introduction Overhaul:** Streamlined `/` landing page into a clean, minimal Introduction Screen with 2 direct entry paths (`/select-campus` and `/login`) and 3 minimal value cards, removing unnecessary 3D canvases, visualizer graphs, bestseller tilt cards, and FAQ clutter.
   - **Celebration Burst & Spring Cart:** High-impact celebration burst on `/checkout` and bouncy spring capsule pill on `/menu`.
 - **Multi-Canteen & Geo-Campus Engine (Full-Stack Complete):** 100% Operational & Verified!
   - **Backend (`backend/`):**
@@ -55,17 +55,20 @@
     - Built `/onboarding` 3-slide value onboarding carousel with deep links to PRN login and campus directory.
     - Added smart campus auto-detection to the `/login` PRN field with a direct link to browse other campuses.
     - Established `MULTI_AGENT_SYNC.md` coordination hub between Antigravity CLI and Antigravity IDE.
-- **Compilation Guarantee:** 100% Zero-Error Compilation across all 38 Next.js routes and Express backend.
+- **Real-Time Telemetry & Health Monitoring (Complete):** 100% Operational & Verified!
+  - `GET /api/telemetry` implemented in both Express backend and Next.js App Router.
+  - Monitors process memory (RSS, Heap in MB), human-readable uptime, active SSE stream connections, slot capacity usage, and live Supabase latency.
+- **Compilation Guarantee:** 100% Zero-Error Compilation across all 39 Next.js routes and Express backend.
 
 ---
 
 ## 🎯 Current Active Sprint & Next Missions
 
 ### ⚡ Mission for Antigravity IDE (Backend Specialist):
-1. **Pilot Deployment Monitoring & Telemetry Dashboard:**
-   - Monitor live memory usage and slot throughput under prolonged break simulation.
-2. **Push Notification / Sound Trigger Integration:**
+1. **Push Notification / Sound Trigger Integration:**
    - Add push / webhook dispatch when order transitions to `READY` for counter staff alert.
+2. **Break Simulation Load Testing:**
+   - Script 60-order rush scenario to verify slot throttling and memory bounds.
 
 ### 🎨 Mission for Antigravity CLI 'agy' (Frontend Specialist):
 1. **Offline Resilience / PWA Offline Banner:**

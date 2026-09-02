@@ -14,10 +14,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <AuthProvider>
         <CampusProvider>
           <CartProvider>
-            <InventoryProvider>
-              {children}
-              <FloatingThemeTrigger />
-            </InventoryProvider>
+            <InventoryProvider>{children}</InventoryProvider>
           </CartProvider>
         </CampusProvider>
       </AuthProvider>

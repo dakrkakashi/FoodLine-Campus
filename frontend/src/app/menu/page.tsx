@@ -182,9 +182,6 @@ export default function MenuPage() {
         />
       </div>
 
-      {/* Subtle Culinary Food Particles Drift */}
-      <FoodParticles />
-
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 pt-6 relative z-10">
