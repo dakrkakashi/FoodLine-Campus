@@ -73,6 +73,18 @@
     - Created `CampusContext.tsx` with resilient client fallbacks, localStorage persistence, and multi-canteen state.
     - Built `/select-campus` featuring a 4-tier cascading geo drilldown (State -> District -> City -> Campus) and instant direct college search.
     - Built `/canteens` 5-outlet directory hub displaying all Sanjivani canteens (Cafe @7, South Corner Dosa Bar, Nescafe Campus Kiosk, MBA Block Cafeteria, Central Hostel Dining Mess) with live prep times, badges, and 1-tap menu navigation.
+- **Google Sheets API v4 Database Engine:** 100% Operational & Live Verified!
+  - Connected live spreadsheet `Foodline Campus Master` (`1UjpWRpsDuBx6aCsZLREx__zSapeEdICM3o7WosWZCW8`) via Service Account (`foodline-backend@foodline-campus-07.iam.gserviceaccount.com`).
+  - Implemented `SheetsDbService` with 4 tabs: `FoodLine — Student Signup Form` (Users), `FoodLine — Payment & UTR Form` (Payments), `Orders`, and `Inventory`.
+  - Dynamic column header detection and in-memory TTL caching (30s Inventory, 60s Users, 20s Payments) protecting Google's 60-100 req/min rate limit.
+  - End-to-end verified with live test order `FL-8389` written directly to the `Orders` tab.
+- **Student & Staff Account / Profile Hub (`/profile` & `/account`):** 100% Operational!
+  - Built comprehensive `/profile` page with student PRN badge copy, campus & canteen affinity, dietary filter preferences (All/Veg/Jain), Web Audio toggle, and DPDP / student welfare links.
+  - Added "Account" links to Desktop Navbar, Mobile Navigation Drawer, and UserAvatar popover menu.
+- **Global Staff & Ombudsman Contact:**
+  - Migrated primary staff, management, and student welfare support email across all routes, terms, and login quick-fill to `foodlinecampus07@gmail.com`.
+- **Android Gradle JDK 21 Environment:**
+  - Configured `frontend/android/gradle.properties` with JDK 21 home; verified `assembleDebug` builds cleanly (93 tasks up-to-date).
     - Enhanced `/menu` with active canteen switch pills in the banner and authentic multi-canteen dish support.
     - Built `/onboarding` 3-slide value onboarding carousel with deep links to PRN login and campus directory.
     - Added smart campus auto-detection to the `/login` PRN field with a direct link to browse other campuses.
