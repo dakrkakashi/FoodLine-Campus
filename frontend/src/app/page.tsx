@@ -27,6 +27,8 @@ import {
   AnimatedText,
   TiltCard,
   CampusVisualizer,
+  FoodParticles,
+  AnimatedCounter,
 } from '@/components/ui';
 import { CampusHero3D } from '@/components/3d/CampusHero3D';
 import { useSoundFX } from '@/hooks/useSoundFX';
@@ -137,6 +139,9 @@ export default function LandingPage() {
         />
       </div>
 
+      {/* Culinary Food Particles Drift */}
+      <FoodParticles />
+
       <Navbar />
 
       {/* Hero Section */}
@@ -152,7 +157,7 @@ export default function LandingPage() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--accent-teal,#00D4AA)] opacity-75" />
             <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--accent-teal,#00D4AA)]" />
           </span>
-          <span className="tracking-wide">SANJIVANI UNIVERSITY • CAFE @7 EXPRESS LANE ACTIVE</span>
+          <span className="tracking-wide">SANJIVANI UNIVERSITY • 5 CAMPUS CANTEENS ACTIVE</span>
           <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-white font-mono">0% Surcharge</span>
         </motion.div>
 
@@ -171,7 +176,7 @@ export default function LandingPage() {
           transition={{ duration: 0.5, delay: 0.35 }}
           className="text-base sm:text-xl text-zinc-400 max-w-3xl mx-auto mb-10 leading-relaxed font-medium"
         >
-          Order your favorite meals straight from lecture halls before break time. Experience smart slot batching, instant UPI verification, and hot tray express pickup.
+          Order your favorite meals straight from lecture halls before break time. Experience smart slot batching, instant UPI verification, and hot tray express pickup across 5 campus outlets.
         </motion.p>
 
         {/* Hero CTAs */}
@@ -179,25 +184,34 @@ export default function LandingPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.45 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto mb-16 w-full"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-2xl mx-auto mb-16 w-full"
         >
-          <Link href="/menu" onClick={playClick} className="w-full">
+          <Link href="/canteens" onClick={playClick} className="w-full sm:w-auto flex-1">
             <motion.button
               whileHover={{ scale: 1.04, y: -2 }}
               whileTap={{ scale: 0.96 }}
-              className="w-full px-8 py-4.5 bg-gradient-to-r from-[var(--accent-orange,#FF6B2C)] via-[#FF8A3D] to-[var(--accent-amber,#FFB347)] text-black font-black text-base md:text-lg rounded-2xl shadow-2xl shadow-[var(--accent-orange,#FF6B2C)]/40 flex items-center justify-center gap-3 cursor-pointer group transition-all"
+              className="w-full px-6 py-4 bg-gradient-to-r from-[var(--accent-orange,#FF6B2C)] via-[#FF8A3D] to-[var(--accent-amber,#FFB347)] text-black font-black text-sm md:text-base rounded-2xl shadow-2xl shadow-[var(--accent-orange,#FF6B2C)]/40 flex items-center justify-center gap-2 cursor-pointer group transition-all"
             >
-              <span>Browse Cafe @7 Menu</span>
-              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+              <span>Explore 5 Canteens</span>
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </motion.button>
           </Link>
-          <Link href="/kds" onClick={playClick} className="w-full">
+          <Link href="/menu" onClick={playClick} className="w-full sm:w-auto flex-1">
             <motion.button
               whileHover={{ scale: 1.04, y: -2 }}
               whileTap={{ scale: 0.96 }}
-              className="w-full px-6 py-4.5 glass-interactive text-white font-extrabold text-base rounded-2xl flex items-center justify-center gap-2.5 shadow-xl cursor-pointer"
+              className="w-full px-6 py-4 glass-card-heavy text-white hover:text-[var(--accent-amber)] border border-white/15 hover:border-[var(--accent-orange)]/50 font-black text-sm md:text-base rounded-2xl shadow-xl flex items-center justify-center gap-2 cursor-pointer transition-all"
             >
-              <span>🍳</span> Kitchen Live Station
+              <span>🍽️ Cafe @7 Menu</span>
+            </motion.button>
+          </Link>
+          <Link href="/kds" onClick={playClick} className="w-full sm:w-auto">
+            <motion.button
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.96 }}
+              className="w-full px-5 py-4 glass-interactive text-white font-extrabold text-sm rounded-2xl flex items-center justify-center gap-2 shadow-xl cursor-pointer"
+            >
+              <span>🍳 KDS</span>
             </motion.button>
           </Link>
         </motion.div>

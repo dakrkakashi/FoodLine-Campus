@@ -1,0 +1,52 @@
+{
+  "states": [
+    {
+      "id": "maharashtra",
+      "name": "Maharashtra",
+      "districts": [
+        {
+          "id": "ahmednagar",
+          "name": "Ahmednagar",
+          "cities": [
+            {
+              "id": "kopargaon",
+              "name": "Kopargaon",
+              "campuses": [
+                {
+                  "id": "a1111111-1111-1111-1111-111111111111",
+                  "name": "Sanjivani University",
+                  "slug": "sanjivani",
+                  "location": "Kopargaon, Maharashtra",
+                  "pincode": "423603",
+                  "totalCanteens": 5,
+                  "isVerified": true
+                }
+              ]
+            },
+            {
+              "id": "shirdi",
+              "name": "Shirdi",
+              "campuses": []
+            },
+            {
+              "id": "sangamner",
+              "name": "Sangamner",
+              "campuses": []
+            }
+          ]
+        },
+        {
+          "id": "pune",
+          "name": "Pune",
+          "cities": [
+            {
+              "id": "pune-city",
+              "name": "Pune City",
+              "campuses": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

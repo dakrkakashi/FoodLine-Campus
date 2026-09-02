@@ -13,16 +13,23 @@ let localMenuItems: MenuItem[] = (initialMenuData as any[]).map((item) => ({
   isVeg: item.isVeg !== undefined ? item.isVeg : true,
   isAvailable: item.isAvailable !== undefined ? item.isAvailable : true,
   image: item.image,
+  cafeteriaId: item.cafeteriaId || item.cafeteria_id || 'b2222222-2222-2222-2222-222222222222',
+  cafeteria_id: item.cafeteria_id || item.cafeteriaId || 'b2222222-2222-2222-2222-222222222222',
 }));
 
 export class MenuService {
   /**
-   * Get all menu items with optional category filtering
+   * Get all menu items with optional category and cafeteria filtering
    */
-  public static async getAllItems(categoryId?: string): Promise<MenuItem[]> {
+  public static async getAllItems(categoryId?: string, cafeteriaId?: string): Promise<MenuItem[]> {
+    const targetCafeteria = cafeteriaId || 'b2222222-2222-2222-2222-222222222222';
+
     if (isSupabaseConfigured) {
       try {
         let query = supabase.from('menu_items').select('*, categories(name)');
+        if (cafeteriaId && cafeteriaId !== 'all') {
+          query = query.eq('cafeteria_id', targetCafeteria);
+        }
         const { data, error } = await query;
 
         if (!error && data && data.length > 0) {
@@ -36,6 +43,8 @@ export class MenuService {
             isVeg: d.is_veg !== undefined ? d.is_veg : true,
             isAvailable: d.is_available !== undefined ? d.is_available : true,
             image: d.image_url,
+            cafeteriaId: d.cafeteria_id || targetCafeteria,
+            cafeteria_id: d.cafeteria_id || targetCafeteria,
           }));
 
           if (categoryId && categoryId !== 'All') {
@@ -49,10 +58,20 @@ export class MenuService {
     }
 
     // Fallback to local memory cache
-    if (!categoryId || categoryId === 'All') {
-      return localMenuItems;
+    let filtered = localMenuItems;
+    if (cafeteriaId && cafeteriaId !== 'all') {
+      filtered = filtered.filter(
+        (item) =>
+          item.cafeteriaId === targetCafeteria ||
+          item.cafeteria_id === targetCafeteria ||
+          (targetCafeteria === 'cafe7' && item.cafeteriaId === 'b2222222-2222-2222-2222-222222222222')
+      );
     }
-    return localMenuItems.filter((item) => item.category.toLowerCase() === categoryId.toLowerCase());
+
+    if (!categoryId || categoryId === 'All') {
+      return filtered;
+    }
+    return filtered.filter((item) => item.category.toLowerCase() === categoryId.toLowerCase());
   }
 
   /**

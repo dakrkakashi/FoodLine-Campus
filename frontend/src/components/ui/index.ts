@@ -13,3 +13,6 @@ export { CustomCursor } from './CustomCursor';
 export { TiltCard } from './TiltCard';
 export { CampusVisualizer } from './CampusVisualizer';
 export { Logo } from './Logo';
+export { SteamEffect } from './SteamEffect';
+export { AnimatedCounter } from './AnimatedCounter';
+export { FoodParticles } from './FoodParticles';

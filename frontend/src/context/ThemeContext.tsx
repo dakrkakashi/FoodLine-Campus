@@ -2,12 +2,21 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-export type ThemeName = 'sunset' | 'cyber' | 'emerald' | 'solar';
+export type ThemeName =
+  | 'sunset'
+  | 'cyber'
+  | 'emerald'
+  | 'solar'
+  | 'midnight'
+  | 'matcha'
+  | 'crimson'
+  | 'aurora';
 
 interface ThemeConfig {
   id: ThemeName;
   name: string;
   emoji: string;
+  tagline: string;
   primary: string;
   secondary: string;
   accent: string;
@@ -20,6 +29,7 @@ export const THEMES: Record<ThemeName, ThemeConfig> = {
     id: 'sunset',
     name: 'Sanjivani Sunset',
     emoji: '🍊',
+    tagline: 'Signature Tangerine & Amber Glow',
     primary: '#FF6B2C',
     secondary: '#FFB347',
     accent: '#00D4AA',
@@ -30,6 +40,7 @@ export const THEMES: Record<ThemeName, ThemeConfig> = {
     id: 'cyber',
     name: 'Cyberpunk Neon',
     emoji: '🌌',
+    tagline: 'Violet Pulse & Cyber Cyan',
     primary: '#8B5CF6',
     secondary: '#00E5FF',
     accent: '#FF2E93',
@@ -39,7 +50,8 @@ export const THEMES: Record<ThemeName, ThemeConfig> = {
   emerald: {
     id: 'emerald',
     name: 'Emerald Mint',
-    emoji: '🍵',
+    emoji: '🍃',
+    tagline: 'Refreshing Mint & Jade Green',
     primary: '#00D4AA',
     secondary: '#10B981',
     accent: '#FFB347',
@@ -50,11 +62,56 @@ export const THEMES: Record<ThemeName, ThemeConfig> = {
     id: 'solar',
     name: 'Solar Flare',
     emoji: '⚡',
+    tagline: 'Molten Gold & Crimson Blaze',
     primary: '#F59E0B',
     secondary: '#EF4444',
     accent: '#8B5CF6',
     bgCanvas: '#0D0B0A',
     bgCard: '#1A1412',
+  },
+  midnight: {
+    id: 'midnight',
+    name: 'Midnight Sapphire',
+    emoji: '💎',
+    tagline: 'Cobalt Deep Blue & Sky Ice',
+    primary: '#3B82F6',
+    secondary: '#38BDF8',
+    accent: '#A855F7',
+    bgCanvas: '#030712',
+    bgCard: '#0B1226',
+  },
+  matcha: {
+    id: 'matcha',
+    name: 'Matcha Breeze',
+    emoji: '🍵',
+    tagline: 'Zen Lime & Golden Pistachio',
+    primary: '#84CC16',
+    secondary: '#EAB308',
+    accent: '#10B981',
+    bgCanvas: '#060C06',
+    bgCard: '#0E170E',
+  },
+  crimson: {
+    id: 'crimson',
+    name: 'Tokyo Neon Crimson',
+    emoji: '⛩️',
+    tagline: 'Hot Sakura Pink & Tokyo Red',
+    primary: '#F43F5E',
+    secondary: '#FF1744',
+    accent: '#FB923C',
+    bgCanvas: '#0C0408',
+    bgCard: '#1C0B14',
+  },
+  aurora: {
+    id: 'aurora',
+    name: 'Cosmic Borealis',
+    emoji: '🌠',
+    tagline: 'Hyper Indigo & Bio Teal Aura',
+    primary: '#6366F1',
+    secondary: '#14F195',
+    accent: '#E879F9',
+    bgCanvas: '#060713',
+    bgCard: '#111329',
   },
 };
 
@@ -83,12 +140,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const applyThemeToCSS = (themeKey: ThemeName) => {
     const t = THEMES[themeKey];
+    if (!t) return;
     const root = document.documentElement;
     root.style.setProperty('--accent-orange', t.primary);
     root.style.setProperty('--accent-amber', t.secondary);
     root.style.setProperty('--accent-teal', t.accent);
+    root.style.setProperty('--accent-orange-glow', `${t.primary}66`);
+    root.style.setProperty('--accent-amber-glow', `${t.secondary}55`);
+    root.style.setProperty('--accent-teal-glow', `${t.accent}66`);
     root.style.setProperty('--bg-canvas', t.bgCanvas);
     root.style.setProperty('--bg-card', t.bgCard);
+    root.style.setProperty('--border-glass-active', `${t.primary}80`);
     root.setAttribute('data-theme', themeKey);
   };
 

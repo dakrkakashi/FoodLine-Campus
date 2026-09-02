@@ -18,9 +18,12 @@ import {
   Tv,
   Receipt,
   Bug,
+  Store,
+  Building2,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useTheme, THEMES, ThemeName } from '@/context/ThemeContext';
+import { useCampus } from '@/context/CampusContext';
 import { useSoundFX } from '@/hooks/useSoundFX';
 import { Logo } from '@/components/ui/Logo';
 import { UserAvatar } from '@/components/auth/UserAvatar';
@@ -30,6 +33,7 @@ import { useAuth } from '@/lib/auth/useAuth';
 export function Navbar() {
   const { totalCount } = useCart();
   const { theme, setTheme } = useTheme();
+  const { selectedCampus, selectedCanteen } = useCampus();
   const { muted, toggleMute, playClick, playTab } = useSoundFX();
   const { isStaffOrAbove, isManagerOrAbove } = usePermissions();
   const { user } = useAuth();
@@ -65,14 +69,23 @@ export function Navbar() {
               <span className="font-black text-xl tracking-tight bg-linear-to-r from-(--accent-orange) via-(--accent-amber) to-white bg-clip-text text-transparent">
                 FoodLine
               </span>
-              <span className="hidden sm:inline-block text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-(--accent-teal) font-extrabold tracking-wider">
-                Cafe @7
-              </span>
+              <Link
+                href="/canteens"
+                title={`Active: ${selectedCanteen.name} (${selectedCampus.name}) — Tap to switch outlet`}
+                className="hidden sm:inline-flex items-center gap-1 text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#FF6B2C]/40 text-[#00D4AA] font-extrabold tracking-wider transition cursor-pointer"
+              >
+                <span>{selectedCanteen.name}</span>
+                <span className="text-[9px] text-[#FFB347]">▾</span>
+              </Link>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-1.5">
+            <NavLink href="/canteens" onClick={playTab}>
+              <Store size={16} />
+              <span>5 Canteens</span>
+            </NavLink>
             {user && (
               <>
                 <NavLink href="/menu" onClick={playTab}>
@@ -234,6 +247,15 @@ export function Navbar() {
             className="md:hidden fixed inset-x-0 top-14.5 z-40 bg-[#07070B]/98 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/80 overflow-hidden"
           >
             <nav className="flex flex-col py-4 px-4 gap-1.5">
+              <MobileNavLink href="/canteens" onClick={() => { playTab(); setMobileOpen(false); }}>
+                <Store size={16} />
+                <span>5 Campus Canteens</span>
+              </MobileNavLink>
+              <MobileNavLink href="/select-campus" onClick={() => { playTab(); setMobileOpen(false); }}>
+                <Building2 size={16} />
+                <span>Change Campus</span>
+              </MobileNavLink>
+
               {user ? (
                 <>
                   <MobileNavLink href="/menu" onClick={() => { playTab(); setMobileOpen(false); }}>
@@ -276,7 +298,7 @@ export function Navbar() {
 
               <div className="pt-3 border-t border-white/10 flex items-center justify-between">
                 <span className="text-[11px] font-black uppercase text-zinc-400">Campus Theme:</span>
-                <div className="flex gap-2">
+                <div className="flex gap-1.5 flex-wrap max-w-[200px] justify-end">
                   {Object.values(THEMES).map((t) => (
                     <button
                       key={t.id}
@@ -284,8 +306,9 @@ export function Navbar() {
                         setTheme(t.id as ThemeName);
                         playClick();
                       }}
-                      className={`p-2 rounded-xl text-xs font-black transition ${
-                        theme === t.id ? 'bg-(--accent-orange) text-black' : 'bg-white/5 text-white'
+                      title={t.name}
+                      className={`w-7 h-7 rounded-xl text-xs font-black transition flex items-center justify-center cursor-pointer ${
+                        theme === t.id ? 'bg-(--accent-orange) text-black shadow-md' : 'bg-white/5 text-white hover:bg-white/15'
                       }`}
                     >
                       {t.emoji}

@@ -3,14 +3,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, X, ShoppingCart, Info, Sparkles, Flame } from 'lucide-react';
+import { Search, X, ShoppingCart, Info, Sparkles, Flame, ArrowRight, ChevronRight, Store, MapPin } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
 import { useCart } from '@/context/CartContext';
 import { useInventory } from '@/context/InventoryContext';
+import { useCampus } from '@/context/CampusContext';
 import { DishCardSkeleton } from '@/components/ui/Skeleton';
 import { Badge } from '@/components/ui/Badge';
 import { InventoryBadge } from '@/components/ui/InventoryBadge';
-import { PageTransition, SpotlightCard } from '@/components/ui';
+import { PageTransition, SpotlightCard, SteamEffect, AnimatedCounter, FoodParticles } from '@/components/ui';
 
 interface MenuItem {
   id: string;
@@ -35,9 +36,67 @@ const TAG_VARIANT: Record<string, 'bestseller' | 'studentFav' | 'fastGrab' | 'sp
   'Spicy': 'spicy',
 };
 
+const gridContainerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+const cardEntranceVariants = {
+  hidden: { opacity: 0, y: 22, scale: 0.97 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 320,
+      damping: 24,
+    },
+  },
+};
+
+const CANTEEN_SPECIFIC_DISHES: Record<string, MenuItem[]> = {
+  'south-corner': [
+    { id: 'sc-1', name: 'Ghee Roast Masala Dosa', price: 65, tag: 'Bestseller', prep_time_mins: 4, is_available: true },
+    { id: 'sc-2', name: 'Mysore Butter Masala Dosa', price: 70, tag: 'Student Fav', prep_time_mins: 5, is_available: true },
+    { id: 'sc-3', name: 'Rava Onion Crispy Dosa', price: 60, tag: 'Fast Grab', prep_time_mins: 4, is_available: true },
+    { id: 'sc-4', name: 'Steamed Idli Sambar (2 Pcs)', price: 35, tag: 'Fast Grab', prep_time_mins: 2, is_available: true },
+    { id: 'sc-5', name: 'Crispy Medu Vada (2 Pcs)', price: 40, tag: 'Bestseller', prep_time_mins: 3, is_available: true },
+    { id: 'sc-6', name: 'Authentic Filter Kaapi', price: 25, tag: 'Student Fav', prep_time_mins: 2, is_available: true },
+  ],
+  'nescafe-kiosk': [
+    { id: 'nk-1', name: 'Classic Chilled Iced Frappe', price: 55, tag: 'Bestseller', prep_time_mins: 2, is_available: true },
+    { id: 'nk-2', name: 'Hot Hazelnut Cappuccino', price: 45, tag: 'Student Fav', prep_time_mins: 2, is_available: true },
+    { id: 'nk-3', name: 'Double Masala Cheese Maggi', price: 50, tag: 'Bestseller', prep_time_mins: 4, is_available: true },
+    { id: 'nk-4', name: 'Peri Peri Spicy Maggi', price: 45, tag: 'Spicy', prep_time_mins: 3, is_available: true },
+    { id: 'nk-5', name: 'Fudge Walnut Brownie', price: 40, tag: 'Student Fav', prep_time_mins: 1, is_available: true },
+    { id: 'nk-6', name: 'Crispy Veg Potato Puff', price: 25, tag: 'Fast Grab', prep_time_mins: 1, is_available: true },
+  ],
+  'mba-cafeteria': [
+    { id: 'mba-1', name: 'Paneer Tikka Panini Grill', price: 85, tag: 'Bestseller', prep_time_mins: 6, is_available: true },
+    { id: 'mba-2', name: 'Triple Layer Cheese Club Sandwich', price: 80, tag: 'Student Fav', prep_time_mins: 5, is_available: true },
+    { id: 'mba-3', name: 'Spicy Corn & Jalapeño Sub', price: 75, tag: 'Fast Grab', prep_time_mins: 5, is_available: true },
+    { id: 'mba-4', name: 'Loaded Cheesy Peri Peri Fries', price: 90, tag: 'Bestseller', prep_time_mins: 4, is_available: true },
+    { id: 'mba-5', name: 'Mint Virgin Mojito', price: 50, tag: 'Student Fav', prep_time_mins: 2, is_available: true },
+  ],
+  'hostel-mess': [
+    { id: 'hm-1', name: 'Deluxe Student Lunch Thali', price: 70, tag: 'Bestseller', prep_time_mins: 1, is_available: true },
+    { id: 'hm-2', name: 'Regular Dal Tadka & Jeera Rice Thali', price: 50, tag: 'Fast Grab', prep_time_mins: 1, is_available: true },
+    { id: 'hm-3', name: 'Hot Maharashtrian Kanda Poha', price: 25, tag: 'Student Fav', prep_time_mins: 1, is_available: true },
+    { id: 'hm-4', name: 'Upma with Coconut Chutney', price: 25, tag: 'Fast Grab', prep_time_mins: 1, is_available: true },
+  ],
+};
+
 export default function MenuPage() {
   const { items: cartItems, addItem, removeItem, updateQuantity, totalAmount, totalCount } = useCart();
   const { getEffectiveAvailability, getStockQuantity } = useInventory();
+  const { selectedCampus, selectedCanteen, availableCanteens } = useCampus();
   const [categories, setCategories] = useState<Category[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -48,7 +107,17 @@ export default function MenuPage() {
     async function loadMenu() {
       try {
         setLoading(true);
-        const res = await fetch('/api/menu');
+        if (selectedCanteen.slug !== 'cafe7' && CANTEEN_SPECIFIC_DISHES[selectedCanteen.slug]) {
+          // Display authentic dishes for selected canteen
+          setCategories([
+            { id: 'cat-all', name: 'All' },
+            { id: 'cat-special', name: 'Specialty Menu' },
+          ]);
+          setMenuItems(CANTEEN_SPECIFIC_DISHES[selectedCanteen.slug]);
+          return;
+        }
+
+        const res = await fetch(`/api/menu?cafeteriaId=${selectedCanteen.id}`);
         const json = await res.json();
         if (json.success && json.data) {
           setCategories(json.data.categories || []);
@@ -61,7 +130,7 @@ export default function MenuPage() {
       }
     }
     loadMenu();
-  }, []);
+  }, [selectedCanteen.id, selectedCanteen.slug]);
 
   // Auto-clamp cart quantities if stock decreases below what is currently in cart
   useEffect(() => {
@@ -113,6 +182,9 @@ export default function MenuPage() {
         />
       </div>
 
+      {/* Subtle Culinary Food Particles Drift */}
+      <FoodParticles />
+
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 pt-6 relative z-10">
@@ -124,13 +196,29 @@ export default function MenuPage() {
           className="relative overflow-hidden rounded-[2.5rem] glass-card-heavy p-6 md:p-10 mb-8 shadow-2xl border border-white/10"
         >
           <div className="relative z-10 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FF6B2C]/15 border border-[#FF6B2C]/30 text-[#FFB347] text-xs font-black uppercase tracking-wider mb-3">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D4AA] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D4AA]" />
-              </span>
-              Cafe @7 Official Menu • 44 Verified Pure Veg Dishes
+            <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#FF6B2C]/15 border border-[#FF6B2C]/30 text-[#FFB347] text-xs font-black uppercase tracking-wider">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D4AA] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D4AA]" />
+                </span>
+                {selectedCanteen.name} • {selectedCampus.name}
+              </div>
+
+              {/* Fast Canteen Switcher Button */}
+              <Link href="/canteens">
+                <motion.button
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition shadow-sm"
+                >
+                  <Store size={13} className="text-[#FFB347]" />
+                  <span>Switch Canteen ({availableCanteens.length} Active)</span>
+                  <ChevronRight size={13} className="text-[#FF6B2C]" />
+                </motion.button>
+              </Link>
             </div>
+
             <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3">
               What's Cooking{' '}
               <span className="bg-gradient-to-r from-[#FF6B2C] via-[#FFB347] to-[#00D4AA] bg-clip-text text-transparent">
@@ -138,7 +226,7 @@ export default function MenuPage() {
               </span>
             </h1>
             <p className="text-xs md:text-sm text-zinc-400 leading-relaxed font-medium">
-              100% Pure Vegetarian campus cuisine. Pre-order before the break bell rings and pick up hot at Cafe @7.
+              100% Pure Vegetarian campus cuisine at <strong className="text-white">{selectedCanteen.name}</strong> ({selectedCanteen.location}). Pre-order before the break bell rings and pick up hot!
             </p>
           </div>
         </motion.div>
@@ -230,8 +318,14 @@ export default function MenuPage() {
             </motion.button>
           </motion.div>
         ) : (
-          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            <AnimatePresence>
+          <motion.div
+            key={selectedCategory + '_' + search}
+            variants={gridContainerVariants}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+          >
+            <AnimatePresence mode="popLayout">
               {filteredItems.map((dish) => {
                 const qty = getCartQuantity(dish.id);
                 const isAvailable = getEffectiveAvailability(dish);
@@ -240,84 +334,65 @@ export default function MenuPage() {
                 const tagVariant = dish.tag ? TAG_VARIANT[dish.tag] || 'custom' : null;
 
                 return (
-                  <SpotlightCard
+                  <motion.div
                     key={dish.id}
-                    spotlightColor="rgba(255, 107, 44, 0.22)"
-                    className={`p-6 flex flex-col justify-between group relative ${
-                      !isAvailable ? 'opacity-50 grayscale pointer-events-none' : ''
-                    }`}
+                    variants={cardEntranceVariants}
+                    layout
+                    whileHover={isAvailable ? { y: -4, transition: { type: 'spring', stiffness: 400, damping: 20 } } : {}}
+                    className="h-full"
                   >
-                    <InventoryBadge item={dish} size="sm" position="top-right" />
-                    {!isAvailable && (
-                      <div className="absolute inset-0 z-20 bg-black/60 rounded-[2rem] flex items-center justify-center backdrop-blur-[2px]">
-                        <span className="px-4 py-2 rounded-2xl bg-red-950 border border-red-500/40 text-red-400 text-xs font-black uppercase tracking-wider flex items-center gap-1.5">
-                          <Info size={14} /> Sold Out
+                    <SpotlightCard
+                      spotlightColor="rgba(255, 107, 44, 0.22)"
+                      className={`h-full p-6 flex flex-col justify-between group relative rounded-[2rem] border border-white/10 hover:border-[#FF6B2C]/50 hover:shadow-[0_0_35px_rgba(255,107,44,0.22)] transition-all duration-300 bg-[#16161E]/85 backdrop-blur-xl ${
+                        !isAvailable ? 'opacity-50 grayscale pointer-events-none' : ''
+                      }`}
+                    >
+                      <InventoryBadge item={dish} size="sm" position="top-right" />
+                      {/* Culinary Steam Effect on hot fresh items */}
+                      {(dish.prep_time_mins || dish.name.toLowerCase().includes('dosa') || dish.name.toLowerCase().includes('chai') || dish.name.toLowerCase().includes('tea') || dish.name.toLowerCase().includes('maggi') || dish.name.toLowerCase().includes('thali') || dish.name.toLowerCase().includes('pav')) && (
+                        <SteamEffect count={3} />
+                      )}
+                      {!isAvailable && (
+                        <div className="absolute inset-0 z-20 bg-black/60 rounded-[2rem] flex items-center justify-center backdrop-blur-[2px]">
+                          <span className="px-4 py-2 rounded-2xl bg-red-950 border border-red-500/40 text-red-400 text-xs font-black uppercase tracking-wider flex items-center gap-1.5">
+                            <Info size={14} /> Sold Out
+                          </span>
+                        </div>
+                      )}
+
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-4">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <Badge variant="veg" />
+                            {tagVariant && <Badge variant={tagVariant}>{dish.tag}</Badge>}
+                          </div>
+                          {dish.prep_time_mins && (
+                            <span className="text-[11px] font-bold text-zinc-400 flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg">
+                              ⏱ {dish.prep_time_mins}m
+                            </span>
+                          )}
+                        </div>
+
+                        <h3 className="text-lg font-black text-white group-hover:text-[#FFB347] transition-colors leading-tight mb-1">
+                          {dish.name}
+                        </h3>
+                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                          {getCategoryName(dish.category_id)}
                         </span>
                       </div>
-                    )}
 
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-4">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Badge variant="veg" />
-                          {tagVariant && <Badge variant={tagVariant}>{dish.tag}</Badge>}
+                      <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
+                        <div>
+                          <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Price</span>
+                          <div className="text-xl font-black text-white">₹{Number(dish.price).toFixed(0)}</div>
                         </div>
-                        {dish.prep_time_mins && (
-                          <span className="text-[11px] font-bold text-zinc-400 flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg">
-                            ⏱ {dish.prep_time_mins}m
-                          </span>
-                        )}
-                      </div>
 
-                      <h3 className="text-lg font-black text-white group-hover:text-[#FFB347] transition-colors leading-tight mb-1">
-                        {dish.name}
-                      </h3>
-                      <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                        {getCategoryName(dish.category_id)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
-                      <div>
-                        <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Price</span>
-                        <div className="text-xl font-black text-white">₹{Number(dish.price).toFixed(0)}</div>
-                      </div>
-
-                      {qty === 0 ? (
-                        <motion.button
-                          whileHover={isAvailable && (stockQty === null || stockQty === undefined || stockQty > 0) ? { scale: 1.06 } : {}}
-                          whileTap={isAvailable && (stockQty === null || stockQty === undefined || stockQty > 0) ? { scale: 0.94 } : {}}
-                          disabled={!isAvailable || (stockQty !== null && stockQty !== undefined && stockQty <= 0)}
-                          onClick={() =>
-                            addItem({
-                              id: dish.id,
-                              name: dish.name,
-                              price: Number(dish.price),
-                              tag: dish.tag,
-                              category: getCategoryName(dish.category_id),
-                              maxStock: stockQty,
-                            })
-                          }
-                          className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-xs shadow-lg shadow-[#FF6B2C]/20 cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-                        >
-                          <span>Add</span>
-                          <span className="text-base font-black">+</span>
-                        </motion.button>
-                      ) : (
-                        <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 rounded-2xl p-1 shadow-inner">
+                        {qty === 0 ? (
                           <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => removeItem(dish.id)}
-                            className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-white font-black text-sm flex items-center justify-center transition cursor-pointer"
-                          >
-                            −
-                          </motion.button>
-                          <span className="w-8 text-center font-black text-base text-[#FFB347]">{qty}</span>
-                          <motion.button
-                            whileTap={!isMaxStockReached ? { scale: 0.9 } : {}}
-                            disabled={isMaxStockReached}
+                            whileHover={isAvailable && (stockQty === null || stockQty === undefined || stockQty > 0) ? { scale: 1.06 } : {}}
+                            whileTap={isAvailable && (stockQty === null || stockQty === undefined || stockQty > 0) ? { scale: 0.94 } : {}}
+                            disabled={!isAvailable || (stockQty !== null && stockQty !== undefined && stockQty <= 0)}
                             onClick={() =>
-                              !isMaxStockReached &&
                               addItem({
                                 id: dish.id,
                                 name: dish.name,
@@ -327,19 +402,49 @@ export default function MenuPage() {
                                 maxStock: stockQty,
                               })
                             }
-                            className={`w-9 h-9 rounded-xl font-black text-sm flex items-center justify-center transition ${
-                              isMaxStockReached
-                                ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-40 shadow-none'
-                                : 'bg-[#FF6B2C] hover:bg-[#FF6B2C]/90 text-white shadow-md shadow-[#FF6B2C]/30 cursor-pointer'
-                            }`}
-                            title={isMaxStockReached ? `Maximum stock of ${stockQty} reached` : 'Add one more'}
+                            className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-xs shadow-lg shadow-[#FF6B2C]/20 cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
-                            +
+                            <span>Add</span>
+                            <span className="text-base font-black">+</span>
                           </motion.button>
-                        </div>
-                      )}
-                    </div>
-                  </SpotlightCard>
+                        ) : (
+                          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 rounded-2xl p-1 shadow-inner">
+                            <motion.button
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => removeItem(dish.id)}
+                              className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-white font-black text-sm flex items-center justify-center transition cursor-pointer"
+                            >
+                              −
+                            </motion.button>
+                            <span className="w-8 text-center font-black text-base text-[#FFB347]">{qty}</span>
+                            <motion.button
+                              whileTap={!isMaxStockReached ? { scale: 0.9 } : {}}
+                              disabled={isMaxStockReached}
+                              onClick={() =>
+                                !isMaxStockReached &&
+                                addItem({
+                                  id: dish.id,
+                                  name: dish.name,
+                                  price: Number(dish.price),
+                                  tag: dish.tag,
+                                  category: getCategoryName(dish.category_id),
+                                  maxStock: stockQty,
+                                })
+                              }
+                              className={`w-9 h-9 rounded-xl font-black text-sm flex items-center justify-center transition ${
+                                isMaxStockReached
+                                  ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-40 shadow-none'
+                                  : 'bg-[#FF6B2C] hover:bg-[#FF6B2C]/90 text-white shadow-md shadow-[#FF6B2C]/30 cursor-pointer'
+                              }`}
+                              title={isMaxStockReached ? `Maximum stock of ${stockQty} reached` : 'Add one more'}
+                            >
+                              +
+                            </motion.button>
+                          </div>
+                        )}
+                      </div>
+                    </SpotlightCard>
+                  </motion.div>
                 );
               })}
             </AnimatePresence>
@@ -347,38 +452,62 @@ export default function MenuPage() {
         )}
       </main>
 
-      {/* Floating Cart Tray */}
+      {/* Spring-Physics Floating Cart Pill */}
       <AnimatePresence>
         {totalCount > 0 && (
           <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="fixed bottom-6 left-4 right-4 max-w-3xl mx-auto z-40"
+            initial={{ y: 90, scale: 0.88, opacity: 0 }}
+            animate={{ y: 0, scale: 1, opacity: 1 }}
+            exit={{ y: 90, scale: 0.88, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 26 }}
+            className="fixed bottom-6 inset-x-0 z-40 px-4 flex justify-center pointer-events-none"
           >
-            <div className="glass-card-heavy rounded-[2.5rem] p-4 md:p-5 shadow-2xl shadow-black/90 flex items-center justify-between gap-4 border-2 border-[#FF6B2C]/40 relative overflow-hidden">
-              <div className="absolute top-0 right-1/4 w-32 h-32 bg-[#FF6B2C]/15 rounded-full blur-2xl pointer-events-none" />
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] text-black flex items-center justify-center shadow-lg shadow-[#FF6B2C]/30">
-                  <ShoppingCart size={24} strokeWidth={2.5} />
-                </div>
-                <div>
-                  <div className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
-                    {totalCount} {totalCount === 1 ? 'Item' : 'Items'} in tray
+            <div className="pointer-events-auto w-full max-w-lg rounded-full glass-card-heavy backdrop-blur-2xl bg-[#16161E]/95 border-2 border-[#FF6B2C]/50 shadow-[0_12px_45px_rgba(0,0,0,0.85),0_0_30px_rgba(255,107,44,0.25)] p-2 sm:p-2.5 flex items-center justify-between gap-3 relative overflow-hidden">
+              {/* Ambient radial glows */}
+              <div className="absolute -left-10 -top-10 w-28 h-28 bg-[#FF6B2C]/20 rounded-full blur-xl pointer-events-none" />
+              <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-[#00D4AA]/15 rounded-full blur-xl pointer-events-none" />
+
+              {/* Left Info: Animated Cart Icon with Pop Badge + Total */}
+              <div className="flex items-center gap-3 pl-2 sm:pl-3 relative z-10">
+                <div className="relative">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] text-black flex items-center justify-center shadow-lg shadow-[#FF6B2C]/35">
+                    <ShoppingCart size={20} strokeWidth={2.5} />
                   </div>
-                  <div className="text-2xl font-black text-white">₹{totalAmount.toFixed(0)}</div>
+                  {/* Bouncy live count badge with AnimatedCounter */}
+                  <motion.span
+                    key={totalCount}
+                    initial={{ scale: 0.5, rotate: -15 }}
+                    animate={{ scale: [0.5, 1.35, 1], rotate: [0, 8, 0] }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+                    className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-[#00D4AA] text-black text-[10px] font-black flex items-center justify-center shadow-md border-2 border-[#16161E]"
+                  >
+                    <AnimatedCounter value={totalCount} />
+                  </motion.span>
+                </div>
+
+                <div className="leading-tight">
+                  <div className="text-[10px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>Tray Subtotal</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] inline-block animate-pulse" />
+                  </div>
+                  <div className="text-lg sm:text-xl font-black text-white font-mono flex items-baseline gap-1">
+                    <AnimatedCounter value={totalAmount} prefix="₹" />
+                    <span className="text-[10px] font-sans font-medium text-zinc-400">
+                      ({totalCount} {totalCount === 1 ? 'item' : 'items'})
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <Link href="/checkout" className="relative z-10">
+              {/* Right CTA Button */}
+              <Link href="/checkout" className="relative z-10 flex-shrink-0">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-6 md:px-8 py-4 rounded-2xl bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-sm md:text-base shadow-2xl shadow-[#FF6B2C]/40 flex items-center gap-2 cursor-pointer"
+                  whileTap={{ scale: 0.94 }}
+                  className="px-5 sm:px-7 py-3 rounded-full bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-xs sm:text-sm shadow-xl shadow-[#FF6B2C]/35 flex items-center gap-2 cursor-pointer border border-white/20 uppercase tracking-wider"
                 >
-                  <span>Checkout</span>
-                  <span className="text-xl">→</span>
+                  <span>Select Slot</span>
+                  <ArrowRight size={16} strokeWidth={3} className="text-black" />
                 </motion.button>
               </Link>
             </div>

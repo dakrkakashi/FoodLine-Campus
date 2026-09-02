@@ -9,6 +9,7 @@ import { sseBroadcaster } from './services/sse-broadcaster.js';
 import { OrderStatus } from './lib/types.js';
 import { checkDatabaseConnection, isSupabaseConfigured } from './lib/supabase.js';
 import { authRouter } from './routes/auth.routes.js';
+import { CampusService } from './services/campus-service.js';
 
 dotenv.config();
 
@@ -50,12 +51,65 @@ app.get('/health', async (req: Request, res: Response) => {
 });
 
 // -----------------------------------------------------------------------------
-// 1. GET /api/menu
+// Geo-Campus Hierarchy & Canteen Discovery
+// -----------------------------------------------------------------------------
+app.get('/api/campuses/geo', async (req: Request, res: Response) => {
+  try {
+    const geo = await CampusService.getGeoHierarchy();
+    res.json({
+      success: true,
+      data: geo,
+      meta: { timestamp: new Date().toISOString() },
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/campuses/:campusId/canteens', async (req: Request, res: Response) => {
+  try {
+    const campusId = String(req.params.campusId);
+    const result = await CampusService.getCanteensByCampus(campusId);
+    res.json({
+      success: true,
+      data: result,
+      meta: { timestamp: new Date().toISOString() },
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/auth/resolve-student', async (req: Request, res: Response) => {
+  try {
+    const { prn, email } = req.body;
+    const identifier = prn || email;
+    if (!identifier) {
+      return res.status(400).json({
+        success: false,
+        error: 'prn or email is required to resolve student profile',
+      });
+    }
+
+    const studentProfile = await CampusService.resolveStudent(identifier);
+    res.json({
+      success: true,
+      data: studentProfile,
+      meta: { timestamp: new Date().toISOString() },
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// -----------------------------------------------------------------------------
+// 1. GET /api/menu (Supports ?cafeteriaId=... & ?categoryId=...)
 // -----------------------------------------------------------------------------
 app.get('/api/menu', async (req: Request, res: Response) => {
   try {
-    const category = req.query.category as string | undefined;
-    const items = await MenuService.getAllItems(category);
+    const category = (req.query.category || req.query.categoryId) as string | undefined;
+    const cafeteriaId = (req.query.cafeteriaId || req.query.canteenId) as string | undefined;
+    const items = await MenuService.getAllItems(category, cafeteriaId);
 
     const categories = [
       'All',
@@ -78,7 +132,11 @@ app.get('/api/menu', async (req: Request, res: Response) => {
         categories,
         items,
       },
-      meta: { timestamp: new Date().toISOString(), count: items.length },
+      meta: {
+        timestamp: new Date().toISOString(),
+        count: items.length,
+        cafeteriaId: cafeteriaId || 'b2222222-2222-2222-2222-222222222222',
+      },
     });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });

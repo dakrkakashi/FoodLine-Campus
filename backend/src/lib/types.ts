@@ -22,6 +22,8 @@ export interface MenuItem {
   isVeg: boolean;
   isAvailable?: boolean;
   image?: string;
+  cafeteriaId?: string;
+  cafeteria_id?: string;
 }
 
 export interface CartItem {
@@ -138,5 +140,68 @@ export interface SheetLogRow {
   phone: string;
   accountId: string;
   formLink: string;
+}
+
+export interface Campus {
+  id: string;
+  name: string;
+  slug: string;
+  location: string;
+  state?: string;
+  district?: string;
+  city_town?: string;
+  pincode?: string;
+  totalCanteens?: number;
+  isVerified?: boolean;
+}
+
+export interface Canteen {
+  id: string;
+  campus_id?: string;
+  name: string;
+  slug: string;
+  tagline?: string;
+  location: string;
+  upi_id?: string;
+  upiId?: string;
+  is_pure_veg?: boolean;
+  isPureVeg?: boolean;
+  is_active?: boolean;
+  isOpen?: boolean;
+  prep_time_mins?: number;
+  prepTimeMins?: number;
+  activeSlotsCount?: number;
+  dishesCount?: number;
+  image_url?: string;
+  imageUrl?: string;
+}
+
+export interface CampusGeoCity {
+  id: string;
+  name: string;
+  campuses: Campus[];
+}
+
+export interface CampusGeoDistrict {
+  id: string;
+  name: string;
+  cities: CampusGeoCity[];
+}
+
+export interface CampusGeoState {
+  id: string;
+  name: string;
+  districts: CampusGeoDistrict[];
+}
+
+export interface CampusGeoHierarchy {
+  states: CampusGeoState[];
+}
+
+export interface ResolvedStudentProfile {
+  studentName?: string;
+  prn: string;
+  campus: Campus;
+  defaultCafeteriaId?: string;
 }
 

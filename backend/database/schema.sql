@@ -28,19 +28,30 @@ CREATE TABLE campuses (
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(100) UNIQUE NOT NULL DEFAULT 'sanjivani',
     location VARCHAR(255) NOT NULL,
+    state VARCHAR(100) NOT NULL DEFAULT 'Maharashtra',
+    district VARCHAR(100) NOT NULL DEFAULT 'Ahmednagar',
+    city_town VARCHAR(100) NOT NULL DEFAULT 'Kopargaon',
+    pincode VARCHAR(10) DEFAULT '423603',
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX idx_campuses_geo ON campuses (state, district, city_town);
 
 CREATE TABLE cafeterias (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     campus_id UUID REFERENCES campuses(id) ON DELETE CASCADE,
     name VARCHAR(255) NOT NULL,
     slug VARCHAR(100) UNIQUE NOT NULL DEFAULT 'cafe7',
+    tagline VARCHAR(255),
+    location VARCHAR(255),
     upi_id VARCHAR(255) NOT NULL DEFAULT '9960091371@slc',
     fssai_license_no VARCHAR(50) DEFAULT '11522036000142',
     is_pure_veg BOOLEAN DEFAULT TRUE,
     commission_rate NUMERIC(4, 2) DEFAULT 0.035, -- 3.5% fast-pass fee
     is_active BOOLEAN DEFAULT TRUE,
+    is_open BOOLEAN DEFAULT TRUE,
+    prep_time_mins INT DEFAULT 5,
+    image_url TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -291,12 +302,17 @@ CREATE POLICY "audit_logs_select_manager" ON audit_logs FOR SELECT USING (
 -- ==============================================================================
 
 -- Campuses
-INSERT INTO campuses (id, name, slug, location)
-VALUES ('a1111111-1111-1111-1111-111111111111', 'Sanjivani University', 'sanjivani', 'Kopargaon, Maharashtra');
+INSERT INTO campuses (id, name, slug, location, state, district, city_town, pincode)
+VALUES ('a1111111-1111-1111-1111-111111111111', 'Sanjivani University', 'sanjivani', 'Kopargaon, Maharashtra', 'Maharashtra', 'Ahmednagar', 'Kopargaon', '423603');
 
--- Cafeterias
-INSERT INTO cafeterias (id, campus_id, name, slug, upi_id, fssai_license_no, is_pure_veg)
-VALUES ('b2222222-2222-2222-2222-222222222222', 'a1111111-1111-1111-1111-111111111111', 'Cafe @7', 'cafe7', '9960091371@slc', '11522036000142', TRUE);
+-- Cafeterias (5 Outlets on Sanjivani Campus)
+INSERT INTO cafeterias (id, campus_id, name, slug, tagline, location, upi_id, fssai_license_no, is_pure_veg, is_open, prep_time_mins, image_url)
+VALUES 
+('b2222222-2222-2222-2222-222222222222', 'a1111111-1111-1111-1111-111111111111', 'Cafe @7', 'cafe7', 'Main Academic Canteen', 'Ground Floor, Main Academic Quad (Near Mech Dept)', '9960091371@slc', '11522036000142', TRUE, TRUE, 5, '/images/canteens/cafe7.webp'),
+('b3333333-3333-3333-3333-333333333333', 'a1111111-1111-1111-1111-111111111111', 'South Corner Dosa Bar', 'south-corner', 'Authentic Crispy Dosas & Idli Sambar', 'Next to Central Library Block', '9960091371@slc', '11522036000143', TRUE, TRUE, 4, '/images/canteens/south_corner.webp'),
+('b4444444-4444-4444-4444-444444444444', 'a1111111-1111-1111-1111-111111111111', 'Nescafe Campus Kiosk', 'nescafe-kiosk', 'Instant Frappe, Maggi & Quick Sips', 'Central Lawn Fountain Corner', '9960091371@slc', '11522036000144', TRUE, TRUE, 2, '/images/canteens/nescafe.webp'),
+('b5555555-5555-5555-5555-555555555555', 'a1111111-1111-1111-1111-111111111111', 'MBA Block Cafeteria', 'mba-cafeteria', 'Gourmet Paninis, Rolls & Subs', 'Management Building, 1st Floor Terrace', '9960091371@slc', '11522036000145', TRUE, TRUE, 6, '/images/canteens/mba_cafe.webp'),
+('b6666666-6666-6666-6666-666666666666', 'a1111111-1111-1111-1111-111111111111', 'Central Hostel Dining Mess', 'hostel-mess', 'Student Lunch Thali & Poha', 'Hostel Complex, Wing B', '9960091371@slc', '11522036000146', TRUE, TRUE, 1, '/images/canteens/hostel_mess.webp');
 
 -- Categories
 INSERT INTO categories (id, name, icon, display_order) VALUES

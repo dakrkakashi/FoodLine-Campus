@@ -5,15 +5,23 @@ import { AuthProvider } from '@/lib/auth/useAuth';
 import { CartProvider } from '@/context/CartContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { InventoryProvider } from '@/context/InventoryContext';
+import { CampusProvider } from '@/context/CampusContext';
+import { FloatingThemeTrigger } from '@/components/theme/FloatingThemeTrigger';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <CartProvider>
-          <InventoryProvider>{children}</InventoryProvider>
-        </CartProvider>
+        <CampusProvider>
+          <CartProvider>
+            <InventoryProvider>
+              {children}
+              <FloatingThemeTrigger />
+            </InventoryProvider>
+          </CartProvider>
+        </CampusProvider>
       </AuthProvider>
     </ThemeProvider>
   );
 }
+

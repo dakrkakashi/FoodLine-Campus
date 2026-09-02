@@ -4,6 +4,7 @@
 ## 0. 🧠 Memory & State Persistence (Session Continuity)
 - **Always Read `PROJECT_MEMORY.md` First:** At the beginning of any session or before executing tasks, inspect `PROJECT_MEMORY.md` to restore full context on where we left off and what your assigned mission is.
 - **Update Memory Upon Milestone Completion:** When a milestone is verified, keep `PROJECT_MEMORY.md` updated so future agent sessions never lose context.
+- **Always Update `MULTI_AGENT_SYNC.md` on Every Iteration (MANDATORY):** Whenever any change, feature, fix, or enhancement is made (frontend or backend), BOTH agents MUST log their changes, contract status, and verification state into `MULTI_AGENT_SYNC.md`. This guarantees real-time collaboration between Antigravity CLI ('agy') and Antigravity IDE.
 
 ## 1. 🧠 Core Philosophy & Anti-Hallucination
 - **Verify Before Asserting:** Never assume a library, API endpoint, or file exists. Inspect `package.json`, `git status`, or run `grep_search` before importing or referencing.

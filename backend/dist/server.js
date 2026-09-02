@@ -12,6 +12,7 @@ const order_service_js_1 = require("./services/order-service.js");
 const sse_broadcaster_js_1 = require("./services/sse-broadcaster.js");
 const supabase_js_1 = require("./lib/supabase.js");
 const auth_routes_js_1 = require("./routes/auth.routes.js");
+const campus_service_js_1 = require("./services/campus-service.js");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 4000;
@@ -44,12 +45,64 @@ app.get('/health', async (req, res) => {
     });
 });
 // -----------------------------------------------------------------------------
-// 1. GET /api/menu
+// Geo-Campus Hierarchy & Canteen Discovery
+// -----------------------------------------------------------------------------
+app.get('/api/campuses/geo', async (req, res) => {
+    try {
+        const geo = await campus_service_js_1.CampusService.getGeoHierarchy();
+        res.json({
+            success: true,
+            data: geo,
+            meta: { timestamp: new Date().toISOString() },
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+app.get('/api/campuses/:campusId/canteens', async (req, res) => {
+    try {
+        const campusId = String(req.params.campusId);
+        const result = await campus_service_js_1.CampusService.getCanteensByCampus(campusId);
+        res.json({
+            success: true,
+            data: result,
+            meta: { timestamp: new Date().toISOString() },
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+app.post('/api/auth/resolve-student', async (req, res) => {
+    try {
+        const { prn, email } = req.body;
+        const identifier = prn || email;
+        if (!identifier) {
+            return res.status(400).json({
+                success: false,
+                error: 'prn or email is required to resolve student profile',
+            });
+        }
+        const studentProfile = await campus_service_js_1.CampusService.resolveStudent(identifier);
+        res.json({
+            success: true,
+            data: studentProfile,
+            meta: { timestamp: new Date().toISOString() },
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+// -----------------------------------------------------------------------------
+// 1. GET /api/menu (Supports ?cafeteriaId=... & ?categoryId=...)
 // -----------------------------------------------------------------------------
 app.get('/api/menu', async (req, res) => {
     try {
-        const category = req.query.category;
-        const items = await menu_service_js_1.MenuService.getAllItems(category);
+        const category = (req.query.category || req.query.categoryId);
+        const cafeteriaId = (req.query.cafeteriaId || req.query.canteenId);
+        const items = await menu_service_js_1.MenuService.getAllItems(category, cafeteriaId);
         const categories = [
             'All',
             'Quick Bites',
@@ -70,7 +123,11 @@ app.get('/api/menu', async (req, res) => {
                 categories,
                 items,
             },
-            meta: { timestamp: new Date().toISOString(), count: items.length },
+            meta: {
+                timestamp: new Date().toISOString(),
+                count: items.length,
+                cafeteriaId: cafeteriaId || 'b2222222-2222-2222-2222-222222222222',
+            },
         });
     }
     catch (error) {

@@ -4,7 +4,7 @@ import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
-import { GraduationCap, Shield, Lock, Mail, KeyRound, ArrowRight, Loader2, Sparkles, User as UserIcon, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { GraduationCap, Shield, Lock, Mail, KeyRound, ArrowRight, Loader2, Sparkles, User as UserIcon, CheckCircle2, Eye, EyeOff, Building2 } from 'lucide-react';
 import { PageTransition, SpotlightCard, fireConfettiSuccess } from '@/components/ui';
 import { useAuth } from '@/lib/auth/useAuth';
 
@@ -312,6 +312,21 @@ function LoginFormContent() {
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all font-mono"
                   />
                 </div>
+                {studentPrn.trim().length >= 3 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-1.5 p-2 rounded-xl bg-[#00D4AA]/10 border border-[#00D4AA]/25 flex items-center justify-between text-[11px]"
+                  >
+                    <span className="flex items-center gap-1.5 text-[#00D4AA] font-bold">
+                      <CheckCircle2 size={12} />
+                      <span>Sanjivani University (Auto-Detected)</span>
+                    </span>
+                    <span className="text-[10px] text-zinc-400 font-mono font-bold">
+                      5 Canteens
+                    </span>
+                  </motion.div>
+                )}
               </div>
 
               {/* Student Password */}
@@ -358,7 +373,7 @@ function LoginFormContent() {
                 )}
               </button>
 
-              <div className="text-center pt-1">
+              <div className="text-center pt-1 space-y-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -366,7 +381,7 @@ function LoginFormContent() {
                     setErrorMessage(null);
                     setSuccessMessage(null);
                   }}
-                  className="text-xs text-neutral-400 hover:text-orange-300 transition cursor-pointer"
+                  className="text-xs text-neutral-400 hover:text-orange-300 transition cursor-pointer block w-full"
                 >
                   {studentMode === 'SIGN_IN' ? (
                     <span>New student at campus? <strong className="text-[var(--accent-orange)] underline">Create Account</strong></span>
@@ -374,6 +389,16 @@ function LoginFormContent() {
                     <span>Already have a password? <strong className="text-[var(--accent-orange)] underline">Sign In</strong></span>
                   )}
                 </button>
+
+                <div className="pt-2 border-t border-white/5">
+                  <Link
+                    href="/select-campus"
+                    className="text-xs text-zinc-400 hover:text-white transition inline-flex items-center gap-1.5"
+                  >
+                    <Building2 size={13} className="text-[#FF6B2C]" />
+                    <span>Not from Sanjivani? Browse other campuses →</span>
+                  </Link>
+                </div>
               </div>
             </form>
           )}

@@ -20,11 +20,14 @@ import {
   Banknote,
   Wallet,
   Zap,
+  PartyPopper,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
 import { useCart } from '@/context/CartContext';
 import { useInventory } from '@/context/InventoryContext';
-import { Stepper, ProgressBar, PageTransition, SpotlightCard, fireConfettiSuccess } from '@/components/ui';
+import { Stepper, ProgressBar, PageTransition, SpotlightCard, fireConfettiSuccess, fireFireworks } from '@/components/ui';
+import { Meteors } from '@/components/magicui/meteors';
+import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { saveOrderToHistory } from '@/lib/order-history-store';
 
 interface Slot {
@@ -53,6 +56,13 @@ export default function CheckoutPage() {
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [dpdpConsent, setDpdpConsent] = useState(true);
+  const [celebrationData, setCelebrationData] = useState<{
+    orderToken: string;
+    pickupOtp?: string;
+    totalAmount: number;
+    slotLabel?: string;
+  } | null>(null);
+  const [countdown, setCountdown] = useState(3);
 
   const unavailableItems = items.filter((item) => !getEffectiveAvailability(item));
 
@@ -65,6 +75,22 @@ export default function CheckoutPage() {
       }
     }
   }, [items, getStockQuantity, updateQuantity]);
+
+  // Countdown timer for post-order celebration burst redirect
+  useEffect(() => {
+    if (!celebrationData) return;
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          router.push(`/order/${celebrationData.orderToken}`);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [celebrationData, router]);
 
   useEffect(() => {
     async function loadSlots() {
@@ -176,21 +202,28 @@ export default function CheckoutPage() {
         createdAt: json.data.createdAt || new Date().toISOString(),
       });
 
-      // Trigger Confetti Celebration!
-      fireConfettiSuccess();
-
       // Clear local cart
       clearCart();
 
-      // Redirect to digital pass page
-      router.push(`/order/${json.data.orderToken}`);
+      // Trigger Confetti & Fireworks Celebration Burst!
+      fireConfettiSuccess();
+      fireFireworks();
+
+      // Set celebration modal data
+      setCelebrationData({
+        orderToken: json.data.orderToken,
+        pickupOtp: json.data.pickupOtp,
+        totalAmount: json.data.totalAmount || finalPayable,
+        slotLabel: selectedSlot?.label || 'Cafe @7 Counter',
+      });
+      setIsSubmitting(false);
     } catch (err: any) {
       setErrorMsg(err.message || 'An unexpected error occurred. Please retry.');
       setIsSubmitting(false);
     }
   };
 
-  if (items.length === 0) {
+  if (items.length === 0 && !celebrationData) {
     return (
       <PageTransition className="min-h-screen bg-[#07070B] text-[#F5F5F7] pb-24">
         <Navbar />
@@ -682,41 +715,139 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                <motion.button
-                  whileHover={(paymentMethod === 'COD' || utrNumber.length === 12) && dpdpConsent && !isSubmitting ? { scale: 1.02 } : {}}
-                  whileTap={(paymentMethod === 'COD' || utrNumber.length === 12) && dpdpConsent && !isSubmitting ? { scale: 0.98 } : {}}
-                  type="submit"
-                  disabled={isSubmitting || (paymentMethod === 'UPI' && utrNumber.length !== 12) || !dpdpConsent}
-                  className={`w-full py-4.5 rounded-2xl font-black text-sm md:text-base transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xl mt-4 mb-4 ${
-                    isSubmitting || (paymentMethod === 'UPI' && utrNumber.length !== 12) || !dpdpConsent
-                      ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5'
-                      : paymentMethod === 'COD'
-                      ? 'bg-gradient-to-r from-[#00D4AA] via-[#00E5BC] to-[#00B4D8] text-black shadow-[#00D4AA]/30'
-                      : 'bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black shadow-[#FF6B2C]/30'
-                  }`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <span className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                      <span>{paymentMethod === 'COD' ? 'Reserving Slot & Issuing Pass...' : 'Verifying Payment & Issuing Pass...'}</span>
-                    </>
-                  ) : paymentMethod === 'COD' ? (
-                    <>
-                      <span>Place Cash on Delivery Order</span>
-                      <ArrowLeft size={16} className="rotate-180" />
-                    </>
-                  ) : (
-                    <>
+                {paymentMethod === 'UPI' && utrNumber.length === 12 && dpdpConsent && !isSubmitting ? (
+                  <ShimmerButton
+                    shimmerColor="#FFFFFF"
+                    shimmerDuration="2.5s"
+                    background="linear-gradient(to right, #FF6B2C, #FF8A3D, #FFB347)"
+                    borderRadius="1rem"
+                    className="w-full py-4.5 font-black text-sm md:text-base text-black shadow-2xl shadow-[#FF6B2C]/35 mt-4 mb-4"
+                    type="submit"
+                  >
+                    <span className="flex items-center justify-center gap-2">
                       <span>Submit Payment & Get Pickup Pass</span>
                       <ArrowLeft size={16} className="rotate-180" />
-                    </>
-                  )}
-                </motion.button>
+                    </span>
+                  </ShimmerButton>
+                ) : (
+                  <motion.button
+                    whileHover={(paymentMethod === 'COD' || utrNumber.length === 12) && dpdpConsent && !isSubmitting ? { scale: 1.02 } : {}}
+                    whileTap={(paymentMethod === 'COD' || utrNumber.length === 12) && dpdpConsent && !isSubmitting ? { scale: 0.98 } : {}}
+                    type="submit"
+                    disabled={isSubmitting || (paymentMethod === 'UPI' && utrNumber.length !== 12) || !dpdpConsent}
+                    className={`w-full py-4.5 rounded-2xl font-black text-sm md:text-base transition-all cursor-pointer flex items-center justify-center gap-2 shadow-2xl mt-4 mb-4 ${
+                      isSubmitting || (paymentMethod === 'UPI' && utrNumber.length !== 12) || !dpdpConsent
+                        ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5'
+                        : paymentMethod === 'COD'
+                        ? 'bg-gradient-to-r from-[#00D4AA] via-[#00E5BC] to-[#00B4D8] text-black shadow-[#00D4AA]/30'
+                        : 'bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black shadow-[#FF6B2C]/30'
+                    }`}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <span className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                        <span>{paymentMethod === 'COD' ? 'Reserving Slot & Issuing Pass...' : 'Verifying Payment & Issuing Pass...'}</span>
+                      </>
+                    ) : paymentMethod === 'COD' ? (
+                      <>
+                        <span>Place Cash on Delivery Order</span>
+                        <ArrowLeft size={16} className="rotate-180" />
+                      </>
+                    ) : (
+                      <>
+                        <span>Submit Payment & Get Pickup Pass</span>
+                        <ArrowLeft size={16} className="rotate-180" />
+                      </>
+                    )}
+                  </motion.button>
+                )}
               </form>
             </SpotlightCard>
           </div>
         </div>
       </main>
+
+      {/* High-Impact Celebration Burst Overlay */}
+      <AnimatePresence>
+        {celebrationData && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl overflow-hidden"
+          >
+            {/* Background Meteors */}
+            <div className="absolute inset-0 pointer-events-none">
+              <Meteors number={25} />
+            </div>
+
+            {/* Glowing Ambient Radials */}
+            <div className="absolute w-96 h-96 bg-[#FF6B2C]/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
+            <div className="absolute w-80 h-80 bg-[#00D4AA]/20 rounded-full blur-3xl pointer-events-none" />
+
+            <motion.div
+              initial={{ scale: 0.8, y: 30, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 360, damping: 24 }}
+              className="relative max-w-md w-full glass-card-heavy rounded-[2.5rem] border-2 border-[#00D4AA]/50 p-6 sm:p-8 text-center shadow-[0_0_60px_rgba(0,212,170,0.3)] overflow-hidden"
+            >
+              {/* Party Popper Badge with Spring Bounce */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: [0, 1.3, 1] }}
+                transition={{ delay: 0.1, type: 'spring', stiffness: 450, damping: 18 }}
+                className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-[#00D4AA] to-[#00E5BC] text-black flex items-center justify-center shadow-2xl shadow-[#00D4AA]/40 mb-5"
+              >
+                <PartyPopper size={38} strokeWidth={2.5} />
+              </motion.div>
+
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#00D4AA]/15 border border-[#00D4AA]/30 text-[#00D4AA] text-xs font-black uppercase tracking-wider mb-2">
+                <CheckCircle2 size={14} className="text-[#00D4AA]" />
+                Payment & Slot Confirmed!
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
+                Order <span className="text-[#FFB347] font-mono">#{celebrationData.orderToken}</span>
+              </h2>
+              <p className="text-xs sm:text-sm text-zinc-400 mb-6 font-medium">
+                Your order is locked for <strong className="text-white">{celebrationData.slotLabel}</strong>. Kitchen ticket dispatched!
+              </p>
+
+              {/* OTP Preview Card */}
+              {celebrationData.pickupOtp && (
+                <div className="p-4 rounded-2xl bg-black/60 border border-white/10 mb-6 shadow-inner">
+                  <span className="text-[10px] font-black uppercase text-zinc-400 tracking-wider block mb-1">
+                    Pickup Verification OTP
+                  </span>
+                  <div className="text-3xl font-black font-mono tracking-widest text-[#00D4AA]">
+                    {celebrationData.pickupOtp}
+                  </div>
+                  <span className="text-[10px] text-zinc-500 mt-1 block">
+                    Flash optical QR or recite this PIN at Cafe @7 Express Counter
+                  </span>
+                </div>
+              )}
+
+              {/* Action & Auto-Redirect Bar */}
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  onClick={() => router.push(`/order/${celebrationData.orderToken}`)}
+                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-sm shadow-xl shadow-[#FF6B2C]/30 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition"
+                >
+                  <span>View Express Digital Pass Now</span>
+                  <span className="text-lg">→</span>
+                </button>
+
+                <div className="text-[11px] text-zinc-500 font-medium flex items-center justify-center gap-1.5">
+                  <Clock size={13} className="text-zinc-400" />
+                  <span>Auto-navigating to pass in <strong className="text-white font-mono">{countdown}s</strong>...</span>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </PageTransition>
   );
 }
