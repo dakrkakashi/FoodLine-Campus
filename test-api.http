@@ -99,3 +99,11 @@ Content-Type: application/json
   "password": "Test@1234"
 }
 
+### 13. Admin 24h Order Retention Cleanup (DPDP Minimization & Operational Audit)
+POST {{baseUrl}}/api/admin/orders/cleanup
+Content-Type: application/json
+
+{
+  "maxAgeHours": 24
+}
+

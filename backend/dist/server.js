@@ -23,6 +23,12 @@ app.use('/api/auth', auth_routes_js_1.authRouter);
 setInterval(() => {
     slot_throttler_js_1.SlotThrottlerService.expireOldHolds();
 }, 60 * 1000);
+// Background retention worker: clean up COLLECTED/CANCELLED orders older than 24h every hour
+setInterval(() => {
+    order_service_js_1.OrderService.cleanupOldOrders(24).catch((err) => {
+        console.warn('Hourly order retention cleanup error:', err);
+    });
+}, 60 * 60 * 1000);
 // -----------------------------------------------------------------------------
 // Health Check (Deep with Supabase status)
 // -----------------------------------------------------------------------------
@@ -267,8 +273,29 @@ app.get('/api/admin/metrics', async (req, res) => {
                 fssaiStatus: 'VERIFIED_100_PERCENT_VEG',
                 fssaiLicense: '11522036000142',
                 dpdpStatus: 'ACTIVE_DATA_MINIMIZATION',
+                retentionPolicy: 'ACTIVE_24H_COLLECTED_PURGE',
             },
             meta: { timestamp: new Date().toISOString() },
+        });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+// -----------------------------------------------------------------------------
+// 9. POST /api/admin/orders/cleanup (Manual Trigger for Retention Cleanup)
+// -----------------------------------------------------------------------------
+app.post('/api/admin/orders/cleanup', async (req, res) => {
+    try {
+        const maxAgeHours = Number(req.body.maxAgeHours || req.query.maxAgeHours || 24);
+        const result = await order_service_js_1.OrderService.cleanupOldOrders(maxAgeHours);
+        res.json({
+            success: true,
+            data: result,
+            meta: {
+                timestamp: new Date().toISOString(),
+                policy: `Purged completed orders older than ${maxAgeHours} hours`,
+            },
         });
     }
     catch (error) {

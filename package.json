@@ -10,6 +10,7 @@
     "dev:backend": "npm --prefix backend run dev",
     "build:frontend": "npm --prefix frontend run build",
     "build:backend": "npm --prefix backend run build",
+    "test:stress": "npm --prefix backend run test:stress",
     "dev:deck": "npx -y serve FoodLine_Pitch_Deck -l 3000",
     "build:deck": "python build_pitch_deck.py",
     "graphify": "graphify extract . --code-only"
