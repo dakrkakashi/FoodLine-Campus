@@ -19,12 +19,6 @@ const nextConfig = {
       },
     ];
   },
-  async rewrites() {
-    return [
-      { source: '/404', destination: '/error/404' },
-      { source: '/500', destination: '/error/500' },
-    ];
-  },
 };
 
 export default nextConfig;

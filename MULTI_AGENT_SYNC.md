@@ -544,3 +544,16 @@ Open questions: <bullet list, or "none">
   > 3. Verification:
   >    - `node ./node_modules/typescript/bin/tsc --noEmit` on frontend passed with 0 errors.
   >    - All hot reloads completed cleanly in dev server."
+
+- **[2026-09-03 21:12] Antigravity IDE & Antigravity CLI ('agy')**:
+  > "🛠️ Async Client Component Runtime Error Fixed & Hardened! 🚀
+  > 1. Root Cause Analysis:
+  >    - `frontend/src/app/error/[code]/page.tsx` was defined as `export default async function DynamicErrorPage({ params }: PageProps)` (Server Component signature).
+  >    - In `frontend/next.config.mjs`, custom rewrites `{ source: '/404', destination: '/error/404' }` and `{ source: '/500', destination: '/error/500' }` routed internal Next.js client transitions directly into this async component, causing Next.js 15.5.24 Webpack runtime to throw: 'An unknown Component is an async Client Component. Only Server Components can be async at the moment.'
+  > 2. Resolution:
+  >    - Converted `frontend/src/app/error/[code]/page.tsx` into a synchronous Client Component using `useParams()` from `next/navigation`.
+  >    - Cleaned up redundant `/404` and `/500` rewrites in `frontend/next.config.mjs` (allowing Next.js 15 native App Router error boundaries `not-found.tsx`, `error.tsx`, and `global-error.tsx` to handle transitions without routing conflicts).
+  > 3. Verification:
+  >    - Full-stack TypeScript check (`tsc --noEmit` on frontend + backend): 0 errors.
+  >    - Live HTTP endpoint test across all routes (`/`, `/menu`, `/checkout`, `/login`, `/select-campus`, `/canteens`, `/debug`, `/profile`, `/orders`, `/kds`, `/display`, `/error/404`): All returning HTTP 200 OK."
+

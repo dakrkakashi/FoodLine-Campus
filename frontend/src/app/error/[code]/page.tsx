@@ -1,23 +1,13 @@
+'use client';
+
 import React from 'react';
-import { Metadata } from 'next';
+import { useParams } from 'next/navigation';
 import { ErrorView } from '@/components/ui/error-view';
-import { getErrorMetadata, HTTP_ERRORS_CATALOG } from '@/lib/errors-catalog';
+import { getErrorMetadata } from '@/lib/errors-catalog';
 
-interface PageProps {
-  params: Promise<{ code: string }>;
-}
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { code } = await params;
-  const error = getErrorMetadata(code);
-  return {
-    title: `${error.code} - ${error.title} | FoodLine Campus`,
-    description: error.subtitle,
-  };
-}
-
-export default async function DynamicErrorPage({ params }: PageProps) {
-  const { code } = await params;
+export default function DynamicErrorPage() {
+  const params = useParams();
+  const code = (params?.code as string) || '500';
   const error = getErrorMetadata(code);
 
   return (
@@ -26,3 +16,4 @@ export default async function DynamicErrorPage({ params }: PageProps) {
     </div>
   );
 }
+
