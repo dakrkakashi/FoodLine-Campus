@@ -637,6 +637,31 @@ app.post('/api/admin/orders/cleanup', async (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------
 // 10. GET /api/telemetry (Real-Time System, Memory, SSE & Slot Monitor)
 // -----------------------------------------------------------------------------
+app.get('/api/notifications/whatsapp/preview/:orderToken', async (req: Request, res: Response) => {
+  try {
+    const orderToken = String(req.params.orderToken);
+    const order = await OrderService.getOrderByToken(orderToken);
+    if (!order) {
+      return res.status(404).json({ success: false, error: `Order ${orderToken} not found` });
+    }
+
+    const payload = NotificationService.formatWhatsAppPickupTemplate(order);
+    res.json({
+      success: true,
+      data: {
+        orderToken: order.orderToken,
+        pickupOtp: order.pickupOtp,
+        studentName: order.studentName,
+        recipientPhone: payload.to,
+        templatePayload: payload,
+      },
+      meta: { timestamp: new Date().toISOString() },
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/api/telemetry', async (req: Request, res: Response) => {
   try {
     const memory = process.memoryUsage();

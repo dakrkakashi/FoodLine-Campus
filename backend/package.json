@@ -4,11 +4,12 @@
   "description": "FoodLine: Backend API, Slot Throttling Engine, UTR Verification & Real-time SSE Streamer",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "dev": "node ./node_modules/tsx/dist/cli.mjs watch src/server.ts",
+    "build": "node ./node_modules/typescript/bin/tsc",
     "start": "node dist/server.js",
-    "test:api": "tsx scripts/verify-api.ts",
-    "test:stress": "tsx scripts/stress-test.ts"
+    "test:api": "node ./node_modules/tsx/dist/cli.mjs scripts/verify-api.ts",
+    "test:stress": "node ./node_modules/tsx/dist/cli.mjs scripts/stress-test.ts",
+    "test:benchmark": "node ./node_modules/tsx/dist/cli.mjs scripts/benchmark-realtime.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.47.0",
@@ -18,6 +19,7 @@
     "googleapis": "^144.0.0"
   },
   "devDependencies": {
+    "@esbuild/win32-x64": "^0.28.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",

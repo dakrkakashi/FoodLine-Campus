@@ -42,6 +42,7 @@
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
     "eslint": "^9.17.0",
+    "lightningcss-win32-x64-msvc": "^1.33.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.7.2"
   }

@@ -18,6 +18,20 @@ export interface ApiResponse<T = any> {
   };
 }
 
+export type CategoryName =
+  | 'All'
+  | 'Quick Bites'
+  | 'Chaat Corner'
+  | 'South Indian'
+  | 'North Indian'
+  | 'Sandwiches'
+  | 'Momos & Burgers'
+  | 'Fries & Pasta'
+  | 'Garlic Bread & Pizza'
+  | 'Maggi & Chinese'
+  | 'Beverages'
+  | 'Desserts';
+
 export interface Category {
   id: string;
   name: string;
@@ -30,8 +44,9 @@ export type InventoryType = 'daily_fresh' | 'persistent';
 export interface MenuItem {
   id: string;
   cafeteria_id?: string;
+  cafeteriaId?: string;
   category_id?: string;
-  category?: string;
+  category?: CategoryName | string;
   name: string;
   tag?: string;
   price: number;
@@ -39,6 +54,8 @@ export interface MenuItem {
   prepTime?: number;
   is_available?: boolean;
   isAvailable?: boolean;
+  is_veg?: boolean;
+  isVeg?: boolean;
   inventory_type?: InventoryType;
   stock_quantity?: number | null;
   low_stock_threshold?: number;
@@ -81,6 +98,9 @@ export interface PickupSlot {
   currentBooked: number;
   availableSlots: number;
   isFull: boolean;
+  cafeteriaId?: string;
+  cafeteria_id?: string;
+  facultyReserved?: number;
 }
 
 export type PaymentMethod = 'UPI' | 'COD';
@@ -88,11 +108,13 @@ export type PaymentMethod = 'UPI' | 'COD';
 export type OrderStatus =
   | 'PENDING_PAYMENT'
   | 'PAY_AT_COUNTER'
+  | 'AWAITING_VERIFICATION'
   | 'CONFIRMED'
   | 'PREPARING'
   | 'READY'
   | 'COLLECTED'
-  | 'CANCELLED';
+  | 'CANCELLED'
+  | 'REFUNDED';
 
 export interface OrderItem {
   id: string;
@@ -104,15 +126,34 @@ export interface OrderItem {
   subtotal: number;
 }
 
+export interface OrderFinancials {
+  itemTotal: number;
+  studentPlatformFee: number; // ₹0 or 3.5%
+  paymentGatewayMdr: number;   // 0%
+  totalAmountPaid: number;
+  merchantPayoutAmount: number; // 88%
+  platformShareAmount: number;  // 12%
+}
+
+export interface OrderCompliance {
+  dpdpConsentGiven: boolean;
+  fssaiLicense: string;
+  maxSlotHoldMinutes: number; // 10-20 mins
+}
+
 export interface Order {
   id: string;
   order_token?: string; // e.g. "FL-1793"
   orderToken?: string;
   user_id?: string;
-  studentPhone?: string;
+  userId?: string;
   cafeteria_id?: string;
+  cafeteriaId?: string;
   slot_id?: string;
   slot?: PickupSlot;
+  studentPhone?: string;
+  studentName?: string;
+  studentPrn?: string;
   total_amount?: number;
   totalAmount?: number;
   payment_method?: PaymentMethod;
@@ -123,25 +164,18 @@ export interface Order {
   utr_number?: string;
   utrNumber?: string;
   notes?: string;
+  counterId?: string;
+  isSquadOrder?: boolean;
+  squadRoomId?: string;
+  idempotencyKey?: string;
   created_at?: string;
   createdAt?: string;
   updated_at?: string;
   updatedAt?: string;
   items?: CartItem[];
   order_items?: OrderItem[];
-  financials?: {
-    itemTotal: number;
-    studentPlatformFee: number; // 3.5%
-    paymentGatewayMdr: number;   // 0%
-    totalAmountPaid: number;
-    merchantPayoutAmount: number;
-    platformShareAmount: number;
-  };
-  compliance?: {
-    dpdpConsentGiven: boolean;
-    fssaiLicense: string;
-    maxSlotHoldMinutes: number; // 20 mins
-  };
+  financials?: OrderFinancials;
+  compliance?: OrderCompliance;
   pickup_slots?: {
     label: string;
     start_time?: string;
@@ -149,15 +183,53 @@ export interface Order {
   };
 }
 
+export interface PaymentRecord {
+  id: string;
+  orderId: string;
+  utrNumber: string;
+  amount: number;
+  status: 'PENDING_VERIFICATION' | 'VERIFIED' | 'FAILED' | 'REFUNDED';
+  verificationMethod: 'UTR_MANUAL' | 'SOUNDBOX_WEBHOOK' | 'CASHIER_SCAN' | 'UPI_INTENT';
+  verifiedBy?: string;
+  createdAt: string;
+  verifiedAt?: string;
+}
+
 export interface Payment {
   id: string;
   order_id: string;
   utr_number: string; // 12-digit numeric
   amount: number;
-  status: 'PENDING_VERIFICATION' | 'VERIFIED' | 'FAILED';
+  status: 'PENDING_VERIFICATION' | 'VERIFIED' | 'FAILED' | 'REFUNDED';
   verified_by?: string;
   created_at: string;
   verified_at?: string;
+}
+
+export interface SlotHoldRecord {
+  id: string;
+  orderId: string;
+  slotId: string;
+  quantity: number;
+  expiresAt: string;
+  isReleased: boolean;
+  createdAt: string;
+}
+
+export interface SignupRequestDTO {
+  name: string;
+  email: string;
+  phone?: string;
+  password: string;
+}
+
+export interface SheetLogRow {
+  timestamp: string;
+  name: string;
+  email: string;
+  phone: string;
+  accountId: string;
+  formLink: string;
 }
 
 export interface CartItem {
@@ -167,6 +239,8 @@ export interface CartItem {
   quantity: number;
   category?: string;
   tag?: string;
+  maxStock?: number | null;
+  item?: MenuItem;
 }
 
 export interface CreateOrderPayload {
@@ -181,7 +255,9 @@ export interface CreateOrderPayload {
   paymentMethod?: PaymentMethod;
   studentName?: string;
   studentPrn?: string;
+  studentPhone?: string;
   utrNumber?: string;
+  cafeteriaId?: string;
 }
 
 export interface VerifyUtrPayload {
@@ -315,5 +391,124 @@ export interface ResolvedStudentProfile {
   prn: string;
   campus: Campus;
   defaultCafeteriaId?: string;
+}
+
+// --- WhatsApp Cloud API & Realtime Benchmark Contracts ---
+
+export interface WhatsAppTemplateParameter {
+  type: 'text' | 'currency' | 'date_time' | 'image';
+  text?: string;
+  [key: string]: any;
+}
+
+export interface WhatsAppTemplateComponent {
+  type: 'header' | 'body' | 'button';
+  sub_type?: 'url' | 'quick_reply';
+  index?: number;
+  parameters: WhatsAppTemplateParameter[];
+}
+
+export interface WhatsAppTemplateLanguage {
+  code: string; // e.g. 'en', 'en_US', 'hi'
+  policy?: 'deterministic';
+}
+
+export interface WhatsAppTemplatePayload {
+  messaging_product: 'whatsapp';
+  recipient_type?: 'individual';
+  to: string;
+  type: 'template';
+  template: {
+    name: string;
+    language: WhatsAppTemplateLanguage | { code: string };
+    components: WhatsAppTemplateComponent[];
+  };
+}
+
+export interface WhatsAppMessageResponse {
+  messaging_product: 'whatsapp';
+  contacts?: Array<{
+    input: string;
+    wa_id: string;
+  }>;
+  messages?: Array<{
+    id: string;
+    message_status?: 'accepted' | 'held_for_quality_assessment';
+  }>;
+}
+
+export interface WhatsAppPickupTemplateParameters {
+  orderToken: string;
+  pickupOtp: string;
+  studentName?: string;
+  cafeteriaName?: string;
+  totalAmount?: number;
+  status?: OrderStatus | string;
+  pickupSlotLabel?: string;
+  readyTimestamp?: string;
+}
+
+export interface WhatsAppNotificationDispatchResult {
+  success: boolean;
+  orderToken: string;
+  recipientPhone: string;
+  channel: 'WHATSAPP';
+  status: 'SENT' | 'FAILED' | 'SKIPPED' | 'MOCK_DISPATCHED';
+  messageId?: string;
+  latencyMs: number;
+  error?: string;
+  dispatchedAt: string;
+}
+
+export interface NotificationLog {
+  id: string;
+  orderToken: string;
+  event: 'ORDER_READY' | 'ORDER_COLLECTED' | 'ORDER_CREATED' | 'WHATSAPP_DISPATCH';
+  channel?: 'SSE' | 'WEBHOOK' | 'WHATSAPP';
+  status: 'SENT' | 'FAILED' | 'SKIPPED' | 'MOCK_DISPATCHED';
+  destination?: string;
+  recipientPhone?: string;
+  timestamp: string;
+  latencyMs?: number;
+  details?: Record<string, any>;
+}
+
+export interface WhatsAppTelemetryLog extends NotificationLog {
+  templateName: string;
+  languageCode: string;
+  recipientPhone: string;
+  otp: string;
+  orderToken: string;
+  httpStatus?: number;
+  responsePayload?: Record<string, any>;
+  errorMessage?: string;
+}
+
+export interface RealtimeBenchmarkMetrics {
+  totalStreams: number;
+  successfulConnections: number;
+  failedConnections: number;
+  avgConnectionLatencyMs: number;
+  minConnectionLatencyMs: number;
+  maxConnectionLatencyMs: number;
+  avgBroadcastLatencyMs: number;
+  p50BroadcastLatencyMs: number;
+  p95BroadcastLatencyMs: number;
+  p99BroadcastLatencyMs: number;
+  packetsSent: number;
+  packetsReceived: number;
+  packetDropRatePercent: number;
+  memoryDeltaRssMb: number;
+  memoryDeltaHeapMb: number;
+  durationMs: number;
+}
+
+export interface RealtimeBenchmarkResult {
+  timestamp: string;
+  targetConcurrency: number;
+  supabaseRealtime: RealtimeBenchmarkMetrics;
+  inMemorySse: RealtimeBenchmarkMetrics;
+  winner: 'SUPABASE_REALTIME' | 'IN_MEMORY_SSE' | 'TIED';
+  recommendation: string;
 }
 

@@ -2,6 +2,21 @@
 
 import { useState, useEffect } from 'react';
 
+let sharedAudioCtx: AudioContext | null = null;
+
+function getAudioContext(): AudioContext | null {
+  if (typeof window === 'undefined') return null;
+  const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+  if (!AudioCtx) return null;
+  if (!sharedAudioCtx) {
+    sharedAudioCtx = new AudioCtx();
+  }
+  if (sharedAudioCtx.state === 'suspended') {
+    sharedAudioCtx.resume().catch(() => {});
+  }
+  return sharedAudioCtx;
+}
+
 export function useSoundFX() {
   const [muted, setMuted] = useState(false);
 
@@ -20,12 +35,23 @@ export function useSoundFX() {
     });
   };
 
+  const unlockAudio = async (): Promise<boolean> => {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      try {
+        await ctx.resume();
+      } catch {
+        // ignore
+      }
+    }
+    return ctx?.state === 'running';
+  };
+
   const playSynth = (frequency = 440, type: OscillatorType = 'sine', duration = 0.1, gainVal = 0.1) => {
     if (muted || typeof window === 'undefined') return;
     try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioCtx) return;
-      const ctx = new AudioCtx();
+      const ctx = getAudioContext();
+      if (!ctx) return;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
@@ -54,12 +80,45 @@ export function useSoundFX() {
   };
   const playTab = () => playSynth(400, 'sine', 0.06, 0.05);
 
+  const playKitchenReadyChime = () => {
+    if (muted || typeof window === 'undefined') return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+
+      // Resonant 3-bell counter chime: A5 (880Hz) -> C#6 (1108.7Hz) -> E6 (1318.5Hz)
+      const playBell = (freq: number, delay: number, duration: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+        gain.gain.setValueAtTime(0.22, ctx.currentTime + delay);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + delay + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + duration);
+      };
+
+      playBell(880.0, 0.0, 0.4);
+      playBell(1108.73, 0.12, 0.5);
+      playBell(1318.51, 0.24, 0.8);
+    } catch (e) {
+      // Ignore audio context issues
+    }
+  };
+
   return {
     muted,
     toggleMute,
+    unlockAudio,
     playClick,
     playPop,
     playSuccess,
     playTab,
+    playKitchenReadyChime,
   };
 }

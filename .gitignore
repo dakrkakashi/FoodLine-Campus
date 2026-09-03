@@ -39,3 +39,5 @@ credentials.json
 graphify-out/
 AGENTS.md
 OPENCODE.md
+inbox/
+outbox/

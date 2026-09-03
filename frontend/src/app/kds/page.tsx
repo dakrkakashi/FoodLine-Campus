@@ -34,6 +34,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { ChefExpressIllustration, CampusExpressIllustration, EmptyCartIllustration } from '@/components/illustrations';
+import { useSoundFX } from '@/hooks/useSoundFX';
 
 interface KdsOrderItem {
   id: string;
@@ -80,6 +81,46 @@ export default function KitchenDisplayPage() {
   const [stockSearch, setStockSearch] = useState('');
   const [stockFilterTab, setStockFilterTab] = useState<'all' | 'instock' | 'soldout'>('all');
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
+
+  // KDS Audio Chime Suite (Resonant Web Audio Engine)
+  const { playKitchenReadyChime, playPop, unlockAudio } = useSoundFX();
+  const readyChimePlayedTokensRef = React.useRef<Set<string>>(new Set());
+  const isInitialLoadRef = React.useRef<boolean>(true);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
+
+  const unlockAudioContext = () => {
+    unlockAudio()
+      .then((unlocked) => {
+        setAudioUnlocked(true);
+        if (unlocked) {
+          playPop();
+        }
+      })
+      .catch(() => {
+        setAudioUnlocked(true);
+      });
+  };
+
+  useEffect(() => {
+    const handleFirstGesture = () => {
+      unlockAudioContext();
+    };
+    window.addEventListener('click', handleFirstGesture, { once: true });
+    window.addEventListener('touchstart', handleFirstGesture, { once: true });
+    return () => {
+      window.removeEventListener('click', handleFirstGesture);
+      window.removeEventListener('touchstart', handleFirstGesture);
+    };
+  }, []);
+
+  const triggerReadyChime = (orderToken?: string) => {
+    if (!soundEnabled) return;
+    if (orderToken) {
+      if (readyChimePlayedTokensRef.current.has(orderToken)) return;
+      readyChimePlayedTokensRef.current.add(orderToken);
+    }
+    playKitchenReadyChime();
+  };
 
   // KDS UI State: Live Clock, Fullscreen & Ticket Search
   const [currentTime, setCurrentTime] = useState('');
@@ -178,6 +219,23 @@ export default function KitchenDisplayPage() {
       ]);
 
       if (ordersRes.data && ordersRes.data.length > 0) {
+        if (isInitialLoadRef.current) {
+          // On first load, seed deduplication set with existing READY orders to prevent startup chime blast
+          ordersRes.data.forEach((o: any) => {
+            if (o.status === 'READY') {
+              readyChimePlayedTokensRef.current.add(o.order_token || o.id);
+            }
+          });
+          isInitialLoadRef.current = false;
+        } else {
+          // On background polling/refresh, check for newly transitioned READY orders
+          ordersRes.data.forEach((o: any) => {
+            const token = o.order_token || o.id;
+            if (o.status === 'READY' && !readyChimePlayedTokensRef.current.has(token)) {
+              triggerReadyChime(token);
+            }
+          });
+        }
         setOrders(ordersRes.data);
       }
 
@@ -218,6 +276,11 @@ export default function KitchenDisplayPage() {
   useEffect(() => {
     loadData();
 
+    // 5-second resilient background polling fallback for tablet kiosk reliability
+    const pollInterval = setInterval(() => {
+      loadData();
+    }, 5000);
+
     try {
       const supabase = createClient();
       const channel = supabase
@@ -229,11 +292,13 @@ export default function KitchenDisplayPage() {
             if (payload.eventType === 'INSERT') {
               loadData();
               if (soundEnabled) {
-                try {
-                  new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play().catch(() => {});
-                } catch (e) {}
+                playPop();
               }
             } else if (payload.eventType === 'UPDATE') {
+              const updated = payload.new as any;
+              if (updated?.status === 'READY') {
+                triggerReadyChime(updated.order_token || updated.id);
+              }
               setOrders((prev) =>
                 prev.map((o) => (o.id === (payload.new as any).id ? { ...o, ...(payload.new as any) } : o))
               );
@@ -243,15 +308,24 @@ export default function KitchenDisplayPage() {
         .subscribe();
 
       return () => {
+        clearInterval(pollInterval);
         supabase.removeChannel(channel);
       };
     } catch (e) {
       console.warn('Realtime channel error:', e);
+      return () => {
+        clearInterval(pollInterval);
+      };
     }
   }, [soundEnabled]);
 
   const handleUpdateStatus = async (orderId: string, newStatus: string) => {
     try {
+      const targetOrder = orders.find((o) => o.id === orderId);
+      if (newStatus === 'READY' && targetOrder) {
+        triggerReadyChime(targetOrder.order_token);
+      }
+
       const res = await fetch(`/api/kds/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -284,9 +358,7 @@ export default function KitchenDisplayPage() {
           prev.map((o) => (o.order_token === orderToken ? { ...o, status: 'COLLECTED' } : o))
         );
         if (soundEnabled) {
-          new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3')
-            .play()
-            .catch(() => {});
+          playKitchenReadyChime();
         }
         setVerifyingOrder(null);
         setEnteredOtp('');
@@ -619,6 +691,30 @@ export default function KitchenDisplayPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-[#F5F5F7] flex flex-col h-screen overflow-hidden select-none">
+      {/* Tablet Autoplay Audio Unlock Warning Banner */}
+      {!audioUnlocked && (
+        <div
+          onClick={unlockAudioContext}
+          className="flex-none bg-gradient-to-r from-amber-600/30 via-orange-600/30 to-amber-600/30 border-b border-amber-500/40 px-4 py-2.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-amber-600/40 transition backdrop-blur-md z-50"
+        >
+          <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold text-amber-200">
+            <span className="text-base animate-bounce">🔔</span>
+            <span>
+              <strong>Tablet Audio Chime Muted:</strong> Tap anywhere on screen or click here to enable automatic order READY chimes for kitchen staff.
+            </span>
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              unlockAudioContext();
+            }}
+            className="flex-none px-3.5 py-1 bg-amber-400 hover:bg-amber-300 active:scale-95 text-black text-xs font-black rounded-lg transition shadow-md cursor-pointer"
+          >
+            Enable Sound
+          </button>
+        </div>
+      )}
+
       {/* Top Staff & Kiosk Header */}
       <header className="flex-none bg-[#14141E]/95 backdrop-blur-xl border-b border-white/10 px-5 py-3.5 flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
@@ -686,6 +782,17 @@ export default function KitchenDisplayPage() {
           >
             {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
           </button>
+
+          {/* Tablet Audio Autoplay Unlock Indicator/Button */}
+          {!audioUnlocked && (
+            <button
+              onClick={unlockAudioContext}
+              className="px-3 py-1.5 rounded-xl text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition cursor-pointer flex items-center gap-1.5 animate-pulse"
+              title="Tap to unblock kitchen audio chime on tablet Safari/Chrome"
+            >
+              <span>🔔 Enable Chime</span>
+            </button>
+          )}
 
           {/* Sound Toggle */}
           <button
