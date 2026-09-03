@@ -3,8 +3,25 @@ import { supabase } from '@/lib/supabase/route-client';
 import { getAllInventoryStatuses } from '@/lib/stock-store';
 import localMenu from '@/data/menu.json';
 
+// In-memory cache to prevent event loop choking from frequent checks
+let cachedStatuses: any[] | null = null;
+let lastCacheTime = 0;
+const CACHE_TTL_MS = 15000; // 15 seconds
+
 export async function GET() {
   try {
+    const now = Date.now();
+    if (cachedStatuses && now - lastCacheTime < CACHE_TTL_MS) {
+      return NextResponse.json({
+        success: true,
+        data: cachedStatuses,
+        meta: {
+          cached: true,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
     let items: any[] = [];
 
     try {
@@ -28,6 +45,8 @@ export async function GET() {
     }
 
     const statuses = getAllInventoryStatuses(items);
+    cachedStatuses = statuses;
+    lastCacheTime = now;
 
     return NextResponse.json({
       success: true,

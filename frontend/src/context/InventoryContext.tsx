@@ -25,7 +25,21 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
     try {
       const statuses = await fetchInventoryStatus();
       if (Array.isArray(statuses) && statuses.length > 0) {
-        setStatusMap(new Map(statuses.map((s) => [s.itemId, s])));
+        setStatusMap((prev) => {
+          // Avoid triggering re-renders across the app if data is unchanged
+          if (prev.size === statuses.length) {
+            let hasChanged = false;
+            for (const s of statuses) {
+              const existing = prev.get(s.itemId);
+              if (!existing || existing.isAvailable !== s.isAvailable || existing.stockQuantity !== s.stockQuantity) {
+                hasChanged = true;
+                break;
+              }
+            }
+            if (!hasChanged) return prev;
+          }
+          return new Map(statuses.map((s) => [s.itemId, s]));
+        });
       }
     } catch (e) {
       console.warn('Inventory refresh warning:', e);
@@ -37,9 +51,10 @@ export function InventoryProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     refresh();
 
+    // 30s backup polling interval (Supabase realtime postgres_changes handles live updates)
     const interval = setInterval(() => {
       refresh();
-    }, 3000);
+    }, 30000);
 
     const onFocus = () => {
       refresh();

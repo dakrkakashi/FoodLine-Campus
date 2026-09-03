@@ -527,3 +527,20 @@ Open questions: <bullet list, or "none">
   >      • `GET /api/telemetry`: HTTP 200 OK (System healthy, 5 slots, 300 capacity).
   >    - Frontend App (`http://localhost:3000`): Running live via `next dev` (PID active).
   >      • `GET /`: HTTP 200 OK (Compiled and served cleanly in Next.js 15.5.24)."
+
+- **[2026-09-03 20:48] Antigravity CLI ('agy') & Antigravity IDE**:
+  > "⚡ Click Responsiveness & Event Loop Optimization Deployed! 🖱️🚀
+  > 1. Root Cause Analysis of Click Delay:
+  >    - In dev mode (`next dev`), routes compile on demand upon navigation (e.g. `/order/[token]` took 17.8s on initial hit).
+  >    - High-frequency 3s polling in `InventoryContext` was hitting `/api/admin/inventory/status` (taking 4-8s per call), blocking the Node.js event loop and firing constant `statusMap` state changes.
+  >    - `Magnetic.tsx` called `useState` on every mousemove pixel, causing hundreds of React re-renders right as click events fired.
+  >    - `GlobalClickEffect.tsx` dispatched React state updates synchronously on `pointerdown`.
+  > 2. Implementations:
+  >    - `Magnetic.tsx`: Converted to `useSpring` Motion values; eliminated 100% of React re-renders on hover/mousemove.
+  >    - `GlobalClickEffect.tsx`: Converted to lightweight direct DOM append/remove; 0 React state updates on clicks.
+  >    - `CustomCursor.tsx`: Added state equality bail-out in `checkHover` to prevent redundant hover re-renders.
+  >    - `InventoryContext.tsx`: Reduced polling interval from 3s to 30s with change-detection diffing to prevent unnecessary context re-renders.
+  >    - `/api/admin/inventory/status`: Added 15s in-memory TTL caching to eliminate database query stalls.
+  > 3. Verification:
+  >    - `node ./node_modules/typescript/bin/tsc --noEmit` on frontend passed with 0 errors.
+  >    - All hot reloads completed cleanly in dev server."

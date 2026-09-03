@@ -42,8 +42,8 @@ export function CustomCursor() {
     const checkHover = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       if (!target) return;
-      const isInteractive = target.closest('button, a, input, select, textarea, [role="button"], .cursor-pointer');
-      setIsHovered(!!isInteractive);
+      const isInteractive = !!target.closest('button, a, input, select, textarea, [role="button"], .cursor-pointer');
+      setIsHovered((prev) => (prev === isInteractive ? prev : isInteractive));
     };
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
