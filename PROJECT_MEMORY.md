@@ -34,11 +34,13 @@
   - Touchscreen 3x4 numeric keypad inside OTP verification modal for cafeteria staff with kitchen gloves.
   - Direct 1-tap tray release button and 1-tap browser fullscreen kiosk mode (`⛶`).
   - Disabled custom spring cursor on `/kds` and `/display` kiosk screens to prevent distraction on tablet screens.
-- **FoodLine Debugging & HTTP Error Suite:** 100% Operational & Verified!
+- **FoodLine Debugging & HTTP Error Suite:** 100% Operational & Hardened!
   - Added Next.js standard error boundaries: `not-found.tsx` (404), `error.tsx` (client boundary), `global-error.tsx` (root boundary).
+  - Converted `frontend/src/app/error/[code]/page.tsx` into a synchronous Client Component using `useParams()` from `next/navigation`, resolving Next.js 15.5.24 Webpack runtime error (*'An unknown Component is an async Client Component'*).
+  - Cleaned up redundant `/404` and `/500` rewrites in `frontend/next.config.mjs` for seamless native App Router boundary transitions.
   - Created centralized `HTTP_ERRORS_CATALOG` (`errors-catalog.ts`) covering 13 HTTP status codes with campus-canteen analogies, technical descriptions, and recovery paths.
   - Built reusable, glassmorphic `<ErrorView />` component with dynamic ambient glow and technical diagnostics drawer.
-  - Created dynamic route `/error/[code]` plus direct static routes: `/401`, `/402`, `/403`, `/409`, `/503` (with rewrites for `/404` and `/500`).
+  - Created dynamic route `/error/[code]` plus direct static routes: `/401`, `/402`, `/403`, `/409`, `/503`.
   - Created interactive Developer & QA Testing Hub at `/debug`: live backend & Supabase health pinging, 1-click error modal previews, React crash boundary simulator, and local storage / cart inspector.
   - Added direct `/debug` link in desktop and mobile navbar for managers and admins.
 - **Pilot Concurrency Stress Test Suite (`test:stress`):** 100% Operational & Verified!
