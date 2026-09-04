@@ -14,40 +14,55 @@ export async function GET(
   const stream = new ReadableStream({
     async start(controller) {
       // 1. Initial order fetch
-      const { data: initialOrder } = await supabase
-        .from('orders')
-        .select(`
-          *,
-          order_items (*),
-          pickup_slots (*)
-        `)
-        .eq('order_token', token)
-        .single();
+      try {
+        const { data: initialOrder } = await supabase
+          .from('orders')
+          .select(`
+            *,
+            order_items (*),
+            pickup_slots (*)
+          `)
+          .eq('order_token', token)
+          .single();
 
-      if (initialOrder) {
-        controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify({ type: 'ORDER_SNAPSHOT', payload: initialOrder, order: initialOrder })}\n\n`)
-        );
+        if (initialOrder) {
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({ type: 'ORDER_SNAPSHOT', payload: initialOrder, order: initialOrder })}\n\n`)
+          );
+        }
+      } catch (fetchErr) {
+        console.warn('Initial order stream fetch warning:', fetchErr);
       }
 
-      // 2. Realtime listener
-      const channel = supabase
-        .channel(`order-stream-${token}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'orders',
-            filter: `order_token=eq.${token}`
-          },
-          (payload) => {
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ type: 'ORDER_UPDATE', payload: payload.new, order: payload.new })}\n\n`)
-            );
-          }
-        )
-        .subscribe();
+      // 2. Realtime listener with unique channel identifier
+      const channelName = `order-stream-${token}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+      let channel: any = null;
+
+      try {
+        channel = supabase
+          .channel(channelName)
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'orders',
+              filter: `order_token=eq.${token}`
+            },
+            (payload) => {
+              try {
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ type: 'ORDER_UPDATE', payload: payload.new, order: payload.new })}\n\n`)
+                );
+              } catch (e) {
+                console.error('Failed to enqueue order update:', e);
+              }
+            }
+          )
+          .subscribe();
+      } catch (subErr) {
+        console.warn('Supabase realtime subscribe warning:', subErr);
+      }
 
       // Keepalive heartbeat
       const heartbeatInterval = setInterval(() => {
@@ -60,8 +75,18 @@ export async function GET(
 
       request.signal.addEventListener('abort', () => {
         clearInterval(heartbeatInterval);
-        supabase.removeChannel(channel);
-        controller.close();
+        if (channel) {
+          try {
+            supabase.removeChannel(channel);
+          } catch {
+            // ignore
+          }
+        }
+        try {
+          controller.close();
+        } catch {
+          // ignore
+        }
       });
     }
   });
@@ -74,3 +99,4 @@ export async function GET(
     },
   });
 }
+

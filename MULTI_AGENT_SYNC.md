@@ -618,3 +618,15 @@ Open questions: <bullet list, or "none">
   >    - `npm --prefix backend run build`: TypeScript compiler passed cleanly with 0 errors.
   >    - Live API query verification: 8/8 categories verified with active dish counts (56 total dishes).
   >    - All categories filter seamlessly with zero 'No dishes found' false positives."
+
+- **[2026-09-04 09:44] Antigravity IDE & Antigravity CLI ('agy')**:
+  > "📡 Realtime Order Stream Collision Immunity & Master GitHub Sync Complete! 🚀
+  > 1. Realtime SSE Stream Collision Fix:
+  >    - Diagnosed `GET /api/order/[token]/stream` 500 error: Supabase Realtime client cached channel `order-stream-${token}`, throwing `cannot add postgres_changes callbacks after subscribe()` on reconnects or simultaneous tabs.
+  >    - Implemented high-entropy unique channel IDs (`order-stream-${token}-${Date.now()}-${random}`) in `frontend/src/app/api/order/[token]/stream/route.ts`.
+  >    - Wrapped subscription and initial order fetch in error-tolerant blocks and ensured clean teardown on abort signal.
+  > 2. Full-Stack Verification:
+  >    - `npm --prefix frontend run build`: 41/41 routes compiled with 0 errors.
+  >    - `npm --prefix backend run build`: 0 errors.
+  > 3. GitHub Master Upload:
+  >    - Synchronized and pushed all commits to `https://github.com/dakrkakashi/FoodLine-Campus.git` on branch `main`."
