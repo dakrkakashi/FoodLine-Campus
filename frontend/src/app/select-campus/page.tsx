@@ -117,12 +117,12 @@ export default function SelectCampusPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center max-w-2xl mx-auto mb-10"
         >
-          <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] text-black flex items-center justify-center shadow-xl shadow-[#FF6B2C]/30 mb-4">
+          <div className="w-16 h-16 mx-auto rounded-3xl bg-linear-to-tr from-accent-orange to-accent-amber text-black flex items-center justify-center shadow-xl shadow-accent-orange/30 mb-4">
             <Building2 size={30} strokeWidth={2.5} />
           </div>
           <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
             Select Your{' '}
-            <span className="bg-gradient-to-r from-[#FF6B2C] via-[#FFB347] to-[#00D4AA] bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-accent-orange via-accent-amber to-accent-teal bg-clip-text text-transparent">
               Campus
             </span>
           </h1>
@@ -231,7 +231,7 @@ export default function SelectCampusPage() {
                     }}
                     className={`px-5 py-3 rounded-2xl text-xs font-black tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
                       selectedStateId === st.id
-                        ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black shadow-lg shadow-[#FF6B2C]/25 border border-white/20'
+                        ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25 border border-white/20'
                         : 'bg-[#12121A] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20'
                     }`}
                   >
@@ -362,7 +362,7 @@ export default function SelectCampusPage() {
                           <motion.button
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-xs shadow-lg shadow-[#FF6B2C]/30 flex items-center gap-1.5"
+                            className="px-5 py-2.5 rounded-2xl bg-linear-to-r from-accent-orange to-accent-amber text-black font-black text-xs shadow-lg shadow-accent-orange/30 flex items-center gap-1.5"
                           >
                             <span>Browse 5 Canteens</span>
                             <ChevronRight size={14} strokeWidth={3} />

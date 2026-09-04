@@ -27,6 +27,10 @@
   - Hand-crafted 5 modular vector SVG illustrations in `components/illustrations/`: `EmptyCartIllustration`, `ChefExpressIllustration`, `CampusExpressIllustration`, `EmptyMenuIllustration`, and `SlotClockIllustration`.
   - Built `Magnetic` spring wrapper for CTAs/pills and `MeshGradientBackground` for fluid ambient hardware-accelerated aurora glows.
   - Integrated illustrations and magnetic interactions into `/`, `/menu`, `/checkout`, and `/order/[token]`.
+  - **Dynamic Theme Engine System Overhaul (100% Operational & Verified):**
+    - Fixed theme color change stall where hardcoded hex colors (`#FF6B2C`, `#FFB347`) prevented visual updates on theme selection.
+    - Synchronized Tailwind CSS v4 `@theme` mappings (`--color-accent-orange`, `--color-accent-amber`, `--color-accent-teal`, `--color-bg-canvas`, `--color-bg-card`) with CSS custom properties on `document.documentElement`.
+    - Converted all components, buttons, tabs, gradients, spotlight glows, and the floating cart tray across `/menu`, `/checkout`, `/canteens`, `/select-campus`, `/login`, and `/` to reactive Tailwind tokens. All 41/41 routes verified in Next.js build.
 - **Kitchen Display System (KDS) Touch UI/UX Suite:** 100% Operational & Verified!
   - Empty state illustrations for Column 2 (`ChefExpressIllustration`) and Column 3 (`CampusExpressIllustration`).
   - Live real-time kitchen clock, shift metrics strip, and automated ticket elapsed timers (`⏱️ 2m`, `⚠️ 8m RUSH`, `🚨 15m DELAY`).

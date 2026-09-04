@@ -130,7 +130,7 @@ export default function CanteensPage() {
                   onClick={() => setFilterTag(pill.id)}
                   className={`px-4 py-2.5 rounded-2xl text-xs font-black tracking-wide flex-shrink-0 transition-all cursor-pointer ${
                     filterTag === pill.id
-                      ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black shadow-lg shadow-[#FF6B2C]/25'
+                      ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25'
                       : 'bg-[#12121A] border border-white/10 text-zinc-400 hover:text-white'
                   }`}
                 >
@@ -172,8 +172,8 @@ export default function CanteensPage() {
                   className="h-full"
                 >
                   <SpotlightCard
-                    spotlightColor="rgba(255, 107, 44, 0.22)"
-                    className={`h-full p-6 md:p-7 rounded-[2.5rem] border border-white/10 hover:border-[#FF6B2C]/50 hover:shadow-[0_0_35px_rgba(255,107,44,0.22)] transition-all duration-300 bg-[#16161E]/85 backdrop-blur-xl flex flex-col justify-between group cursor-pointer ${
+                    spotlightColor="var(--accent-orange-glow, rgba(255, 107, 44, 0.22))"
+                    className={`h-full p-6 md:p-7 rounded-[2.5rem] border border-white/10 hover:border-accent-orange/50 hover:shadow-[0_0_35px_var(--accent-orange-glow)] transition-all duration-300 bg-[#16161E]/85 backdrop-blur-xl flex flex-col justify-between group cursor-pointer ${
                       !isOpen ? 'opacity-60 grayscale' : ''
                     }`}
                     onClick={() => isOpen && handleOpenCanteen(canteen)}
@@ -182,7 +182,7 @@ export default function CanteensPage() {
                       {/* Top Badges */}
                       <div className="flex items-center justify-between gap-2 mb-4">
                         <div className="flex items-center gap-2">
-                          <span className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF6B2C]/20 to-[#FFB347]/20 border border-[#FF6B2C]/30 text-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                          <span className="w-12 h-12 rounded-2xl bg-linear-to-tr from-accent-orange/20 to-accent-amber/20 border border-accent-orange/30 text-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
                             {icon}
                           </span>
                           <div>
@@ -190,7 +190,7 @@ export default function CanteensPage() {
                               ● 100% Pure Veg
                             </span>
                             {canteen.slug === 'cafe7' && (
-                              <span className="ml-1.5 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-[#FFB347] bg-[#FFB347]/10 border border-[#FFB347]/30 px-2 py-0.5 rounded-full">
+                              <span className="ml-1.5 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-accent-amber bg-accent-amber/10 border border-accent-amber/30 px-2 py-0.5 rounded-full">
                                 🔥 Central Hub
                               </span>
                             )}
@@ -199,13 +199,13 @@ export default function CanteensPage() {
 
                         <div className="text-right">
                           <span className="text-[11px] font-bold text-zinc-300 flex items-center gap-1 bg-white/5 px-2.5 py-1 rounded-xl">
-                            <Clock size={12} className="text-[#FFB347]" /> {canteen.prepTimeMins || 5} min prep
+                            <Clock size={12} className="text-accent-amber" /> {canteen.prepTimeMins || 5} min prep
                           </span>
                         </div>
                       </div>
 
                       {/* Title & Tagline */}
-                      <h2 className="text-xl md:text-2xl font-black text-white group-hover:text-[#FFB347] transition-colors leading-tight mb-1.5">
+                      <h2 className="text-xl md:text-2xl font-black text-white group-hover:text-accent-amber transition-colors leading-tight mb-1.5">
                         {canteen.name}
                       </h2>
                       <p className="text-xs font-bold text-[#00D4AA] mb-2">{canteen.tagline}</p>
@@ -228,7 +228,7 @@ export default function CanteensPage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         disabled={!isOpen}
-                        className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-xs shadow-xl shadow-[#FF6B2C]/30 flex items-center gap-2 cursor-pointer border border-white/20 uppercase tracking-wider"
+                        className="px-5 py-3 rounded-2xl bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black font-black text-xs shadow-xl shadow-accent-orange/30 flex items-center gap-2 cursor-pointer border border-white/20 uppercase tracking-wider"
                       >
                         <span>Enter Menu</span>
                         <ArrowRight size={14} strokeWidth={3} className="text-black" />

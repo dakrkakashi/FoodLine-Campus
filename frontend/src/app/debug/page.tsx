@@ -198,7 +198,7 @@ export default function DebugDashboardPage() {
             </button>
             <Link
               href="/"
-              className="px-4 py-2 rounded-xl text-xs font-semibold bg-(--accent-orange,#FF6B2C) hover:brightness-110 text-white transition-all shadow-md shadow-orange-500/20 flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-accent-orange hover:brightness-110 text-black font-black transition-all shadow-md shadow-accent-orange/20 flex items-center gap-1.5"
             >
               <Home className="w-3.5 h-3.5" />
               Return to App

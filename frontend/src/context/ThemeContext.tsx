@@ -192,6 +192,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty('--accent-orange', t.primary);
     root.style.setProperty('--accent-amber', t.secondary);
     root.style.setProperty('--accent-teal', t.accent);
+    root.style.setProperty('--color-accent-orange', t.primary);
+    root.style.setProperty('--color-accent-amber', t.secondary);
+    root.style.setProperty('--color-accent-teal', t.accent);
+    root.style.setProperty('--color-bg-canvas', t.bgCanvas);
+    root.style.setProperty('--color-bg-card', t.bgCard);
     root.style.setProperty('--accent-orange-glow', `${t.primary}66`);
     root.style.setProperty('--accent-amber-glow', `${t.secondary}55`);
     root.style.setProperty('--accent-teal-glow', `${t.accent}66`);

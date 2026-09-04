@@ -26,9 +26,9 @@ export function Badge({ children, variant = 'custom', className, icon }: BadgePr
   }
 
   const variantStyles = {
-    bestseller: 'bg-(--accent-orange)/15 border-(--accent-orange)/40 text-(--accent-orange)',
-    studentFav: 'bg-(--accent-amber)/15 border-(--accent-amber)/40 text-(--accent-amber)',
-    fastGrab: 'bg-(--accent-teal)/15 border-(--accent-teal)/40 text-(--accent-teal)',
+    bestseller: 'bg-accent-orange/15 border-accent-orange/40 text-accent-orange',
+    studentFav: 'bg-accent-amber/15 border-accent-amber/40 text-accent-amber',
+    fastGrab: 'bg-accent-teal/15 border-accent-teal/40 text-accent-teal',
     spicy: 'bg-rose-950/60 border-rose-500/40 text-rose-400',
     live: 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300',
     full: 'bg-red-950/80 border-red-500/40 text-red-300',

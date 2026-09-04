@@ -177,9 +177,9 @@ export function ErrorView({
 
           {/* Campus Metaphor Alert Banner */}
           <div className="mt-4 p-4 rounded-2xl bg-white/3 border border-white/10 flex items-start gap-3">
-            <Utensils className="w-5 h-5 text-(--accent-orange,#FF6B2C) shrink-0 mt-0.5" />
+            <Utensils className="w-5 h-5 text-accent-orange shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <span className="text-xs font-semibold text-(--accent-orange,#FF6B2C) uppercase tracking-wider">
+              <span className="text-xs font-semibold text-accent-orange uppercase tracking-wider">
                 Kitchen Canteen Log
               </span>
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed italic">

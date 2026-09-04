@@ -151,11 +151,11 @@ function LoginFormContent() {
         <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
           <motion.div
             whileHover={{ scale: 1.1, rotate: 6 }}
-            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] flex items-center justify-center font-black text-black text-lg shadow-lg shadow-[#FF6B2C]/20"
+            className="w-10 h-10 rounded-xl bg-linear-to-tr from-accent-orange to-accent-amber flex items-center justify-center font-black text-black text-lg shadow-lg shadow-accent-orange/20"
           >
             🍽
           </motion.div>
-          <span className="font-extrabold text-xl bg-gradient-to-r from-[#FF6B2C] via-[#FFB347] to-white bg-clip-text text-transparent">
+          <span className="font-extrabold text-xl bg-linear-to-r from-accent-orange via-accent-amber to-white bg-clip-text text-transparent">
             FoodLine
           </span>
         </Link>
@@ -182,7 +182,7 @@ function LoginFormContent() {
               {authTab === 'STAFF_ADMIN' ? (
                 <Shield size={28} className="text-purple-400" />
               ) : (
-                <GraduationCap size={28} className="text-[#FFB347]" />
+                <GraduationCap size={28} className="text-accent-amber" />
               )}
             </motion.div>
             <h1 className="text-2xl font-black tracking-tight text-white mb-1">
@@ -201,7 +201,7 @@ function LoginFormContent() {
               onClick={() => { setAuthTab('STUDENT_PRN'); setErrorMessage(null); setSuccessMessage(null); }}
               className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 authTab === 'STUDENT_PRN'
-                  ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FF8C42] text-white shadow-lg shadow-[#FF6B2C]/30'
+                  ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/30'
                   : 'text-neutral-400 hover:text-white'
               }`}
             >
@@ -225,7 +225,7 @@ function LoginFormContent() {
               onClick={() => { setAuthTab('GOOGLE_SSO'); setErrorMessage(null); setSuccessMessage(null); }}
               className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 authTab === 'GOOGLE_SSO'
-                  ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FF8C42] text-white shadow-lg shadow-[#FF6B2C]/30'
+                  ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/30'
                   : 'text-neutral-400 hover:text-white'
               }`}
             >
@@ -359,7 +359,7 @@ function LoginFormContent() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FF8C42] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#FF6B2C]/30 hover:opacity-95 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
+                className="w-full py-3 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber text-black text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-accent-orange/30 hover:opacity-95 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? (
                   <>

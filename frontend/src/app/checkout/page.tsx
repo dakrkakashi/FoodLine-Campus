@@ -240,7 +240,7 @@ export default function CheckoutPage() {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-sm shadow-xl shadow-[#FF6B2C]/30 cursor-pointer"
+                  className="px-8 py-4 rounded-2xl bg-linear-to-r from-accent-orange to-accent-amber text-black font-black text-sm shadow-xl shadow-accent-orange/30 cursor-pointer"
                 >
                   Browse Cafe @7 Menu →
                 </motion.button>
@@ -489,11 +489,11 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('UPI')}
                   className={`flex items-center justify-center gap-2 py-3 px-2 rounded-xl text-xs font-black transition-all cursor-pointer ${
                     paymentMethod === 'UPI'
-                      ? 'bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black shadow-lg shadow-[#FF6B2C]/25'
+                      ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25'
                       : 'text-zinc-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <Zap size={15} className={paymentMethod === 'UPI' ? 'text-black' : 'text-[#FF6B2C]'} />
+                  <Zap size={15} className={paymentMethod === 'UPI' ? 'text-black' : 'text-accent-orange'} />
                   <span>⚡ DirectPay UPI</span>
                 </button>
                 <button
@@ -744,7 +744,7 @@ export default function CheckoutPage() {
                         ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed border border-white/5'
                         : paymentMethod === 'COD'
                         ? 'bg-gradient-to-r from-[#00D4AA] via-[#00E5BC] to-[#00B4D8] text-black shadow-[#00D4AA]/30'
-                        : 'bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black shadow-[#FF6B2C]/30'
+                        : 'bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black shadow-accent-orange/30'
                     }`}
                   >
                     {isSubmitting ? (
@@ -786,7 +786,7 @@ export default function CheckoutPage() {
             </div>
 
             {/* Glowing Ambient Radials */}
-            <div className="absolute w-96 h-96 bg-[#FF6B2C]/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
+            <div className="absolute w-96 h-96 bg-accent-orange/25 rounded-full blur-3xl pointer-events-none animate-pulse" />
             <div className="absolute w-80 h-80 bg-[#00D4AA]/20 rounded-full blur-3xl pointer-events-none" />
 
             <motion.div
@@ -806,7 +806,7 @@ export default function CheckoutPage() {
               </div>
 
               <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
-                Order <span className="text-[#FFB347] font-mono">#{celebrationData.orderToken}</span>
+                Order <span className="text-accent-amber font-mono">#{celebrationData.orderToken}</span>
               </h2>
               <p className="text-xs sm:text-sm text-zinc-400 mb-6 font-medium">
                 Your order is locked for <strong className="text-white">{celebrationData.slotLabel}</strong>. Kitchen ticket dispatched!
@@ -832,7 +832,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => router.push(`/order/${celebrationData.orderToken}`)}
-                  className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-sm shadow-xl shadow-[#FF6B2C]/30 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition"
+                  className="w-full py-4 rounded-2xl bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black font-black text-sm shadow-xl shadow-accent-orange/30 flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02] active:scale-[0.98] transition"
                 >
                   <span>View Express Digital Pass Now</span>
                   <span className="text-lg">→</span>

@@ -59,7 +59,7 @@ export default function IntroductionPage() {
           className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight leading-[1.08] mb-6 max-w-3xl"
         >
           Skip the 25-Min Line.{' '}
-          <span className="bg-gradient-to-r from-[#FF6B2C] via-[#FFB347] to-[#00D4AA] bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-accent-orange via-accent-amber to-accent-teal bg-clip-text text-transparent">
             Grab Hot Food in 30s.
           </span>
         </motion.h1>
@@ -89,7 +89,7 @@ export default function IntroductionPage() {
             <Link
               href="/select-campus"
               onClick={() => playClick()}
-              className="w-full px-7 py-4.5 bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-[#FF6B2C]/30 flex items-center justify-center gap-2.5 cursor-pointer group transition-all"
+              className="w-full px-7 py-4.5 bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-accent-orange/30 flex items-center justify-center gap-2.5 cursor-pointer group transition-all"
             >
               <MapPin size={18} className="text-black" />
               <span>Select Campus & Canteen</span>
@@ -105,7 +105,7 @@ export default function IntroductionPage() {
             <Link
               href="/login"
               onClick={() => playClick()}
-              className="w-full px-7 py-4.5 bg-[#16161E]/90 hover:bg-[#1C1C26] border border-white/15 hover:border-[#FF6B2C]/50 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl flex items-center justify-center gap-2.5 cursor-pointer transition-all"
+              className="w-full px-7 py-4.5 bg-[#16161E]/90 hover:bg-[#1C1C26] border border-white/15 hover:border-accent-orange/50 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl flex items-center justify-center gap-2.5 cursor-pointer transition-all"
             >
               <GraduationCap size={18} className="text-[#00D4AA]" />
               <span>Student PRN Login</span>
@@ -178,7 +178,7 @@ export default function IntroductionPage() {
       <footer className="relative z-10 border-t border-white/10 py-6 px-4 text-center text-xs text-zinc-500 bg-[#07070B]/90 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] flex items-center justify-center text-black font-black text-xs">
+            <div className="w-6 h-6 rounded-lg bg-linear-to-tr from-accent-orange to-accent-amber flex items-center justify-center text-black font-black text-xs">
               🍽
             </div>
             <span className="font-extrabold text-white text-xs">FoodLine Campus</span>

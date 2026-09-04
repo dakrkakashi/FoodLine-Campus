@@ -29,7 +29,7 @@ export function FloatingThemeTrigger() {
           <span className="hidden sm:inline-block text-xs font-black tracking-wide">
             {config.name}
           </span>
-          <Palette size={14} className="text-(--accent-orange)" />
+          <Palette size={14} className="text-accent-orange" />
         </motion.button>
       </div>
 

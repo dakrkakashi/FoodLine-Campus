@@ -66,7 +66,7 @@ export function Navbar() {
               className="flex items-center gap-2.5 group cursor-pointer"
             >
               <Logo size={38} />
-              <span className="font-black text-xl tracking-tight bg-linear-to-r from-(--accent-orange) via-(--accent-amber) to-white bg-clip-text text-transparent">
+              <span className="font-black text-xl tracking-tight bg-linear-to-r from-accent-orange via-accent-amber to-white bg-clip-text text-transparent">
                 FoodLine
               </span>
             </Link>
@@ -131,7 +131,7 @@ export function Navbar() {
               title={muted ? 'Unmute Web Audio FX' : 'Mute Sound FX'}
               className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 transition cursor-pointer ml-1"
             >
-              {muted ? <VolumeX size={16} className="text-zinc-500" /> : <Volume2 size={16} className="text-(--accent-teal)" />}
+              {muted ? <VolumeX size={16} className="text-zinc-500" /> : <Volume2 size={16} className="text-accent-teal" />}
             </button>
 
             {/* Theme Selector Dropdown */}
@@ -157,7 +157,7 @@ export function Navbar() {
                     className="absolute right-0 mt-2 w-48 rounded-2xl bg-[#12121A] border border-white/15 shadow-2xl p-2 z-50 backdrop-blur-2xl"
                   >
                     <div className="text-[10px] font-black uppercase text-zinc-400 px-3 py-1.5 tracking-wider border-b border-white/5 mb-1">
-                      Campus Theme
+                       Campus Theme
                     </div>
                     {Object.values(THEMES).map((t) => (
                       <button
@@ -169,7 +169,7 @@ export function Navbar() {
                         }}
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                           theme === t.id
-                            ? 'bg-(--accent-orange) text-black'
+                            ? 'bg-accent-orange text-black'
                             : 'text-zinc-300 hover:text-white hover:bg-white/5'
                         }`}
                       >
@@ -195,7 +195,7 @@ export function Navbar() {
               <Link
                 href="/checkout"
                 onClick={playClick}
-                className="ml-2 flex items-center gap-2 px-3.5 py-2 rounded-xl bg-linear-to-r from-(--accent-orange) to-(--accent-amber) text-black font-black text-xs shadow-lg shadow-(--accent-orange)/25 hover:shadow-(--accent-orange)/40 transition active:scale-95 cursor-pointer"
+                className="ml-2 flex items-center gap-2 px-3.5 py-2 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber text-black font-black text-xs shadow-lg shadow-accent-orange/25 hover:shadow-accent-orange/40 transition active:scale-95 cursor-pointer"
               >
                 <ShoppingCart size={15} strokeWidth={2.5} />
                 <span>Tray</span>
@@ -214,13 +214,13 @@ export function Navbar() {
               onClick={toggleMute}
               className="p-2 rounded-xl bg-white/5 border border-white/10 text-zinc-300"
             >
-              {muted ? <VolumeX size={16} /> : <Volume2 size={16} className="text-(--accent-teal)" />}
+              {muted ? <VolumeX size={16} /> : <Volume2 size={16} className="text-accent-teal" />}
             </button>
 
             {user && (
               <Link
                 href="/checkout"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-(--accent-orange) text-black font-black text-xs"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent-orange text-black font-black text-xs"
               >
                 <ShoppingCart size={14} />
                 {totalCount > 0 && <span>{totalCount}</span>}
@@ -316,7 +316,7 @@ export function Navbar() {
                       }}
                       title={t.name}
                       className={`w-7 h-7 rounded-xl text-xs font-black transition flex items-center justify-center cursor-pointer ${
-                        theme === t.id ? 'bg-(--accent-orange) text-black shadow-md' : 'bg-white/5 text-white hover:bg-white/15'
+                        theme === t.id ? 'bg-accent-orange text-black shadow-md' : 'bg-white/5 text-white hover:bg-white/15'
                       }`}
                     >
                       {t.emoji}

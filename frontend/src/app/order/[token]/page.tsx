@@ -222,7 +222,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
               ? 'bg-gradient-to-b from-[#00D4AA]/20 via-[#12121A] to-[#07070B] border-[#00D4AA]/70 shadow-[#00D4AA]/30'
               : isCollected
               ? 'bg-gradient-to-b from-zinc-800/40 via-[#12121A] to-[#07070B] border-zinc-700 opacity-75'
-              : 'bg-gradient-to-b from-[#FF6B2C]/15 via-[#12121A] to-[#07070B] border-[#FF6B2C]/40 shadow-black/90'
+              : 'bg-gradient-to-b from-accent-orange/15 via-[#12121A] to-[var(--bg-canvas)] border-accent-orange/40 shadow-black/90'
           }`}
         >
           {/* Header */}
@@ -230,7 +230,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
             <div>
               <div
                 className={`text-[10px] font-black uppercase tracking-widest mb-1 ${
-                  isReady ? 'text-[#00D4AA]' : 'text-[#FFB347]'
+                  isReady ? 'text-[#00D4AA]' : 'text-accent-amber'
                 }`}
               >
                 {isCollected ? 'Pass Completed • Cafe @7' : 'Express Pickup Pass • Cafe @7'}
@@ -396,7 +396,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
                     transition={isCurrent ? { duration: 2, repeat: Infinity } : {}}
                     className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg z-10 transition-all duration-500 shadow-md ${
                       isCurrent
-                        ? 'bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] text-black shadow-lg shadow-[#FF6B2C]/40 ring-2 ring-[#FF6B2C] ring-offset-2 ring-offset-[#12121A]'
+                        ? 'bg-linear-to-tr from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/40 ring-2 ring-accent-orange ring-offset-2 ring-offset-[#12121A]'
                         : isPassed
                         ? 'bg-[#00D4AA] text-black shadow-[#00D4AA]/20'
                         : 'bg-[#16161E] border border-white/10 text-zinc-500'
@@ -410,7 +410,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
                     <div className="flex items-center gap-2">
                       <h3
                         className={`text-sm md:text-base font-extrabold transition-colors duration-500 ${
-                          isCurrent ? 'text-[#FFB347]' : isPassed ? 'text-white' : 'text-zinc-500'
+                          isCurrent ? 'text-accent-amber' : isPassed ? 'text-white' : 'text-zinc-500'
                         }`}
                       >
                         {step.label}

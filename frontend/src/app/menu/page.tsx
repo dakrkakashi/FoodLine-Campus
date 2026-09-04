@@ -154,15 +154,15 @@ export default function MenuPage() {
   };
 
   return (
-    <PageTransition className="min-h-screen bg-[#07070B] text-[#F5F5F7] pb-36 relative overflow-hidden">
+    <PageTransition className="min-h-screen bg-[var(--bg-canvas)] text-[#F5F5F7] pb-36 relative overflow-hidden transition-colors duration-500">
       {/* Background Aurora Mesh */}
       <div className="aurora-mesh">
         <div
-          className="aurora-blob w-[36rem] h-[36rem] bg-(--accent-orange) -top-24 -right-20"
+          className="aurora-blob w-[36rem] h-[36rem] bg-accent-orange -top-24 -right-20"
           style={{ animationDuration: '18s' }}
         />
         <div
-          className="aurora-blob w-[38rem] h-[38rem] bg-(--accent-teal) top-1/2 -left-32"
+          className="aurora-blob w-[38rem] h-[38rem] bg-accent-teal top-1/2 -left-32"
           style={{ animationDuration: '24s', animationDelay: '-6s' }}
         />
       </div>
@@ -179,10 +179,10 @@ export default function MenuPage() {
         >
           <div className="relative z-10 max-w-2xl">
             <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-(--accent-orange)/15 border border-(--accent-orange)/30 text-(--accent-amber) text-xs font-black uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-orange/15 border border-accent-orange/30 text-accent-amber text-xs font-black uppercase tracking-wider">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-(--accent-teal) opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-(--accent-teal)" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-teal opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent-teal" />
                 </span>
                 {selectedCanteen.name} • {selectedCampus.name}
               </div>
@@ -194,16 +194,16 @@ export default function MenuPage() {
                   whileTap={{ scale: 0.96 }}
                   className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition shadow-sm"
                 >
-                  <Store size={13} className="text-(--accent-amber)" />
+                  <Store size={13} className="text-accent-amber" />
                   <span>Switch Canteen ({availableCanteens.length} Active)</span>
-                  <ChevronRight size={13} className="text-(--accent-orange)" />
+                  <ChevronRight size={13} className="text-accent-orange" />
                 </motion.button>
               </Link>
             </div>
 
             <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3">
               What&apos;s Cooking{' '}
-              <span className="bg-linear-to-r from-(--accent-orange) via-(--accent-amber) to-(--accent-teal) bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-accent-orange via-accent-amber to-accent-teal bg-clip-text text-transparent">
                 Today?
               </span>
             </h1>
@@ -228,7 +228,7 @@ export default function MenuPage() {
               placeholder="Search 44+ dishes (e.g. Dosa, Vada Pav, Sandwich)..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-[#12121A] border border-white/10 rounded-2xl pl-11 pr-11 py-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-(--accent-orange) focus:ring-2 focus:ring-(--accent-orange)/20 transition-all shadow-inner"
+              className="w-full bg-[var(--bg-card)] border border-white/10 rounded-2xl pl-11 pr-11 py-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-accent-orange focus:ring-2 focus:ring-accent-orange/20 transition-all shadow-inner"
             />
             <AnimatePresence>
               {search && (
@@ -253,8 +253,8 @@ export default function MenuPage() {
                 onClick={() => setSelectedCategory('All')}
                 className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide transition-all cursor-pointer ${
                   selectedCategory === 'All'
-                    ? 'bg-linear-to-r from-(--accent-orange) to-(--accent-amber) text-black shadow-lg shadow-(--accent-orange)/25'
-                    : 'bg-[#12121A] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
+                    ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25'
+                    : 'bg-[var(--bg-card)] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
                 }`}
               >
                 🍽 All Items
@@ -267,8 +267,8 @@ export default function MenuPage() {
                   onClick={() => setSelectedCategory(cat.name)}
                   className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide flex items-center gap-2 transition-all cursor-pointer ${
                     selectedCategory === cat.name
-                      ? 'bg-linear-to-r from-(--accent-orange) to-(--accent-amber) text-black shadow-lg shadow-(--accent-orange)/25'
-                      : 'bg-[#12121A] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
+                      ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25'
+                      : 'bg-[var(--bg-card)] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
                   }`}
                 >
                   <span>{cat.icon || '🍽'}</span>
@@ -302,7 +302,7 @@ export default function MenuPage() {
                 setSearch('');
                 setSelectedCategory('All');
               }}
-              className="px-6 py-3 rounded-2xl bg-(--accent-orange)/20 border border-(--accent-orange)/30 text-(--accent-amber) font-bold cursor-pointer hover:bg-(--accent-orange)/30 transition"
+              className="px-6 py-3 rounded-2xl bg-accent-orange/20 border border-accent-orange/30 text-accent-amber font-bold cursor-pointer hover:bg-accent-orange/30 transition"
             >
               Reset All Filters
             </motion.button>
@@ -323,7 +323,7 @@ export default function MenuPage() {
                 >
                   <SpotlightCard
                     spotlightColor="var(--accent-orange-glow, rgba(255, 107, 44, 0.18))"
-                    className={`h-full p-6 flex flex-col justify-between group relative rounded-[2rem] border border-white/10 hover:border-(--accent-orange)/50 hover:shadow-[0_0_24px_var(--accent-orange-glow)] transition-all duration-200 bg-[#16161E]/85 backdrop-blur-md ${
+                    className={`h-full p-6 flex flex-col justify-between group relative rounded-[2rem] border border-white/10 hover:border-accent-orange/50 hover:shadow-[0_0_24px_var(--accent-orange-glow)] transition-all duration-200 bg-[#16161E]/85 backdrop-blur-md ${
                       !isAvailable ? 'opacity-50 grayscale pointer-events-none' : ''
                     }`}
                   >
@@ -368,16 +368,16 @@ export default function MenuPage() {
                                   is_available: isAvailable,
                                 });
                               }}
-                              className="text-[10px] font-bold text-(--accent-amber) bg-(--accent-orange)/10 hover:bg-(--accent-orange)/25 border border-(--accent-orange)/30 px-2 py-1 rounded-lg transition active:scale-95 cursor-pointer flex items-center gap-1 shrink-0"
+                              className="text-[10px] font-bold text-accent-amber bg-accent-orange/10 hover:bg-accent-orange/25 border border-accent-orange/30 px-2 py-1 rounded-lg transition active:scale-95 cursor-pointer flex items-center gap-1 shrink-0"
                               title="Inspect dish in 3D"
                             >
                               <span>3D</span>
-                              <Sparkles size={11} className="text-(--accent-amber)" />
+                              <Sparkles size={11} className="text-accent-amber" />
                             </button>
                           </div>
                         </div>
 
-                        <h3 className="text-lg font-black text-white group-hover:text-(--accent-amber) transition-colors leading-tight mb-1">
+                        <h3 className="text-lg font-black text-white group-hover:text-accent-amber transition-colors leading-tight mb-1">
                           {dish.name}
                         </h3>
                         <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
@@ -406,7 +406,7 @@ export default function MenuPage() {
                                 maxStock: stockQty,
                               })
                             }
-                            className="px-5 py-2.5 rounded-2xl bg-linear-to-r from-(--accent-orange) to-(--accent-amber) text-black font-black text-xs shadow-lg shadow-(--accent-orange)/20 cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="px-5 py-2.5 rounded-2xl bg-linear-to-r from-accent-orange to-accent-amber text-black font-black text-xs shadow-lg shadow-accent-orange/20 cursor-pointer flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <span>Add</span>
                             <span className="text-base font-black">+</span>
@@ -420,7 +420,7 @@ export default function MenuPage() {
                             >
                               −
                             </motion.button>
-                            <span className="w-8 text-center font-black text-base text-(--accent-amber)">{qty}</span>
+                            <span className="w-8 text-center font-black text-base text-accent-amber">{qty}</span>
                             <motion.button
                               whileTap={!isMaxStockReached ? { scale: 0.9 } : {}}
                               disabled={isMaxStockReached}
@@ -438,7 +438,7 @@ export default function MenuPage() {
                               className={`w-9 h-9 rounded-xl font-black text-sm flex items-center justify-center transition ${
                                 isMaxStockReached
                                   ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-40 shadow-none'
-                                  : 'bg-(--accent-orange) hover:brightness-110 text-black shadow-md shadow-(--accent-orange)/30 cursor-pointer'
+                                  : 'bg-accent-orange hover:brightness-110 text-black shadow-md shadow-accent-orange/30 cursor-pointer'
                               }`}
                               title={isMaxStockReached ? `Maximum stock of ${stockQty} reached` : 'Add one more'}
                             >
@@ -466,15 +466,15 @@ export default function MenuPage() {
               transition={{ type: 'spring', stiffness: 420, damping: 26 }}
               className="fixed bottom-6 sm:bottom-8 inset-x-0 z-[999] px-4 flex justify-center pointer-events-none pb-[env(safe-area-inset-bottom)]"
             >
-              <div className="pointer-events-auto w-full max-w-lg rounded-full glass-card-heavy backdrop-blur-2xl bg-[#16161E]/95 border-2 border-(--accent-orange)/60 shadow-[0_16px_50px_rgba(0,0,0,0.95),0_0_35px_var(--accent-orange-glow)] p-2 sm:p-2.5 flex items-center justify-between gap-3 relative overflow-hidden">
+              <div className="pointer-events-auto w-full max-w-lg rounded-full glass-card-heavy backdrop-blur-2xl bg-[#16161E]/95 border-2 border-accent-orange/60 shadow-[0_16px_50px_rgba(0,0,0,0.95),0_0_35px_var(--accent-orange-glow)] p-2 sm:p-2.5 flex items-center justify-between gap-3 relative overflow-hidden">
                 {/* Ambient radial glows */}
-                <div className="absolute -left-10 -top-10 w-28 h-28 bg-(--accent-orange)/25 rounded-full blur-xl pointer-events-none" />
-                <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-(--accent-teal)/20 rounded-full blur-xl pointer-events-none" />
+                <div className="absolute -left-10 -top-10 w-28 h-28 bg-accent-orange/25 rounded-full blur-xl pointer-events-none" />
+                <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-accent-teal/20 rounded-full blur-xl pointer-events-none" />
 
                 {/* Left Info: Animated Cart Icon with Pop Badge + Total */}
                 <div className="flex items-center gap-3 pl-2 sm:pl-3 relative z-10">
                   <div className="relative">
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-linear-to-tr from-(--accent-orange) to-(--accent-amber) text-black flex items-center justify-center shadow-lg shadow-(--accent-orange)/35">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-linear-to-tr from-accent-orange to-accent-amber text-black flex items-center justify-center shadow-lg shadow-accent-orange/35">
                       <ShoppingCart size={20} strokeWidth={2.5} />
                     </div>
                     {/* Bouncy live count badge with AnimatedCounter */}
@@ -483,7 +483,7 @@ export default function MenuPage() {
                       initial={{ scale: 0.5, rotate: -12 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: 'spring', stiffness: 550, damping: 14 }}
-                      className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-(--accent-teal) text-black text-[10px] font-black flex items-center justify-center shadow-md border-2 border-[#16161E]"
+                      className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-accent-teal text-black text-[10px] font-black flex items-center justify-center shadow-md border-2 border-[#16161E]"
                     >
                       <AnimatedCounter value={totalCount} />
                     </motion.span>
@@ -492,7 +492,7 @@ export default function MenuPage() {
                   <div className="leading-tight">
                     <div className="text-[10px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
                       <span>Tray Subtotal</span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-(--accent-teal) inline-block animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent-teal inline-block animate-pulse" />
                     </div>
                     <div className="text-lg sm:text-xl font-black text-white font-mono flex items-baseline gap-1">
                       <AnimatedCounter value={totalAmount} prefix="₹" />
@@ -509,7 +509,7 @@ export default function MenuPage() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.94 }}
-                      className="px-5 sm:px-7 py-3 rounded-full bg-linear-to-r from-(--accent-orange) via-(--accent-amber) to-(--accent-amber) text-black font-black text-xs sm:text-sm shadow-xl shadow-(--accent-orange)/35 flex items-center gap-2 cursor-pointer border border-white/20 uppercase tracking-wider"
+                      className="px-5 sm:px-7 py-3 rounded-full bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black font-black text-xs sm:text-sm shadow-xl shadow-accent-orange/35 flex items-center gap-2 cursor-pointer border border-white/20 uppercase tracking-wider"
                     >
                       <span>Select Slot</span>
                       <ArrowRight size={16} strokeWidth={3} className="text-black" />
