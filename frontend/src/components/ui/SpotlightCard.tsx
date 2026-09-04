@@ -60,7 +60,7 @@ export function SpotlightCard({
         delay: Math.min(delay, 0.15),
       }}
       className={clsx(
-        'relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#16161E]/80 backdrop-blur-md transition-colors duration-200 group gpu-layer',
+        'relative overflow-hidden rounded-[2rem] border border-[var(--border-glass)] bg-[var(--bg-card)] text-[var(--text-primary)] backdrop-blur-md transition-colors duration-300 group gpu-layer shadow-sm dark:shadow-none',
         className
       )}
       style={{

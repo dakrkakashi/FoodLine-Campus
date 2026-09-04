@@ -16,11 +16,11 @@ export function Badge({ children, variant = 'custom', className, icon }: BadgePr
 
   if (variant === 'veg') {
     return (
-      <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-950/40 border border-emerald-500/40" title="100% Pure Vegetarian">
-        <div className="w-3 h-3 rounded-[3px] border border-emerald-400 flex items-center justify-center p-[2px]">
-          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+      <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-500/15 border border-emerald-500/40 shadow-xs" title="100% Pure Vegetarian">
+        <div className="w-3 h-3 rounded-[3px] border border-emerald-600 dark:border-emerald-400 flex items-center justify-center p-[2px]">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
         </div>
-        <span className="text-[10px] font-black text-emerald-400 uppercase tracking-wider">VEG</span>
+        <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">VEG</span>
       </div>
     );
   }
@@ -29,11 +29,11 @@ export function Badge({ children, variant = 'custom', className, icon }: BadgePr
     bestseller: 'bg-accent-orange/15 border-accent-orange/40 text-accent-orange',
     studentFav: 'bg-accent-amber/15 border-accent-amber/40 text-accent-amber',
     fastGrab: 'bg-accent-teal/15 border-accent-teal/40 text-accent-teal',
-    spicy: 'bg-rose-950/60 border-rose-500/40 text-rose-400',
-    live: 'bg-emerald-950/80 border-emerald-500/40 text-emerald-300',
-    full: 'bg-red-950/80 border-red-500/40 text-red-300',
-    available: 'bg-emerald-950/60 border-emerald-500/30 text-emerald-400',
-    custom: 'bg-white/5 border-white/10 text-zinc-300',
+    spicy: 'bg-rose-500/15 border-rose-500/40 text-rose-600 dark:text-rose-400',
+    live: 'bg-emerald-500/15 border-emerald-500/40 text-emerald-700 dark:text-emerald-300',
+    full: 'bg-red-500/15 border-red-500/40 text-red-600 dark:text-red-400',
+    available: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-700 dark:text-emerald-400',
+    custom: 'bg-black/5 dark:bg-white/5 border-[var(--border-glass)] text-[var(--text-secondary)]',
   };
 
   return (

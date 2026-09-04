@@ -743,7 +743,7 @@ export default function TermsAndConditionsPage() {
   };
 
   return (
-    <PageTransition className="min-h-screen bg-[#07070B] text-[#F8FAFC] pb-24 relative overflow-hidden">
+    <PageTransition className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] pb-24 relative overflow-hidden transition-colors duration-500">
       {/* Background Ambience Mesh */}
       <div className="absolute -top-40 -left-40 w-[550px] h-[550px] bg-[var(--accent-orange)]/10 rounded-full blur-[140px] pointer-events-none" />
       <div className="absolute top-1/3 -right-40 w-[600px] h-[600px] bg-[var(--accent-teal)]/10 rounded-full blur-[150px] pointer-events-none" />
@@ -759,24 +759,24 @@ export default function TermsAndConditionsPage() {
             <span>Master Service Agreement & Student Bylaws</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-tight">
+          <h1 className="text-4xl sm:text-6xl font-black text-[var(--text-primary)] tracking-tight leading-tight">
             Terms & <br />
             <span className="bg-gradient-to-r from-[var(--accent-orange)] via-[var(--accent-amber)] to-[var(--accent-teal)] bg-clip-text text-transparent">
               Conditions of Service
             </span>
           </h1>
 
-          <p className="text-sm sm:text-base text-zinc-400 font-normal">
+          <p className="text-sm sm:text-base text-[var(--text-secondary)] font-normal">
             Official operational bylaws governing food pre-ordering, direct UPI settlement, break-slot throttling, and express counter pickups at {pilotCampus}.
           </p>
 
           {/* Metadata Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-zinc-400">
-            <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10">
-              🗓 Effective: <strong className="text-white">{effectiveDate}</strong>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-[var(--text-secondary)]">
+            <span className="px-3 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-[var(--border-glass)]">
+              🗓 Effective: <strong className="text-[var(--text-primary)]">{effectiveDate}</strong>
             </span>
-            <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10">
-              🔄 Last Updated: <strong className="text-white">{lastUpdated}</strong>
+            <span className="px-3 py-1 rounded-lg bg-black/5 dark:bg-white/5 border border-[var(--border-glass)]">
+              🔄 Last Updated: <strong className="text-[var(--text-primary)]">{lastUpdated}</strong>
             </span>
             <span className="px-3 py-1 rounded-lg bg-[#00D4AA]/10 text-[#00D4AA] border border-[#00D4AA]/20 font-bold">
               ✓ MoU Tripartite Authorized

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/route-client';
+import { isSlotPassedForDay } from '@/lib/campus-time';
 
 export async function GET(request: Request) {
   try {
@@ -61,9 +62,10 @@ export async function POST(request: Request) {
       );
     }
 
-    // 1. Validate slot capacity if slotId provided
+    // 1. Validate slot capacity and campus time if slotId provided
     const isSlotUuid = typeof slotId === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slotId);
     let resolvedSlotId: string | null = null;
+    const isTomorrow = body.isTomorrow === true || body.pickupDate === 'TOMORROW';
 
     if (slotId && isSlotUuid) {
       const { data: slot, error: slotErr } = await supabase
@@ -74,6 +76,25 @@ export async function POST(request: Request) {
 
       if (!slotErr && slot) {
         resolvedSlotId = slot.id;
+
+        // Check if slot has already passed for Today
+        if (!isTomorrow && slot.start_time) {
+          const isPast = isSlotPassedForDay(slot.start_time, 'TODAY');
+          if (isPast) {
+            return NextResponse.json(
+              {
+                success: false,
+                error: {
+                  code: 'SLOT_CLOSED_TIME_PASSED',
+                  message: `Slot "${slot.label}" is closed because its campus pickup window has already passed. Please choose an upcoming slot or order for Tomorrow.`,
+                },
+              },
+              { status: 400 }
+            );
+          }
+        }
+
+        // Check capacity
         if (slot.current_booked >= slot.max_capacity) {
           return NextResponse.json(
             {
@@ -142,14 +163,20 @@ export async function POST(request: Request) {
     const platformConvenienceFee = Number((subtotal * 0.035).toFixed(2));
     const totalAmount = Number((subtotal + platformConvenienceFee).toFixed(2));
 
-    const paymentMethod = body.paymentMethod === 'COD' ? 'COD' : 'UPI';
-    const cleanUtr = body.utrNumber ? body.utrNumber.toString().trim() : null;
-    const isUpiWithValidUtr = paymentMethod === 'UPI' && cleanUtr && cleanUtr.length === 12;
+    if (body.paymentMethod === 'COD') {
+      return NextResponse.json(
+        { success: false, error: 'Cash on Delivery has been discontinued. Please pay online via DirectPay UPI.' },
+        { status: 400 }
+      );
+    }
 
-    const initialStatus = (paymentMethod === 'COD' || isUpiWithValidUtr) ? 'CONFIRMED' : 'PENDING_PAYMENT';
+    const cleanUtr = body.utrNumber ? body.utrNumber.toString().trim() : null;
+    const isUpiWithValidUtr = cleanUtr && cleanUtr.length === 12;
+    const initialStatus = isUpiWithValidUtr ? 'CONFIRMED' : 'PENDING_PAYMENT';
 
     // Format comprehensive student metadata tag in notes
     const studentTags = [
+      isTomorrow ? 'Pickup: TOMORROW' : 'Pickup: TODAY',
       studentPrn ? `PRN: ${studentPrn.trim()}` : '',
       studentName ? `Name: ${studentName.trim()}` : '',
       phone ? `Phone: ${phone.trim()}` : '',
@@ -158,9 +185,6 @@ export async function POST(request: Request) {
     let orderNotes = notes ? notes.trim() : '';
     if (studentTags) {
       orderNotes = orderNotes ? `[${studentTags}] ${orderNotes}` : `[${studentTags}]`;
-    }
-    if (paymentMethod === 'COD') {
-      orderNotes = orderNotes ? `${orderNotes} | [💵 COD: Collect ₹${totalAmount} at Counter]` : `[💵 COD: Collect ₹${totalAmount} at Counter]`;
     }
 
     // 4. Create Order
@@ -196,7 +220,7 @@ export async function POST(request: Request) {
     }
 
     // Increment slot booked counter for confirmed orders
-    if (slotId && (paymentMethod === 'COD' || isUpiWithValidUtr)) {
+    if (slotId && isUpiWithValidUtr) {
       try {
         const { data: currentSlot } = await supabase.from('pickup_slots').select('current_booked').eq('id', slotId).single();
         if (currentSlot) {
@@ -218,7 +242,7 @@ export async function POST(request: Request) {
         totalAmount: order.total_amount,
         pickupOtp: order.pickup_otp,
         status: order.status,
-        paymentMethod,
+        paymentMethod: 'UPI',
         studentPrn,
         studentName,
         createdAt: order.created_at

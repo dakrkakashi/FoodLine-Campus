@@ -1,30 +1,12 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
-
-const DB_FILE = path.join(process.cwd(), 'src/data/student-accounts.json');
-
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password + '_foodline_campus_2026').digest('hex');
-}
-
-function getStoredStudents(): Record<string, any> {
-  try {
-    if (fs.existsSync(DB_FILE)) {
-      const raw = fs.readFileSync(DB_FILE, 'utf-8');
-      return JSON.parse(raw);
-    }
-  } catch (e) {}
-  return {};
-}
+import { findStudentUser, verifyStudentPassword } from '@/lib/google-sheets';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { prn, password } = body;
 
-    const cleanPrn = (prn || '').toString().trim();
+    const cleanPrn = (prn || '').toString().trim().toUpperCase();
     const cleanPass = (password || '').toString();
 
     if (!cleanPrn || !cleanPass) {
@@ -34,41 +16,39 @@ export async function POST(request: Request) {
       );
     }
 
-    const students = getStoredStudents();
-    const student = students[cleanPrn];
+    // Query real Google Sheets database
+    const student = await findStudentUser(cleanPrn);
 
     if (!student) {
+      // If student is not registered in Google Sheets, prompt to create account
       return NextResponse.json(
         { success: false, error: `No account found for PRN "${cleanPrn}". Please click "Create Account" first.` },
         { status: 404 }
       );
     }
 
-    const passHash = hashPassword(cleanPass);
-    if (student.password_hash !== passHash) {
+    const isMatch = verifyStudentPassword(cleanPass, student.passwordHash);
+    if (!isMatch) {
       return NextResponse.json(
         { success: false, error: 'Incorrect password. Please verify and try again.' },
         { status: 401 }
       );
     }
 
-    // Prepare response with session cookie for this browser
-    const cookiePayload = encodeURIComponent(JSON.stringify({
-      id: student.id || `student_${cleanPrn}`,
+    const studentData = {
+      id: `student_${student.prn}`,
       prn: student.prn,
-      full_name: student.full_name,
+      full_name: student.name,
       role: 'student',
-    }));
+    };
+
+    // Prepare response with session cookie for this browser
+    const cookiePayload = encodeURIComponent(JSON.stringify(studentData));
 
     const response = NextResponse.json({
       success: true,
       message: 'Login successful!',
-      student: {
-        id: student.id || `student_${cleanPrn}`,
-        prn: student.prn,
-        full_name: student.full_name,
-        role: 'student',
-      },
+      student: studentData,
     });
 
     response.cookies.set('foodline_student_session', cookiePayload, {

@@ -117,24 +117,13 @@ async function processNextInQueue() {
     const cleanNum = item.token.replace('FL-', '');
     const spokenToken = `F L ${cleanNum.split('').join(' ')}`;
 
-    const phrases: Record<string, Record<'UPI' | 'COD', string>> = {
-      'en-IN': {
-        UPI: `Token ${spokenToken}, please collect your order at Counter ${item.counter}.`,
-        COD: `Token ${spokenToken}, cash on delivery at Counter ${item.counter}. Please pay on collection.`,
-      },
-      'hi-IN': {
-        UPI: `टोकन ${spokenToken}, कृपया काउंटर ${item.counter} से अपना ऑर्डर प्राप्त करें।`,
-        COD: `टोकन ${spokenToken}, काउंटर ${item.counter} पर नकद भुगतान। कृपया काउंटर पर भुगतान करके ऑर्डर लें।`,
-      },
-      'mr-IN': {
-        UPI: `टोकन ${spokenToken}, कृपया काउंटर ${item.counter} वरून तुमची ऑर्डर घ्या.`,
-        COD: `टोकन ${spokenToken}, काउंटर ${item.counter} वर रोख देय. कृपया काउंटरवर रोख देऊन ऑर्डर घ्या.`,
-      },
+    const phrases: Record<string, string> = {
+      'en-IN': `Token ${spokenToken}, please collect your order at Counter ${item.counter}.`,
+      'hi-IN': `टोकन ${spokenToken}, कृपया काउंटर ${item.counter} से अपना ऑर्डर प्राप्त करें।`,
+      'mr-IN': `टोकन ${spokenToken}, कृपया काउंटर ${item.counter} वरून तुमची ऑर्डर घ्या.`,
     };
 
-    const mode = item.isCod ? 'COD' : 'UPI';
-    const langPhrases = phrases[item.lang] || phrases['en-IN'];
-    const textToSpeak = langPhrases[mode] || langPhrases.UPI;
+    const textToSpeak = phrases[item.lang] || phrases['en-IN'];
     const utterance = new SpeechSynthesisUtterance(textToSpeak);
 
     utterance.lang = item.lang;

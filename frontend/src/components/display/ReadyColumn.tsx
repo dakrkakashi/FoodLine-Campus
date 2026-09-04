@@ -61,10 +61,7 @@ export function ReadyColumn({ orders }: ReadyColumnProps) {
             </motion.div>
           ) : (
             orders.map((order) => {
-              const isCod = (order as any).payment_mode === 'COD' || 
-                (order as any).notes?.includes('COD') || 
-                (order as any).notes?.includes('Cash on Delivery');
-              const counterInfo = getCounterLabel(isCod ? 1 : (order.counter || 1));
+              const counterInfo = getCounterLabel(order.counter || 1);
               const itemsSummary = (order.order_items || [])
                 .map((i) => `${i.quantity}x ${i.item_name || 'Item'}`)
                 .join(', ');
@@ -90,7 +87,7 @@ export function ReadyColumn({ orders }: ReadyColumnProps) {
                           {order.order_token}
                         </span>
 
-                        <PaymentBadge isCod={isCod} />
+                        <PaymentBadge />
 
                         {order.isJustReady && (
                           <span className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-[#FF6B2C]/30 animate-pulse">

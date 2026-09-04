@@ -80,30 +80,30 @@ export function DishInspectModal({ item, onClose }: DishInspectModalProps) {
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}
           transition={{ type: 'spring', damping: 25, stiffness: 350 }}
-          className="relative w-full max-w-xl bg-[#12121A] border border-white/15 rounded-3xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.85),0_0_35px_rgba(255,107,44,0.18)] z-10"
+          className="relative w-full max-w-xl bg-[var(--bg-card)] border border-[var(--border-glass)] text-[var(--text-primary)] rounded-3xl overflow-hidden shadow-2xl z-10"
         >
           {/* Header Bar */}
-          <div className="flex items-center justify-between px-6 pt-5 pb-2 border-b border-white/5">
+          <div className="flex items-center justify-between px-6 pt-5 pb-2 border-b border-[var(--border-glass)]">
             <div className="flex items-center gap-2">
               <span className="p-1.5 rounded-xl bg-[#FF6B2C]/20 text-[#FF6B2C]">
                 <Sparkles size={16} />
               </span>
-              <span className="text-xs font-black uppercase tracking-wider text-zinc-300">
+              <span className="text-xs font-black uppercase tracking-wider text-[var(--text-secondary)]">
                 Interactive 3D Dish View
               </span>
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white flex items-center justify-center transition cursor-pointer"
+              className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/15 text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center justify-center transition cursor-pointer"
             >
               <X size={18} />
             </button>
           </div>
 
           {/* 3D WebGL Canvas Viewport */}
-          <div className="relative w-full h-[280px] sm:h-[320px] bg-gradient-to-b from-[#181824]/60 to-[#0F0F17]">
+          <div className="relative w-full h-[280px] sm:h-[320px] bg-black/[0.03] dark:bg-gradient-to-b dark:from-[#181824]/60 dark:to-[#0F0F17]">
             <Food3DViewer modelType={modelType} className="w-full h-full" autoRotate={true} />
-            <div className="absolute top-3 left-4 px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[10px] font-bold text-zinc-400">
+            <div className="absolute top-3 left-4 px-3 py-1 rounded-full bg-black/40 dark:bg-black/60 backdrop-blur-md border border-[var(--border-glass)] text-[10px] font-bold text-[var(--text-secondary)]">
               Model: {modelType.toUpperCase()}
             </div>
           </div>
@@ -120,40 +120,40 @@ export function DishInspectModal({ item, onClose }: DishInspectModalProps) {
                     </span>
                   )}
                   {item.category && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/5 text-zinc-400">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/5 dark:bg-white/5 text-[var(--text-secondary)] border border-[var(--border-glass)]">
                       {item.category}
                     </span>
                   )}
                 </div>
-                <h2 className="text-2xl font-black text-white">{item.name}</h2>
+                <h2 className="text-2xl font-black text-[var(--text-primary)]">{item.name}</h2>
               </div>
               <div className="text-right shrink-0">
-                <div className="text-xs text-zinc-500 font-bold uppercase">Price</div>
+                <div className="text-xs text-[var(--text-muted)] font-bold uppercase">Price</div>
                 <div className="text-2xl font-black text-[#00D4AA]">₹{item.price}</div>
               </div>
             </div>
 
             {/* Fresh Preparation Signals */}
-            <div className="grid grid-cols-2 gap-2 text-xs text-zinc-300 pt-2 border-t border-white/5">
-              <div className="flex items-center gap-2 bg-white/5 rounded-xl p-2.5">
+            <div className="grid grid-cols-2 gap-2 text-xs text-[var(--text-primary)] pt-2 border-t border-[var(--border-glass)]">
+              <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] rounded-xl p-2.5">
                 <Clock size={15} className="text-[#FFB347]" />
                 <span>
                   Prep time: <strong>~{item.prep_time_mins || 5} mins</strong>
                 </span>
               </div>
-              <div className="flex items-center gap-2 bg-white/5 rounded-xl p-2.5">
+              <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] rounded-xl p-2.5">
                 <CheckCircle2 size={15} className="text-[#00D4AA]" />
                 <span>Express Campus Pickup</span>
               </div>
             </div>
 
             {/* Action Bar */}
-            <div className="flex items-center justify-between pt-4 border-t border-white/10">
-              <div className="text-xs text-zinc-400">
+            <div className="flex items-center justify-between pt-4 border-t border-[var(--border-glass)]">
+              <div className="text-xs text-[var(--text-secondary)]">
                 {quantity > 0 ? (
                   <span>
                     In Cart:{' '}
-                    <strong className="text-white">
+                    <strong className="text-[var(--text-primary)]">
                       {quantity} (₹{quantity * item.price})
                     </strong>
                   </span>
@@ -175,16 +175,16 @@ export function DishInspectModal({ item, onClose }: DishInspectModalProps) {
                       maxStock: stockQty,
                     })
                   }
-                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-sm shadow-lg shadow-[#FF6B2C]/20 hover:scale-[1.02] active:scale-95 transition cursor-pointer flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-white font-black text-sm shadow-lg shadow-[#FF6B2C]/20 hover:scale-[1.02] active:scale-95 transition cursor-pointer flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <ShoppingBag size={16} />
                   <span>Add to Order Tray</span>
                 </button>
               ) : (
-                <div className="flex items-center gap-2 bg-black/60 border border-white/15 rounded-2xl p-1.5">
+                <div className="flex items-center gap-2 bg-black/5 dark:bg-black/60 border border-[var(--border-glass)] rounded-2xl p-1.5">
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white font-black text-sm flex items-center justify-center transition cursor-pointer"
+                    className="w-8 h-8 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-[var(--text-primary)] font-black text-sm flex items-center justify-center transition cursor-pointer"
                   >
                     −
                   </button>

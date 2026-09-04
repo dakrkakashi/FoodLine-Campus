@@ -60,10 +60,6 @@ export function PreparingColumn({ orders }: PreparingColumnProps) {
               const itemsSummary = (order.order_items || [])
                 .map((i) => `${i.quantity}x ${i.item_name || 'Item'}`)
                 .join(', ');
-              const isCod = (order as any).payment_mode === 'COD' || 
-                (order as any).notes?.includes('COD') || 
-                (order as any).notes?.includes('Cash on Delivery');
-
               return (
                 <motion.div
                   key={order.id}
@@ -84,7 +80,7 @@ export function PreparingColumn({ orders }: PreparingColumnProps) {
                           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
                           <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
                         </span>
-                        <PaymentBadge isCod={isCod} />
+                        <PaymentBadge />
                       </div>
                       <p className="text-xs md:text-sm text-zinc-300 font-medium line-clamp-2 mt-1">
                         {itemsSummary || 'Standard Chef Platter'}

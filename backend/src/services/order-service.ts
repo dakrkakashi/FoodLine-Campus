@@ -108,7 +108,7 @@ export class OrderService {
     const now = new Date().toISOString();
     const formattedItems: CartItem[] = items.map((i: any) => ({
       item: i.item || {
-        id: i.id || `dish_${Math.random()}`,
+        id: i.id || randomUUID(),
         name: i.name || 'Campus Dish',
         price: i.price || 0,
         isVeg: true,
@@ -339,9 +339,81 @@ export class OrderService {
   }
 
   /**
-   * Fetch all active orders
+   * Synchronize real orders from Supabase PostgreSQL database into active store
+   */
+  public static async syncFromDatabase(limit: number = 100): Promise<void> {
+    if (!isSupabaseConfigured) return;
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*, order_items(*), pickup_slots(*)')
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (!error && data) {
+        for (const row of data) {
+          if (!ordersStore.has(row.order_token) && !prunedOrderTokens.has(row.order_token)) {
+            const mappedOrder: Order = {
+              id: row.id,
+              orderToken: row.order_token,
+              pickupOtp: row.pickup_otp,
+              userId: row.user_id,
+              cafeteriaId: row.cafeteria_id,
+              items: (row.order_items || []).map((oi: any) => ({
+                item: {
+                  id: oi.menu_item_id || oi.id,
+                  name: oi.item_name,
+                  price: Number(oi.unit_price),
+                  category: 'Quick Bites',
+                  prepTime: 5,
+                  tag: '',
+                  isVeg: true,
+                },
+                quantity: oi.quantity,
+              })),
+              slot: row.pickup_slots
+                ? {
+                    id: row.pickup_slots.id,
+                    label: row.pickup_slots.label,
+                    startTime: row.pickup_slots.start_time,
+                    endTime: row.pickup_slots.end_time,
+                    maxCapacity: row.pickup_slots.max_capacity,
+                    currentBooked: row.pickup_slots.current_booked,
+                    availableSlots: row.pickup_slots.max_capacity - row.pickup_slots.current_booked,
+                    isFull: row.pickup_slots.current_booked >= row.pickup_slots.max_capacity,
+                  }
+                : {
+                    id: 'slot-1',
+                    label: 'Morning Break (10:15 AM - 10:35 AM)',
+                    startTime: '10:15 AM',
+                    endTime: '10:35 AM',
+                    maxCapacity: 60,
+                    currentBooked: 1,
+                    availableSlots: 59,
+                    isFull: false,
+                  },
+              totalAmount: Number(row.total_amount),
+              status: row.status as OrderStatus,
+              notes: row.notes,
+              createdAt: row.created_at,
+              updatedAt: row.updated_at,
+            };
+            ordersStore.set(row.order_token, mappedOrder);
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('[OrderService] Supabase order sync warning:', err);
+    }
+  }
+
+  /**
+   * Fetch all active orders (backed by Supabase PostgreSQL)
    */
   public static getAllOrders(): Order[] {
+    if (ordersStore.size === 0) {
+      OrderService.syncFromDatabase().catch(() => {});
+    }
     return Array.from(ordersStore.values());
   }
 

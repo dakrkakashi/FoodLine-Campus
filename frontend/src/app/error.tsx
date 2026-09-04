@@ -16,14 +16,31 @@ export default function ErrorBoundary({
     console.error('⚠️ [FoodLine Campus] Client Error Caught by App ErrorBoundary:', error);
   }, [error]);
 
+  const isSimulatedCrash = error?.message?.includes('Deliberate test crash');
+
   return (
-    <div className="min-h-screen bg-(--bg-canvas,#07070B) flex flex-col justify-center">
+    <div className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col justify-center">
       <ErrorView
         error={HTTP_ERRORS_CATALOG[500]}
-        customTitle="Unexpected Kitchen Exception"
-        customSubtitle={error.message || 'A client-side runtime exception occurred during rendering.'}
+        customTitle={isSimulatedCrash ? '🧪 Test Error Boundary Verified' : 'Unexpected Kitchen Exception'}
+        customSubtitle={
+          isSimulatedCrash
+            ? 'This was a deliberate test exception triggered from the /debug dashboard to verify that Next.js React Error Boundary catches runtime faults gracefully.'
+            : error.message || 'A client-side runtime exception occurred during rendering.'
+        }
+        customMessage={
+          isSimulatedCrash
+            ? 'Success! The React Error Boundary successfully intercepted the simulated crash and prevented an unhandled white-screen freeze. Everything is working as expected.'
+            : undefined
+        }
         digest={error.digest}
-        onRetry={reset}
+        onRetry={() => {
+          if (isSimulatedCrash && typeof window !== 'undefined') {
+            window.location.href = '/debug';
+          } else {
+            reset();
+          }
+        }}
       />
     </div>
   );

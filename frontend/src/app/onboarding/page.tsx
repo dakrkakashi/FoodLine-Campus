@@ -72,7 +72,7 @@ export default function OnboardingPage() {
   const slide = SLIDES[currentSlide];
 
   return (
-    <PageTransition className="min-h-screen bg-[#07070B] text-[#F5F5F7] pb-24 relative overflow-hidden flex flex-col justify-between">
+    <PageTransition className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] pb-24 relative overflow-hidden flex flex-col justify-between transition-colors duration-500">
       {/* Background Meteors & Radials */}
       <div className="absolute inset-0 pointer-events-none">
         <Meteors number={20} />
@@ -95,7 +95,7 @@ export default function OnboardingPage() {
               className={`h-2 rounded-full transition-all cursor-pointer ${
                 currentSlide === idx
                   ? 'w-8 bg-[#FF6B2C] shadow-md shadow-[#FF6B2C]/50'
-                  : 'w-2 bg-white/20 hover:bg-white/40'
+                  : 'w-2 bg-black/20 dark:bg-white/20 hover:bg-black/40 dark:hover:bg-white/40'
               }`}
               title={`Slide ${idx + 1}`}
             />
@@ -113,7 +113,7 @@ export default function OnboardingPage() {
           >
             <SpotlightCard
               spotlightColor="rgba(255, 107, 44, 0.22)"
-              className="p-8 sm:p-10 rounded-[2.5rem] border border-white/10 bg-[#16161E]/90 backdrop-blur-2xl shadow-2xl text-center relative overflow-hidden"
+              className="p-8 sm:p-10 rounded-[2.5rem] border border-[var(--border-glass)] bg-[var(--bg-card)] backdrop-blur-2xl shadow-2xl text-center relative overflow-hidden"
             >
               {/* Top Accent Radial */}
               <div
@@ -122,30 +122,30 @@ export default function OnboardingPage() {
               />
 
               {/* Big Icon */}
-              <div className="w-20 h-20 mx-auto rounded-3xl bg-white/5 border border-white/10 flex items-center justify-center text-4xl shadow-inner mb-6">
+              <div className="w-20 h-20 mx-auto rounded-3xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] flex items-center justify-center text-4xl shadow-inner mb-6">
                 {slide.icon}
               </div>
 
               {/* Badge */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-[#FFB347] mb-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[10px] font-black uppercase tracking-widest text-[#FFB347] mb-3">
                 <Sparkles size={11} />
                 <span>{slide.badge}</span>
               </div>
 
               {/* Heading & Copy */}
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight leading-snug mb-3">
+              <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight leading-snug mb-3">
                 {slide.title}
               </h1>
-              <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-md mx-auto mb-8 font-medium">
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-md mx-auto mb-8 font-medium">
                 {slide.description}
               </p>
 
               {/* Metric Callout */}
-              <div className="p-4 rounded-2xl bg-black/50 border border-white/10 max-w-xs mx-auto mb-8 shadow-inner">
-                <div className="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight" style={{ color: slide.accent }}>
+              <div className="p-4 rounded-2xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] max-w-xs mx-auto mb-8 shadow-inner">
+                <div className="text-2xl sm:text-3xl font-black font-mono text-[var(--text-primary)] tracking-tight" style={{ color: slide.accent }}>
                   {slide.metric}
                 </div>
-                <div className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider mt-0.5">
+                <div className="text-[10px] uppercase font-bold text-[var(--text-secondary)] tracking-wider mt-0.5">
                   {slide.metricLabel}
                 </div>
               </div>
@@ -157,7 +157,7 @@ export default function OnboardingPage() {
                   shimmerDuration="2.5s"
                   background="linear-gradient(to right, #FF6B2C, #FF8A3D, #FFB347)"
                   borderRadius="1.25rem"
-                  className="w-full py-4 text-black font-black text-sm shadow-xl shadow-[#FF6B2C]/30 cursor-pointer"
+                  className="w-full py-4 text-white font-black text-sm shadow-xl shadow-[#FF6B2C]/30 cursor-pointer"
                   onClick={nextSlide}
                 >
                   <span className="flex items-center justify-center gap-2">
@@ -166,13 +166,13 @@ export default function OnboardingPage() {
                   </span>
                 </ShimmerButton>
 
-                <div className="pt-2 flex items-center justify-between gap-4 text-xs font-bold text-zinc-400">
-                  <Link href="/login" className="hover:text-white transition flex items-center gap-1">
+                <div className="pt-2 flex items-center justify-between gap-4 text-xs font-bold text-[var(--text-secondary)]">
+                  <Link href="/login" className="hover:text-[var(--text-primary)] transition flex items-center gap-1">
                     <GraduationCap size={14} className="text-[#00D4AA]" />
                     <span>Student PRN Login</span>
                   </Link>
 
-                  <Link href="/select-campus" className="hover:text-white transition flex items-center gap-1">
+                  <Link href="/select-campus" className="hover:text-[var(--text-primary)] transition flex items-center gap-1">
                     <MapPin size={14} className="text-[#FF6B2C]" />
                     <span>Browse Colleges</span>
                   </Link>

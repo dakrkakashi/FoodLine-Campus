@@ -1,0 +1,48 @@
+================================================================================
+🎬 FOODLINE CAMPUS — GEMINI AI (VEO) 4-PART VIDEO PROMPTS (40 SECONDS TOTAL)
+================================================================================
+WHY GOOGLE GEMINI GENERATED A 10-SECOND VIDEO:
+Google Gemini (Veo / VideoFX) has an internal limit of 10.0 seconds per video generation.
+When you give it a 40-second prompt, Gemini compresses everything into a 10s teaser.
+
+TO GET 40 SECONDS OF FULL AI FOOTAGE:
+Run these 4 prompts one by one in Gemini / Veo. Each prompt generates exactly 10 seconds.
+Then run the 1-line FFmpeg stitching command at the bottom to merge them into one file!
+
+--------------------------------------------------------------------------------
+PART 1 (0:00 - 0:10): THE 11:15 AM RECESS RUSH & CANTEEN BOTTLENECK
+--------------------------------------------------------------------------------
+Prompt for Gemini / Veo:
+"Cinematic 9:16 vertical smartphone video, 24fps, photorealistic. 
+Scene: A college hallway at Sanjivani University. Exactly at 11:15 AM, a loud brass school bell rings. Digital clock above classroom door flashes '11:15 AM'. 40 Indian college students rush out through the doors in a sudden recess stampede. Camera quickly tracks with them into a crowded cafeteria counter where students wave crumpled twenty-rupee notes in a noisy crowd. Stressed canteen cashier shakes his head: 'Samosa sold out!'. High tension, warm indoor sunlight, cinematic depth of field, dramatic energetic camera motion. Duration: 10 seconds."
+
+--------------------------------------------------------------------------------
+PART 2 (0:10 - 0:20): PRE-ORDERING IN 5 SECONDS FROM CLASS
+--------------------------------------------------------------------------------
+Prompt for Gemini / Veo:
+"Cinematic 9:16 vertical smartphone video, 24fps, photorealistic. 
+Scene: Contrast cut. A calm male college student sitting comfortably under a campus tree with his backpack. He is holding a sleek iPhone with the FoodLine Campus app open on screen. Over-the-shoulder macro close-up of phone screen: vibrant dark-mode UI with orange accents, he taps 'Cafe @7', selects '11:15 AM Break Slot', taps 'Crispy Vada Pav & Chai' into cart, and taps 'DirectPay UPI'. A 12-digit bank verification checkmark flashes green with confetti animation. Kinetic floating HUD text: 'ORDER CONFIRMED IN 5 SECONDS'. The student smiles, pockets his phone, and stands up relaxed. Duration: 10 seconds."
+
+--------------------------------------------------------------------------------
+PART 3 (0:20 - 0:30): KITCHEN KDS TABLET & OPTICAL VIP PASS
+--------------------------------------------------------------------------------
+Prompt for Gemini / Veo:
+"Cinematic 9:16 vertical smartphone video, 24fps, photorealistic. 
+Scene: Inside Cafe @7 kitchen. A modern kitchen tablet (KDS) mounted on stainless steel counter lights up. Chef in clean apron taps green button: 'FL-1793 READY FOR PICKUP'. A large counter TV suspended above flashes 'TOKEN FL-1793 - COUNTER 1'. Cut to the student walking confidently into the canteen holding his phone screen glowing with a high-contrast green Optical QR VIP Pass and 4-digit code 'OTP #6065'. He effortlessly walks past a long 50-student line straight to the dedicated Express Counter lane. Duration: 10 seconds."
+
+--------------------------------------------------------------------------------
+PART 4 (0:30 - 0:40): 18-SECOND VIP PICKUP & CALL TO ACTION
+--------------------------------------------------------------------------------
+Prompt for Gemini / Veo:
+"Cinematic 9:16 vertical smartphone video, 24fps, photorealistic. 
+Scene: At the dedicated FoodLine express counter. The chef scans the student's optical QR pass in 1 second and hands over a steaming hot plate of fresh snacks and cutting chai. A floating digital stopwatch graphic stops at '18 SECONDS TOTAL!'. The student takes a bite, laughs with his friends at a sunny courtyard table while others are still waiting in line. Camera zooms out to an explosive 3D animated neon outro screen with floating smartphone, glowing QR code to download app, Google Play logo, Android APK icon, and bold glowing typography: 'OWN YOUR RECESS • DOWNLOAD FOODLINE CAMPUS NOW'. Duration: 10 seconds."
+
+================================================================================
+⚡ 1-LINE FFMPEG COMMAND TO COMBINE ALL 4 CLIPS INTO 40 SECONDS:
+================================================================================
+Once you save the 4 clips as clip1.mp4, clip2.mp4, clip3.mp4, clip4.mp4:
+
+ffmpeg -i clip1.mp4 -i clip2.mp4 -i clip3.mp4 -i clip4.mp4 \
+  -filter_complex "[0:v][0:a][1:v][1:a][2:v][2:a][3:v][3:a]concat=n=4:v=1:a=1[v][a]" \
+  -map "[v]" -map "[a]" -c:v libx264 -c:a aac FINAL_40S_CAMPUS_VIDEO.mp4
+================================================================================

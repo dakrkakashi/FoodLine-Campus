@@ -22,14 +22,14 @@ export function Stepper({ steps, currentStep, className }: StepperProps) {
             <div className="flex flex-col items-center gap-1.5 min-w-0 flex-shrink-0">
               <div
                 className={clsx(
-                  'w-9 h-9 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all duration-500',
-                  isCompleted && 'bg-[#00D4AA] border-[#00D4AA] text-black scale-100',
-                  isActive && 'bg-[#FF6B2C] border-[#FF6B2C] text-white scale-110 shadow-lg shadow-[#FF6B2C]/40 animate-pulse',
-                  !isCompleted && !isActive && 'bg-[#16161E] border-zinc-700 text-zinc-500'
+                  'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs font-black border-2 transition-all duration-500',
+                  isCompleted && 'bg-accent-teal border-accent-teal text-black scale-100',
+                  isActive && 'bg-accent-orange border-accent-orange text-black scale-110 shadow-lg shadow-accent-orange/40 animate-pulse font-black',
+                  !isCompleted && !isActive && 'bg-black/5 dark:bg-white/5 border-black/15 dark:border-white/15 text-[var(--text-muted)]'
                 )}
               >
                 {isCompleted ? (
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 ) : (
@@ -38,8 +38,8 @@ export function Stepper({ steps, currentStep, className }: StepperProps) {
               </div>
               <span
                 className={clsx(
-                  'text-[10px] font-bold text-center max-w-[72px] leading-tight',
-                  isActive ? 'text-[#FF6B2C]' : isCompleted ? 'text-[#00D4AA]' : 'text-zinc-500'
+                  'text-[9px] sm:text-[10px] font-extrabold text-center max-w-[64px] sm:max-w-[72px] leading-tight',
+                  isActive ? 'text-accent-orange' : isCompleted ? 'text-accent-teal' : 'text-[var(--text-muted)]'
                 )}
               >
                 {label}
@@ -47,11 +47,11 @@ export function Stepper({ steps, currentStep, className }: StepperProps) {
             </div>
 
             {!isLast && (
-              <div className="flex-1 h-[2px] mx-1 mt-[-18px] rounded-full overflow-hidden bg-zinc-800">
+              <div className="flex-1 h-[2px] mx-1 mt-[-18px] rounded-full overflow-hidden bg-black/10 dark:bg-white/10">
                 <div
                   className={clsx(
                     'h-full rounded-full transition-all duration-700',
-                    isCompleted ? 'bg-[#00D4AA]' : 'bg-zinc-700'
+                    isCompleted ? 'bg-accent-teal' : 'bg-black/5 dark:bg-white/5'
                   )}
                   style={{ width: isCompleted ? '100%' : '0%' }}
                 />

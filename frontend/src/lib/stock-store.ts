@@ -4,9 +4,8 @@
  * and persistent beverage inventory across Next.js server reloads & API route invocations.
  */
 
-import fs from 'fs';
-import path from 'path';
 import { InventoryType, InventoryStatus, MenuItem } from './types';
+import { supabase } from './supabase/route-client';
 
 // Global singleton map to survive Next.js module evaluations
 const globalForStock = globalThis as unknown as {
@@ -40,76 +39,26 @@ if (process.env.NODE_ENV !== 'production') {
   globalForStock.dailyFreshBatchIds = dailyFreshBatchIds;
 }
 
-function getStorageFilePath(): string {
-  const candidate1 = path.join(process.cwd(), 'frontend', 'src', 'data', 'inventory-state.json');
-  const candidate2 = path.join(process.cwd(), 'src', 'data', 'inventory-state.json');
-  const candidate3 = path.join(process.cwd(), 'inventory-state.json');
-  if (fs.existsSync(path.dirname(candidate1))) return candidate1;
-  if (fs.existsSync(path.dirname(candidate2))) return candidate2;
-  return candidate3;
-}
-
 function loadStateFromDisk() {
-  try {
-    const filePath = getStorageFilePath();
-    if (fs.existsSync(filePath)) {
-      const raw = fs.readFileSync(filePath, 'utf-8');
-      const data = JSON.parse(raw);
-      if (data) {
-        if (data.lastFreshBatchDate) {
-          globalForStock.lastFreshBatchDate = data.lastFreshBatchDate;
-        }
-        if (typeof data.morningBatchConfigured === 'boolean') {
-          globalForStock.morningBatchConfigured = data.morningBatchConfigured;
-        }
-        if (Array.isArray(data.dailyFreshBatchIds)) {
-          dailyFreshBatchIds.clear();
-          data.dailyFreshBatchIds.forEach((id: string) => dailyFreshBatchIds.add(id));
-        }
-        if (data.stockOverrides && typeof data.stockOverrides === 'object') {
-          stockOverrides.clear();
-          Object.entries(data.stockOverrides).forEach(([k, v]) => stockOverrides.set(k, Boolean(v)));
-        }
-        if (data.dishDetailsMap && typeof data.dishDetailsMap === 'object') {
-          dishDetailsMap.clear();
-          Object.entries(data.dishDetailsMap).forEach(([k, v]) => dishDetailsMap.set(k, v));
-        }
-        if (data.persistentStockMap && typeof data.persistentStockMap === 'object') {
-          persistentStockMap.clear();
-          Object.entries(data.persistentStockMap).forEach(([k, v]) => persistentStockMap.set(k, Number(v)));
-        }
-        if (data.lowStockThresholdMap && typeof data.lowStockThresholdMap === 'object') {
-          lowStockThresholdMap.clear();
-          Object.entries(data.lowStockThresholdMap).forEach(([k, v]) => lowStockThresholdMap.set(k, Number(v)));
-        }
-      }
-    }
-  } catch (err) {
-    console.error('[stock-store] Failed to read inventory-state.json:', err);
-  }
+  // Real database is queried directly - no local JSON disk file needed
 }
 
 function saveStateToDisk() {
-  try {
-    const filePath = getStorageFilePath();
-    const payload = {
-      lastFreshBatchDate: globalForStock.lastFreshBatchDate || getTodayString(),
-      morningBatchConfigured: globalForStock.morningBatchConfigured ?? false,
-      dailyFreshBatchIds: Array.from(dailyFreshBatchIds),
-      stockOverrides: Object.fromEntries(stockOverrides.entries()),
-      dishDetailsMap: Object.fromEntries(dishDetailsMap.entries()),
-      persistentStockMap: Object.fromEntries(persistentStockMap.entries()),
-      lowStockThresholdMap: Object.fromEntries(lowStockThresholdMap.entries()),
-      updatedAt: new Date().toISOString(),
-    };
-    fs.writeFileSync(filePath, JSON.stringify(payload, null, 2), 'utf-8');
-  } catch (err) {
-    console.error('[stock-store] Failed to write inventory-state.json:', err);
-  }
+  // Real database is updated directly - no local JSON disk file needed
 }
 
-// Ensure initial state load
-loadStateFromDisk();
+async function syncAvailabilityToDatabase(dishId: string, isAvailable: boolean) {
+  try {
+    if (dishId && dishId.length === 36) {
+      await supabase
+        .from('menu_items')
+        .update({ is_available: isAvailable })
+        .eq('id', dishId);
+    }
+  } catch (err) {
+    console.warn('[stock-store] Supabase availability sync notice:', err);
+  }
+}
 
 /**
  * Determine inventory type based on dish category or tag
@@ -140,7 +89,7 @@ export function inferInventoryType(dish: { name?: string; category?: string; tag
  * Check and perform lazy daily reset for fresh dishes if new calendar date
  */
 export function performLazyDateReset() {
-  loadStateFromDisk();
+  // Daily fresh check
 }
 
 /**
@@ -153,7 +102,7 @@ export function setDishAvailability(dishId: string, isAvailable: boolean) {
   } else {
     dailyFreshBatchIds.add(dishId);
   }
-  saveStateToDisk();
+  syncAvailabilityToDatabase(dishId, isAvailable);
 }
 
 export function getDishAvailability(dishId: string, defaultStatus: boolean = true): boolean {

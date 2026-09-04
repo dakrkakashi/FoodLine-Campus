@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/route-client';
+import { parseTimeToMinutes, getCampusTimeIST } from '@/lib/campus-time';
 
 export async function GET() {
   try {
@@ -24,8 +25,18 @@ export async function GET() {
       }
     });
 
+    const campusTime = getCampusTimeIST();
+    const currentCampusMinutes = campusTime.totalMinutes;
+    const campusTimeIST = campusTime.displayTime12h;
+
     const formattedSlots = (slotsRes.data || []).map(slot => {
       const booked = Math.max(slot.current_booked || 0, slotCountMap[slot.id] || 0);
+      const startMinutes = parseTimeToMinutes(slot.start_time);
+      const endMinutes = parseTimeToMinutes(slot.end_time);
+      const isPast = currentCampusMinutes >= startMinutes;
+      const isFull = booked >= slot.max_capacity;
+      const isClosed = isPast || isFull;
+
       return {
         id: slot.id,
         label: slot.label,
@@ -34,7 +45,10 @@ export async function GET() {
         maxCapacity: slot.max_capacity,
         currentBooked: booked,
         availableSlots: Math.max(0, slot.max_capacity - booked),
-        isFull: booked >= slot.max_capacity
+        isFull,
+        isPast,
+        isClosed,
+        status: isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN',
       };
     });
 
@@ -42,6 +56,9 @@ export async function GET() {
       success: true,
       data: formattedSlots,
       meta: {
+        campusTimeIST,
+        currentCampusMinutes,
+        allTodaySlotsPassed: formattedSlots.every(s => s.isPast),
         timestamp: new Date().toISOString()
       }
     });
@@ -58,3 +75,4 @@ export async function GET() {
     );
   }
 }
+

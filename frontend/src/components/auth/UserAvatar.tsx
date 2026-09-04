@@ -33,10 +33,10 @@ export function UserAvatar() {
     return (
       <Link
         href="/login"
-        className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-bold shadow-lg shadow-orange-500/20 hover:scale-105 active:scale-95 transition-all"
+        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black text-xs font-black shadow-lg shadow-accent-orange/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
       >
         <LogIn className="w-3.5 h-3.5" />
-        <span>Sign In</span>
+        <span>Student Login</span>
       </Link>
     );
   }
@@ -54,46 +54,46 @@ export function UserAvatar() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 p-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all focus:outline-none"
+        className="flex items-center gap-2.5 p-1.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-[var(--border-glass)] transition-all focus:outline-none cursor-pointer"
       >
         {profile?.avatar_url ? (
           <img
             src={profile.avatar_url}
             alt={profile.full_name || 'User'}
-            className="w-7 h-7 rounded-lg object-cover border border-orange-500/40"
+            className="w-7 h-7 rounded-lg object-cover border border-accent-orange/40"
           />
         ) : (
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 text-white text-xs font-black flex items-center justify-center shadow-inner">
+          <div className="w-7 h-7 rounded-lg bg-linear-to-br from-accent-orange to-accent-amber text-black text-xs font-black flex items-center justify-center shadow-inner">
             {initials}
           </div>
         )}
         <div className="hidden md:flex flex-col text-left">
-          <span className="text-xs font-semibold text-neutral-200 line-clamp-1 max-w-[120px]">
+          <span className="text-xs font-bold text-[var(--text-primary)] line-clamp-1 max-w-[120px]">
             {profile?.full_name || user.email?.split('@')[0]}
           </span>
-          <span className="text-[10px] text-neutral-400 capitalize">
+          <span className="text-[10px] text-[var(--text-secondary)] capitalize font-medium">
             {effectiveRole.replace('_', ' ')}
           </span>
         </div>
-        <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-3.5 h-3.5 text-[var(--text-muted)] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-72 p-3 rounded-2xl bg-neutral-900/95 backdrop-blur-2xl border border-white/10 shadow-2xl z-50 animate-in fade-in zoom-in-95">
+        <div className="absolute right-0 mt-2 w-72 p-3 rounded-2xl bg-[var(--bg-card)] backdrop-blur-2xl border border-[var(--border-glass)] shadow-2xl z-50 animate-in fade-in zoom-in-95 text-[var(--text-primary)]">
           {/* User Info Header */}
-          <div className="pb-3 mb-2 border-b border-white/10 flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
+          <div className="pb-3 mb-2 border-b border-[var(--border-glass)] flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-accent-orange to-accent-amber text-black font-black text-sm flex items-center justify-center shrink-0 shadow-md">
               {initials}
             </div>
             <div className="overflow-hidden">
-              <h4 className="text-sm font-bold text-white line-clamp-1">
+              <h4 className="text-sm font-black text-[var(--text-primary)] line-clamp-1">
                 {profile?.full_name || 'Campus Student'}
               </h4>
-              <p className="text-xs text-neutral-400 line-clamp-1">{user.email}</p>
+              <p className="text-xs text-[var(--text-secondary)] line-clamp-1">{user.email}</p>
               <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
                 <RoleBadge role={effectiveRole} size="sm" />
                 {role === 'admin' && effectiveRole !== 'admin' && (
-                  <span className="text-[9px] text-purple-400 font-mono">(Impersonating)</span>
+                  <span className="text-[9px] text-purple-400 font-mono font-bold">(Impersonating)</span>
                 )}
               </div>
             </div>
@@ -101,19 +101,19 @@ export function UserAvatar() {
 
           {/* Admin Impersonation Switcher */}
           {role === 'admin' && (
-            <div className="py-2 mb-2 border-b border-white/10">
+            <div className="py-2 mb-2 border-b border-[var(--border-glass)]">
               <ImpersonationSwitcher />
             </div>
           )}
 
           {/* Navigation Links */}
-          <div className="space-y-1 text-xs">
+          <div className="space-y-1 text-xs font-bold">
             <Link
               href="/profile"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-neutral-200 hover:text-white hover:bg-white/10 transition-colors font-semibold bg-white/5 border border-white/5"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/10 transition-colors bg-black/[0.03] dark:bg-white/5 border border-[var(--border-glass)]"
             >
-              <User className="w-4 h-4 text-[#00D4AA]" />
+              <User className="w-4 h-4 text-accent-teal" />
               <span>My Account & Profile</span>
             </Link>
 
@@ -121,7 +121,7 @@ export function UserAvatar() {
               <Link
                 href="/admin"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-neutral-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               >
                 <Shield className="w-4 h-4 text-purple-400" />
                 <span>Executive Manager Hub</span>
@@ -132,9 +132,9 @@ export function UserAvatar() {
               <Link
                 href="/kds"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-neutral-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
               >
-                <User className="w-4 h-4 text-amber-400" />
+                <User className="w-4 h-4 text-accent-amber" />
                 <span>Kitchen Display (KDS)</span>
               </Link>
             )}
@@ -142,21 +142,21 @@ export function UserAvatar() {
             <Link
               href="/menu"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-neutral-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
             >
-              <span className="text-orange-400">🍔</span>
+              <span className="text-accent-orange">🍔</span>
               <span>Student Menu</span>
             </Link>
           </div>
 
           {/* Logout */}
-          <div className="pt-2 mt-2 border-t border-white/10">
+          <div className="pt-2 mt-2 border-t border-[var(--border-glass)]">
             <button
               onClick={async () => {
                 setIsOpen(false);
                 await signOut();
               }}
-              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-semibold transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 text-xs font-bold transition-colors cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>

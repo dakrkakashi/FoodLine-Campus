@@ -849,7 +849,6 @@ export default function KitchenDisplayPage() {
             ) : (
               pendingOrders.map((order) => {
                 const urgency = getUrgencyBadge(order.created_at);
-                const isCod = order.notes?.includes('COD');
 
                 return (
                   <div
@@ -883,20 +882,18 @@ export default function KitchenDisplayPage() {
                       ))}
                     </div>
 
-                    {/* High-Visibility COD Alert Box */}
-                    {isCod && (
-                      <div className="bg-amber-950/80 border-2 border-amber-500/80 rounded-xl p-2.5 text-amber-200 flex items-center justify-between shadow-lg shadow-amber-950/60">
-                        <div className="flex items-center gap-1.5 text-xs font-black">
-                          <span className="text-sm">💵</span>
-                          <span>COLLECT CASH:</span>
-                        </div>
-                        <span className="font-mono text-sm font-black text-amber-300">
-                          ₹{order.total_amount?.toFixed(2)}
-                        </span>
+                    {/* Paid Online UPI Badge */}
+                    <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-2 text-emerald-300 flex items-center justify-between text-xs font-bold">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm">⚡</span>
+                        <span>PAID ONLINE (UPI)</span>
                       </div>
-                    )}
+                      <span className="font-mono text-xs font-black text-emerald-400">
+                        ₹{order.total_amount?.toFixed(2)}
+                      </span>
+                    </div>
 
-                    {order.notes && !isCod && (
+                    {order.notes && (
                       <div className="text-[11px] bg-black/40 text-[#FFB347] p-2 rounded-lg border border-[#FFB347]/20 font-medium">
                         Note: {order.notes}
                       </div>
@@ -942,7 +939,6 @@ export default function KitchenDisplayPage() {
             ) : (
               preparingOrders.map((order) => {
                 const urgency = getUrgencyBadge(order.created_at);
-                const isCod = order.notes?.includes('COD');
 
                 return (
                   <div
@@ -977,14 +973,7 @@ export default function KitchenDisplayPage() {
                       ))}
                     </div>
 
-                    {isCod && (
-                      <div className="bg-amber-950/60 border border-amber-500/40 rounded-xl p-2 text-amber-200 flex items-center justify-between text-xs font-bold">
-                        <span>💵 Cash to collect:</span>
-                        <span className="font-mono font-black text-amber-300">₹{order.total_amount?.toFixed(2)}</span>
-                      </div>
-                    )}
-
-                    {order.notes && !isCod && (
+                    {order.notes && (
                       <div className="text-[11px] bg-black/40 text-[#FFB347] p-2 rounded-lg border border-[#FFB347]/20 font-medium">
                         Note: {order.notes}
                       </div>
@@ -1029,8 +1018,6 @@ export default function KitchenDisplayPage() {
               </div>
             ) : (
               readyOrders.map((order) => {
-                const isCod = order.notes?.includes('COD');
-
                 return (
                   <div
                     key={order.id}
@@ -1062,13 +1049,6 @@ export default function KitchenDisplayPage() {
                         </div>
                       ))}
                     </div>
-
-                    {isCod && (
-                      <div className="bg-amber-950/70 border border-amber-500/50 rounded-xl p-2 text-amber-200 flex items-center justify-between text-xs font-bold">
-                        <span>💵 Collect Cash:</span>
-                        <span className="font-mono font-black text-amber-300">₹{order.total_amount?.toFixed(2)}</span>
-                      </div>
-                    )}
 
                     <div className="grid grid-cols-3 gap-2 pt-1">
                       <button

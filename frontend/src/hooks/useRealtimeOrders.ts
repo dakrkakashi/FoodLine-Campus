@@ -24,13 +24,10 @@ export function useRealtimeOrders() {
 
       if (!error && data) {
         const enriched: DisplayOrder[] = data.map((o: any) => {
-          const isCod = o.payment_mode === 'COD' || 
-            o.notes?.includes('COD') || 
-            o.notes?.includes('Cash on Delivery');
           return {
             ...o,
-            payment_mode: isCod ? 'COD' : 'UPI',
-            counter: getCounterForOrder(o.order_items, isCod),
+            payment_mode: 'UPI',
+            counter: getCounterForOrder(o.order_items),
           };
         });
         setOrders(enriched);
@@ -70,22 +67,18 @@ export function useRealtimeOrders() {
               .select('*')
               .eq('order_id', updated.id);
 
-            const isCod = updated.payment_mode === 'COD' || 
-              updated.notes?.includes('COD') || 
-              updated.notes?.includes('Cash on Delivery');
-
             const enrichedOrder: DisplayOrder = {
               ...updated,
-              payment_mode: isCod ? 'COD' : 'UPI',
+              payment_mode: 'UPI',
               order_items: items || [],
-              counter: getCounterForOrder(items || [], isCod),
+              counter: getCounterForOrder(items || []),
               isJustReady: updated.status === 'READY',
             };
 
             // Voice announcement trigger if newly transitioned to READY
             if (updated.status === 'READY' && !announcedTokensRef.current.has(updated.order_token)) {
               announcedTokensRef.current.add(updated.order_token);
-              announceOrderReady(updated.order_token, enrichedOrder.counter || 1, isCod);
+              announceOrderReady(updated.order_token, enrichedOrder.counter || 1);
             }
 
             setOrders((prev) => {

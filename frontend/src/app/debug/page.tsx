@@ -260,9 +260,9 @@ export default function DebugDashboardPage() {
             <p className="text-[11px] text-zinc-500 font-mono">PostgreSQL Cloud Pool</p>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#0E0E15]/90 border border-white/10 backdrop-blur-xl space-y-2">
+          <div className="p-5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-glass)] backdrop-blur-xl space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase text-zinc-400">Crash Boundary</span>
+              <span className="text-xs font-mono uppercase text-[var(--text-secondary)]">Test Crash Simulator</span>
               <Cpu className="w-4 h-4 text-zinc-500" />
             </div>
             <button
@@ -270,9 +270,9 @@ export default function DebugDashboardPage() {
               className="w-full py-1.5 px-3 rounded-lg text-xs font-semibold bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <AlertTriangle className="w-3.5 h-3.5" />
-              Simulate React Error
+              Simulate Test Crash (Test error.tsx)
             </button>
-            <p className="text-[11px] text-zinc-500 font-mono">Tests error.tsx recovery boundary</p>
+            <p className="text-[11px] text-[var(--text-muted)] font-mono">Deliberate test fault to verify error.tsx boundary</p>
           </div>
         </div>
 

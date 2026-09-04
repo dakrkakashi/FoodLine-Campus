@@ -26,7 +26,7 @@ function LoginFormContent() {
   const [showStudentPassword, setShowStudentPassword] = useState(false);
 
   // Staff / Admin auth states (Sign in only)
-  const [staffEmail, setStaffEmail] = useState('foodlinecampus07@gmail.com');
+  const [staffEmail, setStaffEmail] = useState('');
   const [staffPassword, setStaffPassword] = useState('');
   const [showStaffPassword, setShowStaffPassword] = useState(false);
 
@@ -104,7 +104,7 @@ function LoginFormContent() {
     try {
       const { error } = await signInWithPassword(staffEmail.trim(), staffPassword);
       if (error) {
-        setErrorMessage(error.message || 'Invalid staff credentials. Default key: foodline2026');
+        setErrorMessage(error.message || 'Invalid staff email or password.');
         setIsLoading(false);
         return;
       }
@@ -133,7 +133,7 @@ function LoginFormContent() {
   };
 
   return (
-    <PageTransition className="min-h-screen bg-[#07070B] text-white flex flex-col justify-between px-4 py-8 relative overflow-hidden">
+    <PageTransition className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] flex flex-col justify-between px-4 py-8 relative overflow-hidden transition-colors duration-500">
       {/* Background Ambient Mesh */}
       <div className="aurora-mesh">
         <div
@@ -151,15 +151,15 @@ function LoginFormContent() {
         <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">
           <motion.div
             whileHover={{ scale: 1.1, rotate: 6 }}
-            className="w-10 h-10 rounded-xl bg-linear-to-tr from-accent-orange to-accent-amber flex items-center justify-center font-black text-black text-lg shadow-lg shadow-accent-orange/20"
+            className="w-10 h-10 rounded-xl bg-gradient-to-tr from-accent-orange to-accent-amber flex items-center justify-center font-black text-white text-lg shadow-lg shadow-accent-orange/20"
           >
             🍽
           </motion.div>
-          <span className="font-extrabold text-xl bg-linear-to-r from-accent-orange via-accent-amber to-white bg-clip-text text-transparent">
+          <span className="font-extrabold text-xl bg-gradient-to-r from-accent-orange via-accent-amber to-[var(--text-primary)] bg-clip-text text-transparent">
             FoodLine
           </span>
         </Link>
-        <div className="text-[10px] font-black uppercase tracking-wider bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-[#00D4AA] flex items-center gap-1.5 backdrop-blur-md">
+        <div className="text-[10px] font-black uppercase tracking-wider bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] px-3 py-1.5 rounded-full text-[#00D4AA] flex items-center gap-1.5 backdrop-blur-md">
           <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA] animate-pulse" />
           Sanjivani University (Cafe @7)
         </div>
@@ -169,7 +169,7 @@ function LoginFormContent() {
       <main className="max-w-md mx-auto w-full z-10 flex-1 flex flex-col justify-center">
         <SpotlightCard
           spotlightColor="rgba(255, 107, 44, 0.28)"
-          className="p-6 sm:p-8 rounded-[2.5rem] border-2 border-white/10 shadow-2xl shadow-black/90 bg-neutral-950/80 backdrop-blur-2xl"
+          className="p-6 sm:p-8 rounded-[2.5rem] border-2 border-[var(--border-glass)] shadow-2xl bg-[var(--bg-card)] backdrop-blur-2xl"
         >
           {/* Card Header Icon */}
           <div className="text-center mb-6">
@@ -177,18 +177,18 @@ function LoginFormContent() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.15 }}
-              className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-[#16161E] to-[#20202E] border border-white/10 flex items-center justify-center mb-3 shadow-xl text-white"
+              className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-black/5 to-black/10 dark:from-[#16161E] dark:to-[#20202E] border border-[var(--border-glass)] flex items-center justify-center mb-3 shadow-sm text-[var(--text-primary)]"
             >
               {authTab === 'STAFF_ADMIN' ? (
-                <Shield size={28} className="text-purple-400" />
+                <Shield size={28} className="text-purple-500 dark:text-purple-400" />
               ) : (
                 <GraduationCap size={28} className="text-accent-amber" />
               )}
             </motion.div>
-            <h1 className="text-2xl font-black tracking-tight text-white mb-1">
+            <h1 className="text-2xl font-black tracking-tight text-[var(--text-primary)] mb-1">
               {authTab === 'STAFF_ADMIN' ? 'Staff & Admin Portal' : 'Campus Student Portal'}
             </h1>
-            <p className="text-xs text-neutral-400">
+            <p className="text-xs text-[var(--text-secondary)]">
               {authTab === 'STAFF_ADMIN'
                 ? 'Sign in to access KDS, live inventory, and manager dashboard'
                 : 'Sign in or create account with your PRN & Password'}
@@ -196,13 +196,13 @@ function LoginFormContent() {
           </div>
 
           {/* 3-Tab Selector */}
-          <div className="p-1 rounded-2xl bg-black/50 border border-white/10 grid grid-cols-3 gap-1 mb-6 text-xs font-bold">
+          <div className="p-1 rounded-2xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] grid grid-cols-3 gap-1 mb-6 text-xs font-bold">
             <button
               onClick={() => { setAuthTab('STUDENT_PRN'); setErrorMessage(null); setSuccessMessage(null); }}
               className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 authTab === 'STUDENT_PRN'
-                  ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/30'
-                  : 'text-neutral-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-accent-orange to-accent-amber text-white shadow-lg shadow-accent-orange/30 font-black'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <GraduationCap size={13} />
@@ -213,8 +213,8 @@ function LoginFormContent() {
               onClick={() => { setAuthTab('STAFF_ADMIN'); setErrorMessage(null); setSuccessMessage(null); }}
               className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 authTab === 'STAFF_ADMIN'
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-600/30'
-                  : 'text-neutral-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-600/30 font-black'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Shield size={13} />
@@ -225,8 +225,8 @@ function LoginFormContent() {
               onClick={() => { setAuthTab('GOOGLE_SSO'); setErrorMessage(null); setSuccessMessage(null); }}
               className={`py-2 px-1 rounded-xl transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 authTab === 'GOOGLE_SSO'
-                  ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/30'
-                  : 'text-neutral-400 hover:text-white'
+                  ? 'bg-gradient-to-r from-accent-orange to-accent-amber text-white shadow-lg shadow-accent-orange/30 font-black'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <span>Google</span>
@@ -235,14 +235,14 @@ function LoginFormContent() {
 
           {/* Error & Success Banners */}
           {errorMessage && (
-            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium flex items-center gap-2">
+            <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 dark:text-red-400 text-xs font-medium flex items-center gap-2">
               <span className="shrink-0">⚠️</span>
               <span>{errorMessage}</span>
             </div>
           )}
 
           {successMessage && (
-            <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium flex items-center gap-2">
+            <div className="mb-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-medium flex items-center gap-2">
               <span className="shrink-0">🎉</span>
               <span>{successMessage}</span>
             </div>
@@ -252,14 +252,14 @@ function LoginFormContent() {
           {authTab === 'STUDENT_PRN' && (
             <form onSubmit={handleStudentAuth} className="space-y-4">
               {/* Sign In vs Create Account Sub-Toggle */}
-              <div className="p-1 rounded-xl bg-white/5 border border-white/10 flex items-center mb-2">
+              <div className="p-1 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] flex items-center mb-2">
                 <button
                   type="button"
                   onClick={() => { setStudentMode('SIGN_IN'); setErrorMessage(null); setSuccessMessage(null); }}
                   className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                     studentMode === 'SIGN_IN'
-                      ? 'bg-[var(--accent-orange)] text-black shadow-md font-black'
-                      : 'text-neutral-400 hover:text-white'
+                      ? 'bg-[var(--accent-orange)] text-white shadow-md font-black'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
                 >
                   Sign In
@@ -269,8 +269,8 @@ function LoginFormContent() {
                   onClick={() => { setStudentMode('SIGN_UP'); setErrorMessage(null); setSuccessMessage(null); }}
                   className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                     studentMode === 'SIGN_UP'
-                      ? 'bg-[var(--accent-orange)] text-black shadow-md font-black'
-                      : 'text-neutral-400 hover:text-white'
+                      ? 'bg-[var(--accent-orange)] text-white shadow-md font-black'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
                 >
                   Create Account
@@ -280,18 +280,18 @@ function LoginFormContent() {
               {/* Full Name for Student Registration */}
               {studentMode === 'SIGN_UP' && (
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                  <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
                     Student Full Name
                   </label>
                   <div className="relative">
-                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
+                    <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] w-4 h-4" />
                     <input
                       type="text"
                       value={studentFullName}
                       onChange={(e) => setStudentFullName(e.target.value)}
                       required
                       placeholder="e.g. Shivam Nirmal"
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
                     />
                   </div>
                 </div>
@@ -299,18 +299,18 @@ function LoginFormContent() {
 
               {/* Student PRN / Roll Number */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
                   Student PRN / Roll Number
                 </label>
                 <div className="relative">
-                  <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
+                  <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] w-4 h-4" />
                   <input
                     type="text"
                     value={studentPrn}
                     onChange={(e) => setStudentPrn(e.target.value)}
                     required
                     placeholder="e.g. 1031 or 2102001042"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all font-mono"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all font-mono"
                   />
                 </div>
                 {studentPrn.trim().length >= 3 && (
@@ -323,7 +323,7 @@ function LoginFormContent() {
                       <CheckCircle2 size={12} />
                       <span>Sanjivani University (Auto-Detected)</span>
                     </span>
-                    <span className="text-[10px] text-zinc-400 font-mono font-bold">
+                    <span className="text-[10px] text-[var(--text-secondary)] font-mono font-bold">
                       5 Canteens
                     </span>
                   </motion.div>
@@ -332,23 +332,23 @@ function LoginFormContent() {
 
               {/* Student Password */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
                   Password {studentMode === 'SIGN_UP' && '(Min. 4 Characters)'}
                 </label>
                 <div className="relative">
-                  <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
+                  <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] w-4 h-4" />
                   <input
                     type={showStudentPassword ? "text" : "password"}
                     value={studentPassword}
                     onChange={(e) => setStudentPassword(e.target.value)}
                     required
                     placeholder="••••••••••••"
-                    className="w-full pl-10 pr-11 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
+                    className="w-full pl-10 pr-11 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowStudentPassword(!showStudentPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors cursor-pointer p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer p-1"
                     aria-label={showStudentPassword ? "Hide password" : "Show password"}
                   >
                     {showStudentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -359,7 +359,7 @@ function LoginFormContent() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber text-black text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-accent-orange/30 hover:opacity-95 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-accent-orange to-accent-amber text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-accent-orange/30 hover:opacity-95 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? (
                   <>
@@ -382,7 +382,7 @@ function LoginFormContent() {
                     setErrorMessage(null);
                     setSuccessMessage(null);
                   }}
-                  className="text-xs text-neutral-400 hover:text-orange-300 transition cursor-pointer block w-full"
+                  className="text-xs text-[var(--text-secondary)] hover:text-[var(--accent-orange)] transition cursor-pointer block w-full"
                 >
                   {studentMode === 'SIGN_IN' ? (
                     <span>New student at campus? <strong className="text-[var(--accent-orange)] underline">Create Account</strong></span>
@@ -391,10 +391,10 @@ function LoginFormContent() {
                   )}
                 </button>
 
-                <div className="pt-2 border-t border-white/5">
+                <div className="pt-2 border-t border-[var(--border-glass)]">
                   <Link
                     href="/select-campus"
-                    className="text-xs text-zinc-400 hover:text-white transition inline-flex items-center gap-1.5"
+                    className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition inline-flex items-center gap-1.5"
                   >
                     <Building2 size={13} className="text-[#FF6B2C]" />
                     <span>Not from Sanjivani? Browse other campuses →</span>
@@ -407,67 +407,51 @@ function LoginFormContent() {
           {/* TAB 2: Staff & Admin Sign In Only (Strictly No Public Registration) */}
           {authTab === 'STAFF_ADMIN' && (
             <form onSubmit={handleStaffLogin} className="space-y-4">
-              <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-[11px] text-purple-300 flex items-start gap-2">
-                <Shield size={14} className="shrink-0 mt-0.5 text-purple-400" />
+              <div className="p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-[11px] text-purple-600 dark:text-purple-300 flex items-start gap-2">
+                <Shield size={14} className="shrink-0 mt-0.5 text-purple-500 dark:text-purple-400" />
                 <span>Restricted to Authorized Canteen Managers & Kitchen Staff (Assigned via Supabase).</span>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
                   Staff Email Address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] w-4 h-4" />
                   <input
                     type="email"
                     value={staffEmail}
                     onChange={(e) => setStaffEmail(e.target.value)}
                     required
                     placeholder="foodlinecampus07@gmail.com"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-neutral-300 mb-1.5">
+                <label className="block text-xs font-semibold text-[var(--text-primary)] mb-1.5">
                   Staff Password
                 </label>
                 <div className="relative">
-                  <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 w-4 h-4" />
+                  <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] w-4 h-4" />
                   <input
                     type={showStaffPassword ? "text" : "password"}
                     value={staffPassword}
                     onChange={(e) => setStaffPassword(e.target.value)}
                     required
                     placeholder="••••••••••••"
-                    className="w-full pl-10 pr-11 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                    className="w-full pl-10 pr-11 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-primary)] placeholder-[var(--text-muted)] text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowStaffPassword(!showStaffPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-white transition-colors cursor-pointer p-1"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer p-1"
                     aria-label={showStaffPassword ? "Hide password" : "Show password"}
                   >
                     {showStaffPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-              </div>
-
-              {/* Demo Credentials Helper Chip */}
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-purple-500/10 border border-purple-500/20 text-[11px] text-purple-300">
-                <span>🔑 Passkey: <code className="text-white font-mono bg-white/10 px-1.5 py-0.5 rounded">foodline2026</code></span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStaffEmail('foodlinecampus07@gmail.com');
-                    setStaffPassword('foodline2026');
-                    setErrorMessage(null);
-                  }}
-                  className="text-[var(--accent-teal,#00D4AA)] hover:underline font-bold cursor-pointer"
-                >
-                  Quick Fill ⚡
-                </button>
               </div>
 
               <button
@@ -496,10 +480,10 @@ function LoginFormContent() {
               <button
                 onClick={handleGoogleSSO}
                 disabled={isLoading}
-                className="w-full py-3.5 px-4 rounded-2xl bg-white text-black font-bold text-xs flex items-center justify-center gap-3 shadow-xl hover:bg-neutral-100 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
+                className="w-full py-3.5 px-4 rounded-2xl bg-black/5 dark:bg-white border border-[var(--border-glass)] text-[var(--text-primary)] dark:text-black font-bold text-xs flex items-center justify-center gap-3 shadow-sm hover:bg-black/10 dark:hover:bg-neutral-100 active:scale-[0.99] transition-all disabled:opacity-50 cursor-pointer"
               >
                 {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-black" />
+                  <Loader2 className="w-4 h-4 animate-spin text-current" />
                 ) : (
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path
@@ -523,7 +507,7 @@ function LoginFormContent() {
                 <span>Continue with University Google Account</span>
               </button>
 
-              <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-start gap-2.5 text-xs text-neutral-400">
+              <div className="p-3 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] flex items-start gap-2.5 text-xs text-[var(--text-secondary)]">
                 <CheckCircle2 size={16} className="text-[#00D4AA] shrink-0 mt-0.5" />
                 <span>Instant 1-tap sign in for students & faculty with university emails.</span>
               </div>
@@ -531,8 +515,8 @@ function LoginFormContent() {
           )}
 
           {/* Footer Security Note */}
-          <div className="mt-6 pt-4 border-t border-white/5 text-center">
-            <span className="text-[11px] text-neutral-500 flex items-center justify-center gap-1.5">
+          <div className="mt-6 pt-4 border-t border-[var(--border-glass)] text-center">
+            <span className="text-[11px] text-[var(--text-muted)] flex items-center justify-center gap-1.5">
               <Lock size={12} className="text-[#00D4AA]" />
               Secured by Sanjivani University Identity Guard
             </span>
@@ -541,7 +525,7 @@ function LoginFormContent() {
       </main>
 
       {/* Footer */}
-      <footer className="text-center text-[10px] text-neutral-600 z-10 mt-6">
+      <footer className="text-center text-[10px] text-[var(--text-muted)] z-10 mt-6">
         FoodLine Campus Ecosystem • Pilot Outlet: Sanjivani University Cafe @7
       </footer>
     </PageTransition>
@@ -550,7 +534,7 @@ function LoginFormContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#07070B] flex items-center justify-center text-white"><Loader2 className="w-8 h-8 animate-spin text-orange-500" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--bg-canvas)] flex items-center justify-center text-[var(--text-primary)]"><Loader2 className="w-8 h-8 animate-spin text-orange-500" /></div>}>
       <LoginFormContent />
     </Suspense>
   );

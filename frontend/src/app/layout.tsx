@@ -57,7 +57,7 @@ export default function RootLayout({
         <meta name="application-name" content="FoodLine Campus" />
         <meta name="theme-color" content="#07070B" />
       </head>
-      <body className="min-h-screen bg-[var(--bg-canvas,#07070B)] text-[#F5F5F7] antialiased selection:bg-[var(--accent-orange,#FF6B2C)] selection:text-white font-sans relative overflow-x-hidden">
+      <body className="min-h-screen bg-[var(--bg-canvas,#07070B)] text-[var(--text-primary)] antialiased selection:bg-[var(--accent-orange,#FF6B2C)] selection:text-white font-sans relative overflow-x-hidden transition-colors duration-300">
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -9,8 +9,10 @@ import { ThemeCustomizerModal } from './ThemeCustomizerModal';
 
 export function FloatingThemeTrigger() {
   const [isOpen, setIsOpen] = useState(false);
-  const { config } = useTheme();
+  const { config, mode } = useTheme();
   const { playClick } = useSoundFX();
+
+  const isLight = mode === 'light';
 
   return (
     <>
@@ -22,8 +24,12 @@ export function FloatingThemeTrigger() {
             playClick();
             setIsOpen(true);
           }}
-          className="p-3 rounded-2xl bg-[#12121A]/90 hover:bg-[#1A1A26] border border-white/15 shadow-2xl backdrop-blur-xl flex items-center gap-2.5 cursor-pointer text-white transition-all group"
-          title={`Active Theme: ${config.name} (Click to change)`}
+          className={`p-3 rounded-2xl border shadow-2xl backdrop-blur-xl flex items-center gap-2.5 cursor-pointer transition-all group ${
+            isLight
+              ? 'bg-white/90 hover:bg-white border-black/10 text-zinc-900 shadow-xl'
+              : 'bg-[#12121A]/90 hover:bg-[#1A1A26] border-white/15 text-white shadow-2xl'
+          }`}
+          title={`Active Theme: ${config.name} (${mode === 'light' ? 'Day' : 'Night'} Mode) — Click to customize`}
         >
           <span className="text-lg group-hover:rotate-12 transition-transform">{config.emoji}</span>
           <span className="hidden sm:inline-block text-xs font-black tracking-wide">

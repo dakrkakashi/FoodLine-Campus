@@ -28,6 +28,7 @@ credentials.json
 .env
 
 # Misc & System
+scratch/
 .DS_Store
 *.pem
 *.log

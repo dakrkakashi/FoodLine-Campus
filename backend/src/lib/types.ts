@@ -116,6 +116,9 @@ export interface PickupSlot {
   currentBooked: number;
   availableSlots: number;
   isFull: boolean;
+  isPast?: boolean;
+  isClosed?: boolean;
+  status?: 'OPEN' | 'FULL' | 'CLOSED_TIME_PASSED';
   cafeteriaId?: string;
   cafeteria_id?: string;
   facultyReserved?: number;

@@ -21,6 +21,9 @@ import {
   Store,
   Building2,
   User,
+  Sun,
+  Moon,
+  GraduationCap,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useTheme, THEMES, ThemeName } from '@/context/ThemeContext';
@@ -33,7 +36,7 @@ import { useAuth } from '@/lib/auth/useAuth';
 
 export function Navbar() {
   const { totalCount } = useCart();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, mode, toggleMode, config } = useTheme();
   const { selectedCampus, selectedCanteen } = useCampus();
   const { muted, toggleMute, playClick, playTab } = useSoundFX();
   const { isStaffOrAbove, isManagerOrAbove } = usePermissions();
@@ -54,7 +57,7 @@ export function Navbar() {
       <header
         className={`sticky top-0 z-50 px-4 py-3 transition-all duration-300 ${
           scrolled
-            ? 'bg-[#07070B]/92 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/40'
+            ? 'bg-[var(--bg-glass-heavy)] backdrop-blur-2xl border-b border-[var(--border-glass)] shadow-md'
             : 'bg-transparent border-b border-transparent'
         }`}
       >
@@ -66,72 +69,109 @@ export function Navbar() {
               className="flex items-center gap-2.5 group cursor-pointer"
             >
               <Logo size={38} />
-              <span className="font-black text-xl tracking-tight bg-linear-to-r from-accent-orange via-accent-amber to-white bg-clip-text text-transparent">
+              <span className="font-black text-xl tracking-tight bg-linear-to-r from-accent-orange via-accent-amber to-accent-teal bg-clip-text text-transparent">
                 FoodLine
               </span>
             </Link>
-            <Link
-              href="/canteens"
-              title={`Active: ${selectedCanteen.name} (${selectedCampus.name}) — Tap to switch outlet`}
-              className="hidden sm:inline-flex items-center gap-1 text-[10px] uppercase px-2.5 py-0.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#FF6B2C]/40 text-[#00D4AA] font-extrabold tracking-wider transition cursor-pointer"
-            >
-              <span>{selectedCanteen.name}</span>
-              <span className="text-[9px] text-[#FFB347]">▾</span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1.5">
-            <NavLink href="/canteens" onClick={playTab}>
-              <Store size={16} />
-              <span>5 Canteens</span>
-            </NavLink>
-            {user && (
-              <>
-                <NavLink href="/menu" onClick={playTab}>
-                  <UtensilsCrossed size={16} />
-                  <span>Menu</span>
-                </NavLink>
-                <NavLink href="/orders" onClick={playTab}>
-                  <Receipt size={16} />
-                  <span>My Orders</span>
-                </NavLink>
-                <NavLink href="/profile" onClick={playTab}>
-                  <User size={16} />
-                  <span>Account</span>
-                </NavLink>
-                <NavLink href="/display" onClick={playTab}>
-                  <Tv size={16} />
-                  <span>TV Display</span>
-                </NavLink>
-                {isStaffOrAbove && (
-                  <NavLink href="/kds" onClick={playTab}>
-                    <ChefHat size={16} />
-                    <span>Kitchen</span>
-                  </NavLink>
-                )}
-                {isManagerOrAbove && (
-                  <>
-                    <NavLink href="/admin" onClick={playTab}>
-                      <BarChart3 size={16} />
-                      <span>Manager & Admin</span>
-                    </NavLink>
-                    <NavLink href="/debug" onClick={playTab}>
-                      <Bug size={16} />
-                      <span>Debug</span>
-                    </NavLink>
-                  </>
-                )}
-              </>
+            
+            {/* Campus Pill - Only show after student is logged in */}
+            {user && selectedCampus && (
+              <Link
+                href="/select-campus"
+                onClick={playClick}
+                className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-[var(--border-glass)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer"
+                title="Change Campus"
+              >
+                <Building2 size={12} className="text-accent-orange" />
+                <span className="max-w-[130px] truncate">{selectedCampus.name}</span>
+              </Link>
             )}
 
+            {/* Canteen Pill - Only show after student is logged in */}
+            {user && selectedCanteen && (
+              <Link
+                href="/canteens"
+                onClick={playClick}
+                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-orange/10 hover:bg-accent-orange/15 border border-accent-orange/20 text-xs font-bold text-accent-amber hover:text-[var(--text-primary)] transition cursor-pointer"
+                title="Change Canteen"
+              >
+                <Store size={12} className="text-accent-orange" />
+                <span className="max-w-[120px] truncate">{selectedCanteen.name}</span>
+              </Link>
+            )}
+          </div>
+
+          {/* Desktop Navigation - Only visible after student logs in */}
+          {user && (
+            <nav className="hidden md:flex items-center gap-1">
+              <NavLink href="/menu" onClick={playTab}>
+                <UtensilsCrossed size={16} />
+                <span>Menu</span>
+              </NavLink>
+              <NavLink href="/canteens" onClick={playTab}>
+                <Store size={16} />
+                <span>Canteens</span>
+              </NavLink>
+              <NavLink href="/orders" onClick={playTab}>
+                <Receipt size={16} />
+                <span>My Orders</span>
+              </NavLink>
+
+              {isStaffOrAbove && (
+                <>
+                  <div className="w-px h-4 bg-white/10 mx-1" />
+                  <NavLink href="/display" onClick={playTab}>
+                    <Tv size={16} />
+                    <span>TV Display</span>
+                  </NavLink>
+                  {isStaffOrAbove && (
+                    <NavLink href="/kds" onClick={playTab}>
+                      <ChefHat size={16} />
+                      <span>Kitchen</span>
+                    </NavLink>
+                  )}
+                  {isManagerOrAbove && (
+                    <>
+                      <NavLink href="/admin" onClick={playTab}>
+                        <BarChart3 size={16} />
+                        <span>Manager & Admin</span>
+                      </NavLink>
+                      <NavLink href="/debug" onClick={playTab}>
+                        <Bug size={16} />
+                        <span>Debug</span>
+                      </NavLink>
+                    </>
+                  )}
+                </>
+              )}
+            </nav>
+          )}
+
+          {/* Right Action Utilities */}
+          <div className="flex items-center gap-2">
             {/* Sound FX Toggle Button */}
             <button
               onClick={toggleMute}
               title={muted ? 'Unmute Web Audio FX' : 'Mute Sound FX'}
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border border-white/10 transition cursor-pointer ml-1"
+              className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] transition cursor-pointer ml-1"
             >
-              {muted ? <VolumeX size={16} className="text-zinc-500" /> : <Volume2 size={16} className="text-accent-teal" />}
+              {muted ? <VolumeX size={16} className="text-zinc-400" /> : <Volume2 size={16} className="text-accent-teal" />}
+            </button>
+
+            {/* Day / Night Mode Toggle */}
+            <button
+              onClick={() => {
+                toggleMode();
+                playClick();
+              }}
+              title={mode === 'light' ? 'Switch to Night Mode (Dark)' : 'Switch to Day Mode (Light)'}
+              className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] transition cursor-pointer ml-1"
+            >
+              {mode === 'light' ? (
+                <Sun size={16} className="text-amber-500" />
+              ) : (
+                <Moon size={16} className="text-indigo-400" />
+              )}
             </button>
 
             {/* Theme Selector Dropdown */}
@@ -141,10 +181,10 @@ export function Navbar() {
                   setThemeDropdownOpen(!themeDropdownOpen);
                   playClick();
                 }}
-                className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-300 hover:text-white transition flex items-center gap-1.5 cursor-pointer text-xs font-bold"
+                className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition flex items-center gap-1.5 cursor-pointer text-xs font-bold"
                 title="Change Campus Theme"
               >
-                <span>{THEMES[theme]?.emoji || '🍊'}</span>
+                <span>{config.emoji || '🍊'}</span>
               </button>
 
               <AnimatePresence>
@@ -154,9 +194,9 @@ export function Navbar() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute right-0 mt-2 w-48 rounded-2xl bg-[#12121A] border border-white/15 shadow-2xl p-2 z-50 backdrop-blur-2xl"
+                    className="absolute right-0 mt-2 w-52 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-glass)] shadow-2xl p-2 z-50 backdrop-blur-2xl"
                   >
-                    <div className="text-[10px] font-black uppercase text-zinc-400 px-3 py-1.5 tracking-wider border-b border-white/5 mb-1">
+                    <div className="text-[10px] font-black uppercase text-[var(--text-muted)] px-3 py-1.5 tracking-wider border-b border-[var(--border-glass)] mb-1">
                        Campus Theme
                     </div>
                     {Object.values(THEMES).map((t) => (
@@ -170,7 +210,7 @@ export function Navbar() {
                         className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition text-left cursor-pointer ${
                           theme === t.id
                             ? 'bg-accent-orange text-black'
-                            : 'text-zinc-300 hover:text-white hover:bg-white/5'
+                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5'
                         }`}
                       >
                         <span className="flex items-center gap-2">
@@ -206,13 +246,13 @@ export function Navbar() {
                 )}
               </Link>
             )}
-          </nav>
+          </div>
 
           {/* Mobile Right Controls */}
           <div className="flex md:hidden items-center gap-2">
             <button
               onClick={toggleMute}
-              className="p-2 rounded-xl bg-white/5 border border-white/10 text-zinc-300"
+              className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               {muted ? <VolumeX size={16} /> : <Volume2 size={16} className="text-accent-teal" />}
             </button>
@@ -220,7 +260,7 @@ export function Navbar() {
             {user && (
               <Link
                 href="/checkout"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent-orange text-black font-black text-xs"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-accent-orange text-black font-black text-xs shadow-md shadow-accent-orange/30"
               >
                 <ShoppingCart size={14} />
                 {totalCount > 0 && <span>{totalCount}</span>}
@@ -232,7 +272,7 @@ export function Navbar() {
                 setMobileOpen(!mobileOpen);
                 playClick();
               }}
-              className="p-2 rounded-xl bg-white/5 border border-white/10 text-zinc-300 hover:text-white"
+              className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
               {mobileOpen ? <X size={20} /> : <MenuIcon size={20} />}
             </button>
@@ -248,20 +288,19 @@ export function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden fixed inset-x-0 top-14.5 z-40 bg-[#07070B]/98 backdrop-blur-2xl border-b border-white/10 shadow-2xl shadow-black/80 overflow-hidden"
+            className="md:hidden fixed inset-x-0 top-14.5 z-40 bg-[var(--bg-card)]/98 backdrop-blur-2xl border-b border-[var(--border-glass)] text-[var(--text-primary)] shadow-2xl shadow-black/20 dark:shadow-black/80 overflow-hidden"
           >
             <nav className="flex flex-col py-4 px-4 gap-1.5">
-              <MobileNavLink href="/canteens" onClick={() => { playTab(); setMobileOpen(false); }}>
-                <Store size={16} />
-                <span>5 Campus Canteens</span>
-              </MobileNavLink>
-              <MobileNavLink href="/select-campus" onClick={() => { playTab(); setMobileOpen(false); }}>
-                <Building2 size={16} />
-                <span>Change Campus</span>
-              </MobileNavLink>
-
               {user ? (
                 <>
+                  <MobileNavLink href="/canteens" onClick={() => { playTab(); setMobileOpen(false); }}>
+                    <Store size={16} />
+                    <span>Campus Canteens</span>
+                  </MobileNavLink>
+                  <MobileNavLink href="/select-campus" onClick={() => { playTab(); setMobileOpen(false); }}>
+                    <Building2 size={16} />
+                    <span>Change Campus</span>
+                  </MobileNavLink>
                   <MobileNavLink href="/menu" onClick={() => { playTab(); setMobileOpen(false); }}>
                     <UtensilsCrossed size={16} />
                     <span>Browse Menu</span>
@@ -299,13 +338,27 @@ export function Navbar() {
                 </>
               ) : (
                 <MobileNavLink href="/login" onClick={() => { playTab(); setMobileOpen(false); }}>
-                  <LogIn size={16} />
-                  <span>Campus Sign In</span>
+                  <GraduationCap size={16} className="text-accent-orange" />
+                  <span>Student PRN Login</span>
                 </MobileNavLink>
               )}
 
-              <div className="pt-3 border-t border-white/10 flex items-center justify-between">
-                <span className="text-[11px] font-black uppercase text-zinc-400">Campus Theme:</span>
+              <div className="pt-3 border-t border-[var(--border-glass)] flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase text-[var(--text-secondary)]">Mode:</span>
+                <button
+                  onClick={() => {
+                    toggleMode();
+                    playClick();
+                  }}
+                  className="px-3 py-1.5 rounded-xl border border-[var(--border-glass)] bg-black/5 dark:bg-white/5 flex items-center gap-2 text-xs font-bold text-[var(--text-primary)] cursor-pointer"
+                >
+                  {mode === 'light' ? <Sun size={14} className="text-amber-500" /> : <Moon size={14} className="text-indigo-400" />}
+                  <span>{mode === 'light' ? 'Day ☀️' : 'Night 🌙'}</span>
+                </button>
+              </div>
+
+              <div className="pt-2 flex items-center justify-between">
+                <span className="text-[11px] font-black uppercase text-[var(--text-secondary)]">Campus Theme:</span>
                 <div className="flex gap-1.5 flex-wrap max-w-[200px] justify-end">
                   {Object.values(THEMES).map((t) => (
                     <button
@@ -315,8 +368,8 @@ export function Navbar() {
                         playClick();
                       }}
                       title={t.name}
-                      className={`w-7 h-7 rounded-xl text-xs font-black transition flex items-center justify-center cursor-pointer ${
-                        theme === t.id ? 'bg-accent-orange text-black shadow-md' : 'bg-white/5 text-white hover:bg-white/15'
+                      className={`w-7 h-7 rounded-xl text-xs font-black transition flex items-center justify-center cursor-pointer border border-[var(--border-glass)] ${
+                        theme === t.id ? 'bg-accent-orange text-black shadow-md font-black' : 'bg-black/5 dark:bg-white/5 text-[var(--text-primary)] hover:bg-black/10 dark:hover:bg-white/15'
                       }`}
                     >
                       {t.emoji}
@@ -337,7 +390,7 @@ function NavLink({ href, children, onClick }: { href: string; children: React.Re
     <Link
       href={href}
       onClick={onClick}
-      className="text-xs font-black text-zinc-300 hover:text-white px-3.5 py-2 rounded-xl hover:bg-white/5 transition cursor-pointer flex items-center gap-1.5"
+      className="text-xs font-black text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-3.5 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition cursor-pointer flex items-center gap-1.5"
     >
       {children}
     </Link>
@@ -349,7 +402,7 @@ function MobileNavLink({ href, children, onClick }: { href: string; children: Re
     <Link
       href={href}
       onClick={onClick}
-      className="text-sm font-black text-zinc-200 hover:text-white px-4 py-3 rounded-2xl hover:bg-white/10 transition cursor-pointer flex items-center gap-2.5"
+      className="text-sm font-black text-[var(--text-primary)] px-4 py-3 rounded-2xl hover:bg-black/5 dark:hover:bg-white/10 transition cursor-pointer flex items-center gap-2.5"
     >
       {children}
     </Link>

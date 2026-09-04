@@ -41,38 +41,6 @@ const TAG_VARIANT: Record<string, 'bestseller' | 'studentFav' | 'fastGrab' | 'sp
 };
 
 
-const CANTEEN_SPECIFIC_DISHES: Record<string, MenuItem[]> = {
-  'south-corner': [
-    { id: 'sc-1', name: 'Ghee Roast Masala Dosa', price: 65, tag: 'Bestseller', prep_time_mins: 4, is_available: true },
-    { id: 'sc-2', name: 'Mysore Butter Masala Dosa', price: 70, tag: 'Student Fav', prep_time_mins: 5, is_available: true },
-    { id: 'sc-3', name: 'Rava Onion Crispy Dosa', price: 60, tag: 'Fast Grab', prep_time_mins: 4, is_available: true },
-    { id: 'sc-4', name: 'Steamed Idli Sambar (2 Pcs)', price: 35, tag: 'Fast Grab', prep_time_mins: 2, is_available: true },
-    { id: 'sc-5', name: 'Crispy Medu Vada (2 Pcs)', price: 40, tag: 'Bestseller', prep_time_mins: 3, is_available: true },
-    { id: 'sc-6', name: 'Authentic Filter Kaapi', price: 25, tag: 'Student Fav', prep_time_mins: 2, is_available: true },
-  ],
-  'nescafe-kiosk': [
-    { id: 'nk-1', name: 'Classic Chilled Iced Frappe', price: 55, tag: 'Bestseller', prep_time_mins: 2, is_available: true },
-    { id: 'nk-2', name: 'Hot Hazelnut Cappuccino', price: 45, tag: 'Student Fav', prep_time_mins: 2, is_available: true },
-    { id: 'nk-3', name: 'Double Masala Cheese Maggi', price: 50, tag: 'Bestseller', prep_time_mins: 4, is_available: true },
-    { id: 'nk-4', name: 'Peri Peri Spicy Maggi', price: 45, tag: 'Spicy', prep_time_mins: 3, is_available: true },
-    { id: 'nk-5', name: 'Fudge Walnut Brownie', price: 40, tag: 'Student Fav', prep_time_mins: 1, is_available: true },
-    { id: 'nk-6', name: 'Crispy Veg Potato Puff', price: 25, tag: 'Fast Grab', prep_time_mins: 1, is_available: true },
-  ],
-  'mba-cafeteria': [
-    { id: 'mba-1', name: 'Paneer Tikka Panini Grill', price: 85, tag: 'Bestseller', prep_time_mins: 6, is_available: true },
-    { id: 'mba-2', name: 'Triple Layer Cheese Club Sandwich', price: 80, tag: 'Student Fav', prep_time_mins: 5, is_available: true },
-    { id: 'mba-3', name: 'Spicy Corn & Jalapeño Sub', price: 75, tag: 'Fast Grab', prep_time_mins: 5, is_available: true },
-    { id: 'mba-4', name: 'Loaded Cheesy Peri Peri Fries', price: 90, tag: 'Bestseller', prep_time_mins: 4, is_available: true },
-    { id: 'mba-5', name: 'Mint Virgin Mojito', price: 50, tag: 'Student Fav', prep_time_mins: 2, is_available: true },
-  ],
-  'hostel-mess': [
-    { id: 'hm-1', name: 'Deluxe Student Lunch Thali', price: 70, tag: 'Bestseller', prep_time_mins: 1, is_available: true },
-    { id: 'hm-2', name: 'Regular Dal Tadka & Jeera Rice Thali', price: 50, tag: 'Fast Grab', prep_time_mins: 1, is_available: true },
-    { id: 'hm-3', name: 'Hot Maharashtrian Kanda Poha', price: 25, tag: 'Student Fav', prep_time_mins: 1, is_available: true },
-    { id: 'hm-4', name: 'Upma with Coconut Chutney', price: 25, tag: 'Fast Grab', prep_time_mins: 1, is_available: true },
-  ],
-};
-
 export default function MenuPage() {
   const { items: cartItems, addItem, removeItem, updateQuantity, totalAmount, totalCount } = useCart();
   const { getEffectiveAvailability, getStockQuantity } = useInventory();
@@ -94,22 +62,6 @@ export default function MenuPage() {
     async function loadMenu() {
       try {
         setLoading(true);
-        if (selectedCanteen.slug !== 'cafe7' && CANTEEN_SPECIFIC_DISHES[selectedCanteen.slug]) {
-          // Display authentic dishes for selected canteen
-          setCategories([
-            { id: 'cat-all', name: 'All', icon: '🍽' },
-            { id: 'cat-special', name: 'Specialty Menu', icon: '✨' },
-          ]);
-          setMenuItems(
-            CANTEEN_SPECIFIC_DISHES[selectedCanteen.slug].map((dish) => ({
-              ...dish,
-              category: 'Specialty Menu',
-              category_id: 'cat-special',
-            }))
-          );
-          return;
-        }
-
         const res = await fetch(`/api/menu?cafeteriaId=${selectedCanteen.id}`);
         const json = await res.json();
         if (json.success && json.data) {
@@ -117,7 +69,7 @@ export default function MenuPage() {
           setMenuItems(json.data.items || []);
         }
       } catch (err) {
-        console.error('Failed to load live menu:', err);
+        console.error('Failed to load live menu from database:', err);
       } finally {
         setLoading(false);
       }
@@ -297,7 +249,7 @@ export default function MenuPage() {
   };
 
   return (
-    <PageTransition className="min-h-screen bg-[var(--bg-canvas)] text-[#F5F5F7] pb-36 relative overflow-hidden transition-colors duration-500">
+    <PageTransition className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] pb-36 relative overflow-hidden transition-colors duration-500">
       {/* Background Aurora Mesh */}
       <div className="aurora-mesh">
         <div
@@ -318,7 +270,7 @@ export default function MenuPage() {
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden rounded-[2.5rem] glass-card-heavy p-6 md:p-10 mb-8 shadow-2xl border border-white/10"
+          className="relative overflow-hidden rounded-[2.5rem] glass-card-heavy p-6 md:p-10 mb-8 shadow-xl border border-[var(--border-glass)]"
         >
           <div className="relative z-10 max-w-2xl">
             <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
@@ -335,7 +287,7 @@ export default function MenuPage() {
                 <motion.button
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.96 }}
-                  className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer transition shadow-sm"
+                  className="px-3.5 py-1.5 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/15 border border-[var(--border-glass)] text-[var(--text-primary)] text-xs font-bold flex items-center gap-1.5 cursor-pointer transition shadow-sm"
                 >
                   <Store size={13} className="text-accent-amber" />
                   <span>Switch Canteen ({availableCanteens.length} Active)</span>
@@ -344,14 +296,14 @@ export default function MenuPage() {
               </Link>
             </div>
 
-            <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-3">
+            <h1 className="text-3xl md:text-5xl font-black text-[var(--text-primary)] tracking-tight mb-3">
               What&apos;s Cooking{' '}
               <span className="bg-linear-to-r from-accent-orange via-accent-amber to-accent-teal bg-clip-text text-transparent">
                 Today?
               </span>
             </h1>
-            <p className="text-xs md:text-sm text-zinc-400 leading-relaxed font-medium">
-              100% Pure Vegetarian campus cuisine at <strong className="text-white">{selectedCanteen.name}</strong> ({selectedCanteen.location}). Pre-order before the break bell rings and pick up hot!
+            <p className="text-xs md:text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
+              100% Pure Vegetarian campus cuisine at <strong className="text-[var(--text-primary)] font-black">{selectedCanteen.name}</strong> ({selectedCanteen.location}). Pre-order before the break bell rings and pick up hot!
             </p>
           </div>
 
@@ -365,13 +317,13 @@ export default function MenuPage() {
         <div className="mb-8 space-y-5">
           {/* Search Bar */}
           <div className="relative max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
             <input
               type="text"
               placeholder="Search 44+ dishes (e.g. Dosa, Vada Pav, Sandwich)..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-[var(--bg-card)] border border-white/10 rounded-2xl pl-11 pr-11 py-4 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-accent-orange focus:ring-2 focus:ring-accent-orange/20 transition-all shadow-inner"
+              className="w-full bg-[var(--bg-card)] border border-[var(--border-glass)] rounded-2xl pl-11 pr-11 py-4 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-accent-orange focus:ring-2 focus:ring-accent-orange/20 transition-all shadow-inner"
             />
             <AnimatePresence>
               {search && (
@@ -380,9 +332,9 @@ export default function MenuPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   onClick={() => setSearch('')}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center text-zinc-300 transition cursor-pointer"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1 rounded-full hover:bg-black/5 dark:hover:bg-white/10"
                 >
-                  <X size={14} />
+                  <X size={16} />
                 </motion.button>
               )}
             </AnimatePresence>
@@ -397,14 +349,14 @@ export default function MenuPage() {
                 className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide transition-all cursor-pointer flex items-center gap-2 ${
                   selectedCategory === 'All'
                     ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25'
-                    : 'bg-[var(--bg-card)] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
+                    : 'bg-[var(--bg-card)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-accent-orange/40'
                 }`}
               >
                 <span>🍽</span>
                 <span>All Items</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                    selectedCategory === 'All' ? 'bg-black/20 text-black' : 'bg-white/10 text-zinc-400'
+                    selectedCategory === 'All' ? 'bg-black/20 text-black' : 'bg-black/5 dark:bg-white/10 text-[var(--text-secondary)]'
                   }`}
                 >
                   {menuItems.length}
@@ -421,7 +373,7 @@ export default function MenuPage() {
                     className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide flex items-center gap-2 transition-all cursor-pointer ${
                       selectedCategory === cat.name
                         ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25'
-                        : 'bg-[var(--bg-card)] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
+                        : 'bg-[var(--bg-card)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-accent-orange/40'
                     }`}
                   >
                     <span>{cat.icon || '🍽'}</span>
@@ -429,7 +381,7 @@ export default function MenuPage() {
                     {count > 0 && (
                       <span
                         className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                          selectedCategory === cat.name ? 'bg-black/20 text-black' : 'bg-white/10 text-zinc-400'
+                          selectedCategory === cat.name ? 'bg-black/20 text-black' : 'bg-black/5 dark:bg-white/10 text-[var(--text-secondary)]'
                         }`}
                       >
                         {count}
@@ -453,11 +405,11 @@ export default function MenuPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-16 px-4 glass-card rounded-[2.5rem] border-dashed border-white/15"
+            className="text-center py-16 px-4 glass-card rounded-[2.5rem] border-dashed border-[var(--border-glass)]"
           >
             <EmptyMenuIllustration size={160} className="mx-auto mb-2" />
-            <h3 className="text-xl font-bold text-white mb-2">No dishes found</h3>
-            <p className="text-sm text-zinc-400 mb-6 max-w-sm mx-auto">Try searching for something else or reset your active filters.</p>
+            <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">No dishes found</h3>
+            <p className="text-sm text-[var(--text-secondary)] mb-6 max-w-sm mx-auto">Try searching for something else or reset your active filters.</p>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -486,7 +438,7 @@ export default function MenuPage() {
                 >
                   <SpotlightCard
                     spotlightColor="var(--accent-orange-glow, rgba(255, 107, 44, 0.18))"
-                    className={`h-full p-6 flex flex-col justify-between group relative rounded-[2rem] border border-white/10 hover:border-accent-orange/50 hover:shadow-[0_0_24px_var(--accent-orange-glow)] transition-all duration-200 bg-[#16161E]/85 backdrop-blur-md ${
+                    className={`h-full p-6 flex flex-col justify-between group relative rounded-[2rem] border border-[var(--border-glass)] hover:border-accent-orange/50 hover:shadow-[0_0_24px_var(--accent-orange-glow)] transition-all duration-200 bg-[var(--bg-card)] backdrop-blur-md shadow-sm dark:shadow-none ${
                       !isAvailable ? 'opacity-50 grayscale pointer-events-none' : ''
                     }`}
                   >
@@ -498,8 +450,8 @@ export default function MenuPage() {
                       </div>
                     )}
                     {!isAvailable && (
-                      <div className="absolute inset-0 z-20 bg-black/60 rounded-[2rem] flex items-center justify-center backdrop-blur-[2px]">
-                        <span className="px-4 py-2 rounded-2xl bg-red-950 border border-red-500/40 text-red-400 text-xs font-black uppercase tracking-wider flex items-center gap-1.5">
+                      <div className="absolute inset-0 z-20 bg-black/40 dark:bg-black/60 rounded-[2rem] flex items-center justify-center backdrop-blur-[2px]">
+                        <span className="px-4 py-2 rounded-2xl bg-red-500/20 dark:bg-red-950 border border-red-500/40 text-red-600 dark:text-red-400 text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
                           <Info size={14} /> Sold Out
                         </span>
                       </div>
@@ -513,7 +465,7 @@ export default function MenuPage() {
                           </div>
                           <div className="flex items-center gap-1.5">
                             {dish.prep_time_mins && (
-                              <span className="text-[11px] font-bold text-zinc-400 flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg">
+                              <span className="text-[11px] font-bold text-[var(--text-secondary)] flex items-center gap-1 bg-black/5 dark:bg-white/5 px-2 py-1 rounded-lg">
                                 ⏱ {dish.prep_time_mins}m
                               </span>
                             )}
@@ -540,18 +492,18 @@ export default function MenuPage() {
                           </div>
                         </div>
 
-                        <h3 className="text-lg font-black text-white group-hover:text-accent-amber transition-colors leading-tight mb-1">
+                        <h3 className="text-lg font-black text-[var(--text-primary)] group-hover:text-accent-amber transition-colors leading-tight mb-1">
                           {dish.name}
                         </h3>
-                        <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
+                        <span className="text-[10px] font-black text-[var(--text-muted)] uppercase tracking-widest">
                           {getCategoryName(dish.category_id, dish.category) || dish.tag || 'Fresh Made'}
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
+                      <div className="flex items-center justify-between mt-6 pt-4 border-t border-[var(--border-glass)]">
                         <div>
-                          <span className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Price</span>
-                          <div className="text-xl font-black text-white">₹{Number(dish.price).toFixed(0)}</div>
+                          <span className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-bold">Price</span>
+                          <div className="text-xl font-black text-[var(--text-primary)]">₹{Number(dish.price).toFixed(0)}</div>
                         </div>
 
                         {qty === 0 ? (
@@ -575,11 +527,11 @@ export default function MenuPage() {
                             <span className="text-base font-black">+</span>
                           </motion.button>
                         ) : (
-                          <div className="flex items-center gap-1.5 bg-black/40 border border-white/10 rounded-2xl p-1 shadow-inner">
+                          <div className="flex items-center gap-1.5 bg-black/5 dark:bg-black/40 border border-[var(--border-glass)] rounded-2xl p-1 shadow-inner">
                             <motion.button
                               whileTap={{ scale: 0.9 }}
                               onClick={() => removeItem(dish.id)}
-                              className="w-9 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-white font-black text-sm flex items-center justify-center transition cursor-pointer"
+                              className="w-9 h-9 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-primary)] font-black text-sm flex items-center justify-center transition cursor-pointer"
                             >
                               −
                             </motion.button>
@@ -629,7 +581,7 @@ export default function MenuPage() {
               transition={{ type: 'spring', stiffness: 420, damping: 26 }}
               className="fixed bottom-6 sm:bottom-8 inset-x-0 z-[999] px-4 flex justify-center pointer-events-none pb-[env(safe-area-inset-bottom)]"
             >
-              <div className="pointer-events-auto w-full max-w-lg rounded-full glass-card-heavy backdrop-blur-2xl bg-[#16161E]/95 border-2 border-accent-orange/60 shadow-[0_16px_50px_rgba(0,0,0,0.95),0_0_35px_var(--accent-orange-glow)] p-2 sm:p-2.5 flex items-center justify-between gap-3 relative overflow-hidden">
+              <div className="pointer-events-auto w-full max-w-lg rounded-full glass-card-heavy backdrop-blur-2xl bg-[var(--bg-card)]/95 border-2 border-accent-orange/60 shadow-[0_16px_50px_rgba(0,0,0,0.15),0_0_35px_var(--accent-orange-glow)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.95),0_0_35px_var(--accent-orange-glow)] p-2 sm:p-2.5 flex items-center justify-between gap-3 relative overflow-hidden">
                 {/* Ambient radial glows */}
                 <div className="absolute -left-10 -top-10 w-28 h-28 bg-accent-orange/25 rounded-full blur-xl pointer-events-none" />
                 <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-accent-teal/20 rounded-full blur-xl pointer-events-none" />
@@ -637,7 +589,7 @@ export default function MenuPage() {
                 {/* Left Info: Animated Cart Icon with Pop Badge + Total */}
                 <div className="flex items-center gap-3 pl-2 sm:pl-3 relative z-10">
                   <div className="relative">
-                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-linear-to-tr from-accent-orange to-accent-amber text-black flex items-center justify-center shadow-lg shadow-accent-orange/35">
+                    <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-accent-orange to-accent-amber text-white flex items-center justify-center shadow-lg shadow-accent-orange/35">
                       <ShoppingCart size={20} strokeWidth={2.5} />
                     </div>
                     {/* Bouncy live count badge with AnimatedCounter */}
@@ -646,20 +598,20 @@ export default function MenuPage() {
                       initial={{ scale: 0.5, rotate: -12 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: 'spring', stiffness: 550, damping: 14 }}
-                      className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-accent-teal text-black text-[10px] font-black flex items-center justify-center shadow-md border-2 border-[#16161E]"
+                      className="absolute -top-1 -right-1 min-w-[20px] h-[20px] px-1 rounded-full bg-accent-teal text-black text-[10px] font-black flex items-center justify-center shadow-md border-2 border-[var(--bg-card)]"
                     >
                       <AnimatedCounter value={totalCount} />
                     </motion.span>
                   </div>
 
                   <div className="leading-tight">
-                    <div className="text-[10px] sm:text-[11px] font-bold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <div className="text-[10px] sm:text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider flex items-center gap-1.5">
                       <span>Tray Subtotal</span>
                       <span className="w-1.5 h-1.5 rounded-full bg-accent-teal inline-block animate-pulse" />
                     </div>
-                    <div className="text-lg sm:text-xl font-black text-white font-mono flex items-baseline gap-1">
+                    <div className="text-lg sm:text-xl font-black text-[var(--text-primary)] font-mono flex items-baseline gap-1">
                       <AnimatedCounter value={totalAmount} prefix="₹" />
-                      <span className="text-[10px] font-sans font-medium text-zinc-400">
+                      <span className="text-[10px] font-sans font-medium text-[var(--text-secondary)]">
                         ({totalCount} {totalCount === 1 ? 'item' : 'items'})
                       </span>
                     </div>
@@ -672,10 +624,10 @@ export default function MenuPage() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.94 }}
-                      className="px-5 sm:px-7 py-3 rounded-full bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black font-black text-xs sm:text-sm shadow-xl shadow-accent-orange/35 flex items-center gap-2 cursor-pointer border border-white/20 uppercase tracking-wider"
+                      className="px-5 sm:px-7 py-3 rounded-full bg-gradient-to-r from-accent-orange via-accent-amber to-accent-amber text-white dark:text-black font-black text-xs sm:text-sm shadow-xl shadow-accent-orange/35 flex items-center gap-2 cursor-pointer border border-white/20 uppercase tracking-wider"
                     >
                       <span>Select Slot</span>
-                      <ArrowRight size={16} strokeWidth={3} className="text-black" />
+                      <ArrowRight size={16} strokeWidth={3} className="text-white dark:text-black" />
                     </motion.button>
                   </Magnetic>
                 </Link>

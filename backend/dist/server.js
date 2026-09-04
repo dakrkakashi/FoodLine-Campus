@@ -678,6 +678,7 @@ app.get('/api/telemetry', async (req, res) => {
 // Start listening if run directly
 const server = app.listen(PORT, () => {
     console.log(`⚡ FoodLine Backend Engine running on http://localhost:${PORT}`);
+    order_service_js_1.OrderService.syncFromDatabase().catch(console.warn);
 });
 exports.server = server;
 server.on('error', (err) => {

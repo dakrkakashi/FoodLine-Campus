@@ -9,6 +9,35 @@ const supabase_js_1 = require("../lib/supabase.js");
 // In-memory slot state synchronized with 60-cap limit
 const slotState = new Map();
 const slotHolds = new Map();
+function parseTimeToMinutes(timeStr) {
+    if (!timeStr)
+        return 0;
+    const str = timeStr.trim().toUpperCase();
+    const isPM = str.includes('PM');
+    const isAM = str.includes('AM');
+    const cleaned = str.replace(/[AP]M/, '').trim();
+    const parts = cleaned.split(':');
+    let hours = parseInt(parts[0], 10) || 0;
+    const minutes = parseInt(parts[1], 10) || 0;
+    if (isPM && hours < 12)
+        hours += 12;
+    else if (isAM && hours === 12)
+        hours = 0;
+    return hours * 60 + minutes;
+}
+function getCampusCurrentMinutes() {
+    const now = new Date();
+    const istFormatter24 = new Intl.DateTimeFormat('en-IN', {
+        timeZone: 'Asia/Kolkata',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false,
+    });
+    const parts = istFormatter24.formatToParts(now);
+    const hours = parseInt(parts.find((p) => p.type === 'hour')?.value || '0', 10);
+    const minutes = parseInt(parts.find((p) => p.type === 'minute')?.value || '0', 10);
+    return hours * 60 + minutes;
+}
 // Initialize from campus json
 for (const breakWindow of campus_json_1.default.breaks) {
     for (const slot of breakWindow.slots) {
@@ -26,9 +55,10 @@ for (const breakWindow of campus_json_1.default.breaks) {
 }
 class SlotThrottlerService {
     /**
-     * Get all pickup slots with live capacity counts
+     * Get all pickup slots with live capacity counts and auto-time closure
      */
     static async getAllSlots() {
+        const currentCampusMinutes = getCampusCurrentMinutes();
         if (supabase_js_1.isSupabaseConfigured) {
             try {
                 const { data, error } = await supabase_js_1.supabase
@@ -37,25 +67,43 @@ class SlotThrottlerService {
                     .eq('is_active', true)
                     .order('start_time', { ascending: true });
                 if (!error && data && data.length > 0) {
-                    return data.map((d) => ({
-                        id: d.id,
-                        label: d.label,
-                        startTime: d.start_time,
-                        endTime: d.end_time,
-                        maxCapacity: d.max_capacity || 60,
-                        currentBooked: d.current_booked || 0,
-                        availableSlots: Math.max(0, (d.max_capacity || 60) - (d.current_booked || 0)),
-                        isFull: (d.current_booked || 0) >= (d.max_capacity || 60),
-                        cafeteriaId: d.cafeteria_id,
-                        facultyReserved: d.faculty_reserved || 5,
-                    }));
+                    return data.map((d) => {
+                        const startMinutes = parseTimeToMinutes(d.start_time);
+                        const isPast = currentCampusMinutes >= startMinutes;
+                        const isFull = (d.current_booked || 0) >= (d.max_capacity || 60);
+                        return {
+                            id: d.id,
+                            label: d.label,
+                            startTime: d.start_time,
+                            endTime: d.end_time,
+                            maxCapacity: d.max_capacity || 60,
+                            currentBooked: d.current_booked || 0,
+                            availableSlots: Math.max(0, (d.max_capacity || 60) - (d.current_booked || 0)),
+                            isFull,
+                            isPast,
+                            isClosed: isPast || isFull,
+                            status: isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN',
+                            cafeteriaId: d.cafeteria_id,
+                            facultyReserved: d.faculty_reserved || 5,
+                        };
+                    });
                 }
             }
             catch (err) {
                 console.warn('Supabase slots fetch fallback to local cache:', err);
             }
         }
-        return Array.from(slotState.values());
+        return Array.from(slotState.values()).map((slot) => {
+            const startMinutes = parseTimeToMinutes(slot.startTime);
+            const isPast = currentCampusMinutes >= startMinutes;
+            const isFull = (slot.currentBooked || 0) >= (slot.maxCapacity || 60);
+            return {
+                ...slot,
+                isPast,
+                isClosed: isPast || isFull,
+                status: isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN',
+            };
+        });
     }
     /**
      * Get slot by ID

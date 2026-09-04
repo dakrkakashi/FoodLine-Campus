@@ -176,6 +176,52 @@ export class SheetsDbService {
     return inputPassword === storedHash;
   }
 
+  /**
+   * Appends a new student account directly to 'FoodLine — Student Signup Form' tab.
+   * Schema: [A] Timestamp | [B] Email Address | [C] Full Name | [D] PRN / Roll Number | [E] College Email | [F] Password | [G] Phone Number | [H] Role
+   */
+  public static async appendStudentUser(user: {
+    name: string;
+    prn: string;
+    email: string;
+    password: string;
+    phone?: string;
+    role?: string;
+  }): Promise<boolean> {
+    const sheets = getSheetsClient();
+    const spreadsheetId = this.getSpreadsheetId();
+    if (!sheets || !spreadsheetId) return false;
+
+    const passHash = `$sha256$${crypto.createHash('sha256').update(user.password).digest('hex')}`;
+    const rowValues = [
+      new Date().toISOString(),
+      user.email.trim().toLowerCase(),
+      user.name.trim(),
+      user.prn.trim().toUpperCase(),
+      user.email.trim().toLowerCase(),
+      passHash,
+      user.phone ? String(user.phone).trim() : '',
+      user.role || 'student',
+    ];
+
+    try {
+      await sheets.spreadsheets.values.append({
+        spreadsheetId,
+        range: "'FoodLine — Student Signup Form'!A:H",
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [rowValues],
+        },
+      });
+      // Invalidate users cache to force fresh read
+      this.usersCache = null;
+      return true;
+    } catch (err: any) {
+      console.error('[SheetsDbService] Error appending student to Google Sheets:', err?.message || err);
+      return false;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // 2. INVENTORY TAB: Read & Manage Menu Dishes
   // ---------------------------------------------------------------------------

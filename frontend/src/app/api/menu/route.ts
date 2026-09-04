@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/route-client';
 import { applyStockOverrides } from '@/lib/stock-store';
-import localMenu from '@/data/menu.json';
+
+const PRIMARY_CAFE_UUID = '754bd902-cafb-40a6-9cdd-96bc8760ad7f';
 
 const DEFAULT_CATEGORIES = [
   { id: '90421a73-2da6-4eda-bd5a-96a14d02d87f', name: 'Quick Bites & Chaat', icon: '🥪', display_order: 1 },
@@ -61,84 +62,58 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const categoryId = searchParams.get('categoryId') || searchParams.get('category');
-    const cafeteriaId = searchParams.get('cafeteriaId') || searchParams.get('canteenId') || 'b2222222-2222-2222-2222-222222222222';
+    const rawCafeId = searchParams.get('cafeteriaId') || searchParams.get('canteenId');
+
+    // Resolve cafeteria ID to real Supabase UUID
+    const cafeteriaId = (!rawCafeId || rawCafeId === 'all' || rawCafeId === 'cafe7' || rawCafeId === 'b2222222-2222-2222-2222-222222222222')
+      ? PRIMARY_CAFE_UUID
+      : rawCafeId;
 
     let categories: any[] = [];
     let items: any[] = [];
 
-    try {
-      let menuQuery = supabase.from('menu_items').select('*');
-      if (cafeteriaId && cafeteriaId !== 'all') {
-        menuQuery = menuQuery.eq('cafeteria_id', cafeteriaId);
-      }
-      if (categoryId && categoryId !== 'All') {
-        menuQuery = menuQuery.eq('category_id', categoryId);
-      }
+    // Query real Supabase PostgreSQL tables
+    let menuQuery = supabase.from('menu_items').select('*');
+    if (cafeteriaId && cafeteriaId !== 'all') {
+      menuQuery = menuQuery.eq('cafeteria_id', cafeteriaId);
+    }
+    if (categoryId && categoryId !== 'All') {
+      menuQuery = menuQuery.eq('category_id', categoryId);
+    }
 
-      const [categoriesRes, menuRes] = await Promise.all([
-        supabase.from('categories').select('*').order('display_order', { ascending: true }),
-        menuQuery.order('name')
-      ]);
+    const [categoriesRes, menuRes] = await Promise.all([
+      supabase.from('categories').select('*').order('display_order', { ascending: true }),
+      menuQuery.order('name')
+    ]);
 
-      if (!categoriesRes.error && categoriesRes.data && categoriesRes.data.length > 0) {
-        categories = categoriesRes.data;
-      }
-      if (!menuRes.error && menuRes.data && menuRes.data.length > 0) {
-        items = menuRes.data;
-      }
-    } catch (dbErr) {
-      console.warn('Supabase menu fetch warning, using fallback:', dbErr);
+    if (!categoriesRes.error && categoriesRes.data && categoriesRes.data.length > 0) {
+      categories = categoriesRes.data;
+    }
+    if (!menuRes.error && menuRes.data && menuRes.data.length > 0) {
+      items = menuRes.data;
     }
 
     const finalCategories = categories.length > 0 ? categories : DEFAULT_CATEGORIES;
 
-    // Fallback if Supabase was empty
-    if (items.length === 0) {
-      items = (localMenu as any[]).map((m) => {
-        const catInfo = resolveDishCategory(m.category, m.category_id, finalCategories);
-        return {
-          id: m.id,
-          name: m.name,
-          tag: m.tag || m.category,
-          price: m.price,
-          prep_time_mins: m.prepTime || 5,
-          is_available: m.isAvailable !== false,
-          image_url: m.image || null,
-          category: catInfo.category,
-          category_id: catInfo.category_id,
-          cafeteria_id: m.cafeteriaId || m.cafeteria_id || 'b2222222-2222-2222-2222-222222222222',
-        };
-      });
-
-      if (cafeteriaId && cafeteriaId !== 'all') {
-        items = items.filter(
-          (i) =>
-            i.cafeteria_id === cafeteriaId ||
-            (cafeteriaId === 'cafe7' && i.cafeteria_id === 'b2222222-2222-2222-2222-222222222222')
-        );
-      }
-
-      if (categoryId && categoryId !== 'All') {
-        items = items.filter(
-          (i) =>
-            i.category_id === categoryId ||
-            i.category?.toLowerCase() === categoryId.toLowerCase()
-        );
-      }
-    } else {
-      // Ensure all items have both category and category_id
-      items = items.map((i) => {
-        const catInfo = resolveDishCategory(i.category, i.category_id, finalCategories);
-        return {
-          ...i,
-          category: catInfo.category,
-          category_id: catInfo.category_id,
-        };
-      });
-    }
+    // Ensure all items have both category and category_id resolved
+    const mappedItems = items.map((i) => {
+      const catInfo = resolveDishCategory(i.category, i.category_id, finalCategories);
+      return {
+        id: i.id,
+        name: i.name,
+        tag: i.tag || '',
+        price: Number(i.price),
+        prep_time_mins: i.prep_time_mins || 5,
+        is_available: i.is_available !== false,
+        image_url: i.image_url || null,
+        category: catInfo.category,
+        category_id: catInfo.category_id,
+        cafeteria_id: i.cafeteria_id,
+      };
+    });
 
     // Apply live stockout overrides
-    const finalizedItems = applyStockOverrides(items);
+    const finalizedItems = applyStockOverrides(mappedItems);
 
     return NextResponse.json({
       success: true,
@@ -149,6 +124,10 @@ export async function GET(request: Request) {
       meta: {
         totalItems: finalizedItems.length,
         timestamp: new Date().toISOString()
+      }
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=15, stale-while-revalidate=30'
       }
     });
   } catch (error: any) {

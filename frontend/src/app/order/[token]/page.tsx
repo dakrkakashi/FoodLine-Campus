@@ -165,7 +165,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
   )}`;
 
   return (
-    <PageTransition className="min-h-screen bg-[#07070B] text-[#F5F5F7] pb-24 relative overflow-hidden">
+    <PageTransition className="min-h-screen bg-[var(--bg-canvas)] text-[var(--text-primary)] pb-24 relative overflow-hidden transition-colors duration-500">
       {/* Dynamic Aurora Mesh */}
       <div className="aurora-mesh">
         <div
@@ -188,27 +188,27 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
           <div className="flex items-center gap-2">
             <Link
               href="/menu"
-              className="text-xs font-bold text-zinc-400 hover:text-white px-3.5 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2 transition cursor-pointer"
+              className="text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-3.5 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] flex items-center gap-2 transition cursor-pointer"
             >
               <ArrowLeft size={14} />
               <span>Back to Menu</span>
             </Link>
             <Link
               href="/orders"
-              className="text-xs font-bold text-[var(--accent-orange)] hover:text-white px-3.5 py-2 rounded-xl bg-[var(--accent-orange)]/10 hover:bg-[var(--accent-orange)]/20 border border-[var(--accent-orange)]/20 flex items-center gap-2 transition cursor-pointer"
+              className="text-xs font-bold text-[var(--accent-orange)] hover:text-[var(--text-primary)] px-3.5 py-2 rounded-xl bg-[var(--accent-orange)]/10 hover:bg-[var(--accent-orange)]/20 border border-[var(--accent-orange)]/20 flex items-center gap-2 transition cursor-pointer"
             >
               <Receipt size={14} />
               <span>My Orders</span>
             </Link>
           </div>
 
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] backdrop-blur-md">
             <span
               className={`w-2.5 h-2.5 rounded-full ${
                 connectionStatus === 'live' ? 'bg-[#00D4AA] animate-pulse shadow-[0_0_10px_#00D4AA]' : 'bg-amber-400'
               }`}
             />
-            <span className="text-[10px] font-black text-zinc-300 uppercase tracking-widest">
+            <span className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">
               {connectionStatus === 'live' ? 'Kitchen Live Sync' : 'Connecting...'}
             </span>
           </div>
@@ -219,14 +219,14 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
           spotlightColor={isReady ? 'rgba(0, 212, 170, 0.35)' : 'rgba(255, 107, 44, 0.3)'}
           className={`p-6 md:p-8 rounded-[2.5rem] border-2 shadow-2xl mb-8 transition-all duration-700 ${
             isReady
-              ? 'bg-gradient-to-b from-[#00D4AA]/20 via-[#12121A] to-[#07070B] border-[#00D4AA]/70 shadow-[#00D4AA]/30'
+              ? 'bg-gradient-to-b from-[#00D4AA]/20 via-[var(--bg-card)] to-[var(--bg-card)] border-[#00D4AA]/70 shadow-[#00D4AA]/30'
               : isCollected
-              ? 'bg-gradient-to-b from-zinc-800/40 via-[#12121A] to-[#07070B] border-zinc-700 opacity-75'
-              : 'bg-gradient-to-b from-accent-orange/15 via-[#12121A] to-[var(--bg-canvas)] border-accent-orange/40 shadow-black/90'
+              ? 'bg-gradient-to-b from-zinc-500/10 via-[var(--bg-card)] to-[var(--bg-card)] border-[var(--border-glass)] opacity-85'
+              : 'bg-gradient-to-b from-[var(--accent-orange)]/15 via-[var(--bg-card)] to-[var(--bg-card)] border-[var(--accent-orange)]/40 shadow-xl'
           }`}
         >
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[var(--border-glass)]">
             <div>
               <div
                 className={`text-[10px] font-black uppercase tracking-widest mb-1 ${
@@ -235,7 +235,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
               >
                 {isCollected ? 'Pass Completed • Cafe @7' : 'Express Pickup Pass • Cafe @7'}
               </div>
-              <div className="text-4xl md:text-5xl font-black text-white tracking-tight flex items-center gap-3">
+              <div className="text-4xl md:text-5xl font-black text-[var(--text-primary)] tracking-tight flex items-center gap-3">
                 {token}
                 {isReady && (
                   <motion.span
@@ -249,7 +249,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
               </div>
             </div>
 
-            <div className="relative overflow-hidden text-left sm:text-right bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-md shadow-lg">
+            <div className="relative overflow-hidden text-left sm:text-right bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] rounded-2xl p-4 backdrop-blur-md shadow-sm">
               <BorderBeam
                 size={140}
                 duration={8}
@@ -257,10 +257,10 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
                 colorTo={isReady ? "#3B82F6" : "#FFB347"}
                 borderWidth={2}
               />
-              <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-0.5">Pickup OTP</div>
+              <div className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-0.5">Pickup OTP</div>
               <div
                 className={`text-4xl font-black font-mono tracking-widest ${
-                  isCollected ? 'text-zinc-500 line-through' : isReady ? 'text-[#00D4AA] animate-pulse' : 'text-white'
+                  isCollected ? 'text-[var(--text-muted)] line-through' : isReady ? 'text-[#00D4AA] animate-pulse' : 'text-[var(--text-primary)]'
                 }`}
               >
                 {order?.pickup_otp || '----'}
@@ -305,7 +305,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
                       Food is Ready! Flash QR at Counter 🚀
                     </motion.div>
                   ) : (
-                    <p className="text-xs font-bold text-zinc-400">
+                    <p className="text-xs font-bold text-[var(--text-secondary)]">
                       Flash this QR at the Cafe @7 Express Lane for instant 30-sec handover
                     </p>
                   )}
@@ -316,21 +316,21 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
 
           {/* Slot Info */}
           {order?.pickup_slots && (
-            <div className="mt-2 bg-[#16161E]/80 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex items-center justify-between">
+            <div className="mt-2 bg-black/[0.03] dark:bg-white/5 backdrop-blur-md border border-[var(--border-glass)] rounded-2xl p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">⏱️</span>
                 <div>
-                  <div className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-0.5">
+                  <div className="text-[10px] text-[var(--text-secondary)] font-bold uppercase tracking-wider mb-0.5">
                     Reserved Break Slot
                   </div>
-                  <div className="text-sm font-black text-white">{order.pickup_slots.label}</div>
+                  <div className="text-sm font-black text-[var(--text-primary)]">{order.pickup_slots.label}</div>
                 </div>
               </div>
               <span
                 className={`text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
                   isCollected
-                    ? 'bg-zinc-800 text-zinc-400'
-                    : 'bg-emerald-950/80 border border-emerald-500/30 text-emerald-400'
+                    ? 'bg-zinc-500/15 text-[var(--text-secondary)]'
+                    : 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
                 }`}
               >
                 {isCollected ? 'Completed' : 'Slot Confirmed'}
@@ -338,33 +338,35 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
             </div>
           )}
 
-          {/* Cash on Counter Reminder Banner */}
-          {order?.notes?.includes('COD') && !isCollected && (
-            <div className="mt-3 p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-300 flex items-center justify-between text-xs font-bold">
+          {/* Paid Online UPI Confirmation Banner */}
+          {!isCollected && (
+            <div className="mt-3 p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 flex items-center justify-between text-xs font-bold">
               <div className="flex items-center gap-2">
-                <span className="text-base">💵</span>
-                <span>Pay Cash at Counter:</span>
+                <span className="text-base">⚡</span>
+                <span>Paid Online via DirectPay UPI</span>
               </div>
-              <span className="font-mono text-sm font-black text-amber-200">₹{order.total_amount?.toFixed(2)}</span>
+              <span className="font-mono text-sm font-black text-emerald-800 dark:text-emerald-200">
+                ₹{order?.total_amount ? order.total_amount.toFixed(2) : '0.00'}
+              </span>
             </div>
           )}
         </SpotlightCard>
 
         {/* Live Stepper Tracker */}
-        <SpotlightCard className="p-6 md:p-8 rounded-[2.5rem] shadow-2xl mb-8 relative overflow-hidden">
+        <SpotlightCard className="p-6 md:p-8 rounded-[2.5rem] bg-[var(--bg-card)] border border-[var(--border-glass)] shadow-2xl mb-8 relative overflow-hidden">
           <div className="flex items-center justify-between gap-4 mb-6">
-            <h2 className="text-base font-black text-white flex items-center gap-2.5">
+            <h2 className="text-base font-black text-[var(--text-primary)] flex items-center gap-2.5">
               <Utensils size={18} className="text-[#FF6B2C]" />
               <span>Live Kitchen Status Tracker</span>
             </h2>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-bold text-zinc-300">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-xs font-bold text-[var(--text-secondary)]">
               <span className="w-2 h-2 rounded-full bg-[#00D4AA] animate-pulse" />
               <span>SSE Real-Time</span>
             </div>
           </div>
 
           {/* Dynamic Kitchen Stage Illustration */}
-          <div className="py-2 flex justify-center border-b border-white/5 mb-6">
+          <div className="py-2 flex justify-center border-b border-[var(--border-glass)] mb-6">
             {isReady ? (
               <CampusExpressIllustration size={140} />
             ) : isPreparing ? (
@@ -385,7 +387,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
                   {index < steps.length - 1 && (
                     <div
                       className={`absolute left-5 top-10 bottom-[-20px] w-0.5 rounded-full transition-colors duration-500 ${
-                        isPassed ? 'bg-[#00D4AA]' : 'bg-white/10'
+                        isPassed ? 'bg-[#00D4AA]' : 'bg-black/10 dark:bg-white/10'
                       }`}
                     />
                   )}
@@ -396,10 +398,10 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
                     transition={isCurrent ? { duration: 2, repeat: Infinity } : {}}
                     className={`w-10 h-10 rounded-2xl flex items-center justify-center text-lg z-10 transition-all duration-500 shadow-md ${
                       isCurrent
-                        ? 'bg-linear-to-tr from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/40 ring-2 ring-accent-orange ring-offset-2 ring-offset-[#12121A]'
+                        ? 'bg-gradient-to-tr from-accent-orange to-accent-amber text-white shadow-lg shadow-accent-orange/40 ring-2 ring-accent-orange ring-offset-2 ring-offset-[var(--bg-canvas)]'
                         : isPassed
                         ? 'bg-[#00D4AA] text-black shadow-[#00D4AA]/20'
-                        : 'bg-[#16161E] border border-white/10 text-zinc-500'
+                        : 'bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-muted)]'
                     }`}
                   >
                     {isPassed ? <CheckCircle size={18} strokeWidth={3} /> : step.icon}
@@ -410,7 +412,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
                     <div className="flex items-center gap-2">
                       <h3
                         className={`text-sm md:text-base font-extrabold transition-colors duration-500 ${
-                          isCurrent ? 'text-accent-amber' : isPassed ? 'text-white' : 'text-zinc-500'
+                          isCurrent ? 'text-accent-amber' : isPassed ? 'text-[var(--text-primary)]' : 'text-[var(--text-muted)]'
                         }`}
                       >
                         {step.label}
@@ -428,7 +430,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
                         )}
                       </AnimatePresence>
                     </div>
-                    <p className="text-xs text-zinc-400 mt-0.5 font-medium">{step.desc}</p>
+                    <p className="text-xs text-[var(--text-secondary)] mt-0.5 font-medium">{step.desc}</p>
                   </div>
                 </div>
               );
@@ -437,29 +439,29 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
         </SpotlightCard>
 
         {/* Legal, FSSAI & Grievance Redressal Assurance Card */}
-        <div className="bg-[#12121A]/90 border border-white/10 rounded-3xl p-6 shadow-xl space-y-4">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-white/5">
+        <div className="bg-[var(--bg-card)] border border-[var(--border-glass)] rounded-3xl p-6 shadow-xl space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-glass)]">
             <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black">
+              <span className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-black">
                 🍲
               </span>
               <div>
-                <div className="text-xs font-black text-white">Cafe @7 FSSAI Certified Pure Veg Kitchen</div>
-                <div className="text-[10px] text-zinc-400">License #11522036000142 • Freshly cooked in 60-order break batches</div>
+                <div className="text-xs font-black text-[var(--text-primary)]">Cafe @7 FSSAI Certified Pure Veg Kitchen</div>
+                <div className="text-[10px] text-[var(--text-secondary)]">License #11522036000142 • Freshly cooked in 60-order break batches</div>
               </div>
             </div>
-            <span className="text-[10px] uppercase font-black px-2.5 py-1 rounded-lg bg-white/5 text-zinc-400 border border-white/10">
+            <span className="text-[10px] uppercase font-black px-2.5 py-1 rounded-lg bg-black/5 dark:bg-white/5 text-[var(--text-secondary)] border border-[var(--border-glass)]">
               20-Min Express Hold SLA
             </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-zinc-400">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-[var(--text-secondary)]">
             <div>
               <span>Need help or wrong item? </span>
-              <span className="text-zinc-300 font-bold">Ask Level 1 Counter Lead</span> or email <a href="mailto:foodlinecampus07@gmail.com" className="text-[#00D4AA] font-bold hover:underline">foodlinecampus07@gmail.com</a>
+              <span className="text-[var(--text-primary)] font-bold">Ask Level 1 Counter Lead</span> or email <a href="mailto:foodlinecampus07@gmail.com" className="text-[#00D4AA] font-bold hover:underline">foodlinecampus07@gmail.com</a>
             </div>
             <div className="flex items-center gap-4 text-xs font-bold">
-              <Link href="/terms" className="text-zinc-400 hover:text-[var(--accent-orange)] transition">Terms & Conditions</Link>
+              <Link href="/terms" className="text-[var(--text-secondary)] hover:text-[var(--accent-orange)] transition">Terms & Conditions</Link>
             </div>
           </div>
         </div>

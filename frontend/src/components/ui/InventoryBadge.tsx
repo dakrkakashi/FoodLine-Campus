@@ -37,11 +37,11 @@ export function InventoryBadge({
   if (!available) {
     return (
       <span
-        className={`${posClasses} ${sizeClasses} rounded-xl bg-red-950/90 border border-red-500/50 text-red-300 font-black uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-black/60`}
+        className={`${posClasses} ${sizeClasses} rounded-xl bg-red-500/15 dark:bg-red-950/90 border border-red-500/40 text-red-600 dark:text-red-300 font-black uppercase tracking-wider flex items-center gap-1 shadow-sm backdrop-blur-md`}
       >
         <span className="relative flex h-1.5 w-1.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" />
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-600 dark:bg-red-500" />
         </span>
         Sold Out Today
       </span>
@@ -51,11 +51,11 @@ export function InventoryBadge({
   if (lowStock && stockQty !== null) {
     return (
       <span
-        className={`${posClasses} ${sizeClasses} rounded-xl bg-amber-950/90 border border-amber-500/50 text-amber-300 font-black uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-black/60`}
+        className={`${posClasses} ${sizeClasses} rounded-xl bg-amber-500/15 dark:bg-amber-950/90 border border-amber-500/40 text-amber-700 dark:text-amber-300 font-black uppercase tracking-wider flex items-center gap-1 shadow-sm backdrop-blur-md`}
       >
         <span className="relative flex h-1.5 w-1.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75" />
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-600 dark:bg-amber-400" />
         </span>
         ⚡ Only {stockQty} Left
       </span>

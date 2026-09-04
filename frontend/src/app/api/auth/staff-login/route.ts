@@ -110,7 +110,7 @@ export async function POST(request: Request) {
           staffUser.cafeteria_id = staffConfig.cafeteriaId;
         } else {
           return NextResponse.json(
-            { success: false, error: 'Incorrect staff password. Use default campus key: foodline2026' },
+            { success: false, error: 'Incorrect staff password.' },
             { status: 401 }
           );
         }

@@ -1,41 +1,18 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
 import { supabase } from '@/lib/supabase/route-client';
-
-const DB_FILE = path.join(process.cwd(), 'src/data/student-accounts.json');
-
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password + '_foodline_campus_2026').digest('hex');
-}
-
-function getStoredStudents(): Record<string, any> {
-  try {
-    if (fs.existsSync(DB_FILE)) {
-      const raw = fs.readFileSync(DB_FILE, 'utf-8');
-      return JSON.parse(raw);
-    }
-  } catch (e) {}
-  return {};
-}
-
-function saveStoredStudents(data: Record<string, any>) {
-  try {
-    const dir = path.dirname(DB_FILE);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
-  } catch (e) {}
-}
+import { appendStudentUser, findStudentUser } from '@/lib/google-sheets';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { prn, password, fullName } = body;
+    const { prn, password, fullName, phone, email } = body;
 
-    const cleanPrn = (prn || '').toString().trim();
+    const cleanPrn = (prn || '').toString().trim().toUpperCase();
     const cleanName = (fullName || '').toString().trim();
     const cleanPass = (password || '').toString();
+    const cleanPhone = phone ? String(phone).trim() : '';
+    const cleanEmail = email ? String(email).trim().toLowerCase() : `student_${cleanPrn.toLowerCase()}@sanjivani.edu.in`;
 
     if (!cleanPrn || !cleanPass || !cleanName) {
       return NextResponse.json(
@@ -51,56 +28,49 @@ export async function POST(request: Request) {
       );
     }
 
-    const students = getStoredStudents();
-    if (students[cleanPrn]) {
+    // Check duplicate from real Google Sheets Database
+    const existing = await findStudentUser(cleanPrn);
+    if (existing) {
       return NextResponse.json(
         { success: false, error: `An account for PRN ${cleanPrn} already exists. Please Sign In.` },
         { status: 409 }
       );
     }
 
-    const passHash = hashPassword(cleanPass);
-    const studentRecord = {
-      id: `student_${cleanPrn}`,
+    // Persist directly to Google Sheets Master Database ('FoodLine — Student Signup Form' tab)
+    await appendStudentUser({
+      name: cleanName,
       prn: cleanPrn,
-      full_name: cleanName,
-      password_hash: passHash,
-      role: 'student',
-      created_at: new Date().toISOString(),
-    };
+      email: cleanEmail,
+      password: cleanPass,
+      phone: cleanPhone,
+    });
 
-    // Save locally
-    students[cleanPrn] = studentRecord;
-    saveStoredStudents(students);
-
-    // Also attempt to upsert in Supabase profiles if possible
+    // Also persist to Supabase profiles (fire & forget)
     try {
       await supabase.from('profiles').upsert({
         id: crypto.randomUUID(),
-        email: `student_${cleanPrn}@sanjivani.edu.in`,
+        email: cleanEmail,
         full_name: cleanName,
         prn: cleanPrn,
         role: 'student',
       });
     } catch (e) {}
 
-    // Prepare response with session cookie for this browser
-    const cookiePayload = encodeURIComponent(JSON.stringify({
-      id: studentRecord.id,
-      prn: studentRecord.prn,
-      full_name: studentRecord.full_name,
+    const studentRecord = {
+      id: `student_${cleanPrn}`,
+      prn: cleanPrn,
+      full_name: cleanName,
       role: 'student',
-    }));
+    };
+
+    // Prepare response with session cookie for this browser
+    const cookiePayload = encodeURIComponent(JSON.stringify(studentRecord));
 
     const response = NextResponse.json({
       success: true,
       message: 'Account created successfully!',
-      student: {
-        id: studentRecord.id,
-        prn: studentRecord.prn,
-        full_name: studentRecord.full_name,
-        role: 'student',
-      },
+      student: studentRecord,
     });
 
     response.cookies.set('foodline_student_session', cookiePayload, {

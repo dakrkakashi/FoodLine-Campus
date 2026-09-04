@@ -138,11 +138,11 @@ export function ErrorView({
         className={`absolute -top-24 left-1/2 -translate-x-1/2 w-96 h-96 sm:w-125 sm:h-125 bg-linear-to-br ${errorData.glowColor} rounded-full blur-3xl pointer-events-none opacity-40 animate-pulse`}
       />
 
-      <div className="relative w-full max-w-2xl bg-[#0E0E15]/80 border border-white/10 rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl transition-all duration-300">
+      <div className="relative w-full max-w-2xl bg-[var(--bg-card)] border border-[var(--border-glass)] rounded-3xl p-6 sm:p-10 shadow-2xl backdrop-blur-xl transition-all duration-300">
         {/* Top Status Header */}
         <div className="flex items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-white/4 border border-white/10 text-white shadow-inner">
+            <div className="p-3 rounded-2xl bg-[var(--bg-card-hover)] border border-[var(--border-glass)] text-[var(--text-primary)] shadow-inner">
               {renderIcon(errorData.iconName)}
             </div>
             <div>
@@ -151,7 +151,7 @@ export function ErrorView({
               >
                 HTTP {errorData.code} • {errorData.statusName}
               </span>
-              <p className="text-xs text-zinc-400 mt-1 font-mono">
+              <p className="text-xs text-[var(--text-muted)] mt-1 font-mono">
                 Sanjivani Cafe @7 • Campus Express System
               </p>
             </div>
@@ -159,7 +159,7 @@ export function ErrorView({
 
           <Link
             href="/"
-            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg bg-white/3 border border-white/5 hover:border-white/20 transition-colors"
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-3 py-1.5 rounded-lg bg-[var(--bg-card-hover)] border border-[var(--border-glass)] hover:border-orange-500/30 transition-colors"
           >
             <Home className="w-3.5 h-3.5" />
             Home
@@ -168,21 +168,21 @@ export function ErrorView({
 
         {/* Main Error Title & Description */}
         <div className="space-y-3 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
             {customTitle || errorData.title}
           </h1>
-          <p className="text-sm sm:text-base text-zinc-300 leading-relaxed">
+          <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
             {customSubtitle || errorData.subtitle}
           </p>
 
           {/* Campus Metaphor Alert Banner */}
-          <div className="mt-4 p-4 rounded-2xl bg-white/3 border border-white/10 flex items-start gap-3">
+          <div className="mt-4 p-4 rounded-2xl bg-[var(--bg-card-hover)]/70 border border-[var(--border-glass)] flex items-start gap-3">
             <Utensils className="w-5 h-5 text-accent-orange shrink-0 mt-0.5" />
             <div className="space-y-1">
               <span className="text-xs font-semibold text-accent-orange uppercase tracking-wider">
                 Kitchen Canteen Log
               </span>
-              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed italic">
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed italic">
                 &ldquo;{customMessage || errorData.canteenMetaphor}&rdquo;
               </p>
             </div>
@@ -204,8 +204,8 @@ export function ErrorView({
                     isPrimary
                       ? 'bg-linear-to-r from-[#FF6B2C] to-[#FF8F3D] text-white hover:brightness-110 shadow-lg shadow-orange-500/20 active:scale-95'
                       : isOutline
-                      ? 'bg-transparent text-zinc-400 hover:text-white border border-white/10 hover:border-white/25 active:scale-95'
-                      : 'bg-white/10 text-white hover:bg-white/15 border border-white/10 active:scale-95'
+                      ? 'bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] hover:border-orange-500/30 active:scale-95'
+                      : 'bg-[var(--bg-card-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-card-active)] border border-[var(--border-glass)] active:scale-95'
                   }`}
                 >
                   {act.onClickAction === 'retry' && <RefreshCw className="w-4 h-4" />}
@@ -224,8 +224,8 @@ export function ErrorView({
                   isPrimary
                     ? 'bg-linear-to-r from-[#FF6B2C] to-[#FF8F3D] text-white hover:brightness-110 shadow-lg shadow-orange-500/20 active:scale-95'
                     : isOutline
-                    ? 'bg-transparent text-zinc-400 hover:text-white border border-white/10 hover:border-white/25 active:scale-95'
-                    : 'bg-white/10 text-white hover:bg-white/15 border border-white/10 active:scale-95'
+                    ? 'bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] hover:border-orange-500/30 active:scale-95'
+                    : 'bg-[var(--bg-card-hover)] text-[var(--text-primary)] hover:bg-[var(--bg-card-active)] border border-[var(--border-glass)] active:scale-95'
                 }`}
               >
                 {act.label}
@@ -235,7 +235,7 @@ export function ErrorView({
 
           <button
             onClick={() => router.back()}
-            className="px-4 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white border border-white/10 hover:border-white/20 transition-colors flex items-center gap-1.5 cursor-pointer ml-auto"
+            className="px-4 py-2.5 rounded-xl text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] hover:border-orange-500/30 transition-colors flex items-center gap-1.5 cursor-pointer ml-auto"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
@@ -244,29 +244,29 @@ export function ErrorView({
 
         {/* Technical Diagnostics Accordion */}
         {showDiagnostics && (
-          <div className="border-t border-white/10 pt-4">
+          <div className="border-t border-[var(--border-glass)] pt-4">
             <button
               onClick={() => setShowDetails(!showDetails)}
-              className="w-full flex items-center justify-between text-xs text-zinc-400 hover:text-zinc-200 py-1 transition-colors cursor-pointer"
+              className="w-full flex items-center justify-between text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] py-1 transition-colors cursor-pointer"
             >
               <span className="flex items-center gap-2 font-mono">
-                <Terminal className="w-3.5 h-3.5 text-zinc-500" />
+                <Terminal className="w-3.5 h-3.5 text-accent-orange" />
                 Technical Error Diagnostics & Stack Info
               </span>
               {showDetails ? (
-                <ChevronUp className="w-4 h-4 text-zinc-400" />
+                <ChevronUp className="w-4 h-4 text-[var(--text-secondary)]" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-zinc-400" />
+                <ChevronDown className="w-4 h-4 text-[var(--text-secondary)]" />
               )}
             </button>
 
             {showDetails && (
-              <div className="mt-3 p-4 rounded-xl bg-black/40 border border-white/10 text-xs font-mono space-y-3 animate-in fade-in duration-200">
-                <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span className="text-zinc-400">Diagnostic Details</span>
+              <div className="mt-3 p-4 rounded-xl bg-[var(--bg-canvas)] border border-[var(--border-glass)] text-xs font-mono space-y-3 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between border-b border-[var(--border-glass)] pb-2">
+                  <span className="text-[var(--text-secondary)]">Diagnostic Details</span>
                   <button
                     onClick={copyDiagnostics}
-                    className="flex items-center gap-1 text-[11px] text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                    className="flex items-center gap-1 text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                   >
                     {copied ? (
                       <>
@@ -282,48 +282,48 @@ export function ErrorView({
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-zinc-300">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[var(--text-secondary)]">
                   <div>
-                    <span className="text-zinc-500 block text-[10px] uppercase">
+                    <span className="text-[var(--text-muted)] block text-[10px] uppercase">
                       HTTP Status Code
                     </span>
-                    <span>{errorData.code} ({errorData.statusName})</span>
+                    <span className="text-[var(--text-primary)]">{errorData.code} ({errorData.statusName})</span>
                   </div>
                   <div>
-                    <span className="text-zinc-500 block text-[10px] uppercase">
+                    <span className="text-[var(--text-muted)] block text-[10px] uppercase">
                       Timestamp
                     </span>
-                    <span>{new Date().toLocaleTimeString()}</span>
+                    <span className="text-[var(--text-primary)]">{new Date().toLocaleTimeString()}</span>
                   </div>
                   {digest && (
                     <div className="sm:col-span-2">
-                      <span className="text-zinc-500 block text-[10px] uppercase">
+                      <span className="text-[var(--text-muted)] block text-[10px] uppercase">
                         Error Digest Hash
                       </span>
-                      <span className="text-amber-400 break-all">{digest}</span>
+                      <span className="text-amber-500 break-all">{digest}</span>
                     </div>
                   )}
                   <div className="sm:col-span-2">
-                    <span className="text-zinc-500 block text-[10px] uppercase">
+                    <span className="text-[var(--text-muted)] block text-[10px] uppercase">
                       Technical Spec
                     </span>
-                    <span className="text-zinc-400 leading-normal">
+                    <span className="text-[var(--text-secondary)] leading-normal">
                       {errorData.technicalDescription}
                     </span>
                   </div>
                   <div className="sm:col-span-2">
-                    <span className="text-zinc-500 block text-[10px] uppercase">
+                    <span className="text-[var(--text-muted)] block text-[10px] uppercase">
                       Recommended Fix
                     </span>
-                    <span className="text-emerald-400/90 leading-normal">
+                    <span className="text-emerald-500 leading-normal font-medium">
                       {errorData.recommendedAction}
                     </span>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-zinc-500">
+                <div className="pt-2 border-t border-[var(--border-glass)] flex items-center justify-between text-[11px] text-[var(--text-muted)]">
                   <span>FoodLine Campus Engine • Sanjivani Univ</span>
-                  <Link href="/debug" className="text-orange-400 hover:underline">
+                  <Link href="/debug" className="text-orange-500 hover:underline font-medium">
                     Open Debug Hub →
                   </Link>
                 </div>

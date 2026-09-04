@@ -10,26 +10,6 @@ import { SheetsDbService } from '../services/sheets-db.service.js';
 import { CampusService } from '../services/campus-service.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const LOCAL_ACCOUNTS_FILE = path.join(process.cwd(), 'src/data/accounts.json');
-
-function saveToLocalStore(account: any) {
-  try {
-    const dir = path.dirname(LOCAL_ACCOUNTS_FILE);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    let accounts: Record<string, any> = {};
-    if (fs.existsSync(LOCAL_ACCOUNTS_FILE)) {
-      try {
-        accounts = JSON.parse(fs.readFileSync(LOCAL_ACCOUNTS_FILE, 'utf-8'));
-      } catch {}
-    }
-    accounts[account.email] = account;
-    fs.writeFileSync(LOCAL_ACCOUNTS_FILE, JSON.stringify(accounts, null, 2), 'utf-8');
-  } catch (err) {
-    console.error('[AuthController] Failed to write local fallback account:', err);
-  }
-}
 
 export class AuthController {
   /**
@@ -86,11 +66,11 @@ export class AuthController {
     const cleanPhone = phone ? String(phone).trim() : '';
     let accountId: string = crypto.randomUUID();
 
-    // Early duplicate check
+    // Early duplicate check via Google Sheets
     try {
-      if (fs.existsSync(LOCAL_ACCOUNTS_FILE)) {
-        const existing = JSON.parse(fs.readFileSync(LOCAL_ACCOUNTS_FILE, 'utf-8'));
-        if (existing[cleanEmail]) {
+      if (SheetsDbService.isConfigured()) {
+        const existing = await SheetsDbService.findUser(cleanEmail);
+        if (existing) {
           return res.status(409).json({
             success: false,
             data: null,
@@ -163,14 +143,17 @@ export class AuthController {
         }
       }
 
-      // Commit to persistent local JSON store as part of DB commit
-      saveToLocalStore({
-        id: accountId,
-        name: cleanName,
-        email: cleanEmail,
-        phone: cleanPhone,
-        created_at: timestamp,
-      });
+      // 4. PERSIST TO REAL GOOGLE SHEETS USERS TAB
+      if (SheetsDbService.isConfigured()) {
+        await SheetsDbService.appendStudentUser({
+          name: cleanName,
+          prn: (req.body.prn || cleanEmail.split('@')[0]).toUpperCase(),
+          email: cleanEmail,
+          password: password,
+          phone: cleanPhone,
+          role: 'student',
+        });
+      }
       dbCommitted = true;
 
       // 4. INVARIANT: DB COMMIT SUCCEEDED -> Trigger non-blocking fire-and-forget Google Sheets logging

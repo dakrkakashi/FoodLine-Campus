@@ -22,9 +22,9 @@ export function CustomCursor() {
 
   useEffect(() => {
     if (isKioskMode) return;
-    // Only enable for pointer devices (mouse/trackpad, not coarse touchscreens)
+    // Only enable for pointer devices (mouse/trackpad, not coarse touchscreens or mobile viewports)
     if (typeof window === 'undefined') return;
-    if (window.matchMedia('(pointer: coarse)').matches) return;
+    if (window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768) return;
 
     const handleMouseMove = (e: MouseEvent) => {
       cursorX.set(e.clientX);

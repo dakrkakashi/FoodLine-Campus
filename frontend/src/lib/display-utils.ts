@@ -28,9 +28,6 @@ export function getCounterForOrder(
   items?: { item_name?: string; name?: string; category?: string }[],
   isCod?: boolean
 ): 1 | 2 {
-  // COD always routes to Counter 1 for cash collection at counter
-  if (isCod) return 1;
-
   if (!items || items.length === 0) return 1;
 
   const allBeverageOrDessert = items.every((item) => {

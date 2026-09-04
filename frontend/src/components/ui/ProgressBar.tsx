@@ -22,11 +22,11 @@ export function ProgressBar({ value, max = 100, label, showPercent = true, size 
     <div className={clsx('w-full', className)}>
       {(label || showPercent) && (
         <div className="flex items-center justify-between mb-1.5">
-          {label && <span className="text-[11px] font-bold text-zinc-400">{label}</span>}
-          {showPercent && <span className="text-[11px] font-black text-zinc-300">{Math.round(percent)}%</span>}
+          {label && <span className="text-[11px] font-bold text-[var(--text-secondary)]">{label}</span>}
+          {showPercent && <span className="text-[11px] font-black text-[var(--text-primary)]">{Math.round(percent)}%</span>}
         </div>
       )}
-      <div className={clsx('w-full bg-black/40 rounded-full overflow-hidden', heights[size])}>
+      <div className={clsx('w-full bg-black/[0.08] dark:bg-white/10 rounded-full overflow-hidden', heights[size])}>
         <div
           className={clsx('h-full rounded-full transition-all duration-700 ease-out shadow-md', barColor, glowColor)}
           style={{ width: `${percent}%` }}

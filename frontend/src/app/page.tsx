@@ -15,20 +15,22 @@ import {
 import { Navbar } from '@/components/navbar';
 import { PageTransition } from '@/components/ui';
 import { useSoundFX } from '@/hooks/useSoundFX';
+import { useAuth } from '@/lib/auth/useAuth';
 
 export default function IntroductionPage() {
   const { playClick } = useSoundFX();
+  const { user } = useAuth();
 
   return (
-    <PageTransition className="min-h-screen flex flex-col justify-between bg-[#07070B] text-[#F5F5F7] relative overflow-hidden">
+    <PageTransition className="min-h-screen flex flex-col justify-between bg-[var(--bg-canvas)] text-[var(--text-primary)] relative overflow-hidden transition-colors duration-500">
       {/* Subtle Aurora Ambient Mesh */}
       <div className="aurora-mesh">
         <div
-          className="aurora-blob w-[36rem] h-[36rem] bg-[#FF6B2C] -top-24 -left-20"
+          className="aurora-blob w-[36rem] h-[36rem] bg-accent-orange -top-24 -left-20"
           style={{ animationDuration: '22s' }}
         />
         <div
-          className="aurora-blob w-[38rem] h-[38rem] bg-[#00D4AA] top-1/2 -right-28"
+          className="aurora-blob w-[38rem] h-[38rem] bg-accent-teal top-1/2 -right-28"
           style={{ animationDuration: '26s', animationDelay: '-8s' }}
         />
       </div>
@@ -42,11 +44,11 @@ export default function IntroductionPage() {
           initial={{ opacity: 0, y: -16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#FF6B2C]/15 border border-[#FF6B2C]/30 text-xs font-black text-[#FFB347] uppercase tracking-wider mb-8 shadow-xl backdrop-blur-md"
+          className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-accent-orange/15 border border-accent-orange/30 text-xs font-black text-accent-amber uppercase tracking-wider mb-8 shadow-xl backdrop-blur-md"
         >
           <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D4AA] opacity-75" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00D4AA]" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent-teal opacity-75" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent-teal" />
           </span>
           <span>Sanjivani University • Campus Dining Fast-Pass</span>
         </motion.div>
@@ -69,46 +71,40 @@ export default function IntroductionPage() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-sm sm:text-lg text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed font-medium"
+          className="text-sm sm:text-lg text-[var(--text-secondary)] max-w-2xl mx-auto mb-10 leading-relaxed font-medium"
         >
-          FoodLine connects college students with all on-campus canteens. Pre-order fresh meals straight from your lecture hall, skip long break lines, and pick up hot food at the dedicated express counter.
+          FoodLine connects college students with on-campus canteens. Pre-order fresh meals straight from your lecture hall, skip long break lines, and pick up hot food at the dedicated express counter.
         </motion.p>
 
-        {/* Primary Action Buttons (2 Clear Entry Paths) */}
+        {/* Single Primary Action Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-xl mx-auto mb-14"
+          className="flex justify-center w-full max-w-md mx-auto mb-14"
         >
           <motion.div
             whileHover={{ scale: 1.04, y: -2 }}
             whileTap={{ scale: 0.96 }}
-            className="w-full sm:w-auto flex-1"
+            className="w-full"
           >
             <Link
-              href="/select-campus"
+              href={user ? "/menu" : "/login"}
               onClick={() => playClick()}
-              className="w-full px-7 py-4.5 bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-accent-orange/30 flex items-center justify-center gap-2.5 cursor-pointer group transition-all"
+              className="w-full px-8 py-5 bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black font-black text-base sm:text-lg rounded-2xl shadow-xl shadow-accent-orange/30 flex items-center justify-center gap-3 cursor-pointer group transition-all"
             >
-              <MapPin size={18} className="text-black" />
-              <span>Select Campus & Canteen</span>
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </motion.div>
-
-          <motion.div
-            whileHover={{ scale: 1.04, y: -2 }}
-            whileTap={{ scale: 0.96 }}
-            className="w-full sm:w-auto flex-1"
-          >
-            <Link
-              href="/login"
-              onClick={() => playClick()}
-              className="w-full px-7 py-4.5 bg-[#16161E]/90 hover:bg-[#1C1C26] border border-white/15 hover:border-accent-orange/50 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl flex items-center justify-center gap-2.5 cursor-pointer transition-all"
-            >
-              <GraduationCap size={18} className="text-[#00D4AA]" />
-              <span>Student PRN Login</span>
+              {user ? (
+                <>
+                  <Store size={22} className="text-black" />
+                  <span>Enter Cafe @7 & Order</span>
+                </>
+              ) : (
+                <>
+                  <GraduationCap size={22} className="text-black" />
+                  <span>Student PRN Login</span>
+                </>
+              )}
+              <ArrowRight size={20} className="group-hover:translate-x-1.5 transition-transform" />
             </Link>
           </motion.div>
         </motion.div>
@@ -120,78 +116,67 @@ export default function IntroductionPage() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl mx-auto text-left"
         >
-          <div className="p-5 rounded-2xl bg-[#12121A]/80 border border-white/10 backdrop-blur-xl flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#FF6B2C]/15 border border-[#FF6B2C]/30 flex items-center justify-center text-[#FFB347] flex-shrink-0">
-              <Store size={20} />
+          <div className="p-5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-glass)] backdrop-blur-xl flex items-start gap-3.5 shadow-sm dark:shadow-none">
+            <div className="w-10 h-10 rounded-xl bg-accent-orange/15 border border-accent-orange/30 flex items-center justify-center text-accent-amber flex-shrink-0">
+              <Sparkles size={20} />
             </div>
             <div>
-              <h2 className="text-sm font-black text-white mb-1">5 Campus Canteens</h2>
-              <p className="text-xs text-zinc-400 leading-relaxed font-medium">
-                Cafe @7, South Corner Dosa Bar, Nescafe Kiosk, MBA Cafe & Hostel Mess.
+              <h2 className="text-sm font-black text-[var(--text-primary)] mb-1">30-Second Express</h2>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
+                Skip the crowded rush and grab hot food with your optical QR pass in 30 seconds.
               </p>
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#12121A]/80 border border-white/10 backdrop-blur-xl flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#00D4AA]/15 border border-[#00D4AA]/30 flex items-center justify-center text-[#00D4AA] flex-shrink-0">
+          <div className="p-5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-glass)] backdrop-blur-xl flex items-start gap-3.5 shadow-sm dark:shadow-none">
+            <div className="w-10 h-10 rounded-xl bg-accent-teal/15 border border-accent-teal/30 flex items-center justify-center text-accent-teal flex-shrink-0">
               <Clock size={20} />
             </div>
             <div>
-              <h2 className="text-sm font-black text-white mb-1">Break Bell Sync</h2>
-              <p className="text-xs text-zinc-400 leading-relaxed font-medium">
+              <h2 className="text-sm font-black text-[var(--text-primary)] mb-1">Break Bell Sync</h2>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
                 Batch cooked for your exact 10-minute break. Ready hot upon bell ring.
               </p>
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-[#12121A]/80 border border-white/10 backdrop-blur-xl flex items-start gap-3.5">
-            <div className="w-10 h-10 rounded-xl bg-[#8B5CF6]/15 border border-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] flex-shrink-0">
+          <div className="p-5 rounded-2xl bg-[var(--bg-card)] border border-[var(--border-glass)] backdrop-blur-xl flex items-start gap-3.5 shadow-sm dark:shadow-none">
+            <div className="w-10 h-10 rounded-xl bg-accent-purple/15 border border-accent-purple/30 flex items-center justify-center text-accent-purple flex-shrink-0">
               <ShieldCheck size={20} />
             </div>
             <div>
-              <h2 className="text-sm font-black text-white mb-1">0% Student Fee</h2>
-              <p className="text-xs text-zinc-400 leading-relaxed font-medium">
+              <h2 className="text-sm font-black text-[var(--text-primary)] mb-1">0% Student Fee</h2>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-medium">
                 Pay direct canteen prices via UPI with instant 12-digit UTR verification.
               </p>
             </div>
           </div>
         </motion.div>
-
-        {/* Quick Menu Shortcut */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-8"
-        >
-          <Link
-            href="/canteens"
-            onClick={() => playClick()}
-            className="text-xs text-zinc-400 hover:text-white transition inline-flex items-center gap-1.5 font-bold"
-          >
-            <span>Or browse all 5 canteens and live menus directly →</span>
-          </Link>
-        </motion.div>
       </main>
 
       {/* Clean Minimal Footer */}
-      <footer className="relative z-10 border-t border-white/10 py-6 px-4 text-center text-xs text-zinc-500 bg-[#07070B]/90 backdrop-blur-xl">
+      <footer className="relative z-10 border-t border-[var(--border-glass)] py-6 px-4 text-center text-xs text-[var(--text-muted)] bg-[var(--bg-canvas)]/90 backdrop-blur-xl">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-lg bg-linear-to-tr from-accent-orange to-accent-amber flex items-center justify-center text-black font-black text-xs">
               🍽
             </div>
-            <span className="font-extrabold text-white text-xs">FoodLine Campus</span>
+            <span className="font-extrabold text-[var(--text-primary)] text-xs">FoodLine Campus</span>
           </div>
 
-          <div className="flex items-center gap-5 text-xs text-zinc-400 font-medium">
-            <Link href="/canteens" className="hover:text-white transition">5 Canteens</Link>
-            <Link href="/select-campus" className="hover:text-white transition">Campuses</Link>
-            <Link href="/login" className="hover:text-white transition">Sign In</Link>
-            <Link href="/terms" className="hover:text-white transition">Terms</Link>
+          <div className="flex items-center gap-5 text-xs text-[var(--text-secondary)] font-medium">
+            {user && (
+              <Link href="/canteens" className="hover:text-[var(--text-primary)] transition">
+                Canteens
+              </Link>
+            )}
+            <Link href={user ? "/profile" : "/login"} className="hover:text-[var(--text-primary)] transition">
+              {user ? "My Profile" : "Student Login"}
+            </Link>
+            <Link href="/terms" className="hover:text-[var(--text-primary)] transition">Terms</Link>
           </div>
 
-          <span className="text-zinc-500 text-[11px]">Sanjivani University, Kopargaon</span>
+          <span className="text-[var(--text-muted)] text-[11px]">Sanjivani University, Kopargaon</span>
         </div>
       </footer>
     </PageTransition>

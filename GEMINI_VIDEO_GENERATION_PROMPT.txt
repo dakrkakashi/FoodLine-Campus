@@ -1,0 +1,90 @@
+================================================================================
+🎬 GEMINI AI VIDEO GENERATION PROMPT: FOODLINE CAMPUS (40-SECOND AD)
+================================================================================
+Instructions: Copy and paste the prompt below directly into Google Gemini (or Gemini Advanced / Veo / VideoFX).
+
+--------------------------------------------------------------------------------
+[COPY FROM HERE]
+--------------------------------------------------------------------------------
+
+Act as a world-class commercial director, motion graphics artist, and AI video generator. 
+
+Create a high-energy, cinematic, 40-second viral commercial video tailored for college students about "FoodLine Campus" — an express canteen pre-ordering ecosystem that eliminates break-time canteen queues at Sanjivani University.
+
+### 📐 TECHNICAL SPECIFICATIONS:
+- Duration: Exactly 40 Seconds
+- Aspect Ratio: 9:16 (Vertical Reels / TikTok / Shorts) with safe zones for 16:9 widescreen
+- Style: Fast-paced cinematic realism mixed with sleek 3D tech overlays and punchy kinetic typography
+- Lighting: Warm sunlit golden hour transitioning into vibrant neon tech glows
+- Camera: Dynamic tracking shots, whip pans, split screens, and smooth macro close-ups
+- Setting: Authentic modern Indian college campus (Sanjivani University) with lively college students
+
+---
+
+### 🎞️ SCENE-BY-SCENE STORYBOARD & VISUAL DIRECTION:
+
+#### SCENE 1: The Break-Time Panic (0:00 - 0:05)
+- Visual: Cinematic close-up of a modern university classroom wall clock ticking aggressively from 11:14 to 11:15 AM. The professor closes a textbook. A loud mechanical college bell rings. Sudden comedic stampede of engineering students bursting through the lecture hall door with backpacks.
+- Camera: Low-angle tracking shot rushing through the corridor.
+- Kinetic On-Screen Text: "11:15 AM: BREAK TIME! ⏰" / "ONLY 15 MINUTES REMAINING ⏳"
+- SFX: Loud resonant college recess bell (DING-DONG!), scraping chairs, rushing footsteps.
+- Voiceover (Punchy, relatable college student tone): "Recess bell rings. 15 minutes of freedom. You're starving."
+
+#### SCENE 2: The Canteen Nightmare (0:05 - 0:10)
+- Visual: Fast whip-pan to the college cafeteria (Cafe @7). Total chaotic crowd! 40 hungry students pushing, waving crumpled ₹20 notes in the air, shouting orders at the counter. A student looks at their phone timer showing 12 minutes already lost in line.
+- Camera: Handheld documentary-style shake zooming into sweaty, exhausted faces.
+- Kinetic On-Screen Text: "40 PEOPLE IN LINE 😭" / "12 MINUTES LOST IN QUEUE ⏱️"
+- SFX: Murmuring crowd chaos, clattering metal kitchen pans, ticking clock.
+- Voiceover: "But the canteen line is 40 people deep. By the time you get your food... the next lecture starts!"
+
+#### SCENE 3: The Secret Move (0:10 - 0:18)
+- Visual: Sharp record scratch! Dramatic SPLIT SCREEN comparison:
+  - LEFT SIDE (Cold desaturated grade): Students crushed in line, miserable and sweating.
+  - RIGHT SIDE (Vibrant sunlit grade): Smart, relaxed student sitting under a shaded campus tree with friends at 11:10 AM.
+  - Camera glides onto the student's smartphone: Showing the FoodLine Campus App interface.
+  - Quick 3-tap action: Taps 'Cafe @7' -> selects 'Crispy Masala Dosa + Cutting Chai' -> selects '11:15 AM Break Slot' -> enters UPI UTR.
+  - Confetti burst on screen! Pop-up badge: "ORDER CONFIRMED • TOKEN #FL-1793 • OTP: 6065".
+- Kinetic On-Screen Text: "ORDER FROM CLASS 📱" / "SLOT RESERVED IN 5 SECONDS! ⚡"
+- SFX: Tape stop / record scratch, massive bass drop, smooth tactile UI taps, cash register cha-ching!
+- Voiceover: "Or... you could be smart. Order from your classroom on FoodLine before the bell even rings!"
+
+#### SCENE 4: The 30-Second VIP Pickup (0:18 - 0:27)
+- Visual: 11:16 AM. Hero student walks casually with swagger past the 40-person line straight to a glowing dedicated counter marked "FOODLINE EXPRESS PICKUP".
+- The student flashes their phone showing a large glowing 4-Digit Pickup OTP: "6065".
+- Kitchen chef on a modern KDS touch tablet verifies the OTP with one tap. Chef immediately slides over a steaming, fresh, aroma-filled hot food tray.
+- Stopwatch timer on screen freezes at: "18 SECONDS TOTAL!"
+- Camera: Smooth gimbal tracking shot following the student, ending with a mouth-watering macro shot of sizzling hot food and rising steam.
+- Kinetic On-Screen Text: "SKIP THE QUEUE ⚡" / "18-SECOND PICKUP! 🚀" / "HOT & FRESH 🍲"
+- SFX: Confident footsteps, kitchen handover chime (Ding!), appetizing culinary steam whoosh.
+- Voiceover: "Walk straight to the FoodLine VIP counter. Flash your 4-digit OTP. Grab your piping hot meal in under 30 seconds."
+
+#### SCENE 5: Multi-Canteen & Royal Gold Showcase (0:27 - 0:34)
+- Visual: Fast 3D isometric montage showcasing campus features:
+  - Outlets showcase: Cafe @7, South Corner Dosa Bar, Nescafe Campus Kiosk, MBA Cafeteria, Hostel Mess.
+  - App UI morphs smoothly between Sunlit Day Mode (crisp porcelain white) and Royal Ivory & Gold Theme (imperial gold accents).
+  - Floating 3D badge: "₹0 EXTRA FEES • 100% EXPRESS".
+- Kinetic On-Screen Text: "ALL 5 CANTEENS ☕🥞🍛" / "ZERO EXTRA CHARGES 💸" / "ROYAL WHITE & GOLD THEME 👑"
+- SFX: Rapid cybernetic whooshes, smooth UI morph transitions, uplifting chords.
+- Voiceover: "All 5 campus canteens. Guaranteed reserved break slots. Zero extra fees. Never skip breakfast or miss a lecture again."
+
+#### SCENE 6: Call To Action & Download App (0:34 - 0:40)
+- Visual: Floating 3D smartphone rotating to face camera, showing FoodLine Campus app with food popping out in 3D.
+- High-contrast scannable QR Code appears beside a bold Google Play / Android APK badge.
+- Campus badge: "Live Now at Sanjivani University, Kopargaon!"
+- Kinetic On-Screen Text:
+  - "OWN YOUR RECESS. 👑"
+  - "DOWNLOAD FOODLINE CAMPUS NOW"
+  - "Scan QR Code or visit foodline.campus"
+- SFX: Triumphant brass fanfare, celebratory bass drop, app notification chime.
+- Voiceover: "Own your recess. Download the FoodLine Campus App now — and eat like royalty."
+
+---
+
+### 🎵 SOUNDTRACK & AUDIO MIX:
+- Tempo: 128 BPM
+- Genre: Future Bass / Lo-Fi Hip Hop blend with energetic synth drops at 0:10 and 0:34.
+- Voiceover Profile: Young, confident, energetic Indian college student voice (fluent, punchy, authentic campus enthusiasm).
+
+--------------------------------------------------------------------------------
+[END OF PROMPT]
+--------------------------------------------------------------------------------
