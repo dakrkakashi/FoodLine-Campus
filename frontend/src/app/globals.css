@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --color-accent-orange: var(--accent-orange);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-teal: var(--accent-teal);
+  --color-accent-purple: var(--accent-purple);
+  --color-bg-canvas: var(--bg-canvas);
+  --color-bg-card: var(--bg-card);
+}
+
 :root {
   /* Canvas & Surfaces */
   --bg-canvas: #07070B;

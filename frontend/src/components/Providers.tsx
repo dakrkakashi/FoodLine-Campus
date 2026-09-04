@@ -23,6 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
               <CustomCursor />
               <GlobalClickEffect />
               <OfflineBanner />
+              <FloatingThemeTrigger />
               {children}
             </InventoryProvider>
           </CartProvider>

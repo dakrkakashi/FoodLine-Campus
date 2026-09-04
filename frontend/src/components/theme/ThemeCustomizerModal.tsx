@@ -48,13 +48,13 @@ export function ThemeCustomizerModal({ isOpen, onClose }: ThemeCustomizerModalPr
             {/* Header */}
             <div className="flex items-center justify-between pb-6 border-b border-white/10">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#FF6B2C] to-[#FFB347] flex items-center justify-center text-black shadow-lg shadow-[#FF6B2C]/20">
+                <div className="w-12 h-12 rounded-2xl bg-linear-to-tr from-(--accent-orange) to-(--accent-amber) flex items-center justify-center text-black shadow-lg shadow-(--accent-orange)/20">
                   <Palette size={24} strokeWidth={2.4} />
                 </div>
                 <div>
                   <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
                     <span>Campus Color Themes</span>
-                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-[#FFB347] font-bold">
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-white/10 text-(--accent-amber) font-bold">
                       {Object.keys(THEMES).length} Presets
                     </span>
                   </h2>
@@ -87,7 +87,7 @@ export function ThemeCustomizerModal({ isOpen, onClose }: ThemeCustomizerModalPr
                     onClick={() => handleSelectTheme(tKey)}
                     className={`p-4 rounded-3xl border transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between ${
                       isSelected
-                        ? 'border-[#FF6B2C] bg-white/[0.07] shadow-[0_0_30px_rgba(255,107,44,0.25)]'
+                        ? 'border-(--accent-orange) bg-white/[0.07] shadow-[0_0_30px_var(--accent-orange-glow)]'
                         : 'border-white/10 bg-white/[0.03] hover:border-white/25 hover:bg-white/[0.05]'
                     }`}
                   >
@@ -107,7 +107,7 @@ export function ThemeCustomizerModal({ isOpen, onClose }: ThemeCustomizerModalPr
                         </div>
 
                         {isSelected && (
-                          <span className="w-6 h-6 rounded-full bg-[#00D4AA] text-black flex items-center justify-center flex-shrink-0 shadow-md">
+                          <span className="w-6 h-6 rounded-full bg-(--accent-teal) text-black flex items-center justify-center flex-shrink-0 shadow-md">
                             <Check size={14} strokeWidth={3} />
                           </span>
                         )}
@@ -158,14 +158,14 @@ export function ThemeCustomizerModal({ isOpen, onClose }: ThemeCustomizerModalPr
             {/* Live Preview Demo Strip */}
             <div className="p-4 rounded-3xl bg-black/40 border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2 text-xs font-bold text-zinc-300">
-                <Sparkles size={14} className="text-[#FFB347]" />
+                <Sparkles size={14} className="text-(--accent-amber)" />
                 <span>Live Active Theme: <strong className="text-white">{config.name}</strong></span>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => { playClick(); onClose(); }}
-                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black text-xs font-black uppercase tracking-wider cursor-pointer shadow-lg shadow-[#FF6B2C]/25"
+                  className="px-6 py-2.5 rounded-xl bg-linear-to-r from-(--accent-orange) to-(--accent-amber) text-black text-xs font-black uppercase tracking-wider cursor-pointer shadow-lg shadow-(--accent-orange)/25"
                 >
                   Done
                 </button>

@@ -179,11 +179,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeName>('sunset');
 
   useEffect(() => {
-    const saved = localStorage.getItem('foodline-theme') as ThemeName;
-    if (saved && THEMES[saved]) {
-      setThemeState(saved);
-      applyThemeToCSS(saved);
-    }
+    const saved = (localStorage.getItem('foodline-theme') as ThemeName) || 'sunset';
+    const active = THEMES[saved] ? saved : 'sunset';
+    setThemeState(active);
+    applyThemeToCSS(active);
   }, []);
 
   const applyThemeToCSS = (themeKey: ThemeName) => {
@@ -200,6 +199,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     root.style.setProperty('--bg-card', t.bgCard);
     root.style.setProperty('--border-glass-active', `${t.primary}80`);
     root.setAttribute('data-theme', themeKey);
+    if (document.body) {
+      document.body.style.backgroundColor = t.bgCanvas;
+    }
   };
 
   const setTheme = (newTheme: ThemeName) => {
