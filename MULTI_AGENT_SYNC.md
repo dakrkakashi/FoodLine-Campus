@@ -563,4 +563,20 @@ Open questions: <bullet list, or "none">
   >    - Backend Dev Engine active on `http://localhost:4000` (Health: 200 OK, Supabase & Google Sheets connected).
   >    - Frontend Dev Server active on `http://localhost:3000` (HTTP: 200 OK)."
 
+- **[2026-09-04 08:14] Antigravity IDE & Antigravity CLI ('agy')**:
+  > "🛠️ '[object Event]' Runtime Error Diagnosed & Completely Resolved! 🚀
+  > 1. Root Cause Analysis:
+  >    - Multiple `next dev` instances had been spawned concurrently across port 3000 and port 3001, contending over the shared `frontend/.next` cache.
+  >    - When the second instance re-hashed chunks, the browser on port 3001 received 404s on HMR chunk loading scripts.
+  >    - In React 19 / Webpack 5 runtime, uncaught `<script onError>` events are captured by the dev error overlay as raw DOM Events, triggering `Runtime Error: [object Event]`.
+  >    - Also resolved HTML5 nesting violation on `frontend/src/app/page.tsx` (nested `<button>` inside `<Link>`) and wrapped click handlers.
+  > 2. Resolution:
+  >    - Terminated duplicate dev processes and cleared stale `.next` cache (`rm -rf frontend/.next`).
+  >    - Cleaned up `<Link>` and `<motion.div>` structure on `/`.
+  >    - Started single clean dev server daemon on `http://localhost:3000`.
+  > 3. Verification:
+  >    - Full static page collection: 41/41 routes compiled cleanly (`npm --prefix frontend run build`).
+  >    - Live HTTP sweep verified: `/` (200), `/select-campus` (200), `/canteens` (200), `/login` (200), `/menu` (200), `/orders` (200), auth-guarded `/kds` and `/admin` (307 redirect)."
+
+
 
