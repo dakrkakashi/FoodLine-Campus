@@ -81,28 +81,36 @@ export default function IntroductionPage() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-xl mx-auto mb-14"
         >
-          <Link href="/select-campus" onClick={playClick} className="w-full sm:w-auto flex-1">
-            <motion.button
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.96 }}
+          <motion.div
+            whileHover={{ scale: 1.04, y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            className="w-full sm:w-auto flex-1"
+          >
+            <Link
+              href="/select-campus"
+              onClick={() => playClick()}
               className="w-full px-7 py-4.5 bg-gradient-to-r from-[#FF6B2C] via-[#FF8A3D] to-[#FFB347] text-black font-black text-sm sm:text-base rounded-2xl shadow-xl shadow-[#FF6B2C]/30 flex items-center justify-center gap-2.5 cursor-pointer group transition-all"
             >
               <MapPin size={18} className="text-black" />
               <span>Select Campus & Canteen</span>
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </motion.button>
-          </Link>
+            </Link>
+          </motion.div>
 
-          <Link href="/login" onClick={playClick} className="w-full sm:w-auto flex-1">
-            <motion.button
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.96 }}
+          <motion.div
+            whileHover={{ scale: 1.04, y: -2 }}
+            whileTap={{ scale: 0.96 }}
+            className="w-full sm:w-auto flex-1"
+          >
+            <Link
+              href="/login"
+              onClick={() => playClick()}
               className="w-full px-7 py-4.5 bg-[#16161E]/90 hover:bg-[#1C1C26] border border-white/15 hover:border-[#FF6B2C]/50 text-white font-black text-sm sm:text-base rounded-2xl shadow-xl flex items-center justify-center gap-2.5 cursor-pointer transition-all"
             >
               <GraduationCap size={18} className="text-[#00D4AA]" />
               <span>Student PRN Login</span>
-            </motion.button>
-          </Link>
+            </Link>
+          </motion.div>
         </motion.div>
 
         {/* 3 Simple Value Highlights */}
@@ -158,7 +166,7 @@ export default function IntroductionPage() {
         >
           <Link
             href="/canteens"
-            onClick={playClick}
+            onClick={() => playClick()}
             className="text-xs text-zinc-400 hover:text-white transition inline-flex items-center gap-1.5 font-bold"
           >
             <span>Or browse all 5 canteens and live menus directly →</span>
