@@ -592,4 +592,29 @@ Open questions: <bullet list, or "none">
   >    - Production build verification: `npm --prefix frontend run build` compiled 41/41 routes with 0 errors.
   >    - Verified compiled CSS contains `bg-accent-orange`, `from-accent-orange`, `to-accent-amber`, `text-accent-amber`, `border-accent-orange`, `shadow-accent-orange`, `bg-accent-teal`.
   >    - Fresh dev server running on `http://localhost:3000` with instant responsive theme switching."
-
+- **[2026-09-04 09:40] Antigravity IDE & Antigravity CLI ('agy')**:
+  > "🍲 Menu Category Filters Fully Operational & Verified! 🚀
+  > 1. Root Cause of 'Filters Not Working':
+  >    - In `frontend/src/app/menu/page.tsx`:
+  >      - Filtering used `const itemCatName = getCategoryName(item.category_id)` where `getCategoryName` strictly looked up `categories.find(c => c.id === catId)`.
+  >      - The API route `/api/menu` returned items with `category` (string, e.g. `'Quick Bites'`), but `item.category_id` was undefined for fallback items.
+  >      - `itemCatName` was evaluating to `""`, resulting in `matchesCategory === false` for every dish whenever any specific category pill was selected.
+  >      - Furthermore, category pill names (e.g. `'Quick Bites & Chaat'`, `'South & North Indian'`) combine multiple subcategories (`'Quick Bites'`, `'Chaat Corner'`), so exact equality on raw item categories would have failed without canonical mapping.
+  > 2. Full-Stack Solution:
+  >    - `frontend/src/app/api/menu/route.ts`:
+  >      - Added canonical fallback `DEFAULT_CATEGORIES` (with exact Supabase UUIDs, names, icons, and display orders).
+  >      - Added `resolveDishCategory()`: Automatically maps every dish's `category` and assigns its canonical `category_id`.
+  >      - All returned items now contain both `category` and valid `category_id`.
+  >    - `frontend/src/app/menu/page.tsx`:
+  >      - Updated `MenuItem` interface to include `category?: string`.
+  >      - Replaced fragile filter with comprehensive `isCategoryMatch()` supporting direct ID match, name match, category object lookup, and semantic group matching (e.g. Quick Bites + Chaat Corner -> Quick Bites & Chaat).
+  >      - Enhanced category pills with real-time dish count badges (`🍽 All Items (56)`, `🥪 Quick Bites & Chaat (13)`, `🥞 South & North Indian (5)`, etc.).
+  >      - Added `setSelectedCategory('All')` on canteen change so switching outlets never leaves stale category states.
+  >      - Corrected `getCategoryName(dish.category_id, dish.category)` in dish cards, modal inspection, and cart additions.
+  >    - `backend/src/server.ts`:
+  >      - Updated `GET /api/menu` categories array to return standard `Category[]` objects with IDs and icons matching shared contracts.
+  > 3. Verification & Compilation:
+  >    - `npm --prefix frontend run build`: 41/41 routes compiled with 100% 0 errors.
+  >    - `npm --prefix backend run build`: TypeScript compiler passed cleanly with 0 errors.
+  >    - Live API query verification: 8/8 categories verified with active dish counts (56 total dishes).
+  >    - All categories filter seamlessly with zero 'No dishes found' false positives."

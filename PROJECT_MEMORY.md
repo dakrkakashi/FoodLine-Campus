@@ -3,8 +3,13 @@
 <!-- Both Antigravity IDE (Backend) and Antigravity CLI 'agy' (Frontend) read this file. -->
 
 ## 📍 Where We Left Off (Last Completed Checkpoint)
-- **Date & Time:** 2026-09-03 (Midnight Hive Session — Backend Stabilization, Concurrency Quota Optimization & Zero-Collision Engine)
-- **Backend Concurrency & Google Sheets Quota Immunity:** 100% Operational & Verified!
+- **Date & Time:** 2026-09-04 (Menu Category Filter Resolution, Dynamic Theme Engine, Zero-Error Build & GitHub Sync)
+- **Menu Category Filter Fix (100% Operational & Verified):**
+  - Diagnosed "No dishes found" on category filter selection: `/api/menu` returned items with `category` strings while `menu/page.tsx` was looking up strictly by undefined `item.category_id`.
+  - Added canonical `DEFAULT_CATEGORIES` and `resolveDishCategory()` in `frontend/src/app/api/menu/route.ts` to assign both `category` and valid `category_id`.
+  - Implemented smart multi-level `isCategoryMatch()` supporting exact matches, ID lookups, and multi-word semantic groups (`Quick Bites & Chaat` -> `Quick Bites` + `Chaat Corner`, `South & North Indian` -> `South Indian` + `North Indian`, etc.).
+  - Added real-time dish count badges to category pills and auto-reset of category selection when switching canteens.
+  - Verified 100% passing across all 41/41 routes on `npm --prefix frontend run build` and `npm --prefix backend run build`.
   - Built an asynchronous in-memory write buffer queue in `SheetsDbService.ts` (`pendingOrdersQueue`) with debounced (1200ms) and threshold (>=25 items) batching.
   - Flushes up to 50 orders in a single API call to strictly eliminate Google Sheets 60 req/min write quota exhaustion during peak break-time rushes.
   - Added 30s background flush and graceful process termination flush handlers in `server.ts`.

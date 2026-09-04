@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
@@ -23,6 +23,7 @@ interface MenuItem {
   price: number;
   prep_time_mins?: number;
   category_id?: string;
+  category?: string;
   is_available: boolean;
 }
 
@@ -89,16 +90,23 @@ export default function MenuPage() {
   }, []);
 
   useEffect(() => {
+    setSelectedCategory('All');
     async function loadMenu() {
       try {
         setLoading(true);
         if (selectedCanteen.slug !== 'cafe7' && CANTEEN_SPECIFIC_DISHES[selectedCanteen.slug]) {
           // Display authentic dishes for selected canteen
           setCategories([
-            { id: 'cat-all', name: 'All' },
-            { id: 'cat-special', name: 'Specialty Menu' },
+            { id: 'cat-all', name: 'All', icon: '🍽' },
+            { id: 'cat-special', name: 'Specialty Menu', icon: '✨' },
           ]);
-          setMenuItems(CANTEEN_SPECIFIC_DISHES[selectedCanteen.slug]);
+          setMenuItems(
+            CANTEEN_SPECIFIC_DISHES[selectedCanteen.slug].map((dish) => ({
+              ...dish,
+              category: 'Specialty Menu',
+              category_id: 'cat-special',
+            }))
+          );
           return;
         }
 
@@ -127,25 +135,160 @@ export default function MenuPage() {
     }
   }, [cartItems, getStockQuantity, updateQuantity]);
 
-  const getCategoryName = (catId?: string) => {
-    if (!catId) return '';
-    const cat = categories.find((c) => c.id === catId);
-    return cat ? cat.name : '';
-  };
+  const getCategoryName = useCallback(
+    (catId?: string, rawCat?: string) => {
+      if (catId) {
+        const cat = categories.find((c) => c.id === catId);
+        if (cat) return cat.name;
+      }
+      if (rawCat) {
+        const cat = categories.find(
+          (c) => c.name.toLowerCase() === rawCat.toLowerCase() || c.id === rawCat
+        );
+        if (cat) return cat.name;
+
+        const norm = rawCat.toLowerCase();
+        if (norm.includes('quick') || norm.includes('chaat')) return 'Quick Bites & Chaat';
+        if (norm.includes('south') || norm.includes('north') || norm.includes('indian')) return 'South & North Indian';
+        if (norm.includes('sandwich') || norm.includes('roll')) return 'Loaded Sandwiches';
+        if (norm.includes('momo') || norm.includes('burger')) return 'Momos & Burgers';
+        if (norm.includes('frie') || norm.includes('pasta')) return 'Fries & Pastas';
+        if (norm.includes('garlic') || norm.includes('bread') || norm.includes('pizza')) return 'Garlic Bread & Pizzas';
+        if (norm.includes('maggi') || norm.includes('chinese') || norm.includes('rice') || norm.includes('noodle')) return 'Maggi, Chinese & Rice';
+        if (norm.includes('beverage') || norm.includes('dessert') || norm.includes('shake') || norm.includes('coffee') || norm.includes('tea')) return 'Beverages & Desserts';
+
+        return rawCat;
+      }
+      return '';
+    },
+    [categories]
+  );
+
+  const isCategoryMatch = useCallback(
+    (item: MenuItem, selectedCat: string): boolean => {
+      if (!selectedCat || selectedCat === 'All') return true;
+
+      // 1. Direct ID match
+      if (item.category_id === selectedCat) return true;
+
+      // 2. Direct name match
+      if (item.category && item.category.toLowerCase() === selectedCat.toLowerCase()) return true;
+
+      // 3. Category lookup in categories array
+      const matchedCat = categories.find(
+        (c) => c.name.toLowerCase() === selectedCat.toLowerCase() || c.id === selectedCat
+      );
+      if (matchedCat) {
+        if (item.category_id && item.category_id === matchedCat.id) return true;
+        if (item.category && item.category.toLowerCase() === matchedCat.name.toLowerCase()) return true;
+      }
+
+      // 4. Resolved Category Name Match
+      const resolvedName = getCategoryName(item.category_id, item.category);
+      if (resolvedName && resolvedName.toLowerCase() === selectedCat.toLowerCase()) return true;
+
+      // 5. Semantic / Group Matching
+      const selNorm = selectedCat.toLowerCase();
+      const itemCat = (item.category || '').toLowerCase();
+      const itemTag = (item.tag || '').toLowerCase();
+      const itemName = (item.name || '').toLowerCase();
+
+      if (selNorm.includes('quick') || selNorm.includes('chaat')) {
+        return (
+          itemCat.includes('quick') ||
+          itemCat.includes('chaat') ||
+          itemTag.includes('chaat') ||
+          itemTag.includes('grab')
+        );
+      }
+      if (selNorm.includes('south') || selNorm.includes('north') || selNorm.includes('indian')) {
+        return (
+          itemCat.includes('south') ||
+          itemCat.includes('north') ||
+          itemCat.includes('indian') ||
+          itemTag.includes('south') ||
+          itemTag.includes('north') ||
+          itemName.includes('dosa') ||
+          itemName.includes('idli') ||
+          itemName.includes('uttapa') ||
+          itemName.includes('bhature')
+        );
+      }
+      if (selNorm.includes('sandwich')) {
+        return itemCat.includes('sandwich') || itemCat.includes('roll') || itemName.includes('sandwich');
+      }
+      if (selNorm.includes('momo') || selNorm.includes('burger')) {
+        return (
+          itemCat.includes('momo') ||
+          itemCat.includes('burger') ||
+          itemName.includes('burger') ||
+          itemName.includes('momo')
+        );
+      }
+      if (selNorm.includes('frie') || selNorm.includes('pasta')) {
+        return (
+          itemCat.includes('frie') ||
+          itemCat.includes('pasta') ||
+          itemName.includes('fries') ||
+          itemName.includes('pasta')
+        );
+      }
+      if (selNorm.includes('bread') || selNorm.includes('pizza')) {
+        return (
+          itemCat.includes('bread') ||
+          itemCat.includes('pizza') ||
+          itemName.includes('pizza') ||
+          itemName.includes('bread') ||
+          itemName.includes('toast')
+        );
+      }
+      if (selNorm.includes('maggi') || selNorm.includes('chinese') || selNorm.includes('rice')) {
+        return (
+          itemCat.includes('maggi') ||
+          itemCat.includes('chinese') ||
+          itemCat.includes('rice') ||
+          itemName.includes('maggi') ||
+          itemName.includes('noodle') ||
+          itemName.includes('fried rice') ||
+          itemName.includes('manchurian')
+        );
+      }
+      if (selNorm.includes('beverage') || selNorm.includes('dessert')) {
+        return (
+          itemCat.includes('beverage') ||
+          itemCat.includes('dessert') ||
+          itemCat.includes('shake') ||
+          itemTag.includes('drink') ||
+          itemName.includes('coffee') ||
+          itemName.includes('tea') ||
+          itemName.includes('shake') ||
+          itemName.includes('juice') ||
+          itemName.includes('frappe') ||
+          itemName.includes('kaapi') ||
+          itemName.includes('mojito')
+        );
+      }
+      if (selNorm.includes('special')) {
+        return true;
+      }
+
+      return false;
+    },
+    [categories, getCategoryName]
+  );
 
   const filteredItems = useMemo(
     () =>
       menuItems.filter((item) => {
-        const itemCatName = getCategoryName(item.category_id);
-        const matchesCategory =
-          selectedCategory === 'All' || itemCatName === selectedCategory || item.category_id === selectedCategory;
+        const matchesCategory = isCategoryMatch(item, selectedCategory);
         const matchesSearch =
+          !search.trim() ||
           item.name.toLowerCase().includes(search.toLowerCase()) ||
-          (item.tag && item.tag.toLowerCase().includes(search.toLowerCase()));
+          (item.tag && item.tag.toLowerCase().includes(search.toLowerCase())) ||
+          (item.category && item.category.toLowerCase().includes(search.toLowerCase()));
         return matchesCategory && matchesSearch;
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [menuItems, selectedCategory, search, categories]
+    [menuItems, selectedCategory, search, isCategoryMatch]
   );
 
   const getCartQuantity = (id: string) => {
@@ -251,31 +394,51 @@ export default function MenuPage() {
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory('All')}
-                className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide transition-all cursor-pointer ${
+                className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide transition-all cursor-pointer flex items-center gap-2 ${
                   selectedCategory === 'All'
                     ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25'
                     : 'bg-[var(--bg-card)] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
                 }`}
               >
-                🍽 All Items
-              </motion.button>
-            </Magnetic>
-            {categories.map((cat) => (
-              <Magnetic key={cat.id} strength={0.15}>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setSelectedCategory(cat.name)}
-                  className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide flex items-center gap-2 transition-all cursor-pointer ${
-                    selectedCategory === cat.name
-                      ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25'
-                      : 'bg-[var(--bg-card)] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
+                <span>🍽</span>
+                <span>All Items</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                    selectedCategory === 'All' ? 'bg-black/20 text-black' : 'bg-white/10 text-zinc-400'
                   }`}
                 >
-                  <span>{cat.icon || '🍽'}</span>
-                  <span>{cat.name}</span>
-                </motion.button>
-              </Magnetic>
-            ))}
+                  {menuItems.length}
+                </span>
+              </motion.button>
+            </Magnetic>
+            {categories.map((cat) => {
+              const count = menuItems.filter((item) => isCategoryMatch(item, cat.name)).length;
+              return (
+                <Magnetic key={cat.id} strength={0.15}>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSelectedCategory(cat.name)}
+                    className={`snap-start flex-shrink-0 px-5 py-2.5 rounded-2xl text-xs font-black tracking-wide flex items-center gap-2 transition-all cursor-pointer ${
+                      selectedCategory === cat.name
+                        ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25'
+                        : 'bg-[var(--bg-card)] border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 hover:bg-white/5'
+                    }`}
+                  >
+                    <span>{cat.icon || '🍽'}</span>
+                    <span>{cat.name}</span>
+                    {count > 0 && (
+                      <span
+                        className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                          selectedCategory === cat.name ? 'bg-black/20 text-black' : 'bg-white/10 text-zinc-400'
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    )}
+                  </motion.button>
+                </Magnetic>
+              );
+            })}
           </div>
         </div>
 
@@ -364,7 +527,7 @@ export default function MenuPage() {
                                   tag: dish.tag,
                                   price: Number(dish.price),
                                   prep_time_mins: dish.prep_time_mins,
-                                  category: getCategoryName(dish.category_id),
+                                  category: getCategoryName(dish.category_id, dish.category),
                                   is_available: isAvailable,
                                 });
                               }}
@@ -381,7 +544,7 @@ export default function MenuPage() {
                           {dish.name}
                         </h3>
                         <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">
-                          {getCategoryName(dish.category_id)}
+                          {getCategoryName(dish.category_id, dish.category) || dish.tag || 'Fresh Made'}
                         </span>
                       </div>
 
@@ -402,7 +565,7 @@ export default function MenuPage() {
                                 name: dish.name,
                                 price: Number(dish.price),
                                 tag: dish.tag,
-                                category: getCategoryName(dish.category_id),
+                                category: getCategoryName(dish.category_id, dish.category),
                                 maxStock: stockQty,
                               })
                             }
