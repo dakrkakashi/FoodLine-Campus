@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FoodLine — Campus Pre-Ordering & Express Pickup Pitch Deck</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet" />
+  
+  <style>
+    /* ==========================================================================
+       1. DYNAMIC COLOR SYSTEM & THEME TOKENS
+       ========================================================================== */
+    :root {
+      /* Night Mode (Default Dark) */
+      --bg-canvas: #07070B;
+      --bg-slide: rgba(18, 18, 28, 0.85);
+      --bg-slide-border: rgba(255, 255, 255, 0.12);
+      --bg-card: rgba(255, 255, 255, 0.04);
+      --bg-card-hover: rgba(255, 255, 255, 0.07);
+      --border-card: rgba(255, 255, 255, 0.10);
+      --border-card-hover: rgba(255, 255, 255, 0.22);
+      --dock-bg: rgba(12, 12, 18, 0.88);
+      --dock-border: rgba(255, 255, 255, 0.12);
+      
+      /* Typography */
+      --text-primary: #FFFFFF;
+      --text-secondary: #A1A1AA;
+      --text-muted: #71717A;
+      
+      /* Active Theme Accents: Sunset Tangerine (Default) */
+      --accent-primary: #FF6B2C;
+      --accent-secondary: #FFB347;
+      --accent-highlight: #00D4AA;
+      --accent-purple: #8B5CF6;
+      --accent-rose: #FF3366;
+      --accent-blue: #3B82F6;
+      --glow-primary: rgba(255, 107, 44, 0.35);
+      --glow-highlight: rgba(0, 212, 170, 0.35);
+      
+      /* Ambient Blob Opacity */
+      --blob-opacity: 0.26;
+      --slide-shadow: 0 24px 64px rgba(0, 0, 0, 0.65);
+    }
+
+    /* Day Mode (Crisp Sunlight Presentation Theme) */
+    body[data-presentation-mode="light"] {
+      --bg-canvas: #FAF9F5;
+      --bg-slide: rgba(255, 255, 255, 0.94);
+      --bg-slide-border: rgba(0, 0, 0, 0.09);
+      --bg-card: rgba(244, 243, 238, 0.7);
+      --bg-card-hover: rgba(238, 237, 230, 0.9);
+      --border-card: rgba(0, 0, 0, 0.08);
+      --border-card-hover: rgba(0, 0, 0, 0.18);
+      --dock-bg: rgba(255, 255, 255, 0.92);
+      --dock-border: rgba(0, 0, 0, 0.10);
+      
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      
+      --blob-opacity: 0.065;
+      --slide-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Preset 1: Royal Ivory & Gold 👑 */
+    body[data-presentation-theme="gold"] {
+      --accent-primary: #D4AF37;
+      --accent-secondary: #F59E0B;
+      --accent-highlight: #B45309;
+      --accent-purple: #854D0E;
+      --glow-primary: rgba(212, 175, 55, 0.35);
+      --glow-highlight: rgba(245, 158, 11, 0.35);
+    }
+
+    /* Preset 2: Cyberpunk Neon 🌌 */
+    body[data-presentation-theme="cyber"] {
+      --accent-primary: #8B5CF6;
+      --accent-secondary: #06B6D4;
+      --accent-highlight: #EC4899;
+      --accent-purple: #A855F7;
+      --glow-primary: rgba(139, 92, 246, 0.35);
+      --glow-highlight: rgba(6, 182, 212, 0.35);
+    }
+
+    /* Preset 3: Emerald Mint 🍃 */
+    body[data-presentation-theme="emerald"] {
+      --accent-primary: #10B981;
+      --accent-secondary: #34D399;
+      --accent-highlight: #059669;
+      --accent-purple: #047857;
+      --glow-primary: rgba(16, 185, 129, 0.35);
+      --glow-highlight: rgba(52, 211, 153, 0.35);
+    }
+
+    /* Preset 4: Sunset Tangerine 🍊 (Handled by root defaults, re-applied here) */
+    body[data-presentation-theme="sunset"] {
+      --accent-primary: #FF6B2C;
+      --accent-secondary: #FFB347;
+      --accent-highlight: #00D4AA;
+      --accent-purple: #8B5CF6;
+      --glow-primary: rgba(255, 107, 44, 0.35);
+      --glow-highlight: rgba(0, 212, 170, 0.35);
+    }
+
+    /* ==========================================================================
+       2. BASE RESET & VIEWPORT
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: background-color 0.4s ease, color 0.4s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==========================================================================
+       3. AMBIENT AURORA MESH BACKGROUND
+       ========================================================================== */
+    .mesh-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .mesh-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: var(--blob-opacity);
+      transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: floatBlobs 24s ease-in-out infinite alternate;
+    }
+    .blob-1 {
+      width: 520px;
+      height: 520px;
+      top: -120px;
+      left: -100px;
+      background: var(--accent-primary);
+      animation-duration: 22s;
+    }
+    .blob-2 {
+      width: 620px;
+      height: 620px;
+      bottom: -150px;
+      right: -100px;
+      background: var(--accent-secondary);
+      animation-duration: 28s;
+      animation-delay: -6s;
+    }
+    .blob-3 {
+      width: 440px;
+      height: 440px;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--accent-highlight);
+      opacity: calc(var(--blob-opacity) * 0.7);
+      animation-duration: 20s;
+      animation-delay: -12s;
+    }
+
+    @keyframes floatBlobs {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -25px) scale(1.08); }
+      100% { transform: translate(-25px, 35px) scale(0.96); }
+    }
+
+    /* ==========================================================================
+       4. LIVE TICKER BANNER (RUNS CONTINUOUSLY)
+       ========================================================================== */
+    .live-top-ticker {
+      position: relative;
+      z-index: 20;
+      height: 32px;
+      background: rgba(0, 0, 0, 0.35);
+      border-bottom: 1px solid var(--dock-border);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      overflow: hidden;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    body[data-presentation-mode="light"] .live-top-ticker {
+      background: rgba(255, 255, 255, 0.65);
+    }
+    .ticker-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-primary);
+      color: #000;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #000;
+      display: inline-block;
+      animation: livePulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+    .ticker-marquee {
+      display: flex;
+      white-space: nowrap;
+      animation: tickerMarquee 42s linear infinite;
+      color: var(--text-secondary);
+      gap: 32px;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ticker-highlight {
+      color: var(--accent-highlight);
+      font-weight: 800;
+    }
+    @keyframes tickerMarquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ==========================================================================
+       5. MAIN SLIDE STAGE
+       ========================================================================== */
+    main {
+      flex: 1;
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 36px 84px 36px;
+      perspective: 1200px;
+    }
+
+    .slide {
+      position: absolute;
+      width: 94%;
+      max-width: 1240px;
+      height: 84vh;
+      max-height: 720px;
+      background: var(--bg-slide);
+      border: 1px solid var(--bg-slide-border);
+      border-radius: 32px;
+      padding: 38px 48px;
+      backdrop-filter: blur(32px);
+      box-shadow: var(--slide-shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(24px) scale(0.97);
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+                  transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .slide.prev {
+      opacity: 0;
+      transform: translateY(-24px) scale(0.97);
+    }
+
+    /* Slide Header */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 20px;
+      gap: 16px;
+    }
+    .slide-tag {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .slide-tag::before {
+      content: '';
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-primary);
+      box-shadow: 0 0 10px var(--glow-primary);
+    }
+    .slide-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 34px;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+      line-height: 1.18;
+      color: var(--text-primary);
+    }
+    .slide-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 6px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border-card);
+      flex-shrink: 0;
+    }
+
+    /* Slide Body Layouts */
+    .slide-body {
+      flex: 1;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      overflow-y: auto;
+      padding: 4px 0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      width: 100%;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      width: 100%;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      width: 100%;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 22px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-card-hover);
+      transform: translateY(-3px);
+    }
+    .card-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 19px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+    .card-desc {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+    }
+    .card-badge {
+      align-self: flex-start;
+      margin-top: 14px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: rgba(255, 107, 44, 0.15);
+      color: var(--accent-primary);
+      border: 1px solid rgba(255, 107, 44, 0.3);
+    }
+
+    /* Stat Highlights */
+    .stat-hero {
+      font-family: 'Outfit', sans-serif;
+      font-size: 50px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    /* Stepper Pills */
+    .step-pill {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      margin-bottom: 10px;
+      transition: all 0.2s ease;
+    }
+    .step-pill:hover {
+      border-color: var(--accent-primary);
+      transform: translateX(4px);
+    }
+    .step-num {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--accent-primary);
+      color: #000;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-content h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+    .step-content p {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    /* Live Pulsing Radar Ring */
+    .radar-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .radar-ring {
+      position: absolute;
+      inset: -6px;
+      border: 2px solid var(--accent-highlight);
+      border-radius: 16px;
+      animation: radarRing 2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+      pointer-events: none;
+    }
+    @keyframes radarRing {
+      0% { opacity: 0.9; transform: scale(0.96); }
+      100% { opacity: 0; transform: scale(1.15); }
+    }
+
+    /* ==========================================================================
+       6. FLOATING BOTTOM PRESENTATION CONTROLLER DOCK
+       ========================================================================== */
+    .floating-dock {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      width: calc(100% - 48px);
+      max-width: 1240px;
+      height: 60px;
+      background: var(--dock-bg);
+      border: 1px solid var(--dock-border);
+      border-radius: 20px;
+      padding: 0 18px;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .dock-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .dock-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding-right: 12px;
+      border-right: 1px solid var(--border-card);
+    }
+    .dock-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: #000;
+      box-shadow: 0 4px 12px var(--glow-primary);
+    }
+    .dock-name {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      color: var(--text-primary);
+    }
+    
+    .dock-clock {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      padding: 5px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border-card);
+    }
+    .clock-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-highlight);
+      display: inline-block;
+      box-shadow: 0 0 8px var(--glow-highlight);
+    }
+
+    .dock-center {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 440px;
+      justify-content: center;
+    }
+    .nav-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      transition: all 0.2s ease;
+    }
+    .nav-icon-btn:hover {
+      background: var(--accent-primary);
+      color: #000;
+      border-color: var(--accent-primary);
+      transform: translateY(-1px);
+    }
+    .progress-track {
+      flex: 1;
+      height: 6px;
+      background: var(--border-card);
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 6.66%;
+      background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+      border-radius: 6px;
+      transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dock-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .theme-palette-pill {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 12px;
+    }
+    .theme-btn {
+      background: transparent;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 3px 5px;
+      border-radius: 6px;
+      transition: transform 0.15s ease;
+    }
+    .theme-btn:hover {
+      transform: scale(1.25);
+    }
+    .dock-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      color: var(--text-primary);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .dock-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-card-hover);
+      transform: translateY(-1px);
+    }
+    .dock-btn.primary {
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      color: #000;
+      border: none;
+      font-weight: 800;
+    }
+
+    /* ==========================================================================
+       7. SPEAKER SCRIPT MODAL / DRAWER
+       ========================================================================== */
+    #speaker-notes-modal {
+      position: fixed;
+      bottom: 84px;
+      right: 28px;
+      width: 440px;
+      max-height: 420px;
+      background: var(--bg-slide);
+      border: 1px solid var(--bg-slide-border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(32px);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #speaker-notes-modal.show {
+      display: flex;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .notes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-card);
+      padding-bottom: 10px;
+    }
+    .notes-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--accent-primary);
+    }
+    .notes-body {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      overflow-y: auto;
+      max-height: 240px;
+    }
+    .notes-cue {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      border-left: 3px solid var(--accent-highlight);
+    }
+
+    /* ==========================================================================
+       8. RESPONSIVE DESIGN
+       ========================================================================== */
+    @media (max-width: 900px) {
+      .slide {
+        padding: 24px;
+        height: 80vh;
+      }
+      .slide-title {
+        font-size: 24px;
+      }
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .dock-clock {
+        display: none;
+      }
+      #speaker-notes-modal {
+        width: 90%;
+        right: 5%;
+      }
+    }
+  </style>
+</head>
+<body data-presentation-theme="sunset">
+
+  <!-- Ambient Dynamic Mesh Background -->
+  <div class="mesh-bg">
+    <div class="mesh-blob blob-1"></div>
+    <div class="mesh-blob blob-2"></div>
+    <div class="mesh-blob blob-3"></div>
+  </div>
+
+  <!-- Live Top Campus Dispatch Ticker -->
+  <div class="live-top-ticker">
+    <div class="ticker-tag">
+      <span class="pulse-dot"></span>
+      <span>LIVE DISPATCH</span>
+    </div>
+    <div class="ticker-marquee" id="live-marquee">
+      <div class="ticker-item">⚡ <span class="ticker-highlight">Cafe @7 Pilot Active:</span> 44 Dishes Ready for Recess Pre-Order</div>
+      <div class="ticker-item">🟢 <span class="ticker-highlight">Slot 11:15 AM:</span> 54/60 Capacity (Throttler Active)</div>
+      <div class="ticker-item">🎟️ <span class="ticker-highlight">Counter 1:</span> Serving Token FL-1793 • 18s Pickup Speed</div>
+      <div class="ticker-item">🛡️ <span class="ticker-highlight">Anti-Fraud Engine:</span> 12-Digit Bank UTR Verification 100% Online</div>
+      <div class="ticker-item">📲 <span class="ticker-highlight">Student Portal:</span> Direct UPI + 1-Tap Reorder Ready</div>
+      <!-- Duplicate for smooth seamless loop -->
+      <div class="ticker-item">⚡ <span class="ticker-highlight">Cafe @7 Pilot Active:</span> 44 Dishes Ready for Recess Pre-Order</div>
+      <div class="ticker-item">🟢 <span class="ticker-highlight">Slot 11:15 AM:</span> 54/60 Capacity (Throttler Active)</div>
+      <div class="ticker-item">🎟️ <span class="ticker-highlight">Counter 1:</span> Serving Token FL-1793 • 18s Pickup Speed</div>
+      <div class="ticker-item">🛡️ <span class="ticker-highlight">Anti-Fraud Engine:</span> 12-Digit Bank UTR Verification 100% Online</div>
+      <div class="ticker-item">📲 <span class="ticker-highlight">Student Portal:</span> Direct UPI + 1-Tap Reorder Ready</div>
+    </div>
+  </div>
+
+  <!-- Main Slide Stage -->
+  <main>
+
+    <!-- SLIDE 1: Title & Hook -->
+    <div class="slide active" id="slide-0">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Campus Dining Reimagined</div>
+          <h1 class="slide-title">FoodLine — Zero-Queue Express Pickup</h1>
+        </div>
+        <div class="slide-number">01 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card" style="border-color: var(--accent-primary);">
+            <div class="card-icon">🚀</div>
+            <div>
+              <h3 class="card-title" style="font-size: 26px;">The 30-Second Campus Meal</h3>
+              <p class="card-desc" style="font-size: 15px; margin-top: 8px;">
+                Pre-order hot snacks right from your classroom desk before the recess bell rings. Walk straight past the crowded 200-student line, flash your optical QR pass, and grab hot food in 30 seconds!
+              </p>
+            </div>
+            <div class="radar-container" style="align-self: flex-start; margin-top: 18px;">
+              <div class="radar-ring"></div>
+              <div class="card-badge" style="background: var(--accent-highlight); color: #000; border: none; font-weight: 900; margin-top: 0;">
+                ✨ Sanjivani University Pilot • Cafe @7
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div class="stat-hero">15 Min</div>
+                  <div class="stat-label">Average Break Duration</div>
+                  <p class="card-desc" style="font-size: 12.5px; margin-top: 4px;">Students lose up to 12 minutes stuck in line.</p>
+                </div>
+                <div style="font-size: 44px;">⏰</div>
+              </div>
+            </div>
+
+            <div class="card" style="border-color: var(--accent-highlight);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div class="stat-hero" style="color: var(--accent-highlight); background: none; -webkit-text-fill-color: var(--accent-highlight);">30 Sec</div>
+                  <div class="stat-label">Express FoodLine Pickup Time</div>
+                  <p class="card-desc" style="font-size: 12.5px; margin-top: 4px;">Pre-batched meals ready hot at bell ring.</p>
+                </div>
+                <div style="font-size: 44px;">⚡</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: The Problem -->
+    <div class="slide" id="slide-1">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">The Daily Campus Bottleneck</div>
+          <h1 class="slide-title">Why Recess Lines Ruin Every Student's Break</h1>
+        </div>
+        <div class="slide-number">02 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon">⏳</div>
+            <h3 class="card-title">12-Minute Push & Shove</h3>
+            <p class="card-desc">
+              Recess is only 15 minutes. Students spend 12 minutes trapped in a packed crowd waving ₹20 notes, leaving just 3 minutes to eat.
+            </p>
+            <div class="card-badge" style="background: rgba(255, 51, 102, 0.15); color: var(--accent-rose); border-color: rgba(255, 51, 102, 0.3);">
+              80% Break Wasted
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">❌</div>
+            <h3 class="card-title">"Bhaiya Samosa Khatam!"</h3>
+            <p class="card-desc">
+              After waiting 10 minutes in the rush, students reach the counter only to discover their favorite snack is sold out.
+            </p>
+            <div class="card-badge" style="background: rgba(255, 179, 71, 0.15); color: var(--accent-secondary); border-color: rgba(255, 179, 71, 0.3);">
+              Zero Inventory Transparency
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">💸</div>
+            <h3 class="card-title">Fake UPI Screenshots</h3>
+            <p class="card-desc">
+              Canteen cashiers are too busy to verify bank SMS. Cafeteria owners lose up to ₹4,000 daily from fake payment screenshot apps.
+            </p>
+            <div class="card-badge" style="background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); border-color: rgba(139, 92, 246, 0.3);">
+              ₹1.2L Monthly Canteen Loss
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: The 4-Step Solution -->
+    <div class="slide" id="slide-2">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Express Pickup Architecture</div>
+          <h1 class="slide-title">How FoodLine Works in 4 Frictionless Steps</h1>
+        </div>
+        <div class="slide-number">03 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-2">
+          <div>
+            <div class="step-pill">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>Choose Your Break Slot</h4>
+                <p>Reserve 10:15 AM or 1:15 PM slot straight from your lecture desk.</p>
+              </div>
+            </div>
+
+            <div class="step-pill">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>Direct UPI & 12-Digit Verification</h4>
+                <p>Pay straight to canteen QR with instant automatic UTR duplicate check.</p>
+              </div>
+            </div>
+
+            <div class="step-pill">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h4>High-Contrast Optical QR Pass</h4>
+                <p>Screen shows a glowing green digital pass with a 4-digit verification OTP.</p>
+              </div>
+            </div>
+
+            <div class="step-pill">
+              <div class="step-num">4</div>
+              <div class="step-content">
+                <h4>30-Second Express Handover</h4>
+                <p>Bypass the 200-student line, scan code at express lane, grab hot meal.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="border-color: var(--accent-highlight); justify-content: center; align-items: center; text-align: center; gap: 16px;">
+            <div style="font-size: 56px;">🎟️</div>
+            <h3 class="card-title" style="font-size: 24px; color: var(--accent-highlight);">The Optical Express Pass</h3>
+            <p class="card-desc">
+              Zero paper waste. Zero shouted names. Instant optical scanner validation that verifies orders in 400 milliseconds.
+            </p>
+            <div style="padding: 12px 24px; border-radius: 16px; background: rgba(0, 212, 170, 0.12); border: 1px solid var(--accent-highlight); font-family: 'JetBrains Mono'; font-weight: 800; color: var(--accent-highlight);">
+              ORDER: FL-1793 • OTP: 6065
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Secret Magic 1 (Slot Throttler) -->
+    <div class="slide" id="slide-3">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Proprietary Slot Engine</div>
+          <h1 class="slide-title">The 60-Order Slot Throttler (Zero Kitchen Choke)</h1>
+        </div>
+        <div class="slide-number">04 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-icon">🛡️</div>
+            <h3 class="card-title">Controlled Kitchen Flow</h3>
+            <p class="card-desc">
+              Traditional canteens crash when 400 students rush the counter at once. FoodLine caps each 15-minute break slot to exactly 60 orders so food is always fresh and never delayed.
+            </p>
+            <div class="card-badge">Zero Kitchen Meltdowns</div>
+          </div>
+
+          <div class="card" style="border-color: var(--accent-highlight);">
+            <div class="card-icon">⚡</div>
+            <h3 class="card-title">Atomic Concurrency Lock</h3>
+            <p class="card-desc">
+              PostgreSQL row-level transactional locks ensure that even if 2,000 students hit 'Pay' simultaneously during class transition, capacity limits are strictly enforced.
+            </p>
+            <div class="card-badge" style="background: rgba(0, 212, 170, 0.15); color: var(--accent-highlight); border-color: var(--accent-highlight);">
+              2,500 RPS Concurrency Safe
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Secret Magic 2 (Fraud Shield) -->
+    <div class="slide" id="slide-4">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Automated Fraud Defense</div>
+          <h1 class="slide-title">12-Digit Bank UTR & Replay Shield</h1>
+        </div>
+        <div class="slide-number">05 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon">🔍</div>
+            <h3 class="card-title">12-Digit UTR Capture</h3>
+            <p class="card-desc">
+              Every genuine UPI transaction generates a unique 12-digit bank reference number recorded by NPCI.
+            </p>
+            <div class="card-badge">Zero Manual Auditing</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🚫</div>
+            <h3 class="card-title">Duplicate Replay Lock</h3>
+            <p class="card-desc">
+              Attempting to reuse a friend's past payment number triggers an immediate rejection and security audit log.
+            </p>
+            <div class="card-badge" style="background: rgba(255, 51, 102, 0.15); color: var(--accent-rose); border-color: rgba(255, 51, 102, 0.3);">
+              100% Anti-Fraud
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">💰</div>
+            <h3 class="card-title">Direct-to-Canteen UPI</h3>
+            <p class="card-desc">
+              Payments route straight to Cafe @7's bank account with zero payment gateway settlement hold-ups.
+            </p>
+            <div class="card-badge" style="background: rgba(0, 212, 170, 0.15); color: var(--accent-highlight); border-color: var(--accent-highlight);">
+              Instant Merchant Cashflow
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Secret Magic 3 (Kitchen KDS & TV) -->
+    <div class="slide" id="slide-5">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Operations Hardware & Display</div>
+          <h1 class="slide-title">Kitchen KDS Tablet & Counter TV Display</h1>
+        </div>
+        <div class="slide-number">06 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-icon">👨‍🍳</div>
+            <h3 class="card-title">Kitchen Display System (KDS)</h3>
+            <p class="card-desc">
+              Kitchen staff use an intuitive tablet interface displaying incoming orders grouped by break slot. Chefs tap once to transition items from <code>Cooking</code> to <code>Ready</code>.
+            </p>
+            <div class="card-badge">Instant Order Queue</div>
+          </div>
+
+          <div class="card" style="border-color: var(--accent-highlight);">
+            <div class="card-icon">📺</div>
+            <h3 class="card-title">Real-Time Counter TV Display</h3>
+            <p class="card-desc">
+              A large screen suspended over the cafeteria pickup lane plays airport-style chime audio alerts and flashes ready token numbers in bold high-contrast fonts.
+            </p>
+            <div class="card-badge" style="background: rgba(0, 212, 170, 0.15); color: var(--accent-highlight); border-color: var(--accent-highlight);">
+              Web Audio Alert Chimes
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Student Order History & 1-Tap Reorder -->
+    <div class="slide" id="slide-6">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Student Experience</div>
+          <h1 class="slide-title">Order Tracking, History & 1-Tap Reorder</h1>
+        </div>
+        <div class="slide-number">07 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon">📋</div>
+            <h3 class="card-title">Live Status Stepper</h3>
+            <p class="card-desc">
+              Watch your order progress live: <em>Confirmed → Kitchen Preparing → Hot & Ready for Pickup</em> via real-time SSE stream.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🔁</div>
+            <h3 class="card-title">1-Tap Fast Reorder</h3>
+            <p class="card-desc">
+              Reorder your favorite lunch combo with a single tap straight from your history dashboard without re-browsing menus.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">📱</div>
+            <h3 class="card-title">Persistent Digital Pass</h3>
+            <p class="card-desc">
+              Pull up previous optical QR tokens and transaction receipts anytime directly in your student profile.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: Pilot Campus Stats (Cafe @7) -->
+    <div class="slide" id="slide-7">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Live Production Deployment</div>
+          <h1 class="slide-title">Sanjivani University (Cafe @7) Pilot Metrics</h1>
+        </div>
+        <div class="slide-number">08 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card" style="text-align: center; align-items: center;">
+            <div class="stat-hero">44</div>
+            <div class="stat-label">Dishes on Live Menu</div>
+            <p class="card-desc" style="font-size: 12.5px; margin-top: 6px;">Vada Pav, Thick Shakes, Meals, Dosas</p>
+          </div>
+
+          <div class="card" style="text-align: center; align-items: center;">
+            <div class="stat-hero" style="color: var(--accent-highlight); background: none; -webkit-text-fill-color: var(--accent-highlight);">8</div>
+            <div class="stat-label">Campus Break Slots</div>
+            <p class="card-desc" style="font-size: 12.5px; margin-top: 6px;">Morning, Mid-day & Evening Recess</p>
+          </div>
+
+          <div class="card" style="text-align: center; align-items: center;">
+            <div class="stat-hero" style="color: var(--accent-purple); background: none; -webkit-text-fill-color: var(--accent-purple);">100%</div>
+            <div class="stat-label">Paperless Tokens</div>
+            <p class="card-desc" style="font-size: 12.5px; margin-top: 6px;">High-Contrast Optical QR Screen Scanner</p>
+          </div>
+
+          <div class="card" style="text-align: center; align-items: center;">
+            <div class="stat-hero" style="color: var(--accent-secondary); background: none; -webkit-text-fill-color: var(--accent-secondary);">0</div>
+            <div class="stat-label">Mandatory App Installs</div>
+            <p class="card-desc" style="font-size: 12.5px; margin-top: 6px;">Instant Web PWA + Android APK</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Business Model & Revenue -->
+    <div class="slide" id="slide-8">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Economics & Monetization</div>
+          <h1 class="slide-title">Campus Unit Economics (88% / 12% Revenue Split)</h1>
+        </div>
+        <div class="slide-number">09 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon">🏪</div>
+            <h3 class="card-title">88% to Canteen Owner</h3>
+            <p class="card-desc">
+              Canteen owners collect ₹44 on every ₹50 meal directly with zero cashier labor cost or register shrinkage.
+            </p>
+            <div class="card-badge">Zero Cashier Overhead</div>
+          </div>
+
+          <div class="card" style="border-color: var(--accent-primary);">
+            <div class="card-icon">💼</div>
+            <h3 class="card-title">12% FoodLine Take Rate</h3>
+            <p class="card-desc">
+              FoodLine earns ~12% per transaction for software orchestration, slot throttling, and fraud prevention.
+            </p>
+            <div class="card-badge">High Software Margin</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">📈</div>
+            <h3 class="card-title">+40% Daily Order Volume</h3>
+            <p class="card-desc">
+              By eradicating queue bottlenecks, the cafeteria serves 400+ additional students daily with existing staff.
+            </p>
+            <div class="card-badge" style="background: rgba(0, 212, 170, 0.15); color: var(--accent-highlight); border-color: var(--accent-highlight);">
+              Win-Win Expansion
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Tech Stack Architecture -->
+    <div class="slide" id="slide-9">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Robust Architecture</div>
+          <h1 class="slide-title">Engineered for High-Concurrency Break Surges</h1>
+        </div>
+        <div class="slide-number">10 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card">
+            <div class="card-icon">⚡</div>
+            <h3 class="card-title">Next.js 15 & React</h3>
+            <p class="card-desc">Modern App Router, adaptive theme tokens, fast hydration, zero-lag micro-interactions.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🐘</div>
+            <h3 class="card-title">PostgreSQL & Supabase</h3>
+            <p class="card-desc">ACID transaction locking, 60-order quota constraints, row-level security (RLS).</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">📡</div>
+            <h3 class="card-title">Server-Sent Events</h3>
+            <p class="card-desc">Unidirectional real-time order stream from kitchen tablet to student device with auto-reconnect.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">📱</div>
+            <h3 class="card-title">Capacitor Native APK</h3>
+            <p class="card-desc">Hardware haptics, Web Audio alert chimes, offline fallback cache, and PWA capabilities.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: Competitive Advantage -->
+    <div class="slide" id="slide-10">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Defensible Moat</div>
+          <h1 class="slide-title">Why FoodLine Wins vs Aggregators & Paper Tokens</h1>
+        </div>
+        <div class="slide-number">11 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon">🛵</div>
+            <h3 class="card-title">Zomato & Swiggy</h3>
+            <p class="card-desc">
+              ❌ ₹40+ delivery surge fees<br />
+              ❌ 45-minute delivery window<br />
+              ❌ External drivers banned from campus quads<br />
+              ❌ Impractical for 15-min recess
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">📝</div>
+            <h3 class="card-title">Legacy Paper Slips</h3>
+            <p class="card-desc">
+              ❌ Crumpled, lost paper tokens<br />
+              ❌ 12-minute physical queues<br />
+              ❌ Zero slot scheduling<br />
+              ❌ Rampant payment screenshot fraud
+            </p>
+          </div>
+
+          <div class="card" style="border-color: var(--accent-highlight); background: rgba(0, 212, 170, 0.08);">
+            <div class="card-icon">⚡</div>
+            <h3 class="card-title" style="color: var(--accent-highlight);">FoodLine Campus</h3>
+            <p class="card-desc" style="color: var(--text-primary);">
+              ✅ 0% extra student delivery fees<br />
+              ✅ 30-second dedicated express pickup<br />
+              ✅ Guaranteed hot meals synced with bells<br />
+              ✅ 100% bank-verified UPI security
+            </p>
+            <div class="card-badge" style="background: var(--accent-highlight); color: #000; border: none; font-weight: 900;">
+              10x Better Campus Experience
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: Multi-Canteen Campus Network -->
+    <div class="slide" id="slide-11">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Campus Multi-Outlet Expansion</div>
+          <h1 class="slide-title">Multi-Canteen & Geo-Campus Network (All 5 Outlets)</h1>
+        </div>
+        <div class="slide-number">12 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card">
+            <div class="card-icon">☕</div>
+            <h3 class="card-title">Cafe @7</h3>
+            <p class="card-desc">Main academic quad. 44 dishes, cutting chai, samosas, and 4 break-time express pickup slots.</p>
+            <div class="card-badge">Main Canteen</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🥞</div>
+            <h3 class="card-title">South Corner Dosa</h3>
+            <p class="card-desc">Crispy masala dosas, idli sambar, filter coffee right next to the central library complex.</p>
+            <div class="card-badge" style="background: var(--accent-highlight); color:#000;">Dosa Specialist</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🥤</div>
+            <h3 class="card-title">Nescafe & MBA Kiosk</h3>
+            <p class="card-desc">Chilled frappes, maggi noodles, grilled sandwiches, and quick study break refreshments.</p>
+            <div class="card-badge">Express Kiosk</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🍛</div>
+            <h3 class="card-title">Hostel Dining Mess</h3>
+            <p class="card-desc">Wholesome thalis, evening parathas, and late-night student pre-orders without lines.</p>
+            <div class="card-badge">Hostel Central</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13: Dynamic Theme Engine & Day/Night Mode -->
+    <div class="slide" id="slide-12">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Personalized Experience</div>
+          <h1 class="slide-title">Day/Night Mode & Royal Ivory-Gold Luxury Theme 👑</h1>
+        </div>
+        <div class="slide-number">13 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card" style="border-color: #D4AF37; background: rgba(212, 175, 55, 0.08);">
+            <div class="card-icon">👑</div>
+            <h3 class="card-title" style="color: #D4AF37;">Royal Ivory & Gold</h3>
+            <p class="card-desc">Porcelain ivory canvas paired with imperial gold and champagne accents for executive presentations.</p>
+            <div class="card-badge" style="background: #D4AF37; color:#000; font-weight:900;">Luxury Theme</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">☀️</div>
+            <h3 class="card-title">Sunlit Day Mode</h3>
+            <p class="card-desc">High-contrast, glare-free aesthetic calibrated for outdoor campus courtyards and bright classrooms.</p>
+            <div class="card-badge">Crisp & Glare-Free</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🌙</div>
+            <h3 class="card-title">OLED Night Mode</h3>
+            <p class="card-desc">Deep battery-saving dark glassmorphism tailored for late-night hostel cram sessions.</p>
+            <div class="card-badge">Battery Saver</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🎨</div>
+            <h3 class="card-title">Custom Palette Studio</h3>
+            <p class="card-desc">Students and universities customize primary, secondary, and highlight colors to match college departments.</p>
+            <div class="card-badge" style="background: var(--accent-primary); color:#000;">User Freedom</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14: 40-Second Student Ad Campaign -->
+    <div class="slide" id="slide-13">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Viral Student Acquisition</div>
+          <h1 class="slide-title">40-Second Viral Video Campaign: "Own Your Recess"</h1>
+        </div>
+        <div class="slide-number">14 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-4">
+          <div class="card">
+            <div class="card-icon">🔔</div>
+            <h3 class="card-title">0:00 - 0:08 The Panic</h3>
+            <p class="card-desc">Loud recess bell rings. 40 students jam the Cafe @7 counter waving notes as the clock ticks away.</p>
+            <div class="card-badge">Hook</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">📱</div>
+            <h3 class="card-title">0:08 - 0:18 The Smart Move</h3>
+            <p class="card-desc">Student taps FoodLine from their classroom seat, orders hot meal in 5 seconds before the rush starts.</p>
+            <div class="card-badge" style="background: var(--accent-highlight); color:#000;">Turning Point</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">⚡</div>
+            <h3 class="card-title">0:18 - 0:27 30s VIP Pickup</h3>
+            <p class="card-desc">Student breezes past the crowd to the VIP express counter, flashes OTP #6065, grabs food in 18 seconds.</p>
+            <div class="card-badge" style="background: var(--accent-primary); color:#000;">The Solution</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🚀</div>
+            <h3 class="card-title">0:27 - 0:40 Download CTA</h3>
+            <p class="card-desc">5 canteens, 0 delivery fees. "Own your recess. Order on FoodLine Campus today!"</p>
+            <div class="card-badge">App Installs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 15: Expansion Roadmap & Vision -->
+    <div class="slide" id="slide-14">
+      <div class="slide-header">
+        <div>
+          <div class="slide-tag">Expansion Roadmap</div>
+          <h1 class="slide-title">The Vision: 50+ College Campuses Across Maharashtra</h1>
+        </div>
+        <div class="slide-number">15 / 15</div>
+      </div>
+
+      <div class="slide-body">
+        <div class="grid-3">
+          <div class="card">
+            <div class="card-icon">📍</div>
+            <h3 class="card-title">Phase 1: Sanjivani University</h3>
+            <p class="card-desc">
+              Live pilot across Cafe @7 and 5 campus dining outlets. Target 1,200 daily student orders and ₹45,000 daily GMV.
+            </p>
+            <div class="card-badge">Active Deployment</div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">🚀</div>
+            <h3 class="card-title">Phase 2: Pune & Nashik Hubs</h3>
+            <p class="card-desc">
+              Expansion to 15 engineering and medical colleges across the Ahmednagar, Nashik, and Pune university clusters.
+            </p>
+            <div class="card-badge">Q4 2026 Expansion</div>
+          </div>
+
+          <div class="card" style="border-color: var(--accent-primary);">
+            <div class="card-icon">👑</div>
+            <h3 class="card-title">Phase 3: State-Wide Scale</h3>
+            <p class="card-desc">
+              50+ Campuses, 100,000+ active student users, AI squad group meal planning, and ₹50 Lakh+ monthly platform GMV.
+            </p>
+            <div class="card-badge" style="background: var(--accent-primary); color: #000; font-weight: 900;">
+              Standard in Campus Dining
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Floating Bottom Presentation Dock -->
+  <nav class="floating-dock">
+    <!-- Left: Brand & Live Clock -->
+    <div class="dock-left">
+      <div class="dock-brand" onclick="goToSlide(0)" title="Jump to Title Slide">
+        <div class="dock-logo">🍔</div>
+        <span class="dock-name">FoodLine</span>
+      </div>
+      <div class="dock-clock" title="Real-time campus clock">
+        <span class="clock-indicator"></span>
+        <span id="live-clock">11:15:30 AM</span>
+      </div>
+    </div>
+
+    <!-- Center: Navigation Controls & Progress Bar -->
+    <div class="dock-center">
+      <button class="nav-icon-btn" onclick="prevSlide()" title="Previous Slide (Left Arrow)">◀</button>
+      
+      <div class="progress-track" onclick="handleProgressClick(event)" title="Click anywhere to jump to slide">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      
+      <button class="nav-icon-btn" onclick="nextSlide()" title="Next Slide (Right Arrow / Space)">▶</button>
+    </div>
+
+    <!-- Right: Theme Controls, Script & Fullscreen -->
+    <div class="dock-right">
+      <!-- Theme Palette Switcher -->
+      <div class="theme-palette-pill" title="Choose Presentation Color Theme">
+        <button class="theme-btn" onclick="setPresentationTheme('sunset')" title="Sunset Tangerine">🍊</button>
+        <button class="theme-btn" onclick="setPresentationTheme('gold')" title="Royal Ivory & Gold">👑</button>
+        <button class="theme-btn" onclick="setPresentationTheme('cyber')" title="Cyberpunk Neon">🌌</button>
+        <button class="theme-btn" onclick="setPresentationTheme('emerald')" title="Emerald Mint">🍃</button>
+      </div>
+
+      <!-- Day / Night Toggle Button -->
+      <button class="dock-btn" id="pres-mode-btn" onclick="togglePresentationMode()" title="Toggle Day / Night Mode">
+        <span id="pres-mode-icon">☀️</span>
+        <span id="pres-mode-text">Day</span>
+      </button>
+
+      <!-- Speaker Notes Toggle -->
+      <button class="dock-btn" onclick="toggleSpeakerNotes()" title="Open Speaker Script (Press 'S')">
+        <span>🎙️</span>
+        <span id="notes-btn-text">Script</span>
+      </button>
+
+      <!-- Fullscreen Button -->
+      <button class="dock-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen (Press 'F')">
+        <span>⛶</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Speaker Notes Overlay Modal -->
+  <div id="speaker-notes-modal">
+    <div class="notes-header">
+      <span class="notes-title" id="notes-slide-indicator">Slide 1 Speaker Script</span>
+      <button onclick="toggleSpeakerNotes()" style="background:none; border:none; color:var(--text-secondary); font-size:18px; cursor:pointer;">✕</button>
+    </div>
+    <div class="notes-body" id="notes-content">
+      <!-- Script loaded dynamically -->
+    </div>
+    <div class="notes-cue" id="notes-cue">
+      💡 <strong>Stage Tip:</strong> Speak with high energy! Smile and look at the audience.
+    </div>
+  </div>
+
+  <!-- JavaScript Controller -->
+  <script>
+    // Total number of slides (Single authoritative declaration)
+    const totalSlides = 15;
+    let currentSlide = 0;
+    let isNotesOpen = false;
+
+    // Comprehensive Speaker Notes
+    const speakerScripts = [
+      {
+        title: "Slide 1: Title & Hook",
+        cue: "💡 Stage Tip: Open with high energy! Ask the audience if they hate waiting in canteen lines.",
+        script: "Good morning everyone! Today I want to show you <strong>FoodLine</strong> — the smart campus pre-ordering platform that makes canteen queues completely disappear.<br><br>Right now at Sanjivani University, students get a short 15-minute recess, but spend up to 12 minutes trapped in line. FoodLine changes that forever with <strong>30-Second Express Pickup</strong>."
+      },
+      {
+        title: "Slide 2: The Daily Campus Bottleneck",
+        cue: "💡 Stage Tip: Emphasize the shared pain of sold-out snacks and fake payment screenshots.",
+        script: "Let's examine the real problem on campus. Every student experiences the frustration of pushing through crowds, waiting the whole recess, only to hear: <em>'Samosa sold out!'</em><br><br>Meanwhile, canteen owners lose thousands of rupees every week because cashiers can't verify fake Google Pay screenshots during the rush."
+      },
+      {
+        title: "Slide 3: The 4-Step Solution",
+        cue: "💡 Stage Tip: Count with your fingers 1, 2, 3, 4 as you explain the 4 steps.",
+        script: "Here is how FoodLine solves this cleanly in 4 steps:<br><br>1. Choose your break slot in advance on your phone.<br>2. Add snacks and pay via direct UPI with automated 12-digit UTR checks.<br>3. Receive your high-contrast optical QR pass with a 4-digit OTP.<br>4. Walk to the express counter, scan, and pick up your hot food in 30 seconds!"
+      },
+      {
+        title: "Slide 4: Secret Magic 1 — The Slot Engine",
+        cue: "💡 Stage Tip: Explain how slot limits protect the kitchen from being overwhelmed.",
+        script: "What happens if 500 students order at once? That's where our <strong>60-Order Slot Throttler</strong> shines.<br><br>By capping each 15-minute break slot to 60 orders using atomic database transactions, the kitchen never gets overwhelmed, food is always cooked hot, and pickups happen smoothly."
+      },
+      {
+        title: "Slide 5: Secret Magic 2 — Fraud Blocker",
+        cue: "💡 Stage Tip: Highlight how canteen owners gain 100% financial peace of mind.",
+        script: "Next is our <strong>Anti-Fraud UPI Shield</strong>. Every real bank transaction generates a unique 12-digit reference number.<br><br>FoodLine checks this instantly and prevents replay attacks. Canteen owners receive 100% genuine payments directly into their accounts with zero fraudulent screenshot losses."
+      },
+      {
+        title: "Slide 6: Secret Magic 3 — Kitchen Tablet & TV",
+        cue: "💡 Stage Tip: Describe the airport-style TV announcement chimes for ready orders.",
+        script: "In the cafeteria kitchen, chefs manage orders on an intuitive tablet interface called the <strong>KDS</strong>.<br><br>When food is packed and ready, a single tap triggers the suspended counter TV screen with audible chime announcements: <em>'Token FL-1793 is Ready at Counter 1!'</em>"
+      },
+      {
+        title: "Slide 7: Student History & 1-Tap Reorder",
+        cue: "💡 Stage Tip: Mention how students can reorder their favorite meals with 1 tap.",
+        script: "For students, FoodLine provides a complete Order History dashboard.<br><br>You can track live preparation status, retrieve optical QR tokens anytime, and use our <strong>1-Tap Fast Reorder</strong> button to buy your favorite lunch combo without re-browsing menus."
+      },
+      {
+        title: "Slide 8: Live Pilot at Cafe @7",
+        cue: "💡 Stage Tip: Speak with pride about the Sanjivani University Cafe @7 deployment.",
+        script: "This is live right now at <strong>Sanjivani University Cafe @7</strong>!<br><br>We have all 44 menu dishes loaded, 8 daily break slots configured, and 100% paperless optical QR tokens. Students don't even have to install a heavy app — it loads instantly in any browser as a PWA."
+      },
+      {
+        title: "Slide 9: How We Make Money",
+        cue: "💡 Stage Tip: Keep the economics simple: ₹44 to canteen, ₹6 to FoodLine on a ₹50 order.",
+        script: "Our business model is a win-win. On every ₹50 order, the canteen owner retains ₹44 with zero cashier headaches, and FoodLine earns ₹6.<br><br>Because queues vanish, the canteen serves 40% more students every single day without hiring extra workers."
+      },
+      {
+        title: "Slide 10: Robust Tech Stack",
+        cue: "💡 Stage Tip: Highlight high reliability under 2,500 requests per second.",
+        script: "Under the hood, FoodLine is built on <strong>Next.js 15, PostgreSQL database, and Server-Sent Events (SSE)</strong>.<br><br>It handles thousands of simultaneous student clicks during class dismissal bells with zero lag and rock-solid data integrity."
+      },
+      {
+        title: "Slide 11: Why We Win vs Swiggy & Zomato",
+        cue: "💡 Stage Tip: Remind the audience that delivery apps charge high fees and take 45 mins.",
+        script: "Why can't Swiggy or Zomato work here? Because outside delivery drivers aren't allowed inside college corridors, they charge ₹40+ fees, and take 45 minutes!<br><br>FoodLine is engineered specifically for campus recess — ₹0 delivery fee, 30-second pickup, and guaranteed hot food."
+      },
+      {
+        title: "Slide 12: Multi-Canteen Campus Network",
+        cue: "💡 Stage Tip: Name all 5 Sanjivani dining outlets across campus.",
+        script: "FoodLine powers the entire university campus! From Cafe @7 to South Corner Dosa Bar near the library, Nescafe kiosks, and the hostel mess — students can pre-order from any campus counter in one unified app."
+      },
+      {
+        title: "Slide 13: Dynamic Theme Engine & Day/Night Mode",
+        cue: "💡 Stage Tip: Tap the Day/Night or Royal Gold theme button right now to demonstrate live visual switching!",
+        script: "Notice our adaptive design system! We offer full Day and Night modes along with our new <strong>Royal Ivory & Gold</strong> luxury theme.<br><br>Students can enjoy glare-free outdoor browsing during sunny breaks or deep dark OLED modes during evening study hours."
+      },
+      {
+        title: "Slide 14: 40-Second Student Video Campaign",
+        cue: "💡 Stage Tip: Describe the fast-paced, humorous video that drives student adoption.",
+        script: "To acquire students rapidly, we launched our viral <strong>40-Second Student Video Campaign</strong> called <em>'Own Your Recess'</em>.<br><br>It shows students how to order in 5 seconds from class and breeze past 40 people waiting in line to grab hot food in 18 seconds."
+      },
+      {
+        title: "Slide 15: Vision & Expansion Roadmap",
+        cue: "💡 Stage Tip: Conclude with confidence, thank the audience and invite questions!",
+        script: "Our vision is to expand FoodLine to 50+ college campuses across Maharashtra. We are giving students their break time back — hot food, zero queues, and pure convenience.<br><br>Thank you so much! We would love to answer your questions!"
+      }
+    ];
+
+    // ==========================================================================
+    // CORE SLIDE CONTROLLER FUNCTION
+    // ==========================================================================
+    function updateSlide() {
+      const slides = document.querySelectorAll('.slide');
+      slides.forEach((s, idx) => {
+        s.classList.remove('active', 'prev');
+        if (idx === currentSlide) {
+          s.classList.add('active');
+        } else if (idx < currentSlide) {
+          s.classList.add('prev');
+        }
+      });
+
+      // Update progress bar
+      const progress = ((currentSlide + 1) / totalSlides) * 100;
+      const bar = document.getElementById('progress-bar');
+      if (bar) bar.style.width = progress + '%';
+
+      // Update Speaker Notes
+      const note = speakerScripts[currentSlide];
+      if (note) {
+        const ind = document.getElementById('notes-slide-indicator');
+        const cnt = document.getElementById('notes-content');
+        const cue = document.getElementById('notes-cue');
+        if (ind) ind.innerText = note.title;
+        if (cnt) cnt.innerHTML = note.script;
+        if (cue) cue.innerHTML = note.cue;
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) {
+        currentSlide++;
+        updateSlide();
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+      }
+    }
+
+    function goToSlide(index) {
+      if (index >= 0 && index < totalSlides) {
+        currentSlide = index;
+        updateSlide();
+      }
+    }
+
+    function handleProgressClick(e) {
+      const track = e.currentTarget;
+      const rect = track.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const ratio = clickX / rect.width;
+      const targetIndex = Math.min(totalSlides - 1, Math.max(0, Math.floor(ratio * totalSlides)));
+      goToSlide(targetIndex);
+    }
+
+    // ==========================================================================
+    // THEME & DAY/NIGHT SWITCHER
+    // ==========================================================================
+    function safeSet(key, val) {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          window.localStorage.setItem(key, val);
+        }
+      } catch (err) {}
+    }
+    function safeGet(key) {
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          return window.localStorage.getItem(key);
+        }
+      } catch (err) {}
+      return null;
+    }
+
+    function togglePresentationMode() {
+      const isLight = document.body.getAttribute('data-presentation-mode') === 'light';
+      const icon = document.getElementById('pres-mode-icon');
+      const text = document.getElementById('pres-mode-text');
+      if (isLight) {
+        document.body.removeAttribute('data-presentation-mode');
+        if (icon) icon.innerText = '☀️';
+        if (text) text.innerText = 'Day';
+        safeSet('foodline_pres_mode', 'dark');
+      } else {
+        document.body.setAttribute('data-presentation-mode', 'light');
+        if (icon) icon.innerText = '🌙';
+        if (text) text.innerText = 'Night';
+        safeSet('foodline_pres_mode', 'light');
+      }
+    }
+
+    function setPresentationTheme(theme) {
+      document.body.setAttribute('data-presentation-theme', theme);
+      safeSet('foodline_pres_theme', theme);
+    }
+
+    function toggleSpeakerNotes() {
+      const modal = document.getElementById('speaker-notes-modal');
+      const btnText = document.getElementById('notes-btn-text');
+      isNotesOpen = !isNotesOpen;
+      if (isNotesOpen) {
+        modal.classList.add('show');
+        if (btnText) btnText.innerText = 'Hide';
+      } else {
+        modal.classList.remove('show');
+        if (btnText) btnText.innerText = 'Script';
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    // ==========================================================================
+    // LIVE TICKING CLOCK
+    // ==========================================================================
+    function updateClock() {
+      const clockEl = document.getElementById('live-clock');
+      if (clockEl) {
+        const now = new Date();
+        clockEl.innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ==========================================================================
+    // KEYBOARD & TOUCH NAVIGATION
+    // ==========================================================================
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key.toLowerCase() === 's') {
+        toggleSpeakerNotes();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      } else if (e.key.toLowerCase() === 'd') {
+        togglePresentationMode();
+      } else if (e.key === 'Home') {
+        goToSlide(0);
+      } else if (e.key === 'End') {
+        goToSlide(totalSlides - 1);
+      }
+    });
+
+    // Touch Swipe Support
+    let touchStartX = 0;
+    let touchEndX = 0;
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    window.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 50) nextSlide();
+      if (touchEndX - touchStartX > 50) prevSlide();
+    }, { passive: true });
+
+    // Restore saved preferences
+    const savedMode = safeGet('foodline_pres_mode');
+    if (savedMode === 'light') {
+      document.body.setAttribute('data-presentation-mode', 'light');
+      const icon = document.getElementById('pres-mode-icon');
+      const text = document.getElementById('pres-mode-text');
+      if (icon) icon.innerText = '🌙';
+      if (text) text.innerText = 'Night';
+    }
+
+    const savedTheme = safeGet('foodline_pres_theme');
+    if (savedTheme) {
+      document.body.setAttribute('data-presentation-theme', savedTheme);
+    }
+
+    // Initialize presentation on load
+    updateSlide();
+  </script>
+</body>
+</html>

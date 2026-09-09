@@ -1,0 +1,55 @@
+{
+  "name": "foodline-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FoodLine: Next-Generation Campus Pre-Ordering, Slot Throttling & Express Pickup Ecosystem",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test:e2e": "playwright test",
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android",
+    "build:apk": "cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
+    "@supabase/ssr": "^0.12.5",
+    "@supabase/supabase-js": "^2.47.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/animejs": "^3.1.13",
+    "@types/three": "^0.185.4",
+    "animejs": "^4.5.0",
+    "canvas-confetti": "^1.9.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.468.0",
+    "motion": "^12.0.0",
+    "next": "^15.1.0",
+    "postcss": "^8.5.26",
+    "qrcode.react": "^4.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^3.10.1",
+    "tailwind-merge": "^2.5.5",
+    "three": "^0.185.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.1",
+    "eslint": "^9.17.0",
+    "pptxgenjs": "^4.0.1",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.7.2"
+  },
+  "optionalDependencies": {
+    "lightningcss-linux-x64-gnu": "^1.32.0",
+    "lightningcss-win32-x64-msvc": "^1.33.0"
+  }
+}

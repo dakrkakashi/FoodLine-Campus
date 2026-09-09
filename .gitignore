@@ -1,0 +1,69 @@
+# Dependencies & Package Managers
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing & Coverage
+/coverage/
+
+# Next.js & Build Output
+.next/
+.next*/
+*.nobody
+out/
+build/
+dist/
+backend/dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Production Secrets & Environment (NEVER PUSH TO REPOSITORY)
+.env
+.env*
+*.env
+*.env.*
+.env.local
+.env*.local
+.env.production
+.env.development
+inventory-state.json
+client_secret_*.json
+accounts.json
+student-accounts.json
+credentials.json
+*credentials*.json
+*.pem
+*.key
+*.cert
+
+# Local Scratch, Heavy Media & Internal Test Suites
+test-api.http
+scratch/
+LOGO.png
+RUN THIS PROMPT IN EVERY AI U USE
+FRONTEND_SUMMARY.md
+GAP_ANALYSIS.md
+FoodLine_Campus_Terms_Source.md
+foodline-development-plan.md
+start.fish
+RUN_ALL.sh
+model_capabilities.yaml
+*.bak
+*.apk
+*.log
+.DS_Store
+.vercel
+
+# AI & Workspace Metadata (Kept strictly local on disk)
+.agent/
+.agents/
+.opencode/
+.kilo/
+.idea/
+.vscode/
+graphify-out/
+AGENTS.md
+OPENCODE.md
+inbox/
+outbox/
+.github/

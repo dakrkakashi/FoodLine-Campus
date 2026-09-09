@@ -1,0 +1,39 @@
+{
+  "name": "foodline-backend",
+  "version": "1.0.0",
+  "description": "FoodLine: Backend API, Slot Throttling Engine, UTR Verification & Real-time SSE Streamer",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "node ./node_modules/tsx/dist/cli.mjs watch src/server.ts",
+    "build": "node ./node_modules/typescript/bin/tsc",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:api": "node ./node_modules/tsx/dist/cli.mjs scripts/verify-api.ts",
+    "test:security": "node ./node_modules/tsx/dist/cli.mjs scripts/verify-security.ts",
+    "test:stress": "node ./node_modules/tsx/dist/cli.mjs scripts/stress-test.ts",
+    "test:benchmark": "node ./node_modules/tsx/dist/cli.mjs scripts/benchmark-realtime.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.47.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "googleapis": "^144.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/supertest": "^7.2.1",
+    "@vitest/coverage-v8": "^5.0.0",
+    "supertest": "^7.2.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^5.0.0"
+  },
+  "optionalDependencies": {
+    "@esbuild/linux-x64": "^0.28.2",
+    "@esbuild/win32-x64": "^0.28.2"
+  }
+}

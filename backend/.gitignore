@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Compilation Output
+dist/
+*.tsbuildinfo
+
+# Secrets & Local Environment
+.env
+.env*.local
+credentials.json
+*credentials*.json
+*.pem
+*.key
+
+# Logs
+*.log
