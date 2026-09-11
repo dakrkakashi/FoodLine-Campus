@@ -55,7 +55,7 @@ export function Navbar() {
   return (
     <>
       <header
-        className={`sticky top-0 z-50 px-4 py-3 transition-all duration-300 print:hidden ${
+        className={`sticky top-0 z-50 px-4 pb-3 pt-safe transition-all duration-300 print:hidden relative ${
           scrolled
             ? 'bg-[var(--bg-glass-heavy)] backdrop-blur-2xl border-b border-[var(--border-glass)] shadow-md'
             : 'bg-transparent border-b border-transparent'
@@ -66,7 +66,8 @@ export function Navbar() {
             <Link
               href="/"
               onClick={playClick}
-              className="flex items-center gap-2.5 group cursor-pointer"
+              className="flex items-center gap-2.5 group cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-orange rounded-xl focus-visible:outline-hidden"
+              aria-label="FoodLine Campus Home"
             >
               <Logo size={38} />
               <span className="font-black text-xl tracking-tight bg-linear-to-r from-accent-orange via-accent-amber to-accent-teal bg-clip-text text-transparent">
@@ -79,10 +80,11 @@ export function Navbar() {
               <Link
                 href="/select-campus"
                 onClick={playClick}
-                className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-[var(--border-glass)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer"
+                className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-[var(--border-glass)] text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer min-h-[36px] focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
                 title="Change Campus"
+                aria-label={`Current Campus: ${selectedCampus.name}. Click to change campus.`}
               >
-                <Building2 size={12} className="text-accent-orange" />
+                <Building2 size={13} className="text-accent-orange" />
                 <span className="max-w-[130px] truncate">{selectedCampus.name}</span>
               </Link>
             )}
@@ -92,10 +94,11 @@ export function Navbar() {
               <Link
                 href="/canteens"
                 onClick={playClick}
-                className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent-orange/10 hover:bg-accent-orange/15 border border-accent-orange/20 text-xs font-bold text-accent-amber hover:text-[var(--text-primary)] transition cursor-pointer"
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent-orange/10 hover:bg-accent-orange/15 border border-accent-orange/20 text-xs font-bold text-accent-amber hover:text-[var(--text-primary)] transition cursor-pointer min-h-[36px] focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
                 title="Change Canteen"
+                aria-label={`Current Canteen: ${selectedCanteen.name}. Click to change canteen.`}
               >
-                <Store size={12} className="text-accent-orange" />
+                <Store size={13} className="text-accent-orange" />
                 <span className="max-w-[120px] truncate">{selectedCanteen.name}</span>
               </Link>
             )}
@@ -103,7 +106,7 @@ export function Navbar() {
 
           {/* Desktop Navigation - Only visible after student logs in */}
           {user && (
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-1" aria-label="Main Navigation">
               <NavLink href="/menu" onClick={playTab}>
                 <UtensilsCrossed size={16} />
                 <span>Menu</span>
@@ -153,7 +156,8 @@ export function Navbar() {
             <button
               onClick={toggleMute}
               title={muted ? 'Unmute Web Audio FX' : 'Mute Sound FX'}
-              className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] transition cursor-pointer ml-1"
+              aria-label={muted ? 'Unmute Sound Effects' : 'Mute Sound Effects'}
+              className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] transition cursor-pointer flex items-center justify-center focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
             >
               {muted ? <VolumeX size={16} className="text-zinc-400" /> : <Volume2 size={16} className="text-accent-teal" />}
             </button>
@@ -165,7 +169,8 @@ export function Navbar() {
                 playClick();
               }}
               title={mode === 'light' ? 'Switch to Night Mode (Dark)' : 'Switch to Day Mode (Light)'}
-              className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] transition cursor-pointer ml-1"
+              aria-label={mode === 'light' ? 'Switch to Night Mode' : 'Switch to Day Mode'}
+              className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] transition cursor-pointer flex items-center justify-center focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
             >
               {mode === 'light' ? (
                 <Sun size={16} className="text-amber-500" />
@@ -181,10 +186,11 @@ export function Navbar() {
                   setThemeDropdownOpen(!themeDropdownOpen);
                   playClick();
                 }}
-                className="p-2.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition flex items-center gap-1.5 cursor-pointer text-xs font-bold"
+                className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition flex items-center justify-center cursor-pointer text-xs font-bold focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
                 title="Change Campus Theme"
+                aria-label="Change Campus Theme Palette"
               >
-                <span>{config.emoji || '🍊'}</span>
+                <span aria-hidden="true">{config.emoji || '🍊'}</span>
               </button>
 
               <AnimatePresence>
@@ -214,7 +220,7 @@ export function Navbar() {
                         }`}
                       >
                         <span className="flex items-center gap-2">
-                          <span>{t.emoji}</span>
+                          <span aria-hidden="true">{t.emoji}</span>
                           <span>{t.name}</span>
                         </span>
                         {theme === t.id && <Sparkles size={12} className="text-black" />}
@@ -233,14 +239,15 @@ export function Navbar() {
             {/* Cart Tray Pill */}
             {user && (
               <Link
-                href="/checkout"
+                href="/cart"
                 onClick={playClick}
-                className="ml-2 flex items-center gap-2 px-3.5 py-2 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber text-black font-black text-xs shadow-lg shadow-accent-orange/25 hover:shadow-accent-orange/40 transition active:scale-95 cursor-pointer"
+                className="ml-2 flex items-center gap-2 px-3.5 py-2 min-h-[44px] rounded-xl bg-linear-to-r from-accent-orange to-accent-amber text-black font-black text-xs shadow-lg shadow-accent-orange/25 hover:shadow-accent-orange/40 transition active:scale-95 cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
+                aria-label={`View Tray with ${totalCount} items`}
               >
                 <ShoppingCart size={15} strokeWidth={2.5} />
                 <span>Tray</span>
                 {totalCount > 0 && (
-                  <span className="px-1.5 py-0.2 rounded-full bg-black text-white text-[10px] font-black">
+                  <span className="px-1.5 py-0.5 rounded-full bg-black text-white text-[10px] font-black">
                     {totalCount}
                   </span>
                 )}
@@ -256,19 +263,21 @@ export function Navbar() {
                 toggleMode();
                 playClick();
               }}
-              className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-secondary)] active:scale-90 transition"
+              aria-label={mode === 'light' ? 'Switch to Night Mode' : 'Switch to Day Mode'}
+              className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-secondary)] active:scale-90 transition flex items-center justify-center focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
             >
-              {mode === 'light' ? <Sun size={16} className="text-amber-500" /> : <Moon size={16} className="text-indigo-400" />}
+              {mode === 'light' ? <Sun size={18} className="text-amber-500" /> : <Moon size={18} className="text-indigo-400" />}
             </button>
 
             {/* Cart Tray on mobile — compact pill */}
             {user && (
               <Link
-                href="/checkout"
+                href="/cart"
                 onClick={playClick}
-                className="relative flex items-center gap-1.5 px-3 py-2 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber text-black font-black text-xs shadow-md shadow-accent-orange/30 active:scale-95 transition"
+                aria-label={`View Tray with ${totalCount} items`}
+                className="relative flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-xl bg-linear-to-r from-accent-orange to-accent-amber text-black font-black text-xs shadow-md shadow-accent-orange/30 active:scale-95 transition focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
               >
-                <ShoppingCart size={14} strokeWidth={2.5} />
+                <ShoppingCart size={15} strokeWidth={2.5} />
                 <span className="hidden min-[360px]:inline">Tray</span>
                 {totalCount > 0 && (
                   <span className="px-1.5 py-0.5 rounded-full bg-black text-white text-[10px] font-black leading-none">
@@ -284,7 +293,9 @@ export function Navbar() {
                 setMobileOpen(!mobileOpen);
                 playClick();
               }}
-              className="p-2 rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:scale-90 transition"
+              aria-label={mobileOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+              aria-expanded={mobileOpen}
+              className="p-2.5 min-w-[44px] min-h-[44px] rounded-xl bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] active:scale-90 transition flex items-center justify-center focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
             >
               {mobileOpen ? <X size={20} /> : <MenuIcon size={20} />}
             </button>
@@ -300,9 +311,9 @@ export function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25 }}
-            className="md:hidden fixed inset-x-0 top-14.5 z-40 bg-[var(--bg-card)]/98 backdrop-blur-2xl border-b border-[var(--border-glass)] text-[var(--text-primary)] shadow-2xl shadow-black/20 dark:shadow-black/80 overflow-hidden"
+            className="md:hidden absolute inset-x-0 top-full z-40 bg-[var(--bg-card)]/98 backdrop-blur-2xl border-b border-[var(--border-glass)] text-[var(--text-primary)] shadow-2xl shadow-black/20 dark:shadow-black/80 overflow-hidden"
           >
-            <nav className="flex flex-col py-4 px-4 gap-1.5">
+            <nav className="flex flex-col py-4 px-4 gap-1.5" aria-label="Mobile Drawer Navigation">
               {user ? (
                 <>
                   <MobileNavLink href="/canteens" onClick={() => { playTab(); setMobileOpen(false); }}>
@@ -316,6 +327,10 @@ export function Navbar() {
                   <MobileNavLink href="/menu" onClick={() => { playTab(); setMobileOpen(false); }}>
                     <UtensilsCrossed size={16} />
                     <span>Browse Menu</span>
+                  </MobileNavLink>
+                  <MobileNavLink href="/cart" onClick={() => { playTab(); setMobileOpen(false); }}>
+                    <ShoppingCart size={16} />
+                    <span>Review Tray ({totalCount})</span>
                   </MobileNavLink>
                   <MobileNavLink href="/orders" onClick={() => { playTab(); setMobileOpen(false); }}>
                     <Receipt size={16} />
@@ -362,7 +377,8 @@ export function Navbar() {
                     onClick={() => {
                       toggleMute();
                     }}
-                    className="px-3 py-1.5 rounded-xl border border-[var(--border-glass)] bg-black/5 dark:bg-white/5 flex items-center gap-2 text-xs font-bold text-[var(--text-primary)] cursor-pointer"
+                    aria-label={muted ? 'Unmute sound effects' : 'Mute sound effects'}
+                    className="px-3 py-2 min-h-[44px] rounded-xl border border-[var(--border-glass)] bg-black/5 dark:bg-white/5 flex items-center gap-2 text-xs font-bold text-[var(--text-primary)] cursor-pointer"
                     title={muted ? 'Unmute Sounds' : 'Mute Sounds'}
                   >
                     {muted ? <VolumeX size={14} className="text-zinc-400" /> : <Volume2 size={14} className="text-accent-teal" />}
@@ -373,7 +389,8 @@ export function Navbar() {
                       toggleMode();
                       playClick();
                     }}
-                    className="px-3 py-1.5 rounded-xl border border-[var(--border-glass)] bg-black/5 dark:bg-white/5 flex items-center gap-2 text-xs font-bold text-[var(--text-primary)] cursor-pointer"
+                    aria-label={mode === 'light' ? 'Switch to Night Mode' : 'Switch to Day Mode'}
+                    className="px-3 py-2 min-h-[44px] rounded-xl border border-[var(--border-glass)] bg-black/5 dark:bg-white/5 flex items-center gap-2 text-xs font-bold text-[var(--text-primary)] cursor-pointer"
                   >
                     {mode === 'light' ? <Sun size={14} className="text-amber-500" /> : <Moon size={14} className="text-indigo-400" />}
                     <span>{mode === 'light' ? 'Day ☀️' : 'Night 🌙'}</span>
@@ -392,11 +409,12 @@ export function Navbar() {
                         playClick();
                       }}
                       title={t.name}
-                      className={`w-7 h-7 rounded-xl text-xs font-black transition flex items-center justify-center cursor-pointer border border-[var(--border-glass)] ${
+                      aria-label={`Select theme ${t.name}`}
+                      className={`w-9 h-9 rounded-xl text-xs font-black transition flex items-center justify-center cursor-pointer border border-[var(--border-glass)] ${
                         theme === t.id ? 'bg-accent-orange text-black shadow-md font-black' : 'bg-black/5 dark:bg-white/5 text-[var(--text-primary)] hover:bg-black/10 dark:hover:bg-white/15'
                       }`}
                     >
-                      {t.emoji}
+                      <span aria-hidden="true">{t.emoji}</span>
                     </button>
                   ))}
                 </div>
@@ -414,7 +432,7 @@ function NavLink({ href, children, onClick }: { href: string; children: React.Re
     <Link
       href={href}
       onClick={onClick}
-      className="text-xs font-black text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-3.5 py-2 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition cursor-pointer flex items-center gap-1.5"
+      className="text-xs font-black text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-3.5 py-2.5 min-h-[44px] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition cursor-pointer flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
     >
       {children}
     </Link>
@@ -426,7 +444,7 @@ function MobileNavLink({ href, children, onClick }: { href: string; children: Re
     <Link
       href={href}
       onClick={onClick}
-      className="text-sm font-black text-[var(--text-primary)] px-4 py-3 rounded-2xl hover:bg-black/5 dark:hover:bg-white/10 transition cursor-pointer flex items-center gap-2.5"
+      className="text-sm font-black text-[var(--text-primary)] px-4 py-3 min-h-[48px] rounded-2xl hover:bg-black/5 dark:hover:bg-white/10 transition cursor-pointer flex items-center gap-2.5 focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
     >
       {children}
     </Link>

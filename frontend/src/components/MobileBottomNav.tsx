@@ -60,10 +60,10 @@ export function MobileBottomNav() {
           },
           {
             label: 'Tray',
-            href: '/checkout',
+            href: '/cart',
             icon: ShoppingCart,
             badge: totalCount > 0 ? totalCount : undefined,
-            isActive: pathname === '/checkout',
+            isActive: pathname === '/cart' || pathname === '/checkout',
           },
         ]
       : [
@@ -78,13 +78,13 @@ export function MobileBottomNav() {
 
   return (
     <nav
-      aria-label="Mobile Navigation"
+      aria-label="Campus Mobile Navigation"
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--bg-glass-heavy,#0e0e14)]/95 backdrop-blur-2xl border-t border-[var(--border-glass)] shadow-[0_-8px_32px_rgba(0,0,0,0.5)] print:hidden select-none"
       style={{
         paddingBottom: 'max(0.65rem, env(safe-area-inset-bottom))',
       }}
     >
-      <div className="flex items-center justify-around px-2 pt-1.5 pb-0.5 max-w-md mx-auto">
+      <div className="flex items-center justify-around px-2 pt-1 pb-0.5 max-w-md mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = item.isActive;
@@ -94,7 +94,8 @@ export function MobileBottomNav() {
               key={item.href}
               href={item.href}
               onClick={() => playTab()}
-              className="relative flex flex-col items-center justify-center py-1 px-3 min-w-[58px] rounded-2xl transition-all cursor-pointer group active:scale-90"
+              aria-label={item.label}
+              className="relative flex flex-col items-center justify-center py-1.5 px-2.5 min-w-[56px] min-h-[48px] rounded-2xl transition-all cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
             >
               {/* Active Background Glow Pill */}
               {active && (

@@ -711,7 +711,7 @@ export default function MenuPage() {
               animate={{ y: 0, scale: 1, opacity: 1 }}
               exit={{ y: 90, scale: 0.88, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 420, damping: 26 }}
-              className="fixed bottom-6 sm:bottom-8 inset-x-0 z-999 px-4 flex justify-center pointer-events-none pb-[env(safe-area-inset-bottom)]"
+              className="fixed bottom-[74px] sm:bottom-8 inset-x-0 z-999 px-4 flex justify-center pointer-events-none pb-[env(safe-area-inset-bottom)]"
             >
               <div className="pointer-events-auto w-full max-w-lg rounded-full glass-card-heavy backdrop-blur-2xl bg-(--bg-card)/95 border-2 border-accent-orange/60 shadow-[0_16px_50px_rgba(0,0,0,0.15),0_0_35px_var(--accent-orange-glow)] dark:shadow-[0_16px_50px_rgba(0,0,0,0.95),0_0_35px_var(--accent-orange-glow)] p-2 sm:p-2.5 flex items-center justify-between gap-3 relative overflow-hidden">
                 {/* Ambient radial glows */}
@@ -719,7 +719,7 @@ export default function MenuPage() {
                 <div className="absolute -right-10 -bottom-10 w-28 h-28 bg-accent-teal/20 rounded-full blur-xl pointer-events-none" />
 
                 {/* Left Info: Animated Cart Icon with Pop Badge + Total */}
-                <div className="flex items-center gap-3 pl-2 sm:pl-3 relative z-10">
+                <Link href="/cart" className="flex items-center gap-3 pl-2 sm:pl-3 relative z-10 group hover:opacity-90 transition-opacity" aria-label="Review food tray in detail">
                   <div className="relative">
                     <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-linear-to-tr from-accent-orange to-accent-amber text-white flex items-center justify-center shadow-lg shadow-accent-orange/35">
                       <ShoppingCart size={20} strokeWidth={2.5} />
@@ -748,7 +748,7 @@ export default function MenuPage() {
                       </span>
                     </div>
                   </div>
-                </div>
+                </Link>
 
                 {/* Right CTA Button with Magnetic Pull */}
                 <Link href="/checkout" className="relative z-10 shrink-0">

@@ -67,3 +67,9 @@ OPENCODE.md
 inbox/
 outbox/
 .github/
+
+.ai/
+.codex/
+.freebuff/
+.gemini/
+mcp_config*.json

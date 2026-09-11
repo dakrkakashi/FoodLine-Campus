@@ -66,7 +66,7 @@ export function OfflineBanner() {
   };
 
   return (
-    <div className="fixed top-0 inset-x-0 z-[100] pointer-events-none flex flex-col items-center">
+    <div className="fixed top-0 inset-x-0 z-[100] pointer-events-none flex flex-col items-center pt-safe">
       <AnimatePresence>
         {isOffline && (
           <motion.div

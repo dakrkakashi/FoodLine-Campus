@@ -3,6 +3,104 @@
 <!-- Both Antigravity IDE (Backend) and Antigravity CLI 'agy' (Frontend) read this file. -->
 
 ## 📍 Where We Left Off (Last Completed Checkpoint)
+- **Date & Time:** 2026-09-11 (Frontend Upgrade with Agent Skills & UI/UX Pro Max - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **New High-Conversion Dedicated Tray Route (/cart)**:
+     - Built frontend/src/app/cart/page.tsx featuring itemized dish breakdown with Pure Veg indicators, price calculations, and stock warnings.
+     - Implemented chef cooking notes textarea (Less spicy, extra green chutney...).
+     - Added eco-friendly packaging toggle (Skip single-use plastic cutlery).
+     - Added transparent ₹0 student platform fee guarantee with live AnimatedCounter for grand total.
+     - Added responsive sticky bottom bar (bottom-[68px]) avoiding mobile bottom navigation collision.
+  2. **Navigation & Touch Target Upgrades**:
+     - Upgraded MobileBottomNav.tsx: routed Tray tab to /cart, enforced minimum 48px touch targets (min-h-[48px] min-w-[56px]), added explicit aria-labels.
+     - Upgraded navbar.tsx: routed Tray pill to /cart, enforced 44x44px touch targets on sound, theme, and mode buttons with explicit aria-labels and aria-hidden on decorative icons.
+  3. **WCAG 2.2 Accessibility & Mobile Viewport Polish**:
+     - Upgraded menu-card.tsx: replaced hardcoded hexes with semantic CSS variables (var(--bg-card), var(--text-primary), var(--border-glass)), increased stepper size to w-9 h-9 min-w-[36px], added aria-labels.
+     - Fixed menu/page.tsx: adjusted mobile floating cart pill offset to bottom-[74px] sm:bottom-8 preventing collision with MobileBottomNav, linked pill to /cart.
+     - Upgraded checkout/page.tsx: added Edit Tray link pointing to /cart, upgraded steppers to w-8 h-8 min-w-[32px] with full ARIA accessibility.
+  4. **Next.js 15.5 Production Build Verified**:
+     - 43/43 routes statically compiled and validated (0 TypeScript errors, 0 lint warnings).
+
+- **Date & Time:** 2026-09-11 (Global Skills, Rules, and Plugin Integration for IntelliJ IDEA - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **Global Skills Engine Deployed across All Monitored IntelliJ Workspaces**:
+     - Installed all 314 skills from E:\skills folder\skill, skills, and ntigravity-skills into:
+       * C:\Users\shiva\.gemini\config\skills\ (314 skills)
+       * C:\Users\shiva\.gemini\antigravity-cli\skills\ (314 skills)
+       * C:\Users\shiva\.gemini\antigravity\skills\ (314 skills)
+       * C:\Users\shiva\.gemini\skills\ (314 skills)
+       * E:\StartUp Project (FOODLINE CAMPUS)\PPT OTHER TASKES\.gemini\skills\ (314 skills)
+       * E:\StartUp Project (FOODLINE CAMPUS)\PPT OTHER TASKES\.agents\skills\ (391 skills)
+  2. **Global & Project Engineering Rulesets Deployed**:
+     - Installed i-rules.md and graphify.md from E:\skills folder\rules\ into:
+       * C:\Users\shiva\.gemini\rules\
+       * C:\Users\shiva\.gemini\config\rules\
+       * C:\Users\shiva\.gemini\GEMINI.md
+       * E:\StartUp Project (FOODLINE CAMPUS)\PPT OTHER TASKES\.gemini\rules\
+       * E:\StartUp Project (FOODLINE CAMPUS)\PPT OTHER TASKES\.agents\rules\
+  3. **Global CLI Plugin & Command Wrappers Installed**:
+     - Installed ntigravity-skills package into C:\Users\shiva\.gemini\antigravity\plugins\antigravity-skills\ and C:\Users\shiva\.gemini\config\plugins\antigravity-skills\.
+     - Deployed command-line utilities (skills.cmd, skills-manager.cmd, g-skills.cmd, .ps1 wrappers) in C:\Users\shiva\.gemini\antigravity\bin\.
+     - Appended C:\Users\shiva\.gemini\antigravity\bin and C:\Program Files\nodejs to the Windows User PATH.
+     - Verified: skills installed reports 314 active skills ready for execution in IntelliJ terminal.
+
+- **Date & Time:** 2026-09-10 (Google NotebookLM Source Bundles & Integration Guide - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **Pre-Bundled Source Directory (`notebooklm/`)**: Generated 5 clean, standalone Markdown files ready for 1-click import into Google NotebookLM:
+     - `01_System_Architecture_and_Tech_Stack.md`
+     - `02_API_Specification_and_Database_Schema.md`
+     - `03_Business_Plan_and_Investor_Pitch.md`
+     - `04_Canteen_Manager_Growth_and_Profit_Pitch.md`
+     - `05_Legal_Terms_and_DPDP_Compliance.md`
+  2. **Automated Source Generator Script**: Created `scripts/export-notebooklm-sources.js` to re-export updated sources whenever project code, APIs, or business plans change.
+
+- **Date & Time:** 2026-09-10 (Canteen Manager Pitch Presentation Delivered — 100% Canteen Profit Focus - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **Strict User Mandate Enforced**: Zero mention of platform fees, company take rates, or commission. Focused 100% on Canteen Manager Net Profit, Order Volume Growth, and Zero Food Waste.
+  2. **10-Slide Native PowerPoint Deck (`FoodLine_Canteen_Manager_Pitch.pptx`)**:
+     - Complete slide-by-slide 16:9 presentation deck highlighting break-time rush hour recovery, 3x order volume multiplication, 12-digit UTR payment security, 80% food waste reduction, free Kitchen Display System (KDS), and financial projection comparison (+₹1.52 Lakhs net profit/mo).
+  3. **Interactive HTML5 Presentation Deck (`FoodLine_Canteen_Manager_Pitch.html` & `frontend/public/canteen-pitch.html`)**:
+     - Web & tablet friendly 16:9 glassmorphism presentation with arrow keys (`←`/`→`), swipe gestures, progress indicators, and high-contrast green profit cards. Accessible directly at `/canteen-pitch.html`.
+
+- **Date & Time:** 2026-09-09 (Master Brand Logo Standard & APK Asset Integration - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **Master Brand Asset Enforced**:
+     - Configured `/run/media/darkkakashi/PC NVME/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES/LOGO.png` (2048x2048 PNG RGBA) as the permanent source of truth for all branding.
+  2. **Web & PWA Icons Asset Generation**:
+     - Generated `logo.png`, `apple-touch-icon.png`, `favicon.ico`, and full PWA suite in `frontend/public/` (`icon-192x192.png`, `icon-192x192-maskable.png`, `icon-512x512.png`, `icon-512x512-maskable.png`).
+  3. **Android App Launcher Icons**:
+     - Generated density-specific Android launcher icons (`mipmap-mdpi` through `mipmap-xxxhdpi`) in `frontend/android/app/src/main/res/` (`ic_launcher.png`, `ic_launcher_round.png`, `ic_launcher_foreground.png`).
+  4. **Component & Directive Integration**:
+     - Updated `Logo.tsx` to render `/logo.png`. Rebuilt APK (`FoodLine_Campus.apk`, 4.1 MB) and re-verified on Android emulator.
+     - Mandated Rule 8 in `GEMINI.md`.
+
+- **Date & Time:** 2026-09-09 (Android APK Generation & Mobile Compatibility Verified - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **JDK 21 LTS & Android Build Toolchain Setup**:
+     - Configured OpenJDK 21 LTS (`Temurin-21.0.12.1`) in `~/.jdks/jdk-21/`.
+     - Set `org.gradle.java.home=/home/darkkakashi/.jdks/jdk-21` and `android.suppressUnsupportedCompileSdk=36` in `frontend/android/gradle.properties`.
+     - Upgraded AGP in `frontend/android/build.gradle` to `8.9.1` and Gradle wrapper to `8.11.1`.
+  2. **Android APK Compilation (`FoodLine_Campus.apk`)**:
+     - Executed `./gradlew assembleDebug` cleanly (**BUILD SUCCESSFUL in 1m 35s**).
+     - Generated 4.1 MB production APK `FoodLine_Campus.apk` at root (Package: `com.foodline.campus`, supports Android 7.0+ / API 24 to API 36).
+  3. **Emulator Deployment & Mobile UI Compatibility**:
+     - Deployed APK onto Android emulator (`Pixel 10 Pro API 37.1` / `emulator-5554`) via ADB (`Success`).
+     - Verified mobile responsive viewport, Capacitor 8 native WebView wrapper, dark status bar `#07070B`, touch gesture controls, and cleartext network configuration.
+
+- **Date & Time:** 2026-09-09 (Student Account Auto-Detection Hardening, Vitest Suite & Active Monorepo Live Verification - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **Student Account Auto-Detection & Mode Integrity (`login/page.tsx`)**:
+     - Hardened PRN lookup with `AbortController` and `cache: 'no-store'` eliminating debounce race conditions on fast typing.
+     - Enforced exact PRN matching check on UI cards so registered students are welcomed by name (`"✓ Welcome back, [Name]! [Registered]"`) and automatically kept on `SIGN_IN` tab with zero mode hijacking.
+  2. **Automated Vitest & API Suite (100% Pass)**:
+     - `npm --prefix backend run test`: **22/22 unit & integration tests passed** (slot throttler, UTR verifier, order lifecycle, auth controller).
+     - `npm --prefix backend run build`: Clean TypeScript compilation (0 errors).
+     - `npm --prefix frontend run build`: **42/42 static & dynamic routes compiled** cleanly (0 errors).
+  3. **Live Monorepo Servers Running**:
+     - Backend engine active on `http://localhost:4000` (`GET /health` returns HTTP 200, Supabase PostgreSQL connected).
+     - Frontend Next.js app active on `http://localhost:3000` (`GET /login` returns HTTP 200).
+     - Verified end-to-end PRN account resolution (`0110` -> `TEST ACC 1`, `123456789000` -> `TEST 101`) and login auth (`HTTP 200 OK`).
+
 - **Date & Time:** 2026-09-09 (Zero-Leak GitHub Release Reset & Production Index Fresh Start - 100% Operational)
 - **Key Deliverables & System Milestones:**
   1. **Strict Disk Safety Mandate Upheld**:
@@ -597,3 +695,4 @@ When an agent or you completes a task, update the "Where We Left Off" and "Next 
 ```bash
 fl mark-done "What was completed" "What to do next"
 ```
+

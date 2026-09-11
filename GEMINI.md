@@ -72,3 +72,9 @@
   - Chief Security Officer Audit: `/cso`
   - Release Manager Verification: `/ship`
 
+---
+
+## 8. 🎨 Official Brand Logo Standard
+- **Master Brand Asset**: `/run/media/darkkakashi/PC NVME/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES/LOGO.png` (2048x2048 PNG) is the official master logo for FoodLine Campus.
+- **Mandatory Usage**: Always use `LOGO.png` / `/logo.png` across all UI components (`Logo.tsx`), web app icons, favicons, PWA manifests, splash screens, Android launcher icons (`mipmap`), and presentations. Never replace or swap it with placeholder icons.
+

@@ -361,12 +361,19 @@ export default function CheckoutPage() {
 
       <main className="max-w-6xl mx-auto px-4 pt-6">
         {/* Back Link */}
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between gap-4">
           <Link
             href="/menu"
-            className="inline-flex items-center gap-2 text-xs font-bold text-(--text-secondary) hover:text-(--text-primary) transition px-3 py-1.5 rounded-xl bg-black/5 dark:bg-white/5 border border-(--border-glass)"
+            className="inline-flex items-center gap-2 text-xs font-bold text-(--text-secondary) hover:text-(--text-primary) transition px-3.5 py-2 rounded-xl bg-black/5 dark:bg-white/5 border border-(--border-glass) min-h-[38px]"
           >
             <ArrowLeft size={14} /> Back to Menu
+          </Link>
+          <Link
+            href="/cart"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-accent-orange hover:underline transition px-3.5 py-2 rounded-xl bg-accent-orange/10 border border-accent-orange/20 min-h-[38px]"
+          >
+            <span>Review Full Tray</span>
+            <span>→</span>
           </Link>
         </div>
 
@@ -439,9 +446,17 @@ export default function CheckoutPage() {
                   <Receipt size={20} className="text-accent-orange" />
                   <h2 className="text-lg font-black text-(--text-primary)">Your Tray Summary</h2>
                 </div>
-                <span className="text-xs font-extrabold text-accent-amber bg-accent-orange/10 border border-accent-orange/25 px-3 py-1 rounded-full">
-                  {totalCount} {totalCount === 1 ? 'Dish' : 'Dishes'}
-                </span>
+                <div className="flex items-center gap-3">
+                  <Link
+                    href="/cart"
+                    className="text-xs font-bold text-accent-orange hover:text-accent-amber hover:underline inline-flex items-center gap-1 transition-colors"
+                  >
+                    Edit Tray →
+                  </Link>
+                  <span className="text-xs font-extrabold text-accent-amber bg-accent-orange/10 border border-accent-orange/25 px-3 py-1 rounded-full">
+                    {totalCount} {totalCount === 1 ? 'Dish' : 'Dishes'}
+                  </span>
+                </div>
               </div>
 
               <div className="space-y-3.5 divide-y divide-(--border-glass)">
@@ -468,22 +483,24 @@ export default function CheckoutPage() {
                           <button
                             type="button"
                             onClick={() => removeItem(item.id)}
-                            className="w-7 h-7 rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-(--text-primary) font-bold text-xs flex items-center justify-center transition cursor-pointer"
+                            aria-label={`Decrease ${item.name} quantity`}
+                            className="w-8 h-8 min-w-[32px] rounded-lg bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-(--text-primary) font-bold text-xs flex items-center justify-center transition cursor-pointer active:scale-95 focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
                           >
                             −
                           </button>
-                          <span className="w-6 text-center font-black text-xs text-accent-amber">{item.quantity}</span>
+                          <span className="w-6 text-center font-black text-xs text-accent-amber font-mono" aria-label={`Quantity: ${item.quantity}`}>{item.quantity}</span>
                           <button
                             type="button"
                             disabled={isMaxStockReached}
+                            aria-label={`Increase ${item.name} quantity`}
                             onClick={() =>
                               !isMaxStockReached &&
                               addItem({ id: item.id, name: item.name, price: item.price, maxStock: stockQty })
                             }
-                            className={`w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center transition ${
+                            className={`w-8 h-8 min-w-[32px] rounded-lg font-bold text-xs flex items-center justify-center transition focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden ${
                               isMaxStockReached
                                 ? 'bg-black/10 dark:bg-zinc-800 text-(--text-muted) cursor-not-allowed opacity-40'
-                                : 'bg-accent-orange hover:bg-accent-orange/90 text-black font-black cursor-pointer shadow-sm'
+                                : 'bg-accent-orange hover:bg-accent-orange/90 text-black font-black cursor-pointer shadow-sm active:scale-95'
                             }`}
                             title={isMaxStockReached ? `Maximum available stock (${stockQty}) reached` : 'Add one more'}
                           >
@@ -498,10 +515,11 @@ export default function CheckoutPage() {
                         <button
                           type="button"
                           onClick={() => deleteItem(item.id)}
-                          className="text-(--text-muted) hover:text-red-500 p-1 transition cursor-pointer"
+                          className="w-8 h-8 min-w-[32px] rounded-lg flex items-center justify-center text-(--text-muted) hover:text-red-500 hover:bg-red-500/10 p-1 transition cursor-pointer"
+                          aria-label={`Remove ${item.name} completely from tray`}
                           title="Remove dish"
                         >
-                          <Trash2 size={15} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>

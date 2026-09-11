@@ -41,13 +41,16 @@ function LoginFormContent() {
     }
   }, []);
 
-  // Real-time PRN auto-detector
+  // Real-time PRN auto-detector with AbortController, anti-race guards & exact PRN matching
   React.useEffect(() => {
     const clean = studentPrn.trim().toUpperCase();
     if (clean.length < 3) {
       setDetectedAccount(null);
       return;
     }
+
+    // Immediately clear any mismatch from a previous PRN query
+    setDetectedAccount((prev) => (prev && prev.prn === clean ? prev : null));
 
     // Quick local storage check for instantaneous UI response
     if (typeof window !== 'undefined') {
@@ -61,19 +64,28 @@ function LoginFormContent() {
             prn: clean,
             exists: true,
           });
+          setStudentMode('SIGN_IN');
         }
       }
     }
 
+    const controller = new AbortController();
     const timer = setTimeout(async () => {
       setIsResolvingPrn(true);
       try {
-        const res = await fetch(`/api/auth/resolve-student?prn=${encodeURIComponent(clean)}`);
+        const res = await fetch(`/api/auth/resolve-student?prn=${encodeURIComponent(clean)}`, {
+          signal: controller.signal,
+          cache: 'no-store',
+        });
         const json = await res.json();
+
+        // Guard against out-of-order race conditions
+        if (studentPrn.trim().toUpperCase() !== clean) return;
+
         if (json.success && json.exists && json.data) {
           setDetectedAccount({
             studentName: json.data.studentName,
-            prn: json.data.prn,
+            prn: clean,
             exists: true,
           });
           // Account confirmed: ensure user is in SIGN_IN mode to log in easily
@@ -86,12 +98,20 @@ function LoginFormContent() {
           });
           // Never force switch to SIGN_UP! Respect student's manual tab choice
         }
-      } catch {} finally {
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          // On network errors or server reload, don't show false "Not Found"
+          setDetectedAccount(null);
+        }
+      } finally {
         setIsResolvingPrn(false);
       }
-    }, 250);
+    }, 350);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [studentPrn]);
 
   // Staff / Admin auth states (Sign in only)
@@ -533,7 +553,7 @@ function LoginFormContent() {
                     <span>Verifying PRN on Campus Master...</span>
                   </div>
                 )}
-                {!isResolvingPrn && detectedAccount?.exists && (
+                {!isResolvingPrn && detectedAccount?.exists && detectedAccount.prn === studentPrn.trim().toUpperCase() && (
                   <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -548,7 +568,7 @@ function LoginFormContent() {
                     </span>
                   </motion.div>
                 )}
-                {!isResolvingPrn && detectedAccount && !detectedAccount.exists && studentPrn.trim().length >= 3 && (
+                {!isResolvingPrn && detectedAccount && !detectedAccount.exists && detectedAccount.prn === studentPrn.trim().toUpperCase() && studentPrn.trim().length >= 3 && (
                   <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}

@@ -25,20 +25,23 @@ export function MenuCard({ item }: MenuCardProps) {
   const stockQty = getStockQuantity(item.id);
   const isMaxStockReached = stockQty !== null && stockQty !== undefined && quantity >= stockQty;
 
-  const tagColor = 
-    item.tag === 'Bestseller' ? 'border-[#FFB347]/30 text-[#FFB347] bg-[#FFB347]/10' :
-    item.tag === 'Student Fav' ? 'border-[#00D4AA]/30 text-[#00D4AA] bg-[#00D4AA]/10' :
-    item.tag === 'Fast Grab' ? 'border-[#8B5CF6]/30 text-[#8B5CF6] bg-[#8B5CF6]/10' :
-    'border-white/10 text-zinc-300 bg-white/5';
+  const tagColor =
+    item.tag === 'Bestseller'
+      ? 'border-accent-amber/40 text-accent-amber bg-accent-amber/10'
+      : item.tag === 'Student Fav'
+      ? 'border-accent-teal/40 text-accent-teal bg-accent-teal/10'
+      : item.tag === 'Fast Grab'
+      ? 'border-accent-purple/40 text-accent-purple bg-accent-purple/10'
+      : 'border-(--border-glass) text-(--text-secondary) bg-black/5 dark:bg-white/5';
 
   return (
     <div
-      className={`group relative bg-gradient-to-b from-[#181824]/90 to-[#101018]/90 backdrop-blur-xl border rounded-2xl p-4 flex flex-col justify-between transition-all duration-300 shadow-xl hover:-translate-y-1 hover:shadow-2xl hover:shadow-[#FF6B2C]/10 ${
-        !isAvailable 
-          ? 'opacity-60 border-red-500/20 bg-red-950/10' 
-          : quantity > 0 
-          ? 'border-[#FF6B2C]/50 shadow-[#FF6B2C]/15 ring-1 ring-[#FF6B2C]/30' 
-          : 'border-white/10 hover:border-white/25'
+      className={`group relative bg-(--bg-card)/90 backdrop-blur-xl border rounded-3xl p-4 sm:p-5 flex flex-col justify-between transition-all duration-300 shadow-lg hover:-translate-y-1 hover:shadow-2xl hover:shadow-accent-orange/15 ${
+        !isAvailable
+          ? 'opacity-60 border-red-500/20 bg-red-950/10'
+          : quantity > 0
+          ? 'border-accent-orange/60 shadow-accent-orange/15 ring-2 ring-accent-orange/30'
+          : 'border-(--border-glass) hover:border-accent-orange/40'
       }`}
     >
       <InventoryBadge item={item} size="sm" position="top-right" />
@@ -46,44 +49,51 @@ export function MenuCard({ item }: MenuCardProps) {
       <div>
         {/* Top Badges */}
         <div className="flex items-center justify-between gap-2 mb-2.5">
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-950/30 border border-emerald-500/20">
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/20 border border-emerald-500/20">
             <VegIcon className="w-3.5 h-3.5" />
-            <span className="text-[10px] uppercase font-black tracking-wider text-emerald-400">Pure Veg</span>
+            <span className="text-[10px] uppercase font-black tracking-wider text-emerald-500 dark:text-emerald-400">
+              Pure Veg
+            </span>
           </div>
           {item.tag && !lowStock && isAvailable && (
-            <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${tagColor}`}>
+            <span
+              className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${tagColor}`}
+            >
               {item.tag}
             </span>
           )}
         </div>
 
         {/* Dish Title */}
-        <h3 className="font-extrabold text-base text-[#F5F5F7] group-hover:text-[#FF6B2C] transition-colors leading-snug mb-1.5">
+        <h3 className="font-extrabold text-base text-(--text-primary) group-hover:text-accent-amber transition-colors leading-snug mb-1.5">
           {item.name}
         </h3>
 
         {/* Prep Time Estimate */}
-        <div className="flex items-center gap-1.5 text-xs text-zinc-400 mb-3">
-          <ClockIcon className="w-3.5 h-3.5 text-[#FFB347]" />
+        <div className="flex items-center gap-1.5 text-xs text-(--text-secondary) mb-3">
+          <ClockIcon className="w-3.5 h-3.5 text-accent-amber shrink-0" />
           <span className="font-medium text-[11px]">~{item.prep_time_mins || 5} mins fresh prep</span>
         </div>
       </div>
 
       {/* Footer Price & Add Button */}
-      <div className="flex items-center justify-between pt-3 border-t border-white/10 mt-auto">
+      <div className="flex items-center justify-between pt-3 border-t border-(--border-glass) mt-auto">
         <div>
-          <span className="text-[10px] text-zinc-500 uppercase font-bold tracking-wider block">Price</span>
-          <span className="font-black text-lg text-white tracking-tight">
+          <span className="text-[10px] text-(--text-muted) uppercase font-bold tracking-wider block">
+            Price
+          </span>
+          <span className="font-black text-lg text-(--text-primary) tracking-tight font-mono">
             {formatINR(item.price)}
           </span>
         </div>
 
         {!isAvailable || (stockQty !== null && stockQty !== undefined && stockQty <= 0) ? (
-          <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 select-none">
+          <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20 select-none">
             Sold Out
           </span>
         ) : quantity === 0 ? (
           <button
+            type="button"
             onClick={() => {
               playPop();
               addItem({
@@ -95,25 +105,32 @@ export function MenuCard({ item }: MenuCardProps) {
                 maxStock: stockQty,
               });
             }}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FF8A3D] hover:brightness-110 text-black font-black text-xs shadow-lg shadow-[#FF6B2C]/25 transition active:scale-95 cursor-pointer flex items-center gap-1"
+            aria-label={`Add ${item.name} to tray for ${formatINR(item.price)}`}
+            className="min-h-[40px] px-4 py-2 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber hover:brightness-110 text-black font-black text-xs shadow-lg shadow-accent-orange/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
           >
             <span>+ Add</span>
           </button>
         ) : (
-          <div className="flex items-center gap-1.5 bg-[#14141E] border border-[#FF6B2C]/40 rounded-xl p-1 shadow-md shadow-[#FF6B2C]/10">
+          <div className="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 border border-accent-orange/40 rounded-2xl p-1 shadow-md shadow-accent-orange/10">
             <button
+              type="button"
               onClick={() => {
                 playClick();
                 removeItem(item.id);
               }}
-              className="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white font-black text-sm flex items-center justify-center transition active:scale-90 cursor-pointer"
+              aria-label={`Decrease quantity for ${item.name}`}
+              className="w-9 h-9 min-w-[36px] rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-(--text-primary) font-black text-sm flex items-center justify-center transition active:scale-90 cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
             >
-              -
+              −
             </button>
-            <span className="text-xs font-black font-mono text-[#00D4AA] min-w-5 text-center">
+            <span
+              className="text-xs font-black font-mono text-accent-teal min-w-5 text-center"
+              aria-label={`Quantity: ${quantity}`}
+            >
               {quantity}
             </span>
             <button
+              type="button"
               disabled={isMaxStockReached}
               onClick={() => {
                 if (!isMaxStockReached) {
@@ -128,10 +145,11 @@ export function MenuCard({ item }: MenuCardProps) {
                   });
                 }
               }}
-              className={`w-7 h-7 rounded-lg font-black text-sm flex items-center justify-center transition ${
+              aria-label={`Increase quantity for ${item.name}`}
+              className={`w-9 h-9 min-w-[36px] rounded-xl font-black text-sm flex items-center justify-center transition focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden ${
                 isMaxStockReached
-                  ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-50'
-                  : 'bg-[#FF6B2C] hover:bg-[#FF8A3D] text-black active:scale-90 cursor-pointer'
+                  ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-40'
+                  : 'bg-accent-orange hover:brightness-110 text-black active:scale-90 cursor-pointer shadow-sm'
               }`}
               title={isMaxStockReached ? `Maximum stock of ${stockQty} reached` : 'Add one more'}
             >
