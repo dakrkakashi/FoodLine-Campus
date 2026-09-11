@@ -1,74 +1,142 @@
 <div align="center">
 
-# 🍔 FoodLine Campus
-### *Next-Generation Zero-Queue Campus Dining & Express Pre-Ordering Ecosystem*
+  <img src="./LOGO.png" alt="FoodLine Campus Logo" width="140" style="border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
 
-**Pilot University:** Sanjivani University, Kopargaon *(Cafe @7 & 5 Campus Outlets)*  
-**Live Traction:** 544+ Real Orders • ₹65 AOV • 82% Repeat Rate • <30s Express Pickup  
-**Core Guarantee:** 100% Free for Students • Exact Offline Menu Prices • Zero Surge Fees
+  # 🍔 FoodLine Campus
+  ### *Next-Generation Zero-Queue Campus Dining & Express Pre-Ordering Ecosystem*
 
-<br/>
+  [![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+  [![React 19](https://img.shields.io/badge/React-19.0-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+  [![TypeScript 5](https://img.shields.io/badge/TypeScript-5.7+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.3-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+  [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL_15-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+  [![Google Sheets API](https://img.shields.io/badge/Google_Sheets-API_v4-34A853?style=for-the-badge&logo=googlesheets&logoColor=white)](https://developers.google.com/sheets/api)
+  [![Express HTTP/2](https://img.shields.io/badge/Express-HTTP%2F2_Engine-black?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge)](LICENSE)
 
-[![Next.js 15](https://img.shields.io/badge/Next.js-15.5.24-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![React 19](https://img.shields.io/badge/React-19.0.0-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS v4](https://img.shields.io/badge/Tailwind-CSS_v4.3-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL_15-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
-[![Google Sheets API](https://img.shields.io/badge/Google_Sheets-API_v4-34A853?style=for-the-badge&logo=googlesheets&logoColor=white)](https://developers.google.com/sheets/api)
-[![Express HTTP/2](https://img.shields.io/badge/Express-HTTP%2F2_Engine-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge)](LICENSE)
+  <p align="center">
+    <b>📍 Pilot Deployment:</b> Sanjivani University, Kopargaon &nbsp;|&nbsp; 
+    <b>🏛️ Partner Outlets:</b> Cafe @7 + 4 Campus Canteens &nbsp;|&nbsp;
+    <b>🛡️ Security:</b> 12-Digit Bank UTR Anti-Fraud
+  </p>
 
-<br/>
+  <!-- Live Metrics Banner -->
+  <table>
+    <tr>
+      <td align="center" width="20%">
+        <b>⚡ Pickup Speed</b><br/>
+        <code>&lt; 30 Seconds</code>
+      </td>
+      <td align="center" width="20%">
+        <b>📈 Live Traction</b><br/>
+        <code>544+ Real Orders</code>
+      </td>
+      <td align="center" width="20%">
+        <b>🔁 Repeat Rate</b><br/>
+        <code>82% Retention</code>
+      </td>
+      <td align="center" width="20%">
+        <b>💰 Student Surcharge</b><br/>
+        <code>₹0.00 (100% Free)</code>
+      </td>
+      <td align="center" width="20%">
+        <b>⏱️ Overbooking</b><br/>
+        <code>0.00% Deficit</code>
+      </td>
+    </tr>
+  </table>
 
-[**🌐 Student Web App**](http://localhost:3000) • [**👨‍🍳 Kitchen KDS**](http://localhost:3000/kds) • [**📺 TV Announcer**](http://localhost:3000/display) • [**📊 Manager Hub**](http://localhost:3000/admin) • [**🧪 QA Test Hub**](http://localhost:3000/debug)
+  <br/>
 
-<br/>
+  <!-- Quick Action Navigation -->
+  <p align="center">
+    <a href="http://localhost:3000"><b>📱 Student Web App</b></a> •
+    <a href="http://localhost:3000/kds"><b>👨‍🍳 Kitchen KDS</b></a> •
+    <a href="http://localhost:3000/display"><b>📺 TV Voice Announcer</b></a> •
+    <a href="http://localhost:3000/admin"><b>📊 Executive Ledger Hub</b></a> •
+    <a href="http://localhost:3000/debug"><b>🧪 QA Diagnostic Lab</b></a>
+  </p>
 
-**📚 Documentation Suites & Spec Playbooks:**  
-[**📑 System PRD**](project-docs/01_PRD.md) • [**🎨 UI/UX System**](project-docs/03_UIUX.md) • [**🗄️ Database Schema**](project-docs/05_Database.md) • [**📡 API Contract**](project-docs/06_API.md) • [**🔒 Security Spec**](project-docs/08_Security.md)
+  <p align="center">
+    <sub><b>Documentation Suites:</b></sub><br/>
+    <a href="project-docs/01_PRD.md">📖 System PRD</a> &nbsp;•&nbsp;
+    <a href="project-docs/03_UIUX.md">🎨 UI/UX Design Tokens</a> &nbsp;•&nbsp;
+    <a href="project-docs/05_Database.md">🗄️ Database Schema</a> &nbsp;•&nbsp;
+    <a href="project-docs/06_API.md">📡 API Contract</a> &nbsp;•&nbsp;
+    <a href="project-docs/08_Security.md">🔒 Security & DPDP Spec</a>
+  </p>
 
 </div>
 
 ---
 
-## ⚡ The 15-Minute Recess Crisis & The FoodLine Solution
+<details>
+<summary><b>📑 Table of Contents (Click to Expand)</b></summary>
 
-In universities across India, thousands of students pour out of lecture halls into cramped canteens at the exact same minute during short 15-minute breaks.
+- [1. The 15-Minute Recess Crisis & The FoodLine Solution](#-the-15-minute-recess-crisis--the-foodline-solution)
+- [2. System Architecture](#-system-architecture)
+- [3. Application Suite & Experience Portals](#-application-suite--experience-portals)
+- [4. Core Engineering Highlights](#-core-engineering-highlights)
+  - [Autonomous Student Account Continuity](#1-autonomous-student-account-continuity)
+  - [Banking-Grade 12-Digit UTR Anti-Fraud Shield](#2-banking-grade-12-digit-utr-anti-fraud-shield)
+  - [60-Order Slot Throttling Governor](#3-60-order-slot-throttling-governor-000-overbooking)
+  - [Dual-Master Google Sheets API v4 Real-Time Sync](#4-dual-master-google-sheets-api-v4-real-time-sync)
+  - [Multilingual Voice Ticket Announcer](#5-multilingual-voice-ticket-announcer)
+  - [Multi-Canteen & Geo-Campus Directory](#6-multi-canteen--geo-campus-directory)
+  - [12 Dynamic Visual Themes & 3D Dish Inspection](#7-12-dynamic-visual-themes--3d-dish-inspection)
+  - [Thermal Print Receipt Generator](#8-thermal-print-receipt-generator)
+- [5. Business Model & Canteen Economics](#-business-model--canteen-economics)
+- [6. 3-Year Audited Financial Projections](#-3-year-audited-financial-projections-fy-2027--2029)
+- [7. Repository Monorepo Structure](#-repository-monorepo-structure)
+- [8. Core API Specifications](#-core-api-specifications)
+- [9. Quickstart & Local Setup](#-quickstart--local-setup)
+- [10. Automated Testing & Verification](#-automated-testing--verification)
+- [11. Security, Privacy & Compliance](#-security-privacy--compliance)
+- [12. License & Attribution](#-license--attribution)
 
-```
-Traditional Canteen Rush (Broken):
-[ 15-Min Break Starts ] ➔ [ 200+ Students Mob Single Counter ] ➔ [ 12-Min Sweat Queue ] ➔ [ "Samosa Khatam!" ] ➔ [ Late to Class ]
-                                                                 ↳ Canteens bleed ₹5,000/day in fake UPI screenshots!
-
-FoodLine Campus Rail (Automated):
-[ Order from Classroom ] ➔ [ 60-Order Slot Throttler ] ➔ [ 12-Digit Bank UTR Lock ] ➔ [ 30s Express OTP Pickup ] ➔ [ Happy Student ]
-```
-
-### 🎯 4-Step Solution Architecture
-1. **Classroom Pre-Ordering:** Students browse real-time inventory across campus canteens and book an exact **15-Minute Break Slot**.
-2. **60-Order Slot Throttling Engine:** Capping break windows to 60 orders max eliminates kitchen bottlenecks and ensures food is hot and ready.
-3. **12-Digit Bank UTR Shield:** Direct bank UPI transfer verified against duplicate replay attacks, completely eliminating fake screenshot fraud.
-4. **30-Second Express Handover:** Student presents a high-contrast optical QR pass and 4-digit pickup OTP at the express pickup rack.
+</details>
 
 ---
 
-## 🏛️ Full-Stack System Architecture
+## ⚡ The 15-Minute Recess Crisis & The FoodLine Solution
+
+In university campuses across India, thousands of students pour out of lecture halls into cramped canteens at the exact same minute during short 15-minute breaks.
+
+### 🔴 The Traditional Rush vs 🟢 The FoodLine Rail
+
+| Phase | ❌ Traditional Canteen Rush (Broken) | ⚡ FoodLine Campus Rail (Automated) |
+|:---|:---|:---|
+| **Ordering** | 200+ students mob a single physical billing desk | Pre-order from classroom 10–30 minutes ahead |
+| **Pacing & Capacity** | Uncontrolled overload; kitchen drowned in chits | **60-order slot throttling governor** seals window at peak capacity |
+| **Payment Integrity** | Staff fooled by fake UPI payment screenshots (₹5,000/day loss) | **12-digit bank UTR lock** with atomic unique database index |
+| **Pickup Experience** | 12-minute sweat queue, orders cold, "Samosa Khatam!" | **<30s express handover** with high-contrast optical QR & 4-digit OTP |
+| **Class Attendance** | Students chronically late or skipping meals | Grab & go with zero line, back to lecture halls on time |
+
+```
+Classroom Pre-Order ➔ 60-Slot Governor ➔ Direct Bank UPI ➔ 12-Digit UTR Shield ➔ <30s Express Handover
+```
+
+---
+
+## 🏛️ System Architecture
+
+FoodLine Campus is architected as an event-driven, high-concurrency hybrid monorepo connecting Next.js 15 client portals, an Express HTTP/2 micro-engine, Supabase PostgreSQL, and real-time dual-master Google Sheets.
 
 ```mermaid
 graph TD
     subgraph ClientLayer ["📱 Frontend Experience (Next.js 15 + React 19 + Tailwind v4 PWA)"]
-        UI1["Student Web App (/menu, /checkout)"]
-        UI2["Geo-Campus & Canteens Hub (/select-campus, /canteens)"]
-        UI3["Realtime Kitchen Display KDS (/kds)"]
+        UI1["Student Web App (/menu, /checkout, /cart)"]
+        UI2["Campus Hub (/select-campus, /canteens)"]
+        UI3["Chef KDS Kitchen Tablet (/kds)"]
         UI4["Multilingual TV Voice Announcer (/display)"]
         UI5["Canteen Manager Executive Ledger (/admin)"]
-        UI6["Autonomous Account Detection Engine (/login)"]
+        UI6["Diagnostic Test & Benchmark Lab (/debug)"]
     end
 
-    subgraph EngineLayer ["⚡ High-Throughput Backend & Concurrency Engine"]
-        E1["Express HTTP/2 REST API & Route Handlers"]
-        E2["60-Slot Atomic Throttling Governor (0% Overbooking)"]
-        E3["12-Digit Banking UTR Replay & Fraud Shield"]
+    subgraph EngineLayer ["⚡ Concurrency & Business Logic Engine (Node.js & Express HTTP/2)"]
+        E1["HTTP/2 REST API & Route Handlers"]
+        E2["60-Slot Atomic Throttler (0.00% Overbooking)"]
+        E3["12-Digit Bank UTR Anti-Fraud Shield"]
         E4["Server-Sent Events (SSE) Live Broadcast Stream"]
         E5["Google Sheets Two-Way Dual-Master Queue"]
         E6["Order Token Collision Defense & Retry Engine"]
@@ -76,37 +144,51 @@ graph TD
 
     subgraph DataLayer ["🗄️ Hybrid Resilient Persistence Layer"]
         DB1[("Supabase PostgreSQL 15 (ylweomuodekukjjpjrgx)")]
-        DB2[("Google Sheets API v4 Master Mirror (1UjpWRps...)")]
+        DB2[("Google Sheets API v4 Master Mirror")]
         DB3[("Client Session Storage & 30-Day Cookie Cache")]
     end
 
-    ClientLayer <== HTTP/2 REST & SSE Realtime ==> EngineLayer
-    EngineLayer <== Atomic Queries & RLS Policies ==> DB1
-    EngineLayer <== Service Account RSA-SHA256 ==> DB2
-    ClientLayer <== Bidirectional Sync ==> DB3
+    ClientLayer <== "HTTP/2 REST & SSE Realtime" ==> EngineLayer
+    EngineLayer <== "Atomic Queries & RLS Policies" ==> DB1
+    EngineLayer <== "Service Account RSA-SHA256" ==> DB2
+    ClientLayer <== "Bidirectional Sync" ==> DB3
 ```
 
 ---
 
-## 💎 Key Features & Engineering Highlights
+## 🖥️ Application Suite & Experience Portals
 
-### 🧠 1. Autonomous Student Account Detection & Persistent Continuity
+| Portal | Route | Primary Persona | Core Capabilities |
+|:---|:---|:---|:---|
+| **Student Web App** | [`/`](http://localhost:3000), [`/menu`](http://localhost:3000/menu), [`/cart`](http://localhost:3000/cart) | Students & Faculty | 44 dishes, real-time inventory badges, tray summary, 3D dish inspector, 12 dynamic themes |
+| **Express Checkout** | [`/checkout`](http://localhost:3000/checkout), [`/payment`](http://localhost:3000/payment) | Paying Student | 15-min break slot selector, auto-filled PRN continuity, direct UPI payment, numeric keypad |
+| **Order Pass & Receipt** | [`/order/[token]`](http://localhost:3000/order/FL-2026-0001) | Student at Pickup | High-contrast optical QR pass, 4-digit OTP, live SSE progress bar, 58/80mm thermal receipt |
+| **Kitchen KDS** | [`/kds`](http://localhost:3000/kds) | Head Chef & Kitchen Crew | Ticket kanban, single-tap state transitions, multilingual audio chimes, 1-tap stockout |
+| **TV Voice Announcer** | [`/display`](http://localhost:3000/display) | Cafeteria Overhead Screen | Large-font order tickets, Marathi/Hindi/English speech synthesis, harmonic audio chimes |
+| **Executive Ledger** | [`/admin`](http://localhost:3000/admin) | Canteen Manager | Real-time sales telemetry, 88/12 settlement breakdown, inventory toggle, hourly rush charts |
+| **Diagnostic Lab** | [`/debug`](http://localhost:3000/debug) | Engineering & QA | Slot governor burst simulation (65 req test), SSE heartbeat probe, UTR validator test |
+
+---
+
+## 💎 Core Engineering Highlights
+
+### 1. Autonomous Student Account Continuity
 - **Dual-Storage Synchronization:** Persists authenticated student profiles across both `localStorage` and `document.cookie` (30-day max-age retention).
 - **Zero-Friction Returning Login (`/login`):** If an active session exists, immediately displays a personalized **Active Account Detected** card with 1-tap **"⚡ Continue to Menu"**.
-- **Real-Time PRN Resolution:** Sub-50ms debounced verification queries both Google Sheets Master and Supabase `profiles`. As a student types their PRN, the interface dynamically switches between Sign-In (with a personalized greeting) and Sign-Up.
-- **Express Checkout Pre-Fill (`/checkout`):** Automatically injects student name, PRN, and contact info, rendering an **"Account Auto-Detected (Verified)"** badge.
+- **Real-Time PRN Resolution:** Sub-50ms debounced verification queries both Google Sheets Master and Supabase `profiles`. As a student types their PRN, the interface dynamically switches between Sign-In and Sign-Up.
+- **Express Checkout Pre-Fill (`/checkout`):** Automatically injects student name, PRN, and contact info with an **"Account Auto-Detected (Verified)"** badge.
 
-### 🛡️ 2. Banking-Grade 12-Digit UTR Anti-Fraud Shield
-- Indian college canteens lose **₹4,000 to ₹6,000 every single day** to students flashing manipulated Google Pay / PhonePe screenshots.
-- FoodLine requires students to enter their bank **12-digit UPI UTR reference number**.
-- The backend validates format length, checks atomic unique constraint indexing in PostgreSQL, and prevents replay attacks before an order transitions to `CONFIRMED`.
+### 2. Banking-Grade 12-Digit UTR Anti-Fraud Shield
+- Indian college canteens lose **₹4,000 to ₹6,000 daily** to students flashing edited UPI screenshots or fake payment receipts.
+- FoodLine mandates entering the genuine bank **12-digit UPI UTR reference number**.
+- The backend validates format length, checks atomic unique constraint indexing in PostgreSQL, and guards against replay attacks before an order transitions to `CONFIRMED`.
 
-### ⏱️ 3. 60-Order Slot Throttling Governor (0.00% Overbooking)
-- Deep fryers and prep stations have physical throughput limits of 50–60 dishes per 15 minutes.
-- When an academic break slot reaches 60 orders, the system automatically seals that window and gracefully transitions upcoming orders to the next recess slot.
-- **Concurrency Hardened:** Stress-tested with 65 concurrent burst requests yielding exactly 60 accepted orders and 5 gracefully throttled with 0 race conditions.
+### 3. 60-Order Slot Throttling Governor (0.00% Overbooking)
+- Deep fryers and prep counters operate at a physical ceiling of 50–60 dishes per 15-minute window.
+- When an academic recess slot hits 60 orders, the system automatically seals that window and cascades upcoming orders to the subsequent recess window.
+- **Concurrency Hardened:** Validated under burst stress tests with 65 concurrent requests yielding exactly 60 accepted orders and 5 gracefully throttled with 0 race conditions.
 
-### 📊 4. Dual-Master Google Sheets API v4 Real-Time Sync
+### 4. Dual-Master Google Sheets API v4 Real-Time Sync
 - **Two-Way Hybrid Architecture:** Web orders and UPI payments write directly to **Supabase PostgreSQL 15** for sub-second ACID transactions, while simultaneously appending rows to the university's Google Sheets Master using Google Sheets API v4 service account credentials.
 - **Synced Tabs:**
   - `'FoodLine — Payment & UTR Form'` (Payment timestamp, order token, amount, 12-digit UTR, status).
@@ -114,12 +196,12 @@ graph TD
   - `'Orders'` (Comprehensive line-item order details and slot IDs).
 - **Collision-Free Row Appends:** Configured with `insertDataOption=INSERT_ROWS` to strictly eliminate row overwrites.
 
-### 🗣️ 5. Multilingual Voice Ticket Announcer (`/kds` & `/display`)
-- Announces ready orders on kitchen tablets and cafeteria TV display screens.
+### 5. Multilingual Voice Ticket Announcer
+- Announces ready orders on kitchen tablets (`/kds`) and cafeteria TV display screens (`/display`).
 - Supports **Marathi (`mr-IN` default)**, **Hindi (`hi-IN`)**, and **English (`en-IN`)** using the Web Speech Synthesis API with custom pitch/rate modulation.
 - Accompanied by Web Audio API dual-tone harmonic chimes (800Hz / 1060Hz) as an audio fallback when voice synthesis is restricted.
 
-### 🍱 6. Multi-Canteen & Geo-Campus Directory
+### 6. Multi-Canteen & Geo-Campus Directory
 - Hierarchical location engine: `State` ➔ `District` ➔ `City` ➔ `Campus` ➔ `Canteens`.
 - Sanjivani University Pilot includes **5 live outlets**:
   1. **Cafe @7** *(Main Academic Quad)* — 44 Dishes, Fast Indian & Quick Bites
@@ -128,36 +210,26 @@ graph TD
   4. **MBA Block Cafeteria** *(Executive Wing)* — Paninis, Subs & Gourmet Rolls
   5. **Central Hostel Dining Mess** *(Hostel Complex)* — Lunch Thali & Poha
 
-### 🎨 7. 12 Dynamic Visual Themes & Interactive 3D Modal
+### 7. 12 Dynamic Visual Themes & 3D Dish Inspection
 - **Tailwind CSS v4 CSS Variable Reactivity:** 12 curated campus color palettes (Sanjivani Sunset 🍊, Obsidian OLED 🖤, Cyberpunk Neon 🌌, Matcha Breeze 🍵, Tokyo Crimson ⛩️, Emerald Mint 🍃, Solar Flare ⚡, etc.).
 - Procedural **Three.js 3D food inspection** modal with 360° drag-rotation and levitation physics on `/menu`.
 
-### 🧾 8. Thermal Print Receipt Modal
+### 8. Thermal Print Receipt Generator
 - Instant 58mm/80mm thermal receipt generator on the student order completion screen (`/order/[token]`).
 - Includes order token, pickup OTP, itemized quantities, UTR transaction reference, and campus canteen branding for offline validation.
 
 ---
 
-## 💼 Business Model: 100% Free for Students, Pure B2B Monetization
+## 💼 Business Model & Canteen Economics
 
-FoodLine operates on a strict **zero-friction student guarantee** paired with high-leverage B2B canteen economics:
+FoodLine operates on a strict **zero-friction student guarantee** paired with sustainable B2B canteen monetization:
 
-```
-┌───────────────────────────┐      ┌───────────────────────────┐
-│     STUDENT PROMISE       │      │       CANTEEN B2B         │
-│   ₹0 Extra to Students    │      │    10% – 12% Take-Rate    │
-│  Exact Offline Menu Price │      │ ₹7.80 on ₹65 Average Order│
-│  Zero Delivery Fees • Ads │      │  Eliminates ₹5k/day Fraud │
-└───────────────────────────┘      └───────────────────────────┘
-              ▲                                  ▲
-              │                                  │
-┌───────────────────────────┐      ┌───────────────────────────┐
-│   KITCHEN HARDWARE LEASE  │      │   INSTITUTIONAL CATERING  │
-│      ₹2,500 / Month       │      │        5% – 8% Fee        │
-│   Rugged KDS Touch Tablet │      │ College Fests, Events &   │
-│ Express Heated Pickup Rack│      │   Hostel Mess Pre-Orders  │
-└───────────────────────────┘      └───────────────────────────┘
-```
+| Pillar | Rate / Fee | Value Delivered |
+|:---|:---:|:---|
+| **🎓 Student Guarantee** | **₹0.00 Extra** | Exact offline canteen menu prices, zero platform markups, zero surge fees |
+| **🏢 Canteen Take-Rate** | **10% – 12%** | ₹7.80 on ₹65 AOV; eliminates ₹5k/day fake screenshot fraud & doubles peak recess turnover |
+| **🖥️ Hardware Lease** | **₹2,500 / month** | Rugged kitchen display tablet + express heated pickup rack installation |
+| **🎉 Institutional Catering** | **5% – 8%** | Pre-ordering infrastructure for college fests, academic conferences & hostel mess pre-bookings |
 
 ---
 
@@ -178,15 +250,17 @@ FoodLine operates on a strict **zero-friction student guarantee** paired with hi
 
 ---
 
-## 📁 Repository Structure
+## 📁 Repository Monorepo Structure
 
 ```
 FoodLine-Campus/
-├── frontend/                               # Next.js 15 App Router & React 19 Client
+├── LOGO.png                                 # Brand Identity & High-Resolution Vector Asset
+├── frontend/                                # Next.js 15 App Router & React 19 Client
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── page.tsx                    # Minimalist Hero & Auto-Account Greeting
-│   │   │   ├── menu/page.tsx               # 44 Dishes, Category Scroll, 3D Dish Modal
+│   │   │   ├── menu/page.tsx               # 44 Dishes, Category Tabs, 3D Dish Modal
+│   │   │   ├── cart/page.tsx               # Dedicated Tray Review & Summary
 │   │   │   ├── checkout/page.tsx           # Slot Capacity Meter, Auto-Fill Account Card
 │   │   │   ├── payment/page.tsx            # Direct UPI Pay with Numeric Keypad & Haptics
 │   │   │   ├── order/[token]/page.tsx      # Live Optical QR Pass, Thermal Print Receipt
@@ -199,21 +273,21 @@ FoodLine-Campus/
 │   │   │   ├── debug/page.tsx              # Developer QA Diagnostic & Stress Testing Hub
 │   │   │   └── api/                        # Next.js Edge & Node API Handlers
 │   │   ├── components/                     # Reusable Glassmorphism UI, Modals & 3D Cards
-│   │   ├── context/                        # CartContext, CampusContext, ThemeContext, InventoryContext
-│   │   └── lib/                            # Shared TypeScript Types, Auth Engine, Google Sheets Client
+│   │   ├── context/                        # CartContext, CampusContext, ThemeContext
+│   │   └── lib/                            # Shared Types, Auth Engine, Google Sheets Client
 │   └── globals.css                         # Tailwind CSS v4 Theme Design Tokens
 │
-├── backend/                                # High-Concurrency Express & SSE Engine
+├── backend/                                 # High-Concurrency Express & SSE Engine
 │   ├── src/
 │   │   ├── services/
 │   │   │   ├── order-service.ts            # Order Lifecycle & 88/12 Settlement Ledger
 │   │   │   ├── slot-throttler.ts           # 60-Order Atomic Slot Reservation Engine
 │   │   │   ├── utr-verifier.ts             # 12-Digit Bank UTR Anti-Fraud Shield
 │   │   │   └── sheets-db.service.ts        # Google Sheets API v4 Two-Way Queue
-│   │   └── server.ts                       # Express HTTP/2 REST & SSE Server (Port 4000)
-│   └── database/schema.sql                 # PostgreSQL Database DDL & RLS Policies
+│   │   ├── server.ts                       # Express HTTP/2 REST & SSE Server (Port 4000)
+│   │   └── database/schema.sql             # PostgreSQL Database DDL & RLS Policies
 │
-├── project-docs/                           # Spec-Driven Architecture & Engineering Standards
+├── project-docs/                            # Spec-Driven Architecture & Engineering Standards
 │   ├── 01_PRD.md                           # Product Requirements Document
 │   ├── 02_Features.md                      # Complete Feature Matrix
 │   ├── 03_UIUX.md                          # Design System Tokens & Glassmorphism Guidelines
@@ -225,43 +299,38 @@ FoodLine-Campus/
 │   ├── 09_Deployment.md                    # Production CI/CD & Cloud Infrastructure
 │   └── 10_AI_Instructions.md              # Multi-Agent Coordination Guidelines
 │
-├── adapters/                               # LLM & Multi-Agent Adapter Framework
-│   ├── CLAUDE.md                           # Anthropic Claude Engineering Guide
-│   ├── GEMINI.md                           # Google Gemini & Antigravity IDE Engine
-│   └── GPT_OSS.md                          # OpenAI & Open-Source LLM Architecture
-│
-├── MULTI_AGENT_SYNC.md                     # Live Multi-Agent Coordination Log
-├── PROJECT_MEMORY.md                       # Active Project State & Architecture Checkpoints
-└── package.json                            # Root Monorepo Orchestration Scripts
+├── adapters/                                # Multi-Agent LLM Guidelines (Claude, Gemini, GPT)
+├── MULTI_AGENT_SYNC.md                      # Multi-Agent Sync Log
+└── PROJECT_MEMORY.md                        # Active Project State & Architecture Checkpoints
 ```
 
 ---
 
 ## 📡 Core API Specifications
 
-All API endpoints strictly follow the standard JSON:API response envelope:
+All endpoints follow the standard JSON:API response envelope:
 
 ```json
 {
   "success": true,
   "data": { ... },
-  "meta": { "timestamp": "2026-09-06T08:00:00Z" }
+  "meta": { "timestamp": "2026-09-11T08:00:00Z" }
 }
 ```
 
 | Method | Endpoint | Purpose | Description |
 |:---|:---|:---|:---|
 | `GET` | `/api/campuses/geo` | Geo Directory | Returns States, Districts, Cities, and registered campuses |
-| `GET` | `/api/campuses/:id/canteens`| Canteen Outlets | Returns the 5 registered canteens with live prep times |
+| `GET` | `/api/campuses/:id/canteens` | Canteen Outlets | Returns the 5 registered canteens with live prep times |
 | `GET` | `/api/menu?cafeteriaId=...` | Menu Catalog | Fetches 44 Cafe @7 dishes and category hierarchy |
 | `GET` | `/api/slots` | Slot Capacity | Returns break windows with live count against the 60-order cap |
-| `POST`| `/api/auth/resolve-student` | Account Detection | Sub-50ms check verifying student registration by PRN |
-| `POST`| `/api/orders` | Create Pre-Order | Reserves slot, generates unique token `FL-XXXX` & 4-digit OTP |
-| `POST`| `/api/payments/verify-utr` | UTR Anti-Fraud | Validates 12-digit bank reference and marks order `CONFIRMED` |
+| `POST` | `/api/auth/resolve-student` | Account Detection | Sub-50ms check verifying student registration by PRN |
+| `POST` | `/api/orders` | Create Pre-Order | Reserves slot, generates unique token `FL-XXXX` & 4-digit OTP |
+| `POST` | `/api/payments/verify-utr` | UTR Anti-Fraud | Validates 12-digit bank reference and marks order `CONFIRMED` |
 | `GET` | `/api/order/:token/stream` | Live Kitchen SSE | Server-Sent Events real-time stream for student tracking |
-| `POST`| `/api/orders/verify-otp` | Express Handover | Kitchen verifies student 4-digit OTP and marks order `COLLECTED` |
-| `PATCH`| `/api/kds/orders/:id/status`| Kitchen State | Chef advances ticket (`CONFIRMED` ➔ `PREPARING` ➔ `READY`) |
-| `PATCH`| `/api/kds/inventory/:dishId`| 1-Tap Stockout | Instantly marks a dish sold out across all student screens |
+| `POST` | `/api/orders/verify-otp` | Express Handover | Kitchen verifies student 4-digit OTP and marks order `COLLECTED` |
+| `PATCH` | `/api/kds/orders/:id/status` | Kitchen State | Chef advances ticket (`CONFIRMED` ➔ `PREPARING` ➔ `READY`) |
+| `PATCH` | `/api/kds/inventory/:dishId` | 1-Tap Stockout | Instantly marks a dish sold out across all student screens |
 | `GET` | `/api/telemetry` | Process Health | Reports memory RSS, uptime, active SSE streams, and DB latency |
 
 ---
@@ -274,7 +343,7 @@ git clone https://github.com/dakrkakashi/FoodLine-Campus.git
 cd FoodLine-Campus
 ```
 
-### 2. Configure Environment
+### 2. Configure Environment Variables
 Create `.env.local` inside `frontend/`:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://ylweomuodekukjjpjrgx.supabase.co
@@ -282,20 +351,20 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-supabase-anon-key
 NEXT_PUBLIC_BACKEND_URL=http://localhost:4000
 ```
 
-### 3. Launch Development Server
+### 3. Launch Development Servers
 ```bash
 # Launch the Next.js Frontend Application (Port 3000)
 npm run dev
 
-# Or launch both Frontend & Backend concurrently:
+# Or launch both Frontend & Express Backend concurrently:
 npm run dev:all
 ```
 
-Open [**`http://localhost:3000`**](http://localhost:3000) in your browser.
+Access the application in your browser at [**`http://localhost:3000`**](http://localhost:3000).
 
 ---
 
-## 🧪 Verification & Automated Testing
+## 🧪 Automated Testing & Verification
 
 ```bash
 # Verify Frontend Next.js Production Build (41/41 Routes Clean)
@@ -313,19 +382,23 @@ npm --prefix backend run test:api
 
 ---
 
-## 🔒 Security, Privacy & DPDP Compliance
+## 🔒 Security, Privacy & Compliance
 
-- **Absolute Secret Isolation:** Service role keys and bank credentials never leave server environment variables.
-- **SQL Parameterization:** All PostgreSQL interactions utilize parameterized queries or the official Supabase SDK, strictly preventing SQL injection.
+- **Absolute Secret Isolation:** Service role keys and bank credentials never leave secure server environment variables.
+- **SQL Parameterization:** All PostgreSQL queries utilize parameterized statements or the official Supabase SDK, strictly preventing SQL injection.
 - **Data Minimization:** Only stores necessary student data (PRN, minimal contact info). Phone numbers are masked in client-side telemetry logs.
 - **24-Hour Ephemeral Retention:** Order tracking snapshots and temporary tokens are automatically pruned after 24 hours under DPDP data minimization guidelines.
 
 ---
 
-## 📄 License & Attribution
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
-
 <div align="center">
+
+  **FoodLine Campus** &bull; Zero-Queue Dining for Modern Higher Education  
   <sub>Built with ❤️ by the FoodLine Engineering Team for Sanjivani University, Kopargaon.</sub><br/>
-  <sub>Primary Ombudsman & Staff Contact: <code>foodlinecampus07@gmail.com</code></sub>
+  <sub>Primary Ombudsman & Staff Contact: <a href="mailto:foodlinecampus07@gmail.com"><code>foodlinecampus07@gmail.com</code></a></sub>
+
+  <br/>
+
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 </div>
