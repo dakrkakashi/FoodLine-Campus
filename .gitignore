@@ -26,6 +26,8 @@ next-env.d.ts
 .env*.local
 .env.production
 .env.development
+!.env.example
+!*.env.example
 inventory-state.json
 client_secret_*.json
 accounts.json

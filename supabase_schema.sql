@@ -299,3 +299,21 @@ BEGIN
         ALTER PUBLICATION supabase_realtime ADD TABLE pickup_slots;
     END IF;
 END $$;
+
+-- 10. PASSWORD RESET TOKENS
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) NOT NULL,
+    prn VARCHAR(100),
+    token_hash VARCHAR(64) NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    ip_address VARCHAR(45)
+);
+
+CREATE INDEX IF NOT EXISTS idx_reset_token_hash ON password_reset_tokens(token_hash) WHERE used = FALSE;
+CREATE INDEX IF NOT EXISTS idx_reset_token_email ON password_reset_tokens(email);
+
+ALTER TABLE password_reset_tokens ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow server to manage password reset tokens" ON password_reset_tokens FOR ALL USING (true);

@@ -162,11 +162,18 @@ CREATE TABLE orders (
     platform_fee_amount NUMERIC(10, 2) DEFAULT 0.00,
     dpdp_consent_given BOOLEAN DEFAULT TRUE,
     status VARCHAR(50) DEFAULT 'PENDING_PAYMENT' CHECK (status IN ('PENDING_PAYMENT', 'PAY_AT_COUNTER', 'CONFIRMED', 'PREPARING', 'READY', 'COLLECTED', 'CANCELLED')),
+    payment_status VARCHAR(50) DEFAULT 'PENDING',
+    idempotency_key VARCHAR(100),
     pickup_otp VARCHAR(10) NOT NULL,
     payment_method VARCHAR(20) DEFAULT 'UPI' CHECK (payment_method IN ('UPI', 'COD')),
+    notes TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_orders_idempotency_key
+  ON orders (idempotency_key)
+  WHERE idempotency_key IS NOT NULL;
 
 CREATE TABLE order_items (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

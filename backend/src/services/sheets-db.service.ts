@@ -257,6 +257,89 @@ export class SheetsDbService {
     }
   }
 
+  /**
+   * Updates student password in 'FoodLine — Student Signup Form' tab.
+   * Matches by PRN or Email, hashes password with salted scrypt ($scrypt$salt$hash),
+   * updates the password cell, and invalidates user cache.
+   */
+  public static async updateStudentPassword(identifier: string, newPassword: string): Promise<boolean> {
+    const sheets = getSheetsClient();
+    const spreadsheetId = this.getSpreadsheetId();
+    if (!sheets || !spreadsheetId || !identifier || !newPassword) {
+      return false;
+    }
+
+    const cleanId = identifier.trim().toLowerCase();
+    const passHash = this.hashPassword(newPassword);
+
+    try {
+      let rangeName = "'FoodLine — Student Signup Form'!A1:Z";
+      let response;
+      try {
+        response = await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: rangeName,
+        });
+      } catch {
+        rangeName = 'Users!A1:Z';
+        response = await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range: rangeName,
+        });
+      }
+
+      const allRows = response.data.values || [];
+      if (allRows.length < 2) return false;
+
+      const headers = allRows[0].map((h: any) => String(h || '').toLowerCase().trim());
+      const prnIdx = headers.findIndex((h: string) => h.includes('prn') || h.includes('roll'));
+      const collegeEmailIdx = headers.findIndex((h: string) => h.includes('college email'));
+      const emailAddressIdx = headers.findIndex((h: string) => h.includes('email address') || h.includes('email'));
+      const passIdx = headers.findIndex((h: string) => h.includes('password'));
+
+      const actualPassIdx = passIdx !== -1 ? passIdx : 5;
+      let targetRow = -1;
+
+      for (let i = 1; i < allRows.length; i++) {
+        const row = allRows[i];
+        const rowPrn = String(row[prnIdx !== -1 ? prnIdx : 3] || '').trim().toLowerCase();
+        const rowEmail = String(
+          (collegeEmailIdx !== -1 && row[collegeEmailIdx]) ||
+          (emailAddressIdx !== -1 && row[emailAddressIdx]) ||
+          ''
+        ).trim().toLowerCase();
+
+        if (rowPrn === cleanId || rowEmail === cleanId) {
+          targetRow = i + 1; // 1-based index in Google Sheets
+          break;
+        }
+      }
+
+      if (targetRow !== -1) {
+        const colLetter = String.fromCharCode(65 + actualPassIdx);
+        const cellRange = rangeName.startsWith("'")
+          ? `'FoodLine — Student Signup Form'!${colLetter}${targetRow}`
+          : `Users!${colLetter}${targetRow}`;
+
+        await sheets.spreadsheets.values.update({
+          spreadsheetId,
+          range: cellRange,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: {
+            values: [[passHash]],
+          },
+        });
+
+        this.usersCache = null;
+        return true;
+      }
+      return false;
+    } catch (err: any) {
+      console.error('[SheetsDbService] Error updating student password in Google Sheets:', err?.message || err);
+      return false;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // 2. INVENTORY TAB: Read & Manage Menu Dishes
   // ---------------------------------------------------------------------------

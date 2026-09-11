@@ -26,13 +26,16 @@ export interface SavedOrder {
 
 const STORAGE_KEY = 'foodline_user_orders';
 
-export function getLocalOrderHistory(): SavedOrder[] {
+export function getLocalOrderHistory(prnFilter?: string): SavedOrder[] {
   if (typeof window === 'undefined') return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    const list: SavedOrder[] = Array.isArray(parsed) ? parsed : [];
+    if (!prnFilter) return list;
+    const clean = prnFilter.trim().toUpperCase();
+    return list.filter((o) => (o.studentPrn || '').toString().trim().toUpperCase() === clean);
   } catch (err) {
     console.warn('Failed to parse local order history:', err);
     return [];

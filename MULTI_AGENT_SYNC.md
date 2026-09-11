@@ -1602,6 +1602,36 @@ Open questions: <bullet list, or "none">
   >    - \`05_Legal_Terms_and_DPDP_Compliance.md\` (25-section statutory master terms, DPDP Act 2023, FSSAI regulations).
   > 2. **Automated Source Exporter (`scripts/export-notebooklm-sources.js`)**: Executable node script to keep NotebookLM sources synced whenever project code or docs change.
 
+- **[2026-09-11 10:20 IST] 🎨 Antigravity CLI (`agy`) — Supabase Auth as Student Login Source of Truth**:
+  > 1. **Env wired**: `frontend/.env.local`, `backend/.env`, `backend/.env.local` now include `NEXT_PUBLIC_SUPABASE_*` + `SUPABASE_SERVICE_ROLE_KEY` for project `ylweomuodekukjjpjrgx`.
+  > 2. **Student signup/login moved off Sheets passwords**:
+  >    - `POST /api/auth/student-signup` → Supabase Auth `admin.createUser` + `profiles` upsert with PRN; blocks duplicate PRN (409); optional Sheets append as staff mirror only.
+  >    - `POST /api/auth/student-login` → resolve PRN via `profiles`, then `signInWithPassword`; returns real Supabase session tokens.
+  >    - `useAuth` `signInWithPrnPassword` / `signUpWithPrnPassword` call `supabase.auth.setSession`.
+  > 3. **`resolve-student`**: Supabase `profiles` first (admin client), Sheets fallback second.
+  > 4. **New**: `frontend/src/lib/supabase/admin.ts`; migration `backend/database/migrations/002_unique_prn_supabase_auth.sql` (unique PRN index + trigger metadata).
+  > 5. **Verified**: live createUser + signInWithPassword + profile PRN lookup OK against Supabase.
+  > 6. **Operator action**: run `002_unique_prn_supabase_auth.sql` in Supabase SQL Editor for DB-level unique PRN. Rotate service_role key (was shared in chat).
+
+- **[2026-09-11 10:25 IST] 🎨 Antigravity CLI (`agy`) — Fix checkout `idempotency_key` schema cache error**:
+  > 1. **Root cause**: Live Supabase `orders` lacked `idempotency_key` / `payment_status`; `POST /api/orders` inserted them → PGRST204.
+  > 2. **Code fix** (`frontend/src/app/api/orders/route.ts`): insert retries with base columns when extended columns missing; idempotency falls back to `notes` tag `IDEM:...`.
+  > 3. **Migration** `backend/database/migrations/003_orders_idempotency_payment_status.sql` + `schema.sql` updated to include columns.
+  > 4. **Verified**: base-column insert succeeds against live Supabase; extended insert fails as expected until SQL migration is applied.
+
+- **[2026-09-11 10:35 IST] 🎨 Antigravity CLI (`agy`) — Per-student order privacy + transparent logo**:
+  > 1. **Privacy bug**: `/orders` called `GET /api/orders?limit=30` with no PRN → returned entire campus order list (30 orders) to every account.
+  > 2. **Fix**:
+  >    - `GET /api/orders` now requires `prn` and/or `userId` (or `token`); filters by `user_id` / `PRN:` notes tag; 401 if missing.
+  >    - `/orders` page passes current student PRN/userId from `useAuth` + session; local history filtered by `studentPrn`.
+  >    - Checkout POST sends `userId` so new orders attach `orders.user_id`.
+  > 3. **Logo**: Cropped FoodLine icon from brand asset, removed charcoal background → transparent `frontend/public/logo.png` (used by `Logo.tsx`).
+
+- **[2026-09-11 10:40 IST] 🎨 Antigravity CLI (`agy`) — Mobile nav fit + More menu moved to bottom**:
+  > 1. **Overflow fix**: Removed crowded mobile top controls (Sun / Tray / Hamburger) that clipped off-screen; top bar is now Logo + avatar only (`navbar.tsx`).
+  > 2. **More menu → bottom**: `MobileBottomNav` tabs are equal `flex-1` (Home / Menu / Orders / Tray / More) and auto-fit any phone width; **More** opens a bottom sheet with canteens, profile, theme, sound, staff links.
+  > 3. **Desktop**: Staff/extra links collapsed into header **More** dropdown so the top bar no longer overflows mid-width screens.
+
 
 
 

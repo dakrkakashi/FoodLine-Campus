@@ -28,13 +28,43 @@ import { PageTransition, SpotlightCard } from '@/components/ui';
 import { getLocalOrderHistory, SavedOrder } from '@/lib/order-history-store';
 import { useCart } from '@/context/CartContext';
 import { useSoundFX } from '@/hooks/useSoundFX';
+import { useAuth } from '@/lib/auth/useAuth';
 
 type FilterTab = 'all' | 'active' | 'completed';
+
+function resolveStudentIdentity(profile: { prn?: string; id?: string; full_name?: string } | null) {
+  let prn = (profile?.prn || '').toString().trim().toUpperCase();
+  let userId = (profile?.id || '').toString().trim();
+
+  if (typeof window !== 'undefined') {
+    if (!prn) {
+      prn = (localStorage.getItem('foodline_last_prn') || '').trim().toUpperCase();
+    }
+    if (!prn || !userId) {
+      try {
+        const raw = localStorage.getItem('foodline_student_session');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (!prn && parsed?.prn) prn = String(parsed.prn).trim().toUpperCase();
+          if (!userId && parsed?.id) userId = String(parsed.id).trim();
+        }
+      } catch {}
+    }
+  }
+
+  // Ignore fake non-uuid ids from legacy cookie sessions
+  if (userId && !/^[0-9a-f-]{36}$/i.test(userId)) {
+    userId = '';
+  }
+
+  return { prn, userId };
+}
 
 export default function OrdersHistoryPage() {
   const router = useRouter();
   const { addItem, clearCart } = useCart();
   const { playClick, playSuccess, playTab } = useSoundFX();
+  const { profile, loading: authLoading } = useAuth();
 
   const [orders, setOrders] = useState<SavedOrder[]>([]);
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
@@ -45,25 +75,43 @@ export default function OrdersHistoryPage() {
   const loadOrders = async () => {
     setIsRefreshing(true);
     try {
-      // 1. Load from local storage
-      const localHistory = getLocalOrderHistory();
+      const { prn, userId } = resolveStudentIdentity(profile);
 
-      // 2. Fetch latest statuses from backend API if available
+      // 1. Local history scoped to this student only
+      const localHistory = getLocalOrderHistory().filter((o) => {
+        if (!prn) return false;
+        const orderPrn = (o.studentPrn || '').toString().trim().toUpperCase();
+        if (orderPrn) return orderPrn === prn;
+        // Legacy local rows without PRN: do not show to other accounts
+        return false;
+      });
+
+      if (!prn && !userId) {
+        setOrders([]);
+        return;
+      }
+
+      // 2. Fetch only this student's orders from API
       try {
-        const res = await fetch('/api/orders?limit=30');
+        const params = new URLSearchParams({ limit: '50' });
+        if (prn) params.set('prn', prn);
+        if (userId) params.set('userId', userId);
+
+        const res = await fetch(`/api/orders?${params.toString()}`);
         if (res.ok) {
           const json = await res.json();
-          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          if (json.success && Array.isArray(json.data)) {
             const apiOrders: SavedOrder[] = json.data.map((o: any) => ({
               orderId: o.id,
               orderToken: o.order_token,
               totalAmount: Number(o.total_amount),
               pickupOtp: o.pickup_otp,
               status: o.status,
-              paymentMethod: 'UPI',
+              paymentMethod: 'UPI' as const,
               slotLabel: o.pickup_slots?.label || 'Campus Break Slot',
               slotTime: o.pickup_slots ? `${o.pickup_slots.start_time} - ${o.pickup_slots.end_time}` : '',
               notes: o.notes,
+              studentPrn: prn,
               items: (o.order_items || []).map((oi: any) => ({
                 id: oi.menu_item_id || oi.id,
                 name: oi.item_name,
@@ -73,20 +121,17 @@ export default function OrdersHistoryPage() {
               createdAt: o.created_at,
             }));
 
-            // Merge API orders with local orders (deduplicating by token)
             const tokenMap = new Map<string, SavedOrder>();
             for (const o of localHistory) tokenMap.set(o.orderToken, o);
             for (const o of apiOrders) {
               const existing = tokenMap.get(o.orderToken);
-              tokenMap.set(o.orderToken, { ...existing, ...o });
+              tokenMap.set(o.orderToken, { ...existing, ...o, studentPrn: prn });
             }
 
             const merged = Array.from(tokenMap.values()).sort(
               (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
             setOrders(merged);
-            setIsLoading(false);
-            setIsRefreshing(false);
             return;
           }
         }
@@ -94,7 +139,6 @@ export default function OrdersHistoryPage() {
         console.warn('API order fetch fallback to local history:', apiErr);
       }
 
-      // Fallback: local history only
       setOrders(localHistory);
     } catch (err) {
       console.error('Failed to load order history:', err);
@@ -105,8 +149,10 @@ export default function OrdersHistoryPage() {
   };
 
   useEffect(() => {
+    if (authLoading) return;
     loadOrders();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, profile?.prn, profile?.id]);
 
   const handleReorder = (order: SavedOrder) => {
     playSuccess();

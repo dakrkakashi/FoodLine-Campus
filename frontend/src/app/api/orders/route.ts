@@ -6,30 +6,89 @@ import { appendPaymentRecord, appendOrderRecord } from '@/lib/google-sheets';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const prn = searchParams.get('prn');
-    const token = searchParams.get('token');
+    const prn = (searchParams.get('prn') || '').trim();
+    const userId = (searchParams.get('userId') || '').trim();
+    const token = (searchParams.get('token') || '').trim();
     const limit = parseInt(searchParams.get('limit') || '50', 10);
 
-    let query = supabase
-      .from('orders')
-      .select('*, order_items (*), pickup_slots (*)')
-      .order('created_at', { ascending: false })
-      .limit(limit);
-
-    if (token) {
-      query = query.eq('order_token', token);
-    } else if (prn) {
-      query = query.ilike('notes', `%${prn}%`);
+    // Privacy: never return the full campus order list to students
+    if (!token && !prn && !userId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'AUTH_REQUIRED',
+            message: 'PRN or user id is required to load your orders.',
+          },
+        },
+        { status: 401 }
+      );
     }
 
-    const { data: orders, error } = await query;
+    let orders: any[] = [];
 
-    if (error) throw error;
+    if (token) {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*, order_items (*), pickup_slots (*)')
+        .eq('order_token', token)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      orders = data || [];
+    } else {
+      const results: any[] = [];
+
+      if (userId) {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*, order_items (*), pickup_slots (*)')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(limit);
+        if (error) throw error;
+        results.push(...(data || []));
+      }
+
+      if (prn) {
+        const { data, error } = await supabase
+          .from('orders')
+          .select('*, order_items (*), pickup_slots (*)')
+          .ilike('notes', `%PRN: ${prn}%`)
+          .order('created_at', { ascending: false })
+          .limit(limit);
+        if (error) throw error;
+        results.push(...(data || []));
+      }
+
+      const byId = new Map<string, any>();
+      for (const row of results) {
+        if (row?.id) byId.set(row.id, row);
+      }
+      orders = Array.from(byId.values()).sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    }
+
+    // Extra client-side guard: keep only rows that clearly belong to this student
+    const filtered = (orders || []).filter((o: any) => {
+      if (token) return o.order_token === token;
+      if (userId && o.user_id && o.user_id === userId) return true;
+      if (prn) {
+        const notes = String(o.notes || '');
+        const prnUpper = prn.toUpperCase();
+        return (
+          notes.toUpperCase().includes(`PRN: ${prnUpper}`) ||
+          notes.toUpperCase().includes(`PRN:${prnUpper}`)
+        );
+      }
+      return false;
+    }).slice(0, limit);
 
     return NextResponse.json({
       success: true,
-      data: orders || [],
-      meta: { count: orders?.length || 0 }
+      data: filtered,
+      meta: { count: filtered.length }
     });
   } catch (error: any) {
     return NextResponse.json(
@@ -53,13 +112,29 @@ export async function POST(request: Request) {
     const effectivePrn = (studentPrn || body.prn || '').toString().trim();
     const effectiveName = (studentName || body.name || body.fullName || '').toString().trim();
 
-    // Idempotency: If idempotency-key provided, return existing order to avoid duplicate creation
+    // Idempotency: prefer dedicated column when present; fall back to notes tag
+    // (live Supabase may not yet have idempotency_key — migration 003 adds it)
     if (idempotencyKey) {
-      const { data: existingOrder } = await supabase
+      let existingOrder: any = null;
+
+      const byColumn = await supabase
         .from('orders')
         .select('*, order_items (*), pickup_slots (*)')
         .eq('idempotency_key', idempotencyKey)
         .maybeSingle();
+
+      if (!byColumn.error && byColumn.data) {
+        existingOrder = byColumn.data;
+      } else if (byColumn.error?.message?.includes('idempotency_key')) {
+        const byNotes = await supabase
+          .from('orders')
+          .select('*, order_items (*), pickup_slots (*)')
+          .ilike('notes', `%IDEM:${idempotencyKey}%`)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (!byNotes.error && byNotes.data) existingOrder = byNotes.data;
+      }
 
       if (existingOrder) {
         return NextResponse.json({
@@ -232,26 +307,47 @@ export async function POST(request: Request) {
     if (studentTags) {
       orderNotes = orderNotes ? `[${studentTags}] ${orderNotes}` : `[${studentTags}]`;
     }
+    if (idempotencyKey) {
+      const idemTag = `IDEM:${idempotencyKey}`;
+      orderNotes = orderNotes ? `${orderNotes} ${idemTag}` : idemTag;
+    }
 
     // 4. Create Order with automatic collision-retry loop
+    // Insert only columns known to exist on live Supabase; optionally attach
+    // idempotency_key / payment_status when migration 003 has been applied.
     let order: any = null;
     let lastOrderErr: any = null;
     const MAX_INSERT_ATTEMPTS = 3;
+    let useExtendedColumns = true;
 
     for (let attempt = 1; attempt <= MAX_INSERT_ATTEMPTS; attempt++) {
+      const basePayload: Record<string, unknown> = {
+        order_token: orderToken,
+        cafeteria_id: cafeteriaId,
+        slot_id: resolvedSlotId,
+        total_amount: totalAmount,
+        status: initialStatus,
+        pickup_otp: pickupOtp,
+        notes: orderNotes || null,
+      };
+
+      // Attach ownership when client sends authenticated student id
+      const studentUserId = (body.userId || body.studentUserId || '').toString().trim();
+      if (studentUserId && /^[0-9a-f-]{36}$/i.test(studentUserId)) {
+        basePayload.user_id = studentUserId;
+      }
+
+      const insertPayload = useExtendedColumns
+        ? {
+            ...basePayload,
+            payment_status: isUpiWithValidUtr ? 'PENDING_MANUAL_REVIEW' : 'PENDING',
+            idempotency_key: idempotencyKey || null,
+          }
+        : basePayload;
+
       const { data: insertedOrder, error: orderErr } = await supabase
         .from('orders')
-        .insert({
-          order_token: orderToken,
-          cafeteria_id: cafeteriaId,
-          slot_id: resolvedSlotId,
-          total_amount: totalAmount,
-          status: initialStatus,
-          payment_status: isUpiWithValidUtr ? 'PENDING_MANUAL_REVIEW' : 'PENDING',
-          idempotency_key: idempotencyKey || null,
-          pickup_otp: pickupOtp,
-          notes: orderNotes || null
-        })
+        .insert(insertPayload)
         .select()
         .single();
 
@@ -261,6 +357,17 @@ export async function POST(request: Request) {
       }
 
       lastOrderErr = orderErr;
+      const missingColumn =
+        orderErr?.message?.includes('idempotency_key') ||
+        orderErr?.message?.includes('payment_status') ||
+        orderErr?.code === 'PGRST204';
+
+      if (missingColumn && useExtendedColumns) {
+        console.warn('[OrderCreation] Extended columns missing on orders — retrying with base schema.');
+        useExtendedColumns = false;
+        continue;
+      }
+
       const isUniqueViolation = orderErr?.code === '23505' || orderErr?.message?.includes('duplicate key');
       if (isUniqueViolation && attempt < MAX_INSERT_ATTEMPTS) {
         console.warn(`[OrderCreation] Token collision on ${orderToken}. Generating fresh token (attempt ${attempt + 1}/${MAX_INSERT_ATTEMPTS})...`);

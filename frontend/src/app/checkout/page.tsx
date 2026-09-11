@@ -275,6 +275,7 @@ export default function CheckoutPage() {
           notes,
           studentName,
           studentPrn,
+          userId: user?.id && /^[0-9a-f-]{36}$/i.test(user.id) ? user.id : undefined,
         }),
       });
 

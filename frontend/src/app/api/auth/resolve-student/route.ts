@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase/route-client';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { findStudentUser } from '@/lib/google-sheets';
 
 async function resolveStudent(identifier: string) {
@@ -8,44 +8,26 @@ async function resolveStudent(identifier: string) {
     return { success: false, error: 'PRN or email is required', status: 400 };
   }
 
-  // 1. Check real Google Sheets Master Database first
-  try {
-    const sheetStudent = await findStudentUser(cleanId);
-    if (sheetStudent) {
-      return {
-        success: true,
-        exists: true,
-        data: {
-          studentName: sheetStudent.name,
-          prn: cleanId.toUpperCase() || sheetStudent.prn,
-          email: sheetStudent.email,
-          phone: sheetStudent.phone || '',
-          role: 'student',
-          campus: {
-            id: 'a1111111-1111-1111-1111-111111111111',
-            name: 'Sanjivani University',
-            slug: 'sanjivani',
-            location: 'Kopargaon, Maharashtra',
-          },
-          defaultCafeteriaId: 'b2222222-2222-2222-2222-222222222222',
-        },
-      };
-    }
-  } catch (sheetErr) {
-    console.warn('[resolve-student] Error checking Google Sheets:', sheetErr);
-  }
+  const campusFallback = {
+    id: 'a1111111-1111-1111-1111-111111111111',
+    name: 'Sanjivani University',
+    slug: 'sanjivani',
+    location: 'Kopargaon, Maharashtra',
+  };
+  const cafeteriaFallback = 'b2222222-2222-2222-2222-222222222222';
 
-  // 2. Check Supabase profiles table
-  if (supabase) {
+  // 1. Supabase profiles first (source of truth for login) — admin bypasses RLS
+  const admin = createAdminClient();
+  if (admin) {
     try {
       const cleanNoZero = cleanId.replace(/^0+/, '');
       const query = cleanId.includes('@')
-        ? supabase.from('profiles').select('*, campuses(*), cafeterias(*)').ilike('email', cleanId).maybeSingle()
-        : supabase.from('profiles').select('*, campuses(*), cafeterias(*)').ilike('prn', cleanId).maybeSingle();
+        ? admin.from('profiles').select('*, campuses(*), cafeterias(*)').ilike('email', cleanId).maybeSingle()
+        : admin.from('profiles').select('*, campuses(*), cafeterias(*)').ilike('prn', cleanId).maybeSingle();
 
       let { data, error } = await query;
       if (!data && cleanNoZero && cleanNoZero !== cleanId && !cleanId.includes('@')) {
-        const altQuery = await supabase.from('profiles').select('*, campuses(*), cafeterias(*)').ilike('prn', cleanNoZero).maybeSingle();
+        const altQuery = await admin.from('profiles').select('*, campuses(*), cafeterias(*)').ilike('prn', cleanNoZero).maybeSingle();
         if (altQuery.data) {
           data = altQuery.data;
           error = null;
@@ -58,17 +40,17 @@ async function resolveStudent(identifier: string) {
           exists: true,
           data: {
             studentName: data.full_name || 'Campus Student',
-            prn: cleanId.toUpperCase() || data.prn,
+            prn: data.prn || cleanId.toUpperCase(),
             email: data.email || '',
             phone: data.phone || '',
             role: data.role || 'student',
             campus: {
-              id: data.campuses?.id || 'a1111111-1111-1111-1111-111111111111',
-              name: data.campuses?.name || 'Sanjivani University',
-              slug: data.campuses?.slug || 'sanjivani',
-              location: data.campuses?.location || 'Kopargaon, Maharashtra',
+              id: data.campuses?.id || campusFallback.id,
+              name: data.campuses?.name || campusFallback.name,
+              slug: data.campuses?.slug || campusFallback.slug,
+              location: data.campuses?.location || campusFallback.location,
             },
-            defaultCafeteriaId: data.cafeteria_id || 'b2222222-2222-2222-2222-222222222222',
+            defaultCafeteriaId: data.cafeteria_id || cafeteriaFallback,
           },
         };
       }
@@ -77,7 +59,28 @@ async function resolveStudent(identifier: string) {
     }
   }
 
-  // Not found
+  // 2. Google Sheets mirror (legacy / staff ledger fallback)
+  try {
+    const sheetStudent = await findStudentUser(cleanId);
+    if (sheetStudent) {
+      return {
+        success: true,
+        exists: true,
+        data: {
+          studentName: sheetStudent.name,
+          prn: sheetStudent.prn || cleanId.toUpperCase(),
+          email: sheetStudent.email,
+          phone: sheetStudent.phone || '',
+          role: 'student',
+          campus: campusFallback,
+          defaultCafeteriaId: cafeteriaFallback,
+        },
+      };
+    }
+  } catch (sheetErr) {
+    console.warn('[resolve-student] Error checking Google Sheets:', sheetErr);
+  }
+
   return {
     success: true,
     exists: false,

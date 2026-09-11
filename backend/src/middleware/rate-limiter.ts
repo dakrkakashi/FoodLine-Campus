@@ -128,3 +128,10 @@ export const orderPlacementLimiter = createRateLimiter({
   maxRequests: 20,
   message: 'Order submission rate limit exceeded. Please wait a few moments before placing another order.',
 });
+
+// 5. Password Reset Rate Limiter: Max 3 attempts per 15 minutes per IP
+export const passwordResetRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  maxRequests: 3,
+  message: 'Too many password reset requests. For security reasons, please wait 15 minutes before requesting again.',
+});

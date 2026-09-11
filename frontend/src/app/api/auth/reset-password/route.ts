@@ -4,6 +4,7 @@ import { findStudentUser, updateStudentPassword } from '@/lib/google-sheets';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { supabase } from '@/lib/supabase/route-client';
 
+const BACKEND_API_BASE = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 const AUTHORIZED_STAFF_PASSKEY = process.env.STAFF_AUTH_PASSKEY || 'foodline2026';
 const AUTHORIZED_STAFF_EMAILS = [
   'foodlinecampus07@gmail.com',
@@ -24,12 +25,52 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { type, prn, identifier, newPassword, email } = body;
+    const { token, newPassword, type, prn, identifier, email } = body;
+
+    // A. TOKEN-BASED PASSWORD RESET (High Security Flow)
+    if (token) {
+      const cleanToken = (token || '').toString().trim();
+      const cleanPass = (newPassword || '').toString();
+
+      if (!cleanPass || cleanPass.length < 4) {
+        return NextResponse.json(
+          { success: false, error: 'Password must be at least 4 characters long.' },
+          { status: 400 }
+        );
+      }
+
+      // Proxy to backend engine
+      try {
+        const clientIp =
+          request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+          request.headers.get('x-real-ip') ||
+          '127.0.0.1';
+
+        const backendRes = await fetch(`${BACKEND_API_BASE}/auth/reset-password`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-forwarded-for': clientIp,
+          },
+          body: JSON.stringify({ token: cleanToken, newPassword: cleanPass }),
+          cache: 'no-store',
+        });
+
+        const backendData = await backendRes.json();
+        return NextResponse.json(backendData, { status: backendRes.status });
+      } catch (backendErr) {
+        console.warn('[ResetPasswordRoute] Backend proxy notice:', backendErr);
+        return NextResponse.json(
+          { success: false, error: 'Password reset service temporarily unavailable. Please try again shortly.' },
+          { status: 500 }
+        );
+      }
+    }
+
+    // B. LEGACY / DIRECT MODAL RESETS
 
     // 1. Staff / Admin Password Recovery
     if (type === 'staff') {
-      const cleanEmail = (email || '').toString().trim().toLowerCase();
-      
       return NextResponse.json({
         success: true,
         authorizedPasskey: AUTHORIZED_STAFF_PASSKEY,
@@ -38,7 +79,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // 2. Student PRN Password Reset
+    // 2. Student PRN Password Reset (Direct form)
     const cleanPrn = (prn || '').toString().trim().toUpperCase();
     const cleanPass = (newPassword || '').toString();
     const cleanId = (identifier || '').toString().trim().toLowerCase();

@@ -8,6 +8,7 @@ import { SignupRequestDTO, SheetLogRow } from '../lib/types.js';
 import { signJwt } from '../lib/jwt.js';
 import { SheetsDbService } from '../services/sheets-db.service.js';
 import { CampusService } from '../services/campus-service.js';
+import { PasswordResetService } from '../services/password-reset.service.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -289,6 +290,157 @@ export class AuthController {
       return res.status(500).json({
         success: false,
         error: err.message || 'Login failed',
+        meta: { timestamp },
+      });
+    }
+  }
+
+  /**
+   * Request password reset link.
+   * Generates secure 64-character token with 15-minute validity.
+   * Dispatches via notification service / logs for pilot development.
+   */
+  public static async forgotPassword(req: Request, res: Response) {
+    const timestamp = new Date().toISOString();
+    const { emailOrPrn, email, prn } = req.body || {};
+    const identifier = (emailOrPrn || email || prn || '').trim();
+
+    if (!identifier) {
+      return res.status(400).json({
+        success: false,
+        data: null,
+        error: 'Please provide your registered PRN or Email address.',
+        meta: { timestamp, error: 'VALIDATION_IDENTIFIER_REQUIRED' },
+      });
+    }
+
+    try {
+      const clientIp = (req.headers['x-forwarded-for'] as string) || req.socket.remoteAddress || '';
+      const origin = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : undefined);
+
+      const result = await PasswordResetService.requestPasswordReset(identifier, clientIp, origin);
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          message: result.message,
+          ...(result.rawToken ? { rawToken: result.rawToken, resetUrl: result.resetUrl, prn: result.debugPrn } : {}),
+        },
+        meta: { timestamp },
+      });
+    } catch (err: any) {
+      console.error('[AuthController] forgotPassword error:', err);
+      return res.status(500).json({
+        success: false,
+        error: 'Unable to process password reset at this moment.',
+        meta: { timestamp },
+      });
+    }
+  }
+
+  /**
+   * Verifies if a reset token is valid and unexpired before presenting the reset form.
+   */
+  public static async verifyResetToken(req: Request, res: Response) {
+    const timestamp = new Date().toISOString();
+    const token = (req.query.token as string) || (req.body && req.body.token);
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        valid: false,
+        error: 'Reset token is required.',
+        meta: { timestamp },
+      });
+    }
+
+    try {
+      const result = await PasswordResetService.verifyResetToken(token);
+      if (!result.valid) {
+        return res.status(400).json({
+          success: false,
+          valid: false,
+          error: result.message,
+          meta: { timestamp },
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        valid: true,
+        data: {
+          email: result.email,
+          prn: result.prn,
+          name: result.name,
+          message: result.message,
+        },
+        meta: { timestamp },
+      });
+    } catch (err: any) {
+      console.error('[AuthController] verifyResetToken error:', err);
+      return res.status(500).json({
+        success: false,
+        valid: false,
+        error: 'Unable to verify reset token.',
+        meta: { timestamp },
+      });
+    }
+  }
+
+  /**
+   * Executes password update with verified reset token.
+   */
+  public static async resetPassword(req: Request, res: Response) {
+    const timestamp = new Date().toISOString();
+    const { token, newPassword, confirmPassword } = req.body || {};
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        error: 'Reset token is required.',
+        meta: { timestamp, error: 'VALIDATION_TOKEN_REQUIRED' },
+      });
+    }
+
+    if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 4) {
+      return res.status(400).json({
+        success: false,
+        error: 'New password must be at least 4 characters long.',
+        meta: { timestamp, error: 'VALIDATION_PASSWORD_TOO_SHORT' },
+      });
+    }
+
+    if (confirmPassword && newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        error: 'Passwords do not match.',
+        meta: { timestamp, error: 'VALIDATION_PASSWORD_MISMATCH' },
+      });
+    }
+
+    try {
+      const result = await PasswordResetService.executePasswordReset(token, newPassword);
+
+      if (!result.success) {
+        return res.status(400).json({
+          success: false,
+          error: result.message,
+          meta: { timestamp },
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          message: result.message,
+        },
+        meta: { timestamp },
+      });
+    } catch (err: any) {
+      console.error('[AuthController] resetPassword error:', err);
+      return res.status(500).json({
+        success: false,
+        error: err.message || 'Failed to update password.',
         meta: { timestamp },
       });
     }
