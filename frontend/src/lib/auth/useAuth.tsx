@@ -392,16 +392,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUpWithPrnPassword = useCallback(async (prn: string, password: string, fullName: string, email?: string) => {
     const cleanPrn = prn.trim();
+    const cleanEmail = (email || '').trim().toLowerCase();
     try {
       const res = await fetch('/api/auth/student-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prn: cleanPrn, password, fullName }),
+        body: JSON.stringify({ prn: cleanPrn, password, fullName, email: cleanEmail }),
       });
       const json = await res.json();
       if (!res.ok || !json.success) {
         return { error: { message: json.error || 'Failed to create student account.' } };
       }
+
+      const studentEmail = json.student?.email || cleanEmail || `student_${cleanPrn}@sanjivani.edu.in`;
 
       if (json.session?.access_token && json.session?.refresh_token) {
         await supabase.auth.setSession({
@@ -415,19 +418,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } else {
         const studentUser = {
-          id: json.student.id || `student_${cleanPrn}`,
-          email: json.student.email || `student_${cleanPrn}@sanjivani.edu.in`,
+          id: json.student?.id || `student_${cleanPrn}`,
+          email: studentEmail,
           user_metadata: {
-            full_name: json.student.full_name,
+            full_name: json.student?.full_name || fullName,
             prn: cleanPrn,
             role: 'student',
           },
         } as unknown as User;
         setUser(studentUser);
         setProfile({
-          id: json.student.id || `student_${cleanPrn}`,
-          email: json.student.email || `student_${cleanPrn}@sanjivani.edu.in`,
-          full_name: json.student.full_name,
+          id: json.student?.id || `student_${cleanPrn}`,
+          email: studentEmail,
+          full_name: json.student?.full_name || fullName,
           role: 'student',
           prn: cleanPrn,
           is_active: true,
@@ -436,9 +439,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       const studentProf: UserProfile = {
-        id: json.student.id || `student_${cleanPrn}`,
-        email: json.student.email || `student_${cleanPrn}@sanjivani.edu.in`,
-        full_name: json.student.full_name,
+        id: json.student?.id || `student_${cleanPrn}`,
+        email: studentEmail,
+        full_name: json.student?.full_name || fullName,
         role: 'student',
         prn: cleanPrn,
         is_active: true,
@@ -448,8 +451,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (typeof window !== 'undefined') {
         localStorage.setItem('foodline_student_session', JSON.stringify(studentProf));
         localStorage.setItem('foodline_last_prn', cleanPrn);
-        if (json.student?.full_name) {
-          localStorage.setItem('foodline_last_name', json.student.full_name);
+        if (json.student?.full_name || fullName) {
+          localStorage.setItem('foodline_last_name', json.student?.full_name || fullName);
         }
       }
       if (typeof document !== 'undefined') {
@@ -462,6 +465,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return { error: { message: e.message || 'Connection error. Please retry.' } };
     }
   }, [supabase, fetchProfile]);
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut().catch(() => {});
     if (typeof document !== 'undefined') {

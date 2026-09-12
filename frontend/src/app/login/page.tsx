@@ -21,6 +21,7 @@ function LoginFormContent() {
   // Student PRN auth states
   const [studentMode, setStudentMode] = useState<'SIGN_IN' | 'SIGN_UP'>('SIGN_IN');
   const [studentFullName, setStudentFullName] = useState('');
+  const [studentEmail, setStudentEmail] = useState('');
   const [studentPrn, setStudentPrn] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
   const [showStudentPassword, setShowStudentPassword] = useState(false);
@@ -228,9 +229,15 @@ function LoginFormContent() {
       return;
     }
 
-    if (studentMode === 'SIGN_UP' && !studentFullName.trim()) {
-      setErrorMessage('Please enter your full name.');
-      return;
+    if (studentMode === 'SIGN_UP') {
+      if (!studentFullName.trim()) {
+        setErrorMessage('Please enter your full name.');
+        return;
+      }
+      if (!studentEmail.trim() || !studentEmail.includes('@') || !studentEmail.includes('.')) {
+        setErrorMessage('Please enter a valid Gmail / email address.');
+        return;
+      }
     }
 
     if (studentPassword.length < 4) {
@@ -244,7 +251,7 @@ function LoginFormContent() {
 
     try {
       if (studentMode === 'SIGN_UP') {
-        const { error } = await signUpWithPrnPassword(studentPrn.trim(), studentPassword, studentFullName.trim());
+        const { error } = await signUpWithPrnPassword(studentPrn.trim(), studentPassword, studentFullName.trim(), studentEmail.trim());
         if (error) {
           setErrorMessage(error.message || 'Failed to create student account. Please check if PRN is already registered.');
           setIsLoading(false);
@@ -327,7 +334,7 @@ function LoginFormContent() {
             whileHover={{ scale: 1.1, rotate: 6 }}
             className="w-10 h-10 rounded-xl bg-linear-to-tr from-accent-orange to-accent-amber flex items-center justify-center font-black text-white text-lg shadow-lg shadow-accent-orange/20"
           >
-            🍽
+            🍽️
           </motion.div>
           <span className="font-extrabold text-xl bg-linear-to-r from-accent-orange via-accent-amber to-(--text-primary) bg-clip-text text-transparent">
             FoodLine
@@ -568,7 +575,7 @@ function LoginFormContent() {
                     </span>
                   </motion.div>
                 )}
-                {!isResolvingPrn && detectedAccount && !detectedAccount.exists && detectedAccount.prn === studentPrn.trim().toUpperCase() && studentPrn.trim().length >= 3 && (
+                {!isResolvingPrn && detectedAccount && !detectedAccount.exists && studentPrn.trim().length >= 3 && (
                   <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -579,7 +586,7 @@ function LoginFormContent() {
                       <span>
                         {studentMode === 'SIGN_IN'
                           ? 'PRN not found on master yet.'
-                          : 'New Student PRN! Fill name & password below.'}
+                          : 'New Student PRN! Fill name, Gmail & password below.'}
                       </span>
                     </span>
                     {studentMode === 'SIGN_IN' ? (
@@ -598,6 +605,28 @@ function LoginFormContent() {
                   </motion.div>
                 )}
               </div>
+
+              {/* Student Gmail / College Email (Added for user convenience and instant digital pickup passes) */}
+              {studentMode === 'SIGN_UP' && (
+                <div>
+                  <label className="block text-xs font-semibold text-(--text-primary) mb-1.5 flex items-center justify-between">
+                    <span>College / Personal Gmail Address</span>
+                    <span className="text-[10px] text-accent-orange font-semibold">Required for Pickup Pass</span>
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-(--text-muted) w-4 h-4" />
+                    <input
+                      type="email"
+                      value={studentEmail}
+                      onChange={(e) => setStudentEmail(e.target.value)}
+                      required
+                      placeholder="e.g. shivam@gmail.com"
+                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 border border-(--border-glass) text-(--text-primary) placeholder-(--text-muted) text-xs focus:outline-none focus:ring-2 focus:ring-[#FF6B2C] transition-all"
+                    />
+                  </div>
+                  <p className="mt-1 text-[11px] text-(--text-muted)">Your order receipts and live counter notifications will be sent here.</p>
+                </div>
+              )}
 
               {/* Student Password */}
               <div>

@@ -50,22 +50,15 @@ export default function IntroductionPage() {
           <Link
             href={user ? '/menu' : '/login'}
             onClick={() => playClick()}
-            className="w-full sm:w-auto flex-1 px-8 py-4 bg-accent-orange hover:bg-accent-orange/90 text-white font-bold text-base rounded-xl transition shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+            className="w-full px-8 py-4 bg-accent-orange hover:bg-accent-orange/90 text-white font-bold text-base rounded-xl transition shadow-lg shadow-accent-orange/25 hover:shadow-accent-orange/40 flex items-center justify-center gap-2"
           >
             <span>{user ? 'Open Cafe @7 Menu' : 'Sign in with your PRN'}</span>
             <ArrowRight size={18} />
           </Link>
-          <Link
-            href="/canteens"
-            onClick={() => playClick()}
-            className="w-full sm:w-auto px-6 py-4 bg-neutral-100 dark:bg-neutral-800/90 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-800 dark:text-neutral-200 font-semibold text-base rounded-xl transition border border-neutral-200 dark:border-neutral-700 text-center"
-          >
-            Check Canteen Hours
-          </Link>
         </div>
 
         {/* Concrete Proof & Real Measured Results (Replaces generic 3-card icons) */}
-        <section className="w-full max-w-3xl mx-auto space-y-8 text-left">
+        <section className="w-full max-w-3xl mx-auto space-y-8 text-left mb-16">
           {/* Real Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div className="p-4 sm:p-5 rounded-xl bg-neutral-50 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800">
@@ -142,8 +135,10 @@ export default function IntroductionPage() {
           </div>
         </section>
 
-        {/* Expandable Campus Canteen FAQ Accordion */}
-        <FAQAccordion />
+        {/* Dedicated Campus Canteen FAQ Section */}
+        <section id="faq" className="w-full scroll-mt-24 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+          <FAQAccordion />
+        </section>
       </main>
 
       {/* Clean Minimal Footer */}
@@ -156,6 +151,9 @@ export default function IntroductionPage() {
           </div>
 
           <div className="flex items-center gap-5 font-medium">
+            <Link href="/faq" className="hover:text-neutral-900 dark:hover:text-white transition">
+              FAQ & Help
+            </Link>
             {user && (
               <Link href="/canteens" className="hover:text-neutral-900 dark:hover:text-white transition">
                 Canteens

@@ -24,6 +24,7 @@ import {
   GraduationCap,
   X,
   Sparkles,
+  HelpCircle,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/lib/auth/useAuth';
@@ -38,29 +39,28 @@ export function MobileBottomNav() {
   const { playTab, playClick, muted, toggleMute } = useSoundFX();
   const { theme, setTheme, mode, toggleMode, config } = useTheme();
   const { isStaffOrAbove, isManagerOrAbove } = usePermissions();
+
   const [moreOpen, setMoreOpen] = useState(false);
 
+  // Close drawer on route change
   useEffect(() => {
     setMoreOpen(false);
   }, [pathname]);
 
+  // Lock body scroll when drawer is open
   useEffect(() => {
-    if (!moreOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    if (moreOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
     return () => {
-      document.body.style.overflow = prev;
+      document.body.style.overflow = '';
     };
   }, [moreOpen]);
 
-  if (
-    pathname?.startsWith('/kds') ||
-    pathname?.startsWith('/display') ||
-    pathname?.startsWith('/admin')
-  ) {
-    return null;
-  }
-
+  // Bottom tabs configuration
+  // Rule: max 5 tabs on mobile. Everything else goes into "More".
   const navItems = [
     {
       id: 'home',
@@ -83,7 +83,7 @@ export function MobileBottomNav() {
             label: 'Orders',
             href: '/orders',
             icon: Receipt,
-            isActive: pathname === '/orders' || Boolean(pathname?.startsWith('/order/')),
+            isActive: pathname === '/orders',
           },
           {
             id: 'tray',
@@ -181,62 +181,47 @@ export function MobileBottomNav() {
               playClick();
               setMoreOpen(true);
             }}
-            aria-label="Open more menu"
+            aria-label="More options"
             aria-expanded={moreOpen}
-            className="relative flex flex-1 min-w-0 flex-col items-center justify-center py-1.5 px-1 min-h-[52px] rounded-2xl transition-all cursor-pointer group active:scale-95 focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
+            className="relative flex flex-1 min-w-0 flex-col items-center justify-center py-1.5 px-1 min-h-[52px] rounded-2xl transition-all cursor-pointer group active:scale-95 text-[var(--text-secondary)] hover:text-[var(--text-primary)] focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
           >
-            {moreOpen && (
-              <div className="absolute inset-0.5 bg-accent-orange/15 rounded-2xl -z-10 border border-accent-orange/30" />
-            )}
-            <MoreHorizontal
-              size={20}
-              strokeWidth={moreOpen ? 2.5 : 2}
-              className={moreOpen ? 'text-accent-orange' : 'text-[var(--text-secondary)]'}
-            />
-            <span
-              className={`text-[10px] tracking-tight mt-0.5 font-semibold ${
-                moreOpen ? 'font-black text-accent-amber' : 'text-[var(--text-secondary)]'
-              }`}
-            >
+            <MoreHorizontal size={20} />
+            <span className="text-[10px] tracking-tight font-semibold mt-0.5 max-w-full truncate">
               More
             </span>
           </button>
         </div>
       </nav>
 
-      {/* More Menu bottom sheet */}
+      {/* Slide-over Drawer / Bottom Sheet */}
       <AnimatePresence>
         {moreOpen && (
           <>
-            <motion.button
-              type="button"
-              aria-label="Close more menu"
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="md:hidden fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px]"
+              transition={{ duration: 0.2 }}
               onClick={closeMore}
+              className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+              aria-hidden="true"
             />
+
             <motion.div
               role="dialog"
-              aria-modal="true"
               aria-label="More menu"
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
-              transition={{ type: 'spring', stiffness: 380, damping: 34 }}
-              className="md:hidden fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] overflow-y-auto rounded-t-3xl bg-[var(--bg-card)] border-t border-[var(--border-glass)] shadow-2xl"
-              style={{
-                paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
-                paddingLeft: 'max(1rem, env(safe-area-inset-left))',
-                paddingRight: 'max(1rem, env(safe-area-inset-right))',
-              }}
+              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+              className="md:hidden fixed bottom-0 inset-x-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl bg-[var(--bg-card)] border-t border-[var(--border-glass)] shadow-2xl p-4 flex flex-col pb-safe"
             >
-              <div className="sticky top-0 z-10 bg-[var(--bg-card)]/95 backdrop-blur-md pt-3 pb-2">
-                <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-[var(--text-muted)]/40" />
-                <div className="flex items-center justify-between px-1">
+              <div className="w-12 h-1.5 rounded-full bg-[var(--text-secondary)]/30 mx-auto mb-3" />
+
+              <div className="flex items-center justify-between pb-3 mb-2 border-b border-[var(--border-glass)]">
+                <div className="flex items-center justify-between w-full">
                   <div>
-                    <p className="text-sm font-black text-[var(--text-primary)]">More</p>
+                    <h2 className="text-sm font-black text-[var(--text-primary)]">Quick Actions</h2>
                     <p className="text-[11px] text-[var(--text-secondary)]">Campus tools & settings</p>
                   </div>
                   <button
@@ -255,6 +240,7 @@ export function MobileBottomNav() {
                   <>
                     <SheetLink href="/canteens" icon={Store} label="Campus Canteens" onClick={() => { playTab(); closeMore(); }} />
                     <SheetLink href="/select-campus" icon={Building2} label="Change Campus" onClick={() => { playTab(); closeMore(); }} />
+                    <SheetLink href="/faq" icon={HelpCircle} label="Campus FAQ & Help" onClick={() => { playTab(); closeMore(); }} />
                     <SheetLink href="/profile" icon={User} label="My Account & Profile" onClick={() => { playTab(); closeMore(); }} />
                     <SheetLink href="/display" icon={Tv} label="Counter TV Display" onClick={() => { playTab(); closeMore(); }} />
                     {isStaffOrAbove && (
@@ -268,7 +254,10 @@ export function MobileBottomNav() {
                     )}
                   </>
                 ) : (
-                  <SheetLink href="/login" icon={GraduationCap} label="Student PRN Login" onClick={() => { playTab(); closeMore(); }} />
+                  <>
+                    <SheetLink href="/login" icon={GraduationCap} label="Student PRN Login" onClick={() => { playTab(); closeMore(); }} />
+                    <SheetLink href="/faq" icon={HelpCircle} label="Campus FAQ & Help" onClick={() => { playTab(); closeMore(); }} />
+                  </>
                 )}
 
                 <div className="mt-2 pt-3 border-t border-[var(--border-glass)] space-y-3">
@@ -318,7 +307,7 @@ export function MobileBottomNav() {
                               : 'bg-black/5 dark:bg-white/5'
                           }`}
                         >
-                          {theme === t.id ? <Sparkles size={12} /> : <span aria-hidden="true">{t.emoji}</span>}
+                          <span aria-hidden="true">{t.emoji}</span>
                         </button>
                       ))}
                     </div>
@@ -340,7 +329,7 @@ function SheetLink({
   onClick,
 }: {
   href: string;
-  icon: React.ComponentType<{ size?: number }>;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
   label: string;
   onClick: () => void;
 }) {
@@ -348,9 +337,9 @@ function SheetLink({
     <Link
       href={href}
       onClick={onClick}
-      className="text-sm font-black text-[var(--text-primary)] px-4 py-3 min-h-[48px] rounded-2xl hover:bg-black/5 dark:hover:bg-white/10 transition cursor-pointer flex items-center gap-2.5 focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
+      className="flex items-center gap-3 px-3 py-2.5 min-h-[44px] rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition text-sm font-bold text-[var(--text-primary)]"
     >
-      <Icon size={16} />
+      <Icon size={18} className="text-accent-orange" />
       <span>{label}</span>
     </Link>
   );
