@@ -14,6 +14,7 @@ import {
   AlertCircle,
   Sparkles,
   Timer,
+  Phone,
   QrCode,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
@@ -22,6 +23,7 @@ import { BorderBeam } from '@/components/magicui';
 import { ChefExpressIllustration, CampusExpressIllustration } from '@/components/illustrations';
 import { createClient } from '@/utils/supabase/client';
 import { ThermalReceiptModal } from '@/components/order/ThermalReceiptModal';
+import { CopyButton } from '@/components/ui/CopyButton';
 
 interface OrderItem {
   id: string;
@@ -225,6 +227,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
               </div>
               <div className="text-4xl md:text-5xl font-black text-(--text-primary) tracking-tight flex items-center gap-3">
                 {token}
+                <CopyButton text={token} label="Copy Pass" />
                 {isReady && (
                   <motion.span
                     animate={{ y: [0, -6, 0] }}
@@ -253,6 +256,11 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
               >
                 {order?.pickup_otp || '----'}
               </div>
+              {order?.pickup_otp && (
+                <div className="mt-1.5 flex justify-start sm:justify-end">
+                  <CopyButton text={order.pickup_otp} label="Copy OTP" />
+                </div>
+              )}
             </div>
           </div>
 
@@ -459,7 +467,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs text-(--text-secondary)">
             <div>
               <span>Need help or wrong item? </span>
-              <span className="text-(--text-primary) font-bold">Ask Level 1 Counter Lead</span> or email <a href="mailto:foodlinecampus07@gmail.com" className="text-[#00D4AA] font-bold hover:underline">foodlinecampus07@gmail.com</a>
+              <span className="text-(--text-primary) font-bold">Ask Level 1 Counter Lead</span> or call <a href="tel:+919876543210" className="text-accent-orange font-bold hover:underline inline-flex items-center gap-1"><Phone size={12} /> +91-98765-43210</a> or email <a href="mailto:foodlinecampus07@gmail.com" className="text-[#00D4AA] font-bold hover:underline">foodlinecampus07@gmail.com</a>
             </div>
             <div className="flex items-center gap-4 text-xs font-bold">
               <Link href="/terms" className="text-(--text-secondary) hover:text-(--accent-orange) transition">Terms & Conditions</Link>

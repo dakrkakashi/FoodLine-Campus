@@ -16,6 +16,7 @@ import { PageTransition, SpotlightCard, SteamEffect, AnimatedCounter, FoodPartic
 import { DishInspectModal, DishInspectItem } from '@/components/3d/DishInspectModal';
 import { ChefExpressIllustration, EmptyMenuIllustration } from '@/components/illustrations';
 import { CampusCombosBar } from '@/components/menu/CampusCombosBar';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 interface MenuItem {
   id: string;
@@ -43,6 +44,7 @@ const TAG_VARIANT: Record<string, 'bestseller' | 'studentFav' | 'fastGrab' | 'sp
 
 
 export default function MenuPage() {
+  useKeyboardShortcuts();
   const { items: cartItems, addItem, removeItem, updateQuantity, totalAmount, totalCount } = useCart();
   const { getEffectiveAvailability, getStockQuantity } = useInventory();
   const { selectedCampus, selectedCanteen, availableCanteens } = useCampus();
@@ -391,7 +393,8 @@ export default function MenuPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-(--text-muted)" />
             <input
               type="text"
-              placeholder="Search 44+ dishes (e.g. Dosa, Vada Pav, Sandwich)..."
+              id="menu-search-input"
+              placeholder="Search 44+ dishes (Press '/' to focus)..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-(--bg-card) border border-(--border-glass) rounded-2xl pl-11 pr-11 py-4 text-sm text-(--text-primary) placeholder-(--text-muted) focus:outline-none focus:border-accent-orange focus:ring-2 focus:ring-accent-orange/20 transition-all shadow-inner"

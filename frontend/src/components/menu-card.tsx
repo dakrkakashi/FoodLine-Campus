@@ -8,6 +8,7 @@ import { useCart } from '../context/CartContext';
 import { useInventory } from '../context/InventoryContext';
 import { InventoryBadge } from './ui/InventoryBadge';
 import { useSoundFX } from '../hooks/useSoundFX';
+import { useToast } from '../context/ToastContext';
 
 interface MenuCardProps {
   item: MenuItem;
@@ -17,6 +18,7 @@ export function MenuCard({ item }: MenuCardProps) {
   const { items, addItem, removeItem } = useCart();
   const { getEffectiveAvailability, isLowStock, getStockQuantity } = useInventory();
   const { playPop, playClick } = useSoundFX();
+  const { cart: toastCart } = useToast();
 
   const cartItem = items.find((i) => i.id === item.id);
   const quantity = cartItem ? cartItem.quantity : 0;
@@ -96,6 +98,7 @@ export function MenuCard({ item }: MenuCardProps) {
             type="button"
             onClick={() => {
               playPop();
+              toastCart(`Added ${item.name} to Tray!`);
               addItem({
                 id: item.id,
                 name: item.name,

@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
 import { PageTransition, SpotlightCard } from '@/components/ui';
+import { CopyButton } from '@/components/ui/CopyButton';
 import { getLocalOrderHistory, SavedOrder } from '@/lib/order-history-store';
 import { useCart } from '@/context/CartContext';
 import { useSoundFX } from '@/hooks/useSoundFX';
@@ -428,6 +429,7 @@ export default function OrdersHistoryPage() {
                             <span className="font-black text-lg text-(--text-primary) tracking-tight">
                               {order.orderToken}
                             </span>
+                            <CopyButton text={order.orderToken} label="Copy Token" />
                             <span className="px-2 py-0.5 rounded-lg bg-black/5 dark:bg-white/5 border border-(--border-glass) text-[10px] font-extrabold text-(--text-secondary)">
                               OTP: <strong className="text-(--text-primary) tracking-wider">{order.pickupOtp}</strong>
                             </span>

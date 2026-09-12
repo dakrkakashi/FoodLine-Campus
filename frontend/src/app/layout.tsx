@@ -12,8 +12,42 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://foodline-campus.vercel.app'),
-  title: 'FoodLine Campus — Express Pre-Ordering & Pickup',
+  title: {
+    default: 'FoodLine Campus — Express Pre-Ordering & Pickup',
+    template: '%s | FoodLine Campus',
+  },
   description: 'Skip the line, not the meal. Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
+  keywords: [
+    'canteen pre-ordering',
+    'Sanjivani University',
+    'Cafe @7',
+    'foodline',
+    'campus food delivery',
+    'express pickup',
+    'break slot reservation',
+  ],
+  openGraph: {
+    title: 'FoodLine Campus — Express Pre-Ordering & Pickup',
+    description: 'Skip the line, not the meal. Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
+    url: 'https://foodline-campus.vercel.app',
+    siteName: 'FoodLine Campus',
+    locale: 'en_IN',
+    type: 'website',
+    images: [
+      {
+        url: '/logo.png',
+        width: 512,
+        height: 512,
+        alt: 'FoodLine Campus Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'FoodLine Campus — Express Pre-Ordering & Pickup',
+    description: 'Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
+    images: ['/logo.png'],
+  },
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -59,7 +93,17 @@ export default function RootLayout({
         <meta name="theme-color" content="#07070B" />
       </head>
       <body className="min-h-screen bg-(--bg-canvas,#07070B) text-(--text-primary) antialiased selection:bg-(--accent-orange,#FF6B2C) selection:text-white font-sans relative overflow-x-hidden transition-colors duration-300">
-        <Providers>{children}</Providers>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-accent-orange text-white text-xs font-bold rounded-xl shadow-lg ring-2 ring-white transition"
+        >
+          Skip to main content
+        </a>
+        <Providers>
+          <div id="main-content" tabIndex={-1} className="outline-hidden">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );

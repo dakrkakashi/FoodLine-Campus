@@ -1,0 +1,239 @@
+================================================================================
+  FOODLINE CAMPUS - FRONTEND POLISH, SECURITY & UX MASTER PLAN
+  Compiled from Architectural Audit, Security Rules & Vibe-Coding Standards
+  Governed by: Andrej Karpathy Guidelines & OWASP Z+ Security
+================================================================================
+
+[EXECUTIVE SUMMARY]
+This blueprint synthesizes all 15 visual design, security, and polish references into an
+actionable, file-level execution roadmap for FoodLine Campus (Next.js 15 App Router).
+
+Every item is classified into:
+  - [ACTIVE]   Already built, tested, and running in the repository.
+  - [UPGRADE]  Partially implemented or needs styling/behavioral enhancement.
+  - [PENDING]  New component or configuration to be built.
+
+================================================================================
+SECTION 1: THE 16 VIBE-CODING ESSENTIALS (adhubuildsthings reel)
+================================================================================
+
+#01. DARK / LIGHT MODE TOGGLE
+    Status: [ACTIVE] (ThemeContext.tsx & FloatingThemeTrigger.tsx)
+    Details: Multi-theme palette (Obsidian Cafe, Midnight Espresso, Cyber Neon,
+             Pure Light) with smooth CSS variable transitions.
+
+#02. COOKIE & LOCAL STORAGE PRIVACY BANNER
+    Status: [ACTIVE] (CookieConsentBanner.tsx - Mounted in Providers)
+    Target File: frontend/src/components/ui/CookieConsentBanner.tsx
+    Details: Lightweight DPDP-compliant bottom banner informing students of local
+             PRN & cart session storage. 1-tap "Got it" dismisses to localStorage.
+
+#03. BACK-TO-TOP FLOATING BUTTON
+    Status: [ACTIVE] (BackToTop.tsx - Mounted in Providers)
+    Target File: frontend/src/components/ui/BackToTop.tsx
+    Details: Appears smoothly when scrolling > 400px on /menu, /terms, and /orders.
+             Smooth scroll back to top with haptic sound effect.
+
+#04. MOBILE BOTTOM NAVIGATION (Navigation Tabs V2 - code.xr)
+    Status: [ACTIVE] (frontend/src/components/MobileBottomNav.tsx)
+    Details: Floating bottom nav with layoutId active spring pill indicator,
+             glowing amber active tabs, and responsive safe-area insets.
+
+#05. KEYBOARD SHORTCUTS
+    Status: [ACTIVE] (useKeyboardShortcuts.ts - Integrated in /menu)
+    Target File: frontend/src/hooks/useKeyboardShortcuts.ts
+    Details:
+      - Press '/' anywhere to focus the menu search bar.
+      - Press 'Esc' to dismiss modals (Thermal receipt, 3D viewer, Cart).
+      - Press 'Alt + C' to navigate to Food Tray (/cart).
+
+#06. HOVER & MICRO-INTERACTION STATES
+    Status: [ACTIVE]
+    Details: Tailwind group-hover scale, active:scale-95, magnetic button physics,
+             and spotlight cursor highlights on cards.
+
+#07. SLEEK CUSTOM SCROLLBAR
+    Status: [ACTIVE] (globals.css)
+    Details: Ultra-thin 6px scrollbar with subtle slate thumb and dark track.
+
+#08. 1-TAP COPY BUTTON WITH FEEDBACK
+    Status: [ACTIVE] (CopyButton.tsx - Integrated in /order/[token] and /orders)
+    Target File: frontend/src/components/ui/CopyButton.tsx
+    Details: Reusable copy pill with checkmark animation & "Copied!" toast for:
+             Order Tokens, Pickup OTPs, UTR Numbers, and Canteen UPI IDs.
+
+#09. SKELETON LOADERS
+    Status: [ACTIVE] (frontend/src/components/ui/Skeleton.tsx)
+    Details: Shimmering placeholders for dishes, canteens, and order history cards.
+
+#10. STICKY GLASSMORPHISM HEADER
+    Status: [ACTIVE] (frontend/src/components/navbar.tsx)
+    Details: Fixed navbar with backdrop-blur-2xl, border-b border-glass, and
+             campus cafeteria context indicator.
+
+#11. SKIP-TO-CONTENT ACCESSIBILITY LINK
+    Status: [ACTIVE] (frontend/src/app/layout.tsx - WCAG 2.2 compliant)
+    Target File: frontend/src/app/layout.tsx
+    Details: Screen-reader-first hidden link (<a href="#main-content">Skip to content</a>)
+             meeting WCAG 2.2 accessibility compliance.
+
+#12. OPEN GRAPH & TWITTER META PREVIEW
+    Status: [ACTIVE] (layout.tsx - Complete OG & Twitter card tags)
+    Target File: frontend/src/app/layout.tsx
+    Details: Add complete og:image, og:title, og:description, twitter:card metadata
+             so WhatsApp and social links show rich card previews for Sanjivani Univ.
+
+#13. DEFENSIVE EMPTY STATES
+    Status: [ACTIVE] (EmptyCartIllustration, EmptyMenuIllustration, EmptyOrders)
+    Details: Friendly illustrations with 1-tap call-to-action buttons when
+             tray is empty, search yields 0 items, or no past orders exist.
+
+#14. EXPANDABLE FAQ ACCORDION
+    Status: [ACTIVE] (FAQAccordion.tsx - Embedded in homepage)
+    Target File: frontend/src/components/FAQAccordion.tsx
+    Details: Smooth animated accordion addressing break-slot pickup rules,
+             cancellations, UPI refund timeline, and FSSAI hygiene guarantees.
+
+#15. TOAST NOTIFICATIONS
+    Status: [ACTIVE] (ToastContext.tsx - Global toast provider + cart alerts)
+    Target File: frontend/src/components/ui/Toast.tsx & frontend/src/context/ToastContext.tsx
+    Details: Floating snackbar toast for:
+             - "Added [Dish] to Tray!"
+             - "Order Token copied to clipboard"
+             - "Payment verification pending"
+
+#16. PASSWORD VISIBILITY EYE TOGGLE
+    Status: [ACTIVE] (frontend/src/app/login/page.tsx)
+    Details: Eye / EyeOff icon toggle on student PRN and staff login passwords.
+
+================================================================================
+SECTION 2: THE 17 ESSENTIAL WEBSITE FIXES (shubhamnalingupta reel)
+================================================================================
+
+#01. REMOVE HORIZONTAL SCROLL
+    Status: [ACTIVE] (globals.css: overflow-x: hidden on body, touch-action: manipulation)
+
+#02. ADD META DESCRIPTIONS
+    Status: [UPGRADE] (Root has metadata; extend to /menu, /canteens, /orders, /cart)
+
+#03. ADD A FAVICON
+    Status: [ACTIVE] (public/favicon.ico, logo.svg, /icons/icon-192x192.png)
+
+#04. FIX PAGE TITLES
+    Status: [ACTIVE] (layout.tsx title template "%s | FoodLine Campus") (Add title template in layout: "%s | FoodLine Campus")
+
+#05. COMPRESS IMAGES
+    Status: [ACTIVE] (SVGs for illustrations, Next.js Image component optimization)
+
+#06. CLICKABLE EMAIL (mailto:)
+    Status: [ACTIVE] (mailto:foodlinecampus07@gmail.com on /order/[token], /profile, /terms)
+
+#07. FIX BROKEN LINKS
+    Status: [ACTIVE] (All navbar and mobile nav links mapped to real Next.js routes)
+
+#08. ADD MOBILE MENU
+    Status: [ACTIVE] (MobileBottomNav.tsx + collapsible mobile hamburger in navbar.tsx)
+
+#09. REMOVE PLACEHOLDER TEXT
+    Status: [ACTIVE] (Real Sanjivani University, Cafe @7, and genuine dish catalog data)
+
+#10. TEST ON A MOBILE DEVICE
+    Status: [ACTIVE] (Capacitor Android wrapper config & mobile responsive breakpoints)
+
+#11. HAVE AN EMPTY STATE PAGE
+    Status: [ACTIVE] (EmptyCartIllustration, EmptyMenuIllustration, /not-found)
+
+#12. OPTIMIZE FOR MOBILE
+    Status: [ACTIVE] (Thumb-zone floating tray bar, touch targets >= 44x44px, safe-area insets)
+
+#13. FIX MOBILE OVERFLOW
+    Status: [ACTIVE] (max-w-[100vw], pb-safe, pt-safe, overscroll-behavior-y: contain)
+
+#14. ADD ERROR MESSAGES
+    Status: [ACTIVE] (HTTP error pages 401-503, inline validation error banners)
+
+#15. ADD SUCCESS MESSAGES
+    Status: [ACTIVE] (Confetti cannons, sound effects, green badges on checkout & login)
+
+#16. ADD 404 PAGE
+    Status: [ACTIVE] (frontend/src/app/not-found.tsx with empty plate illustration)
+
+#17. CLICKABLE PHONE NUMBER (tel:)
+    Status: [ACTIVE] (tel:+919876543210 in /terms and /order/[token])
+    Target Files: frontend/src/app/terms/page.tsx, frontend/src/app/order/[token]/page.tsx
+    Details: Add clickable helpline links (tel:+919876543210) for Cafe @7 Canteen Manager
+             and student grievance support.
+
+================================================================================
+SECTION 3: DEFENSIVE UI ARCHITECTURE (React Snippets Reference)
+================================================================================
+
+1. CONDITIONAL AUTH GATING (isLoggedIn ? <Dashboard /> : <Login />)
+   - Profile & Orders gate unauthenticated users cleanly to /login?redirect=...
+   - Logged-in state on /profile and /orders shows personalized student banner:
+     "Welcome back, [Student Name]! (PRN: [1031])"
+
+2. LOADING STATE (isLoading && <Loader />)
+   - Consistent loader spinner + animated brand icon during API fetches.
+   - Prevents flashing unstyled content (FOUC).
+
+3. ERROR STATE & INLINE RETRY (hasError && <ErrorMessage />)
+   - Standard error view with red alert banner and "Retry Request" button.
+   - Preserves form inputs so students do not retype data on network drop.
+
+================================================================================
+SECTION 4: Z+ SECURITY & AUTHENTICATION PROTOCOLS (ankurdecodes reels)
+================================================================================
+
+1. LIMIT THE LOGIN RATE (Brute-force prevention)
+   - Backend rate limiter restricts student login attempts to 10/min.
+   - OTP requests throttled to 5 per 15 minutes per device/phone.
+
+2. HASH & ENCRYPT ALL PASSWORDS (Bcrypt / Supabase Auth)
+   - Zero plain-text passwords stored anywhere in Supabase Postgres.
+   - Industry-standard salted Bcrypt hashing with cost factor >= 10.
+
+3. USE GENERIC ERROR MESSAGES (Anti-User Enumeration)
+   - When login fails: "Invalid PRN or password. Please check your credentials."
+   - Never expose "User does not exist" or "Incorrect password for Shivam".
+
+4. DON'T REINVENT NAIVE AUTH
+   - Auth is delegated to Supabase Auth engine with JWT stateless verification
+     and hardened httpOnly cookies where supported.
+
+================================================================================
+SECTION 5: INTERACTIVE CHECKOUT & CART MICRO-INTERACTIONS (code.xr reels)
+================================================================================
+
+1. INTERACTIVE "ADD TO CART" BUTTON
+   - 1-tap add turns button into a compact [- Qty +] pill on menu cards.
+   - Shows pop animation with instant count increment without full page re-render.
+
+2. PAYMENT CHECKOUT V3 CARD
+   - Unified checkout summary card with:
+     * Break Slot reservation badge (e.g. 1:15 PM - 1:25 PM Break)
+     * DirectPay UPI QR code with 12-digit UTR input
+     * Total amount in Indian Rupees (INR)
+     * Lock-secured "Pay and Reserve Slot" primary button
+
+3. ANIMATED OTP VERIFICATION V2
+   - 4-digit split inputs for pickup verification with auto-advance and backspace.
+   - Glowing waveform/pulse indicator when verifying against backend.
+
+================================================================================
+SECTION 6: ANDREJ KARPATHY & CAVEMAN LEAN ENGINEERING LAWS
+================================================================================
+
+1. THINK BEFORE CODING: Surface all trade-offs before writing files.
+2. SIMPLICITY FIRST: Maximum 40-70 lines per utility component. Zero AI bloat.
+3. SURGICAL CHANGES: Touch only specified files. Never refactor working logic.
+4. GOAL-DRIVEN VERIFICATION: Every modification must compile with:
+   - TypeScript: npx tsc --noEmit (0 errors)
+   - Production Build: npm run build (0 build errors)
+
+================================================================================
+EXECUTION PHASING:
+  Phase 1: Polish Infrastructure (ToastContext, CopyButton, BackToTop, CookieConsent)
+  Phase 2: UX Upgrades (1-Tap Reorder on /orders, FAQ Accordion, Menu Shortcuts, tel: links)
+  Phase 3: Security & Metadata (OpenGraph Cards, Skip-to-content, Title template)
+================================================================================

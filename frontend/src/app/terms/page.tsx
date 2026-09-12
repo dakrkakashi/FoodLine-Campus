@@ -976,7 +976,8 @@ export default function TermsAndConditionsPage() {
               <div className="text-white font-bold text-xs uppercase tracking-wider">Statutory Nodal Officer Contact</div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 <div><span className="text-zinc-500">Designated Officer:</span> <strong className="text-white">Legal Redressal &amp; Privacy Officer</strong></div>
-                <div><span className="text-zinc-500">Official Grievance Email:</span> <code className="text-[#00D4AA]">grievance@foodline.campus</code></div>
+                <div><span className="text-zinc-500">Official Grievance Email:</span> <a href="mailto:foodlinecampus07@gmail.com" className="text-[#00D4AA] hover:underline font-mono">foodlinecampus07@gmail.com</a></div>
+                <div><span className="text-zinc-500">Campus Helpline:</span> <a href="tel:+919876543210" className="text-accent-orange font-bold hover:underline font-mono">+91-98765-43210</a></div>
                 <div><span className="text-zinc-500">Response Acknowledgment:</span> <strong className="text-white">&lt; 48 Hours</strong></div>
                 <div><span className="text-zinc-500">Target Resolution SLA:</span> <strong className="text-white">Within 15 Business Days</strong></div>
                 <div className="sm:col-span-2"><span className="text-zinc-500">Campus Physical Office:</span> <span className="text-zinc-300">FoodLine Desk, Student Welfare Complex, Sanjivani University, Kopargaon - 423603</span></div>

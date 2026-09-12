@@ -7,6 +7,7 @@ import { Navbar } from '@/components/navbar';
 import { PageTransition } from '@/components/ui';
 import { useSoundFX } from '@/hooks/useSoundFX';
 import { useAuth } from '@/lib/auth/useAuth';
+import { FAQAccordion } from '@/components/FAQAccordion';
 
 export default function IntroductionPage() {
   const { playClick } = useSoundFX();
@@ -140,6 +141,9 @@ export default function IntroductionPage() {
             </div>
           </div>
         </section>
+
+        {/* Expandable Campus Canteen FAQ Accordion */}
+        <FAQAccordion />
       </main>
 
       {/* Clean Minimal Footer */}
