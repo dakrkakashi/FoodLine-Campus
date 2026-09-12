@@ -69,7 +69,29 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
 
     async function loadOrder() {
       try {
-        const { data, error } = await supabase
+        // 1. Fetch from server API with service role (bypasses RLS)
+        const res = await fetch(`/api/orders?token=${encodeURIComponent(token)}`);
+        const json = await res.json();
+        if (json?.success && Array.isArray(json.data) && json.data.length > 0) {
+          const freshOrder = json.data[0];
+          setOrder((prev) => {
+            if (prev && prev.status !== 'READY' && freshOrder.status === 'READY') {
+              fireFireworks();
+              try {
+                new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play();
+              } catch (e) {}
+            }
+            return {
+              ...(prev || {}),
+              ...freshOrder,
+            };
+          });
+          setConnectionStatus('live');
+          return;
+        }
+
+        // 2. Direct client fallback
+        const { data } = await supabase
           .from('orders')
           .select('*, order_items (*), pickup_slots (*)')
           .eq('order_token', token)
@@ -85,6 +107,11 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
     }
 
     loadOrder();
+
+    // Resilient 3-second live polling fallback for guaranteed status transitions
+    const pollInterval = setInterval(() => {
+      loadOrder();
+    }, 3000);
 
     // Supabase Realtime Channel
     const channel = supabase
@@ -143,6 +170,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
     };
 
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
       sse.close();
     };

@@ -221,22 +221,29 @@ export default function KitchenDisplayPage() {
   async function loadData() {
     try {
       setLoading(true);
-      const supabase = createClient();
+      const [kdsOrdersRes, menuApiRes] = await Promise.all([
+        fetch('/api/kds/orders').then((r) => r.json()).catch(() => null),
+        fetch('/api/menu').then((r) => r.json()).catch(() => null)
+      ]);
 
-      const [ordersRes, menuApiRes] = await Promise.all([
-        supabase
+      let incomingOrders: any[] = [];
+      if (kdsOrdersRes?.success && Array.isArray(kdsOrdersRes.data)) {
+        incomingOrders = kdsOrdersRes.data;
+      } else {
+        const supabase = createClient();
+        const ordersRes = await supabase
           .from('orders')
           .select('*, order_items (*), pickup_slots (*)')
           .in('status', ['CONFIRMED', 'PREPARING', 'READY', 'COLLECTED'])
           .order('created_at', { ascending: false })
-          .limit(30),
-        fetch('/api/menu').then((r) => r.json()).catch(() => null)
-      ]);
+          .limit(60);
+        if (ordersRes.data) incomingOrders = ordersRes.data;
+      }
 
-      if (ordersRes.data && ordersRes.data.length > 0) {
+      if (incomingOrders && incomingOrders.length > 0) {
         if (isInitialLoadRef.current) {
           // On first load, seed deduplication set with existing READY orders to prevent startup chime blast
-          ordersRes.data.forEach((o: any) => {
+          incomingOrders.forEach((o: any) => {
             if (o.status === 'READY') {
               readyChimePlayedTokensRef.current.add(o.order_token || o.id);
             }
@@ -244,14 +251,14 @@ export default function KitchenDisplayPage() {
           isInitialLoadRef.current = false;
         } else {
           // On background polling/refresh, check for newly transitioned READY orders
-          ordersRes.data.forEach((o: any) => {
+          incomingOrders.forEach((o: any) => {
             const token = o.order_token || o.id;
             if (o.status === 'READY' && !readyChimePlayedTokensRef.current.has(token)) {
               triggerReadyChime(token);
             }
           });
         }
-        setOrders(ordersRes.data);
+        setOrders(incomingOrders);
       }
 
       if (menuApiRes?.success && menuApiRes.data?.items?.length > 0) {
@@ -270,6 +277,7 @@ export default function KitchenDisplayPage() {
           }))
         );
       } else {
+        const supabase = createClient();
         const menuDbRes = await supabase.from('menu_items').select('*').order('name');
         if (menuDbRes.data && menuDbRes.data.length > 0) {
           setMenuItems(
@@ -294,7 +302,7 @@ export default function KitchenDisplayPage() {
     // 5-second resilient background polling fallback for tablet kiosk reliability
     const pollInterval = setInterval(() => {
       loadData();
-    }, 5000);
+    }, 3000);
 
     try {
       const supabase = createClient();

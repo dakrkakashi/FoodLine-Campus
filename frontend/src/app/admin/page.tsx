@@ -133,31 +133,37 @@ export default function AdminAnalyticsPage() {
   const fetchAnalytics = async () => {
     try {
       setIsRefreshing(true);
-      const supabase = createClient();
 
-      const [ordersRes, itemsRes, slotsRes, menuRes] = await Promise.all([
-        supabase
-          .from('orders')
-          .select('*, pickup_slots (*)')
-          .neq('status', 'CANCELLED')
-          .order('created_at', { ascending: false }),
-        supabase
-          .from('order_items')
-          .select('*'),
-        supabase
-          .from('pickup_slots')
-          .select('*')
-          .order('start_time', { ascending: true }),
+      const [adminOrdersRes, menuRes] = await Promise.all([
+        fetch('/api/admin/orders').then((r) => r.json()).catch(() => null),
         fetch('/api/menu').then((r) => r.json()).catch(() => null),
       ]);
 
-      if (ordersRes.data) setOrders(ordersRes.data);
-      if (itemsRes.data) setOrderItems(itemsRes.data);
-      if (slotsRes.data) setSlots(slotsRes.data);
+      if (adminOrdersRes?.success && adminOrdersRes.data) {
+        if (adminOrdersRes.data.orders) setOrders(adminOrdersRes.data.orders);
+        if (adminOrdersRes.data.orderItems) setOrderItems(adminOrdersRes.data.orderItems);
+        if (adminOrdersRes.data.slots) setSlots(adminOrdersRes.data.slots);
+      } else {
+        const supabase = createClient();
+        const [ordersRes, itemsRes, slotsRes] = await Promise.all([
+          supabase
+            .from('orders')
+            .select('*, pickup_slots (*)')
+            .neq('status', 'CANCELLED')
+            .order('created_at', { ascending: false }),
+          supabase.from('order_items').select('*'),
+          supabase.from('pickup_slots').select('*').order('start_time', { ascending: true }),
+        ]);
+
+        if (ordersRes.data) setOrders(ordersRes.data);
+        if (itemsRes.data) setOrderItems(itemsRes.data);
+        if (slotsRes.data) setSlots(slotsRes.data);
+      }
 
       if (menuRes?.success && menuRes.data?.items?.length > 0) {
         setMenuItems(menuRes.data.items);
       } else {
+        const supabase = createClient();
         const menuDbRes = await supabase.from('menu_items').select('*').order('name');
         if (menuDbRes.data) setMenuItems(menuDbRes.data);
       }
@@ -172,6 +178,10 @@ export default function AdminAnalyticsPage() {
   useEffect(() => {
     fetchAnalytics();
 
+    const pollInterval = setInterval(() => {
+      fetchAnalytics();
+    }, 5000);
+
     const supabase = createClient();
     const channel = supabase
       .channel('admin-analytics-live')
@@ -184,6 +194,7 @@ export default function AdminAnalyticsPage() {
       .subscribe();
 
     return () => {
+      clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
   }, []);

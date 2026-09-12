@@ -14,16 +14,24 @@ export function useRealtimeOrders() {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*, order_items(*)')
-        .in('status', ['CONFIRMED', 'PREPARING', 'READY', 'COLLECTED'])
-        .order('created_at', { ascending: false })
-        .limit(25);
+      // 1. Fetch via backend KDS orders route (bypasses RLS)
+      const res = await fetch('/api/kds/orders');
+      const json = await res.json();
+      let rawData = json?.success && Array.isArray(json.data) ? json.data : null;
 
-      if (!error && data) {
-        const enriched: DisplayOrder[] = data.map((o: any) => {
+      if (!rawData) {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('orders')
+          .select('*, order_items(*)')
+          .in('status', ['CONFIRMED', 'PREPARING', 'READY', 'COLLECTED'])
+          .order('created_at', { ascending: false })
+          .limit(25);
+        rawData = data;
+      }
+
+      if (rawData) {
+        const enriched: DisplayOrder[] = rawData.map((o: any) => {
           return {
             ...o,
             payment_mode: 'UPI',
@@ -39,6 +47,10 @@ export function useRealtimeOrders() {
 
   useEffect(() => {
     fetchOrders();
+
+    const pollInterval = setInterval(() => {
+      fetchOrders();
+    }, 4000);
 
     // Check demo mode from localStorage
     if (typeof window !== 'undefined') {
@@ -97,6 +109,7 @@ export function useRealtimeOrders() {
         });
 
       return () => {
+        clearInterval(pollInterval);
         supabase.removeChannel(channel);
       };
     } catch (e) {
