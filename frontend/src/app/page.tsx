@@ -150,7 +150,7 @@ export default function IntroductionPage() {
             <span>Sanjivani University, Kopargaon</span>
           </div>
 
-          <div className="flex items-center gap-5 font-medium">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-5 font-medium">
             <Link href="/faq" className="hover:text-neutral-900 dark:hover:text-white transition">
               FAQ & Help
             </Link>
@@ -162,10 +162,20 @@ export default function IntroductionPage() {
             <Link href={user ? '/profile' : '/login'} className="hover:text-neutral-900 dark:hover:text-white transition">
               {user ? 'My Profile' : 'Student Login'}
             </Link>
+            <Link href="/privacy" className="hover:text-neutral-900 dark:hover:text-white transition">
+              Privacy
+            </Link>
+            <Link href="/refund-policy" className="hover:text-neutral-900 dark:hover:text-white transition">
+              Refund Policy
+            </Link>
             <Link href="/terms" className="hover:text-neutral-900 dark:hover:text-white transition">
               Terms
             </Link>
           </div>
+        </div>
+        <div className="max-w-4xl mx-auto mt-4 pt-4 border-t border-neutral-200/60 dark:border-neutral-800/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-neutral-400 dark:text-neutral-500 text-center sm:text-left">
+          <span>&copy; {new Date().getFullYear()} FoodLine Campus. All rights reserved.</span>
+          <span>Intermediary Food Technology Platform &bull; DPDP & IT Act Compliant</span>
         </div>
       </footer>
     </PageTransition>

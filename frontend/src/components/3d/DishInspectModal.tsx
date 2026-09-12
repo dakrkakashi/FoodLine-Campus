@@ -147,6 +147,16 @@ export function DishInspectModal({ item, onClose }: DishInspectModalProps) {
               </div>
             </div>
 
+            {/* Allergen & Kitchen Intermediary Disclaimer */}
+            <div className="p-2.5 rounded-xl bg-amber-500/5 border border-amber-500/15 text-[11px] text-[var(--text-secondary)] leading-relaxed space-y-0.5">
+              <div className="font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5 text-[11px]">
+                <span>Allergen & Quality Notice</span>
+              </div>
+              <p className="text-[10px] text-neutral-500 dark:text-neutral-400">
+                Prepared by campus canteen kitchen staff. May contain gluten, dairy, or nuts. FoodLine serves as an ordering intermediary; food quality & FSSAI hygiene are maintained directly by the licensed canteen.
+              </p>
+            </div>
+
             {/* Action Bar */}
             <div className="flex items-center justify-between pt-4 border-t border-[var(--border-glass)]">
               <div className="text-xs text-[var(--text-secondary)]">

@@ -24,6 +24,8 @@ function LoginFormContent() {
   const [studentEmail, setStudentEmail] = useState('');
   const [studentPrn, setStudentPrn] = useState('');
   const [studentPassword, setStudentPassword] = useState('');
+  const [confirmAge, setConfirmAge] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const [showStudentPassword, setShowStudentPassword] = useState(false);
   const [detectedAccount, setDetectedAccount] = useState<{
     studentName: string;
@@ -236,6 +238,14 @@ function LoginFormContent() {
       }
       if (!studentEmail.trim() || !studentEmail.includes('@') || !studentEmail.includes('.')) {
         setErrorMessage('Please enter a valid Gmail / email address.');
+        return;
+      }
+      if (!confirmAge) {
+        setErrorMessage('Please confirm that you are at least 18 years old or an enrolled college student.');
+        return;
+      }
+      if (!agreeTerms) {
+        setErrorMessage('Please agree to the Terms of Service, Privacy Policy, and Refund Policy to create an account.');
         return;
       }
     }
@@ -664,6 +674,47 @@ function LoginFormContent() {
                   </button>
                 </div>
               </div>
+
+              {/* Age Verification & Legal Agreement Checkboxes */}
+              {studentMode === 'SIGN_UP' && (
+                <div className="space-y-2.5 pt-1 pb-1">
+                  <label className="flex items-start gap-2.5 cursor-pointer text-left">
+                    <input
+                      type="checkbox"
+                      checked={confirmAge}
+                      onChange={(e) => setConfirmAge(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-accent-orange focus:ring-accent-orange accent-accent-orange cursor-pointer"
+                    />
+                    <span className="text-[11px] text-(--text-secondary) leading-snug">
+                      I confirm that I am at least <strong>18 years of age</strong> (or an enrolled college student authorized by my campus).
+                    </span>
+                  </label>
+
+                  <label className="flex items-start gap-2.5 cursor-pointer text-left">
+                    <input
+                      type="checkbox"
+                      checked={agreeTerms}
+                      onChange={(e) => setAgreeTerms(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-neutral-300 dark:border-neutral-700 text-accent-orange focus:ring-accent-orange accent-accent-orange cursor-pointer"
+                    />
+                    <span className="text-[11px] text-(--text-secondary) leading-snug">
+                      I agree to the{' '}
+                      <Link href="/terms" target="_blank" className="text-accent-orange underline font-semibold hover:opacity-80">
+                        Terms of Service
+                      </Link>
+                      ,{' '}
+                      <Link href="/privacy" target="_blank" className="text-accent-orange underline font-semibold hover:opacity-80">
+                        Privacy Policy
+                      </Link>
+                      , and{' '}
+                      <Link href="/refund-policy" target="_blank" className="text-accent-orange underline font-semibold hover:opacity-80">
+                        Refund Policy
+                      </Link>
+                      .
+                    </span>
+                  </label>
+                </div>
+              )}
 
               <button
                 type="submit"
