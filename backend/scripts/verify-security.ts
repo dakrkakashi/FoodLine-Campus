@@ -12,7 +12,6 @@ async function runSecurityTests() {
   console.log('  🛡️ FOODLINE CAMPUS — AUTOMATED SECURITY SUITE AUDIT');
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
-
   let passed = 0;
   let failed = 0;
 
@@ -72,7 +71,7 @@ async function runSecurityTests() {
 
   if (resOversized.status === 413) {
     const data = await resOversized.json();
-    console.log(`   ✅ [PASS] Oversized payload rejected with HTTP 413 Payload Too Large!`);
+    console.log('   ✅ [PASS] Oversized payload rejected with HTTP 413 Payload Too Large!');
     console.log(`      Message: "${data.message}"\n`);
     passed++;
   } else {
@@ -91,12 +90,11 @@ async function runSecurityTests() {
     body: JSON.stringify({ prn: xssPrn }),
   });
   const sanitizeData = await resSanitize.json();
-  // Sanitizer strips <script>alert("xss")</script>, leaving PRN12345
   if (resSanitize.status === 200 && sanitizeData.data?.prn === 'PRN12345') {
     console.log(`   ✅ [PASS] XSS tag stripped cleanly: "${xssPrn}" -> "${sanitizeData.data.prn}"\n`);
     passed++;
   } else if (resSanitize.status === 400) {
-    console.log(`   ✅ [PASS] Malicious input rejected with HTTP 400!\n`);
+    console.log('   ✅ [PASS] Malicious input rejected with HTTP 400!\n');
     passed++;
   } else {
     console.log(`   ✅ [PASS] Input sanitized/handled safely (Status: ${resSanitize.status})\n`);
@@ -160,7 +158,7 @@ async function runSecurityTests() {
 
   if (resUnauthKds.status === 401) {
     const data = await resUnauthKds.json();
-    console.log(`   ✅ [PASS] Unauthenticated KDS request rejected with HTTP 401 Unauthorized!`);
+    console.log('   ✅ [PASS] Unauthenticated KDS request rejected with HTTP 401 Unauthorized!');
     console.log(`      Message: "${data.error}"\n`);
     passed++;
   } else {
@@ -191,29 +189,315 @@ async function runSecurityTests() {
   }
 
   // ---------------------------------------------------------------------------
-  // Test 8: Audit Finding 3.1 — Salted scrypt Password Verification & Plaintext Rejection
+  // Test 8: Audit Finding 3.1 — Salted scrypt Password Hashing & Plaintext Rejection
   // ---------------------------------------------------------------------------
   console.log('🧪 Test 8: Salted scrypt Password Hashing & Plaintext Fallback Elimination...');
   try {
     const { SheetsDbService } = await import('../src/services/sheets-db.service.js');
     const testPassword = 'CampusStudentSecurePass!2026';
     const hashedPassword = SheetsDbService.hashPassword(testPassword);
-    
+
     const isScryptFormat = hashedPassword.startsWith('$scrypt$');
     const isValid = SheetsDbService.verifyPassword(testPassword, hashedPassword);
     const isWrongRejected = !SheetsDbService.verifyPassword('WrongPass', hashedPassword);
     const isPlaintextRejected = !SheetsDbService.verifyPassword(testPassword, testPassword);
 
     if (isScryptFormat && isValid && isWrongRejected && isPlaintextRejected) {
-      console.log(`   ✅ [PASS] Salted scrypt hashing verified ($scrypt$ format, timing-safe match).`);
-      console.log(`   ✅ [PASS] Plaintext comparison fallback strictly rejected!\n`);
+      console.log('   ✅ [PASS] Salted scrypt hashing verified ($scrypt$ format, timing-safe match).');
+      console.log('   ✅ [PASS] Plaintext comparison fallback strictly rejected!\n');
       passed++;
     } else {
       console.error(`   ❌ [FAIL] Password verification logic failed: scrypt=${isScryptFormat}, valid=${isValid}, plaintextRejected=${isPlaintextRejected}`);
       failed++;
     }
   } catch (err: any) {
-    console.error(`   ❌ [FAIL] Error importing SheetsDbService for Test 8:`, err.message);
+    console.error('   ❌ [FAIL] Error importing SheetsDbService for Test 8:', err.message);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 9: HTTP Security Headers & X-Powered-By Stripping
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 9: Production Security Headers & Fingerprinting Defense...');
+  try {
+    const resHeaders = await fetch(`${BASE_URL}/health`);
+    const contentTypeOptions = resHeaders.headers.get('x-content-type-options');
+    const frameOptions = resHeaders.headers.get('x-frame-options');
+    const hsts = resHeaders.headers.get('strict-transport-security');
+    const csp = resHeaders.headers.get('content-security-policy');
+    const poweredBy = resHeaders.headers.get('x-powered-by');
+
+    const headersValid =
+      contentTypeOptions === 'nosniff' &&
+      frameOptions === 'SAMEORIGIN' &&
+      Boolean(hsts) &&
+      Boolean(csp) &&
+      poweredBy === null;
+
+    if (headersValid) {
+      console.log(`   ✅ [PASS] X-Content-Type-Options: ${contentTypeOptions}`);
+      console.log(`   ✅ [PASS] X-Frame-Options: ${frameOptions}`);
+      console.log(`   ✅ [PASS] Strict-Transport-Security: ${hsts?.slice(0, 30)}...`);
+      console.log('   ✅ [PASS] Content-Security-Policy: Configured');
+      console.log('   ✅ [PASS] X-Powered-By Header: Stripped (null)\n');
+      passed++;
+    } else {
+      console.error(`   ❌ [FAIL] Missing expected security headers. Found: nosniff=${contentTypeOptions}, frame=${frameOptions}, hsts=${Boolean(hsts)}, csp=${Boolean(csp)}, poweredBy=${poweredBy}`);
+      failed++;
+    }
+  } catch (err: any) {
+    console.error('   ❌ [FAIL] Error fetching headers for Test 9:', err.message);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 10: Unauthorized Payment Reconciliation Rejection (HTTP 401)
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 10: Unauthorized Payment Reconciliation Protection...');
+  const resReconcile = await fetch(`${BASE_URL}/api/payments/reconcile`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ orderToken: 'FL-1234', verifiedBy: 'Attacker' }),
+  });
+
+  if (resReconcile.status === 401) {
+    console.log('   ✅ [PASS] POST /api/payments/reconcile rejected unauthenticated request with HTTP 401 Unauthorized!\n');
+    passed++;
+  } else {
+    console.error(`   ❌ [FAIL] Expected HTTP 401 on reconcile route, got ${resReconcile.status}`);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 11: Unauthorized WhatsApp Notification Preview Rejection (HTTP 401)
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 11: Unauthorized WhatsApp Notification Preview Protection...');
+  const resPreview = await fetch(`${BASE_URL}/api/notifications/whatsapp/preview/FL-1234`);
+
+  if (resPreview.status === 401) {
+    console.log('   ✅ [PASS] GET /api/notifications/whatsapp/preview/:orderToken rejected unauthenticated request with HTTP 401 Unauthorized!\n');
+    passed++;
+  } else {
+    console.error(`   ❌ [FAIL] Expected HTTP 401 on notification preview route, got ${resPreview.status}`);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 12: NoSQL Injection & Prototype Pollution Sanitization
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 12: Deep Sanitizer NoSQL & Prototype Pollution Defense...');
+  try {
+    const { sanitizeDeep } = await import('../src/middleware/sanitizer.js');
+    const maliciousPayload = {
+      $where: '1 == 1',
+      $gt: '',
+      constructor: { polluted: true },
+      safeField: 'GoodStudent\0Value<script>alert("hack")</script>',
+    };
+
+    const cleaned = sanitizeDeep(maliciousPayload);
+
+    const keys = Object.keys(cleaned);
+    const noSqlBlocked = !keys.includes('$where') && !keys.includes('$gt');
+    const protoClean = !keys.includes('constructor') && !keys.includes('__proto__');
+    const nullByteClean = typeof cleaned.safeField === 'string' && !cleaned.safeField.includes('\0');
+    const xssClean = typeof cleaned.safeField === 'string' && !cleaned.safeField.includes('<script>');
+
+    if (noSqlBlocked && protoClean && nullByteClean && xssClean) {
+      console.log('   ✅ [PASS] NoSQL operators ($where, $gt) cleanly stripped.');
+      console.log('   ✅ [PASS] Prototype pollution keys (constructor, __proto__) neutralized.');
+      console.log('   ✅ [PASS] Null bytes (\\0) and script tags removed from string values.\n');
+      passed++;
+    } else {
+      console.error(`   ❌ [FAIL] Sanitization failure: noSqlBlocked=${noSqlBlocked}, protoClean=${protoClean}, nullByteClean=${nullByteClean}, xssClean=${xssClean}`);
+      failed++;
+    }
+  } catch (err: any) {
+    console.error('   ❌ [FAIL] Error in Test 12:', err.message);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 13: CSPRNG Token Entropy & Timing Attack Resistance
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 13: Cryptographic Randomness (CSPRNG) & JWT Signature Hardening...');
+  try {
+    const { OrderService } = await import('../src/services/order-service.js');
+    const { signJwt, verifyJwt } = await import('../src/lib/jwt.js');
+
+    // Generate tokens and verify entropy
+    const tokens = new Set<string>();
+    const otps = new Set<string>();
+    let tokensValid = true;
+    let otpsValid = true;
+
+    for (let i = 0; i < 50; i++) {
+      const t = OrderService.generateOrderToken();
+      const o = OrderService.generatePickupOtp();
+      if (!/^FL-\d{4,5}$/.test(t)) tokensValid = false;
+      if (!/^\d{4}$/.test(o)) otpsValid = false;
+      tokens.add(t);
+      otps.add(o);
+    }
+
+    // Entropy check: At least 40 unique values out of 50
+    const highEntropy = tokens.size >= 45 && otps.size >= 40;
+
+    // JWT tamper check
+    const validJwt = signJwt({ email: 'student@sanjivani.edu.in', role: 'student' });
+    const parts = validJwt.split('.');
+    // Tamper signature by swapping last character
+    const tamperedSig = parts[2].slice(0, -1) + (parts[2].slice(-1) === 'a' ? 'b' : 'a');
+    const tamperedJwt = `${parts[0]}.${parts[1]}.${tamperedSig}`;
+
+    const legitDecoded = verifyJwt(validJwt);
+    const tamperedDecoded = verifyJwt(tamperedJwt);
+
+    if (tokensValid && otpsValid && highEntropy && legitDecoded.valid && !tamperedDecoded.valid) {
+      console.log('   ✅ [PASS] CSPRNG generates cryptographically random tokens and OTPs.');
+      console.log('   ✅ [PASS] Constant-time signature verification successfully rejects tampered JWT.\n');
+      passed++;
+    } else {
+      console.error(`   ❌ [FAIL] Cryptography check failed: tokensValid=${tokensValid}, otpsValid=${otpsValid}, highEntropy=${highEntropy}, legitValid=${legitDecoded.valid}, tamperedRejected=${!tamperedDecoded.valid}`);
+      failed++;
+    }
+  } catch (err: any) {
+    console.error('   ❌ [FAIL] Error in Test 13:', err.message);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 14: CSRF & Origin Validation (Rejection of Untrusted Origin)
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 14: CSRF & Untrusted Origin Blocking...');
+  const resCsrf = await fetch(`${BASE_URL}/api/auth/resolve-student`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Origin': 'http://malicious-attacker-site.com',
+    },
+    body: JSON.stringify({ prn: '2023SUCS0142' }),
+  });
+
+  if (resCsrf.status === 403) {
+    const csrfData = await resCsrf.json();
+    console.log('   ✅ [PASS] Mutating POST from untrusted origin blocked with HTTP 403 Forbidden!');
+    console.log(`      Error: "${csrfData.error}"\n`);
+    passed++;
+  } else {
+    console.error(`   ❌ [FAIL] Expected HTTP 403 for untrusted Origin, got ${resCsrf.status}`);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 15: Financial Integrity & Negative Quantity/Price Defense
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 15: Financial Integrity & Negative Parameter Defense...');
+  try {
+    const { OrderService } = await import('../src/services/order-service.js');
+    let caughtNegativeQty = false;
+    let caughtNegativePrice = false;
+
+    try {
+      await OrderService.createOrder({
+        items: [{ id: 'dish-1', name: 'Thali', price: 100, quantity: -5 }],
+      });
+    } catch (e: any) {
+      if (e.message.includes('quantity')) caughtNegativeQty = true;
+    }
+
+    try {
+      await OrderService.createOrder({
+        items: [{ id: 'dish-2', name: 'Thali', price: -50, quantity: 1 }],
+      });
+    } catch (e: any) {
+      if (e.message.includes('price')) caughtNegativePrice = true;
+    }
+
+    if (caughtNegativeQty && caughtNegativePrice) {
+      console.log('   ✅ [PASS] Negative quantity correctly rejected with validation exception.');
+      console.log('   ✅ [PASS] Negative price correctly rejected with financial integrity guard.\n');
+      passed++;
+    } else {
+      console.error(`   ❌ [FAIL] Financial integrity failed: negativeQty=${caughtNegativeQty}, negativePrice=${caughtNegativePrice}`);
+      failed++;
+    }
+  } catch (err: any) {
+    console.error('   ❌ [FAIL] Error in Test 15:', err.message);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 16: UTR Replay Attack Protection
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 16: UTR Payment Replay Attack Defense...');
+  try {
+    const { UtrVerifierService } = await import('../src/services/utr-verifier.js');
+    const testUtr = '887766554433';
+    const firstCheck = UtrVerifierService.verifyUtr(testUtr, 'FL-1001');
+    const replayCheck = UtrVerifierService.verifyUtr(testUtr, 'FL-1002');
+
+    if (firstCheck.valid && !replayCheck.valid && replayCheck.message.includes('Replay detected')) {
+      console.log('   ✅ [PASS] First UTR submission accepted.');
+      console.log(`   ✅ [PASS] Second identical UTR submission blocked: "${replayCheck.message}"\n`);
+      passed++;
+    } else {
+      console.error(`   ❌ [FAIL] Replay protection check failed: firstValid=${firstCheck.valid}, replayBlocked=${!replayCheck.valid}`);
+      failed++;
+    }
+  } catch (err: any) {
+    console.error('   ❌ [FAIL] Error in Test 16:', err.message);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 17: JWT Algorithm Lockdown & Token Revocation
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 17: JWT Algorithm Lockdown (alg:none rejection) & Token Revocation...');
+  try {
+    const { signJwt, verifyJwt, revokeJwt } = await import('../src/lib/jwt.js');
+
+    // 1. None algorithm attack simulation
+    const noneHeader = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url');
+    const nonePayload = Buffer.from(JSON.stringify({ user: 'admin', exp: Math.floor(Date.now() / 1000) + 3600 })).toString('base64url');
+    const noneToken = `${noneHeader}.${nonePayload}.`;
+    const noneResult = verifyJwt(noneToken);
+
+    // 2. Issuance and Revocation
+    const freshToken = signJwt({ user: 'shiv', role: 'student' });
+    const freshResultBefore = verifyJwt(freshToken);
+    revokeJwt(freshToken, 3600);
+    const freshResultAfter = verifyJwt(freshToken);
+
+    const noneBlocked = !noneResult.valid && Boolean(noneResult.error && noneResult.error.includes('HS256'));
+    const revocationWorked = freshResultBefore.valid && !freshResultAfter.valid && Boolean(freshResultAfter.error && freshResultAfter.error.includes('revoked'));
+
+    if (noneBlocked && revocationWorked) {
+      console.log('   ✅ [PASS] Algorithm "none" attack token immediately rejected.');
+      console.log('   ✅ [PASS] Token successfully revoked and subsequent verification fails with "revoked".\n');
+      passed++;
+    } else {
+      console.error(`   ❌ [FAIL] JWT hardening check failed: noneBlocked=${noneBlocked}, revocationWorked=${revocationWorked}`);
+      failed++;
+    }
+  } catch (err: any) {
+    console.error('   ❌ [FAIL] Error in Test 17:', err.message);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 18: Path Traversal Attack Defense
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 18: Path Traversal Defense (.. directory jump rejection)...');
+  const resTraversal = await fetch(`${BASE_URL}/api/campuses/..%2f..%2fpackage.json/canteens`);
+
+  if (resTraversal.status === 400) {
+    const travData = await resTraversal.json();
+    console.log('   ✅ [PASS] Path traversal attempt blocked with HTTP 400 Bad Request!');
+    console.log(`      Message: "${travData.message}"\n`);
+    passed++;
+  } else {
+    console.error(`   ❌ [FAIL] Expected HTTP 400 for path traversal, got ${resTraversal.status}`);
     failed++;
   }
 
@@ -234,5 +518,3 @@ runSecurityTests().catch((err) => {
   }
   process.exit(1);
 });
-
-

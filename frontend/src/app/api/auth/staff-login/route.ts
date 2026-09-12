@@ -1,12 +1,24 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import crypto from 'crypto';
 
 const DEFAULT_SUPABASE_URL = 'https://ylweomuodekukjjpjrgx.supabase.co';
 const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlsd2VvbXVvZGVrdWtqanBqcmd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTczMDMsImV4cCI6MjEwMzAzMzMwM30.g75fot8jU_36gPD6sQCL81MUUZUfoJLDxL9eSsFAHaE';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
+
+// Constant-time string comparison to prevent timing side-channel attacks
+function timingSafeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a, 'utf-8');
+  const bufB = Buffer.from(b, 'utf-8');
+  if (bufA.length !== bufB.length) {
+    crypto.timingSafeEqual(bufA, bufA);
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 // Authorized staff accounts and roles for campus operations
 const AUTHORIZED_STAFF: Record<string, { role: 'canteen_manager' | 'kitchen' | 'admin'; name: string; cafeteriaId: string }> = {
@@ -38,7 +50,7 @@ const AUTHORIZED_STAFF: Record<string, { role: 'canteen_manager' | 'kitchen' | '
 };
 
 export async function POST(request: NextRequest) {
-  // Prompt 1: Rate limiting on login routes (max 5 attempts per 15 min)
+  // Rate limiting on login routes (max 5 attempts per 15 min)
   const rateLimitResponse = checkRateLimit(request, {
     maxRequests: 5,
     windowMs: 15 * 60 * 1000,
@@ -96,14 +108,13 @@ export async function POST(request: NextRequest) {
       // Supabase timeout or unreachable -> proceed to authorized staff verification
     }
 
-    // 2. Fallback validation for authorized campus staff accounts
+    // 2. Fallback validation for authorized campus staff accounts with timing-safe comparison
     if (!authenticated) {
       const staffConfig = AUTHORIZED_STAFF[cleanEmail];
       if (staffConfig) {
-        // Prompt 2 & 3: Pull authorized staff passkey from environment variable, eliminating dictionary passwords and length bypass
         const authorizedPasskey = process.env.STAFF_AUTH_PASSKEY || 'foodline2026';
 
-        if (cleanPass === authorizedPasskey) {
+        if (timingSafeCompare(cleanPass, authorizedPasskey)) {
           authenticated = true;
           staffUser.full_name = staffConfig.name;
           staffUser.role = staffConfig.role;
@@ -148,6 +159,7 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
       sameSite: 'lax',
       httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
     });
 
     return response;

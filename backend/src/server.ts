@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { MenuService } from './services/menu-service.js';
@@ -13,8 +13,16 @@ import { CampusService } from './services/campus-service.js';
 import { checkGoogleSheetsConnection } from './config/googleSheets.js';
 import { SheetsDbService } from './services/sheets-db.service.js';
 import { NotificationService } from './services/notification-service.js';
-import { generalApiLimiter, otpRateLimiter, orderPlacementLimiter } from './middleware/rate-limiter.js';
-import { sanitizeInputsMiddleware, payloadSizeGuard, SecurityValidators } from './middleware/sanitizer.js';
+import {
+  generalApiLimiter,
+  otpRateLimiter,
+  orderPlacementLimiter,
+  utrRateLimiter,
+  studentResolveLimiter,
+  orderLookupLimiter,
+  notificationPreviewLimiter,
+} from './middleware/rate-limiter.js';
+import { sanitizeInputsMiddleware, payloadSizeGuard, SecurityValidators, csrfOriginGuard, pathTraversalGuard } from './middleware/sanitizer.js';
 import { requireAuth } from './middleware/auth.middleware.js';
 import { logger } from './lib/logger.js';
 
@@ -23,7 +31,30 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Prompt 4: Reject oversized payloads (>64KB) and sanitize all user inputs
+// Security Hardening: Disable fingerprinting headers
+app.disable('x-powered-by');
+
+// Production-grade security headers
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '0');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-site');
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* https://*.supabase.co;"
+  );
+  next();
+});
+
+// Path Traversal Defense: Block directory traversal attempts
+app.use(pathTraversalGuard);
+
+// Reject oversized payloads (>64KB) and sanitize all user inputs
 app.use(payloadSizeGuard(64 * 1024));
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
@@ -47,10 +78,14 @@ app.use(
     credentials: true,
   })
 );
+
+// CSRF & Cross-Origin State Mutation Guard
+app.use(csrfOriginGuard(allowedOrigins));
+
 app.use(express.json({ limit: '64kb' }));
 app.use(sanitizeInputsMiddleware);
 
-// Prompt 1: Rate limiting on all endpoints (120 req/min general limit)
+// Rate limiting on all endpoints (120 req/min general limit)
 app.use('/api', generalApiLimiter);
 
 // Auth & Signup Routes (with 5-attempt per 15 min rate limit)
@@ -369,7 +404,7 @@ app.get('/api/campuses/:campusId/canteens', async (req: Request, res: Response) 
   }
 });
 
-app.post('/api/auth/resolve-student', async (req: Request, res: Response) => {
+app.post('/api/auth/resolve-student', studentResolveLimiter, async (req: Request, res: Response) => {
   try {
     const { prn, email } = req.body;
     const identifier = prn || email;
@@ -380,7 +415,15 @@ app.post('/api/auth/resolve-student', async (req: Request, res: Response) => {
       });
     }
 
-    const studentProfile = await CampusService.resolveStudent(identifier);
+    const cleanId = String(identifier).trim();
+    if (!SecurityValidators.isValidPrn(cleanId) && !SecurityValidators.isValidEmail(cleanId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Malformed student identifier. Must be a valid PRN or email address.',
+      });
+    }
+
+    const studentProfile = await CampusService.resolveStudent(cleanId);
     res.json({
       success: true,
       data: studentProfile,
@@ -402,7 +445,7 @@ app.get('/api/menu', async (req: Request, res: Response) => {
 
     const categories = [
       { id: '90421a73-2da6-4eda-bd5a-96a14d02d87f', name: 'Quick Bites & Chaat', icon: '🥪', display_order: 1 },
-      { id: 'd7b7aefc-7ff3-41ac-b35f-08dd0045f955', name: 'South & North Indian', icon: '🥞', display_order: 2 },
+      { id: 'd7b7aefc-7ff3-41ac-b35f-08dd0045f955', name: 'South & North Indian', icon: '🥘', display_order: 2 },
       { id: 'f71276ce-2b56-4e1d-bd2c-989af0ca40a9', name: 'Loaded Sandwiches', icon: '🥪', display_order: 3 },
       { id: '8401f019-6824-43c3-a547-8a94f8db4fbf', name: 'Momos & Burgers', icon: '🍔', display_order: 4 },
       { id: 'ecbfe374-85de-49ae-9ef4-c50e6d09ceb2', name: 'Fries & Pastas', icon: '🍟', display_order: 5 },
@@ -452,10 +495,17 @@ app.post('/api/orders', orderPlacementLimiter, async (req: Request, res: Respons
     const { slotId, items, studentPhone, studentName, studentPrn, notes, userId, cafeteriaId } = req.body;
     const idempotencyKey = (req.headers['idempotency-key'] as string) || req.body.idempotencyKey;
 
-    // Prompt 4: Sanitize & validate order items payload
+    // Sanitize & validate order items payload
     const itemsValidation = SecurityValidators.validateOrderItems(items);
     if (!itemsValidation.valid) {
       return res.status(400).json({ success: false, error: itemsValidation.error });
+    }
+
+    if (studentPrn && !SecurityValidators.isValidPrn(studentPrn)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Malformed student PRN format.',
+      });
     }
 
     const newOrder = await OrderService.createOrder({
@@ -473,10 +523,10 @@ app.post('/api/orders', orderPlacementLimiter, async (req: Request, res: Respons
     res.status(201).json({
       success: true,
       data: {
-        orderId: newOrder.id,
+        id: newOrder.id,
         orderToken: newOrder.orderToken,
-        totalAmount: newOrder.totalAmount,
         pickupOtp: newOrder.pickupOtp,
+        totalAmount: newOrder.totalAmount,
         status: newOrder.status,
         paymentStatus: newOrder.paymentStatus,
         idempotencyKey: newOrder.idempotencyKey,
@@ -493,9 +543,9 @@ app.post('/api/orders', orderPlacementLimiter, async (req: Request, res: Respons
 });
 
 // -----------------------------------------------------------------------------
-// 4. POST /api/payments/verify-utr
+// 4. POST /api/payments/verify-utr (Protected with utrRateLimiter)
 // -----------------------------------------------------------------------------
-app.post('/api/payments/verify-utr', async (req: Request, res: Response) => {
+app.post('/api/payments/verify-utr', utrRateLimiter, async (req: Request, res: Response) => {
   try {
     const { orderToken, utrNumber, amount } = req.body;
 
@@ -503,7 +553,7 @@ app.post('/api/payments/verify-utr', async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: 'orderToken is required' });
     }
 
-    // Prompt 4: Validate 12-digit numeric UTR format
+    // Validate 12-digit numeric UTR format
     if (utrNumber && !SecurityValidators.isValidUtr(String(utrNumber))) {
       return res.status(400).json({
         success: false,
@@ -531,9 +581,9 @@ app.post('/api/payments/verify-utr', async (req: Request, res: Response) => {
 });
 
 // -----------------------------------------------------------------------------
-// 4a. POST /api/payments/reconcile (Staff/Admin manual payment verification)
+// 4a. POST /api/payments/reconcile (Protected: Staff/Admin authentication required)
 // -----------------------------------------------------------------------------
-app.post('/api/payments/reconcile', async (req: Request, res: Response) => {
+app.post('/api/payments/reconcile', requireAuth(['canteen_manager', 'admin', 'kitchen']), async (req: Request, res: Response) => {
   try {
     const { orderToken, verifiedBy } = req.body;
 
@@ -541,7 +591,7 @@ app.post('/api/payments/reconcile', async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: 'orderToken is required' });
     }
 
-    const order = await OrderService.reconcilePayment(orderToken, verifiedBy || 'Staff');
+    const order = await OrderService.reconcilePayment(orderToken, verifiedBy || req.user?.email || 'Staff');
 
     res.json({
       success: true,
@@ -572,7 +622,7 @@ app.post('/api/orders/verify-otp', otpRateLimiter, async (req: Request, res: Res
       });
     }
 
-    // Prompt 4: Validate 4-digit pickup OTP format
+    // Validate 4-digit pickup OTP format
     if (!SecurityValidators.isValidOtp(String(pickupOtp))) {
       return res.status(400).json({
         success: false,
@@ -599,9 +649,9 @@ app.post('/api/orders/verify-otp', otpRateLimiter, async (req: Request, res: Res
 });
 
 // -----------------------------------------------------------------------------
-// 5. GET /api/order/:token & /api/order/:token/stream
+// 5. GET /api/order/:token (Protected with orderLookupLimiter) & /api/order/:token/stream
 // -----------------------------------------------------------------------------
-app.get('/api/order/:token', async (req: Request<{ token: string }>, res: Response) => {
+app.get('/api/order/:token', orderLookupLimiter, async (req: Request<{ token: string }>, res: Response) => {
   const token = req.params.token;
   const order = await OrderService.getOrderByToken(token);
 
@@ -728,34 +778,43 @@ app.post('/api/admin/orders/cleanup', requireAuth(['admin']), async (req: Reques
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
 // -----------------------------------------------------------------------------
-// 10. GET /api/telemetry (Real-Time System, Memory, SSE & Slot Monitor)
+// 10. GET /api/notifications/whatsapp/preview/:orderToken (Protected: kitchen, canteen_manager, admin)
 // -----------------------------------------------------------------------------
-app.get('/api/notifications/whatsapp/preview/:orderToken', async (req: Request, res: Response) => {
-  try {
-    const orderToken = String(req.params.orderToken);
-    const order = await OrderService.getOrderByToken(orderToken);
-    if (!order) {
-      return res.status(404).json({ success: false, error: `Order ${orderToken} not found` });
+app.get(
+  '/api/notifications/whatsapp/preview/:orderToken',
+  notificationPreviewLimiter,
+  requireAuth(['kitchen', 'canteen_manager', 'admin']),
+  async (req: Request, res: Response) => {
+    try {
+      const orderToken = String(req.params.orderToken);
+      const order = await OrderService.getOrderByToken(orderToken);
+      if (!order) {
+        return res.status(404).json({ success: false, error: `Order ${orderToken} not found` });
+      }
+
+      const payload = NotificationService.formatWhatsAppPickupTemplate(order);
+      res.json({
+        success: true,
+        data: {
+          orderToken: order.orderToken,
+          pickupOtp: order.pickupOtp,
+          studentName: order.studentName,
+          recipientPhone: payload.to,
+          templatePayload: payload,
+        },
+        meta: { timestamp: new Date().toISOString() },
+      });
+    } catch (error: any) {
+      res.status(500).json({ success: false, error: error.message });
     }
-
-    const payload = NotificationService.formatWhatsAppPickupTemplate(order);
-    res.json({
-      success: true,
-      data: {
-        orderToken: order.orderToken,
-        pickupOtp: order.pickupOtp,
-        studentName: order.studentName,
-        recipientPhone: payload.to,
-        templatePayload: payload,
-      },
-      meta: { timestamp: new Date().toISOString() },
-    });
-  } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
   }
-});
+);
 
+// -----------------------------------------------------------------------------
+// 11. GET /api/telemetry (Real-Time System, Memory, SSE & Slot Monitor)
+// -----------------------------------------------------------------------------
 app.get('/api/telemetry', async (req: Request, res: Response) => {
   try {
     const memory = process.memoryUsage();
@@ -805,6 +864,17 @@ app.get('/api/telemetry', async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }
+});
+
+// Centralized error handling middleware preventing stack trace leakage
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  const statusCode = err.status || err.statusCode || 500;
+  const isProd = process.env.NODE_ENV === 'production';
+  res.status(statusCode).json({
+    success: false,
+    error: isProd ? 'Internal Server Error' : (err.message || 'Unknown Server Error'),
+    meta: { timestamp: new Date().toISOString() },
+  });
 });
 
 // Start listening if run directly

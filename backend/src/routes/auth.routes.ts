@@ -14,8 +14,8 @@ authRouter.post('/login', loginRateLimiter, AuthController.login);
 authRouter.post('/forgot-password', passwordResetRateLimiter, AuthController.forgotPassword);
 
 // GET & POST /api/auth/verify-reset-token - Verify token authenticity before rendering reset form
-authRouter.get('/verify-reset-token', AuthController.verifyResetToken);
-authRouter.post('/verify-reset-token', AuthController.verifyResetToken);
+authRouter.get('/verify-reset-token', passwordResetRateLimiter, AuthController.verifyResetToken);
+authRouter.post('/verify-reset-token', passwordResetRateLimiter, AuthController.verifyResetToken);
 
 // POST /api/auth/reset-password - Execute password update with valid token
 authRouter.post('/reset-password', passwordResetRateLimiter, AuthController.resetPassword);

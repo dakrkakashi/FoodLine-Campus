@@ -1,4 +1,4 @@
-import { randomUUID } from 'crypto';
+import { randomUUID, randomInt, timingSafeEqual } from 'crypto';
 import { Order, OrderStatus, CartItem, PickupSlot } from '../lib/types.js';
 import { SlotThrottlerService } from './slot-throttler.js';
 import { UtrVerifierService } from './utr-verifier.js';
@@ -34,17 +34,17 @@ export class OrderService {
   private static idempotencyMap = new Map<string, { order: Order; timestamp: number }>();
 
   /**
-   * Helper to generate 4-digit token e.g. FL-1793
+   * Helper to generate 4-digit token e.g. FL-1793 using CSPRNG
    */
   public static generateOrderToken(): string {
     let token = '';
     let attempts = 0;
     do {
-      const randNum = Math.floor(1000 + Math.random() * 9000);
+      const randNum = randomInt(1000, 10000);
       token = `FL-${randNum}`;
       attempts++;
       if (attempts > 30) {
-        const highEntropyNum = Math.floor(10000 + Math.random() * 90000);
+        const highEntropyNum = randomInt(10000, 100000);
         token = `FL-${highEntropyNum}`;
         break;
       }
@@ -53,10 +53,10 @@ export class OrderService {
   }
 
   /**
-   * Helper to generate 4-digit pickup OTP e.g. 6065
+   * Helper to generate 4-digit pickup OTP e.g. 6065 using CSPRNG
    */
   public static generatePickupOtp(): string {
-    return Math.floor(1000 + Math.random() * 9000).toString();
+    return randomInt(1000, 10000).toString();
   }
 
   /**
@@ -81,6 +81,22 @@ export class OrderService {
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       throw new Error('Order must contain at least 1 item');
+    }
+    if (items.length > 50) {
+      throw new Error('Maximum 50 items allowed per order');
+    }
+
+    // Strict item quantity and price validation to prevent negative values or tamper exploits
+    for (const rawItem of items) {
+      const q = rawItem.quantity !== undefined ? rawItem.quantity : 1;
+      const p = rawItem.price !== undefined ? rawItem.price : (rawItem.item?.price !== undefined ? rawItem.item.price : 0);
+
+      if (!Number.isInteger(q) || q < 1 || q > 50) {
+        throw new Error('Invalid item quantity: Quantities must be positive integers between 1 and 50.');
+      }
+      if (typeof p !== 'number' || isNaN(p) || !isFinite(p) || p < 0 || p > 50000) {
+        throw new Error('Invalid item price: Prices must be valid non-negative numbers.');
+      }
     }
 
     const orderId = randomUUID();
@@ -591,6 +607,7 @@ export class OrderService {
 
   /**
    * Verify pickup OTP and complete order handover (Counter Staff)
+   * Protected with constant-time comparison against timing side-channel attacks.
    */
   public static async verifyPickupOtp(
     orderToken: string,
@@ -605,7 +622,10 @@ export class OrderService {
       throw new Error(`Order ${orderToken} has already been collected`);
     }
 
-    if (order.pickupOtp !== pickupOtp.trim()) {
+    const bufExpected = Buffer.from(order.pickupOtp, 'utf8');
+    const bufProvided = Buffer.from(pickupOtp ? pickupOtp.trim() : '', 'utf8');
+
+    if (bufExpected.length !== bufProvided.length || !timingSafeEqual(bufExpected, bufProvided)) {
       throw new Error('Invalid 4-digit pickup OTP. Handover denied.');
     }
 
@@ -716,4 +736,3 @@ export class OrderService {
     };
   }
 }
-

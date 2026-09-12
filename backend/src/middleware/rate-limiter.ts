@@ -12,9 +12,12 @@ interface RateLimiterOptions {
   keyGenerator?: (req: Request) => string;
 }
 
+const MAX_STORE_CAPACITY = 5000;
+
 /**
  * In-memory sliding window rate limiter.
  * Zero external dependencies (Reuse Ladder: stdlib + native platform).
+ * Hardened with bounded memory store to prevent heap exhaustion attacks.
  */
 export function createRateLimiter(options: RateLimiterOptions) {
   const {
@@ -26,9 +29,11 @@ export function createRateLimiter(options: RateLimiterOptions) {
       // Extract client IP, prioritizing x-forwarded-for if behind reverse proxy
       const forwarded = req.headers['x-forwarded-for'];
       if (typeof forwarded === 'string') {
-        return forwarded.split(',')[0].trim();
+        const firstIp = forwarded.split(',')[0].trim().replace(/[^a-zA-Z0-9.:_-]/g, '').slice(0, 45);
+        if (firstIp) return firstIp;
       }
-      return req.ip || req.socket.remoteAddress || 'unknown';
+      const rawIp = req.ip || req.socket.remoteAddress || 'unknown';
+      return rawIp.replace(/[^a-zA-Z0-9.:_-]/g, '').slice(0, 45);
     },
   } = options;
 
@@ -56,6 +61,14 @@ export function createRateLimiter(options: RateLimiterOptions) {
     let record = store.get(key);
 
     if (!record) {
+      // Memory exhaustion defense: Evict oldest entry if max capacity reached
+      if (store.size >= MAX_STORE_CAPACITY) {
+        const oldestKey = store.keys().next().value;
+        if (oldestKey) {
+          store.delete(oldestKey);
+        }
+      }
+
       record = { timestamps: [] };
       store.set(key, record);
     }
@@ -97,8 +110,7 @@ export function createRateLimiter(options: RateLimiterOptions) {
 }
 
 /**
- * Prompt 1 Requirement:
- * "Implement rate limiting on all endpoints — max 5 attempts per 15 min on login routes."
+ * Preconfigured specialized rate limiters
  */
 
 // 1. General API Rate Limiter: 120 requests per minute per IP
@@ -134,4 +146,32 @@ export const passwordResetRateLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
   maxRequests: 3,
   message: 'Too many password reset requests. For security reasons, please wait 15 minutes before requesting again.',
+});
+
+// 6. UTR Payment Verification Limiter: Max 10 attempts per 5 minutes per IP
+export const utrRateLimiter = createRateLimiter({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  maxRequests: 10,
+  message: 'Too many payment reference submissions. Please wait 5 minutes before retrying.',
+});
+
+// 7. Student PRN Resolution Limiter: Max 30 requests per minute per IP
+export const studentResolveLimiter = createRateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 30,
+  message: 'Too many student lookup attempts. Rate limit exceeded.',
+});
+
+// 8. Order Token Lookup Limiter: Max 60 lookups per minute per IP
+export const orderLookupLimiter = createRateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 60,
+  message: 'Order status check frequency limit reached. Please slow down.',
+});
+
+// 9. Notification Preview Limiter: Max 15 requests per minute per IP
+export const notificationPreviewLimiter = createRateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 15,
+  message: 'Notification preview rate limit exceeded.',
 });

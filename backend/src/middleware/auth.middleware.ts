@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import crypto from 'crypto';
 import { verifyJwt } from '../lib/jwt.js';
 
 export interface AuthenticatedUser {
@@ -18,23 +19,53 @@ declare global {
 }
 
 /**
+ * Constant-time string comparison to prevent timing side-channel attacks.
+ */
+function timingSafeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a, 'utf8');
+  const bufB = Buffer.from(b, 'utf8');
+
+  if (bufA.length !== bufB.length) {
+    // Perform dummy timing-safe comparison with bufA to equalize execution timing
+    crypto.timingSafeEqual(bufA, bufA);
+    return false;
+  }
+
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+/**
  * Middleware to require authentication and optional role authorization.
  * Accepts either:
  *  1. Bearer JWT via Authorization header ('Authorization: Bearer <token>')
- *  2. Direct staff/kds passkey via 'x-staff-passkey' header
+ *  2. Direct staff/kds passkey via 'x-staff-passkey' or 'x-admin-passkey' header
  */
 export function requireAuth(allowedRoles?: string[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
-    const staffPasskey = (req.headers['x-staff-passkey'] || req.headers['x-admin-passkey']) as string | undefined;
+    const rawStaffPasskey = (req.headers['x-staff-passkey'] || req.headers['x-admin-passkey']) as string | undefined;
     const targetPasskey = process.env.STAFF_AUTH_PASSKEY || 'FoodLineCafe@7';
 
-    // 1. Staff Passkey bypass for physical KDS hardware tablets / onsite staff
-    if (staffPasskey) {
-      if (staffPasskey.trim() === targetPasskey) {
+    // 1. Staff Passkey authentication for physical KDS hardware tablets / onsite staff
+    if (rawStaffPasskey) {
+      const isMatch = timingSafeCompare(rawStaffPasskey.trim(), targetPasskey);
+      if (isMatch) {
         req.user = {
           role: 'kitchen',
           isStaffPasskey: true,
         };
+
+        // Check if role is allowed (if role restrictions are passed)
+        if (allowedRoles && allowedRoles.length > 0) {
+          const hasRole = allowedRoles.includes('kitchen') || allowedRoles.includes('canteen_manager') || allowedRoles.includes('admin');
+          if (!hasRole) {
+            res.status(403).json({
+              success: false,
+              error: 'Forbidden: Staff passkey is not authorized for this operation',
+            });
+            return;
+          }
+        }
+
         return next();
       } else {
         res.status(401).json({
