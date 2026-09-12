@@ -542,6 +542,7 @@ app.post('/api/orders', orderPlacementLimiter, async (req: Request, res: Respons
       success: true,
       data: {
         id: newOrder.id,
+        orderId: newOrder.id,
         orderToken: newOrder.orderToken,
         pickupOtp: newOrder.pickupOtp,
         totalAmount: newOrder.totalAmount,

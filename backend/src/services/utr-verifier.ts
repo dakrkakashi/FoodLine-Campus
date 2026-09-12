@@ -74,7 +74,7 @@ export class UtrVerifierService {
           order_id: orderId,
           utr_number: verification.utrNumber,
           amount,
-          status: 'PENDING_MANUAL_REVIEW',
+          status: 'PENDING_VERIFICATION',
           verified_at: new Date().toISOString(),
         };
 

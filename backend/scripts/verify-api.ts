@@ -129,7 +129,7 @@ async function runApiAudit() {
     const data = await res.json();
     if (!data.success || !data.data.orderToken) throw new Error('No orderToken generated');
     orderToken = data.data.orderToken;
-    orderId = data.data.orderId;
+    orderId = data.data.id || data.data.orderId;
   });
 
   // 9. Payment UTR Verification
