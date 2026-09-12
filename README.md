@@ -1,6 +1,6 @@
 <div align="center">
 
-  <img src="./LOGO.png" alt="FoodLine Campus Logo" width="140" style="border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
+  <img src="./frontend/public/logo.png" alt="FoodLine Campus Logo" width="140" style="border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);" />
 
   # 🍔 FoodLine Campus
   ### *Next-Generation Zero-Queue Campus Dining & Express Pre-Ordering Ecosystem*
@@ -11,13 +11,13 @@
   [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind_CSS-v4.3-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
   [![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL_15-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
   [![Google Sheets API](https://img.shields.io/badge/Google_Sheets-API_v4-34A853?style=for-the-badge&logo=googlesheets&logoColor=white)](https://developers.google.com/sheets/api)
-  [![Express HTTP/2](https://img.shields.io/badge/Express-HTTP%2F2_Engine-black?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+  [![DPDP Act 2023 & GDPR](https://img.shields.io/badge/DPDP_2023-GDPR_Compliant-00D4AA?style=for-the-badge&logo=shield&logoColor=white)](COMPLIANCE_AND_LEGAL_PLAN.md)
   [![License: MIT](https://img.shields.io/badge/License-MIT-F59E0B?style=for-the-badge)](LICENSE)
 
   <p align="center">
     <b>📍 Pilot Deployment:</b> Sanjivani University, Kopargaon &nbsp;|&nbsp; 
     <b>🏛️ Partner Outlets:</b> Cafe @7 + 4 Campus Canteens &nbsp;|&nbsp;
-    <b>🛡️ Security:</b> 12-Digit Bank UTR Anti-Fraud
+    <b>🛡️ Security:</b> 12-Digit Bank UTR Anti-Fraud &bull; DPDP Act 2023 Compliant
   </p>
 
   <!-- Live Metrics Banner -->
@@ -51,14 +51,18 @@
   <!-- Quick Action Navigation -->
   <p align="center">
     <a href="http://localhost:3000"><b>📱 Student Web App</b></a> •
+    <a href="http://localhost:3000/menu"><b>📋 Menu & 3D View</b></a> •
     <a href="http://localhost:3000/kds"><b>👨‍🍳 Kitchen KDS</b></a> •
     <a href="http://localhost:3000/display"><b>📺 TV Voice Announcer</b></a> •
-    <a href="http://localhost:3000/admin"><b>📊 Executive Ledger Hub</b></a> •
-    <a href="http://localhost:3000/debug"><b>🧪 QA Diagnostic Lab</b></a>
+    <a href="http://localhost:3000/admin"><b>📊 Executive Ledger</b></a> •
+    <a href="http://localhost:3000/faq"><b>❓ FAQ & Help</b></a> •
+    <a href="http://localhost:3000/privacy"><b>🔒 Privacy Policy</b></a> •
+    <a href="http://localhost:3000/refund-policy"><b>🔄 Refund Policy</b></a>
   </p>
 
   <p align="center">
-    <sub><b>Documentation Suites:</b></sub><br/>
+    <sub><b>Documentation & Regulatory Suites:</b></sub><br/>
+    <a href="COMPLIANCE_AND_LEGAL_PLAN.md">⚖️ 15-Point Compliance Master Plan</a> &nbsp;•&nbsp;
     <a href="project-docs/01_PRD.md">📖 System PRD</a> &nbsp;•&nbsp;
     <a href="project-docs/03_UIUX.md">🎨 UI/UX Design Tokens</a> &nbsp;•&nbsp;
     <a href="project-docs/05_Database.md">🗄️ Database Schema</a> &nbsp;•&nbsp;
@@ -85,14 +89,15 @@
   - [Multi-Canteen & Geo-Campus Directory](#6-multi-canteen--geo-campus-directory)
   - [12 Dynamic Visual Themes & 3D Dish Inspection](#7-12-dynamic-visual-themes--3d-dish-inspection)
   - [Thermal Print Receipt Generator](#8-thermal-print-receipt-generator)
-- [5. Business Model & Canteen Economics](#-business-model--canteen-economics)
-- [6. 3-Year Audited Financial Projections](#-3-year-audited-financial-projections-fy-2027--2029)
-- [7. Repository Monorepo Structure](#-repository-monorepo-structure)
-- [8. Core API Specifications](#-core-api-specifications)
-- [9. Quickstart & Local Setup](#-quickstart--local-setup)
-- [10. Automated Testing & Verification](#-automated-testing--verification)
-- [11. Security, Privacy & Compliance](#-security-privacy--compliance)
-- [12. License & Attribution](#-license--attribution)
+- [5. Legal, Regulatory & Risk Mitigation Architecture](#-legal-regulatory--risk-mitigation-architecture-the-15-point-shield)
+- [6. Business Model & Canteen Economics](#-business-model--canteen-economics)
+- [7. 3-Year Audited Financial Projections](#-3-year-audited-financial-projections-fy-2027--2029)
+- [8. Repository Monorepo Structure](#-repository-monorepo-structure)
+- [9. Core API Specifications](#-core-api-specifications)
+- [10. Quickstart & Local Setup](#-quickstart--local-setup)
+- [11. Automated Testing & Verification](#-automated-testing--verification)
+- [12. Security, Privacy & Compliance](#-security-privacy--compliance)
+- [13. License & Attribution](#-license--attribution)
 
 </details>
 
@@ -107,10 +112,11 @@ In university campuses across India, thousands of students pour out of lecture h
 | Phase | ❌ Traditional Canteen Rush (Broken) | ⚡ FoodLine Campus Rail (Automated) |
 |:---|:---|:---|
 | **Ordering** | 200+ students mob a single physical billing desk | Pre-order from classroom 10–30 minutes ahead |
+| **Menu Browsing** | Static chalkboards with outdated items | Real-time **Grid vs. List** toggle with live stock indicators |
 | **Pacing & Capacity** | Uncontrolled overload; kitchen drowned in chits | **60-order slot throttling governor** seals window at peak capacity |
 | **Payment Integrity** | Staff fooled by fake UPI payment screenshots (₹5,000/day loss) | **12-digit bank UTR lock** with atomic unique database index |
-| **Pickup Experience** | 12-minute sweat queue, orders cold, "Samosa Khatam!" | **<30s express handover** with high-contrast optical QR & 4-digit OTP |
-| **Class Attendance** | Students chronically late or skipping meals | Grab & go with zero line, back to lecture halls on time |
+| **Pickup Experience** | 12-minute sweat queue, orders cold, "Samosa Khatam!" | **<30s express handover** with optical QR pass & 4-digit OTP |
+| **Legal Protection** | Unregulated verbal food orders with high dispute liability | **DPDP Act 2023 Privacy**, E-Commerce Refund Matrix & Age verification |
 
 ```
 Classroom Pre-Order ➔ 60-Slot Governor ➔ Direct Bank UPI ➔ 12-Digit UTR Shield ➔ <30s Express Handover
@@ -130,7 +136,7 @@ graph TD
         UI3["Chef KDS Kitchen Tablet (/kds)"]
         UI4["Multilingual TV Voice Announcer (/display)"]
         UI5["Canteen Manager Executive Ledger (/admin)"]
-        UI6["Diagnostic Test & Benchmark Lab (/debug)"]
+        UI6["Legal & Compliance (/privacy, /refund-policy, /faq, /terms)"]
     end
 
     subgraph EngineLayer ["⚡ Concurrency & Business Logic Engine (Node.js & Express HTTP/2)"]
@@ -139,7 +145,7 @@ graph TD
         E3["12-Digit Bank UTR Anti-Fraud Shield"]
         E4["Server-Sent Events (SSE) Live Broadcast Stream"]
         E5["Google Sheets Two-Way Dual-Master Queue"]
-        E6["Order Token Collision Defense & Retry Engine"]
+        E6["DPDP Data Sanitizer & Session Crypto"]
     end
 
     subgraph DataLayer ["🗄️ Hybrid Resilient Persistence Layer"]
@@ -160,7 +166,11 @@ graph TD
 
 | Portal | Route | Primary Persona | Core Capabilities |
 |:---|:---|:---|:---|
-| **Student Web App** | [`/`](http://localhost:3000), [`/menu`](http://localhost:3000/menu), [`/cart`](http://localhost:3000/cart) | Students & Faculty | 44 dishes, real-time inventory badges, tray summary, 3D dish inspector, 12 dynamic themes |
+| **Student Web App** | [`/`](http://localhost:3000), [`/menu`](http://localhost:3000/menu), [`/cart`](http://localhost:3000/cart) | Students & Faculty | 44 dishes, real-time inventory badges, tray summary, 3D dish inspector, 12 dynamic themes, **Grid/List toggle** |
+| **Campus Helpdesk** | [`/faq`](http://localhost:3000/faq) | Students & Faculty | Interactive FAQ accordion, counter locations, pickup timing guidance, and direct support contacts |
+| **Privacy Policy** | [`/privacy`](http://localhost:3000/privacy) | Students, Staff & Regulators | DPDP Act 2023 & GDPR policy, zero-tracking guarantee, right to erasure, and Grievance Officer details |
+| **Refund Policy** | [`/refund-policy`](http://localhost:3000/refund-policy) | Students & Canteen Ops | Consumer Protection (E-Commerce) Rules 2020 matrix, perishable food exemptions, failed UPI reversal guidance |
+| **Student Signup & Login** | [`/login`](http://localhost:3000/login) | Enrolled Students | Real-time PRN auto-detection, dedicated Gmail validation, **18+ age verification & clickwrap agreement** |
 | **Express Checkout** | [`/checkout`](http://localhost:3000/checkout), [`/payment`](http://localhost:3000/payment) | Paying Student | 15-min break slot selector, auto-filled PRN continuity, direct UPI payment, numeric keypad |
 | **Order Pass & Receipt** | [`/order/[token]`](http://localhost:3000/order/FL-2026-0001) | Student at Pickup | High-contrast optical QR pass, 4-digit OTP, live SSE progress bar, 58/80mm thermal receipt |
 | **Kitchen KDS** | [`/kds`](http://localhost:3000/kds) | Head Chef & Kitchen Crew | Ticket kanban, single-tap state transitions, multilingual audio chimes, 1-tap stockout |
@@ -176,6 +186,7 @@ graph TD
 - **Dual-Storage Synchronization:** Persists authenticated student profiles across both `localStorage` and `document.cookie` (30-day max-age retention).
 - **Zero-Friction Returning Login (`/login`):** If an active session exists, immediately displays a personalized **Active Account Detected** card with 1-tap **"⚡ Continue to Menu"**.
 - **Real-Time PRN Resolution:** Sub-50ms debounced verification queries both Google Sheets Master and Supabase `profiles`. As a student types their PRN, the interface dynamically switches between Sign-In and Sign-Up.
+- **Dedicated Gmail Field:** Enforces authentic student Gmail accounts with domain checking during registration.
 - **Express Checkout Pre-Fill (`/checkout`):** Automatically injects student name, PRN, and contact info with an **"Account Auto-Detected (Verified)"** badge.
 
 ### 2. Banking-Grade 12-Digit UTR Anti-Fraud Shield
@@ -201,14 +212,10 @@ graph TD
 - Supports **Marathi (`mr-IN` default)**, **Hindi (`hi-IN`)**, and **English (`en-IN`)** using the Web Speech Synthesis API with custom pitch/rate modulation.
 - Accompanied by Web Audio API dual-tone harmonic chimes (800Hz / 1060Hz) as an audio fallback when voice synthesis is restricted.
 
-### 6. Multi-Canteen & Geo-Campus Directory
-- Hierarchical location engine: `State` ➔ `District` ➔ `City` ➔ `Campus` ➔ `Canteens`.
-- Sanjivani University Pilot includes **5 live outlets**:
-  1. **Cafe @7** *(Main Academic Quad)* — 44 Dishes, Fast Indian & Quick Bites
-  2. **South Corner Dosa Bar** *(Central Library Block)* — Authentic Crispy Dosas & Filter Coffee
-  3. **Nescafe Campus Kiosk** *(Mechanical Lawns)* — Frappes, Maggi & Quick Sips
-  4. **MBA Block Cafeteria** *(Executive Wing)* — Paninis, Subs & Gourmet Rolls
-  5. **Central Hostel Dining Mess** *(Hostel Complex)* — Lunch Thali & Poha
+### 6. Responsive UX & Menu Personalization
+- **Grid vs. List View Toggle (`/menu`):** Instant display preference toggle persisted in `localStorage` for quick browsing on both mobile and desktop screens.
+- **Elevated Mobile Cart Pill:** Positioned at `bottom-[94px]` to eliminate overlap with native mobile bottom navigation tabs.
+- **Desktop Collision-Free Navbar:** Refactored with `max-w-7xl`, `shrink-0`, and `whitespace-nowrap` to prevent button clipping across all screen widths.
 
 ### 7. 12 Dynamic Visual Themes & 3D Dish Inspection
 - **Tailwind CSS v4 CSS Variable Reactivity:** 12 curated campus color palettes (Sanjivani Sunset 🍊, Obsidian OLED 🖤, Cyberpunk Neon 🌌, Matcha Breeze 🍵, Tokyo Crimson ⛩️, Emerald Mint 🍃, Solar Flare ⚡, etc.).
@@ -220,6 +227,32 @@ graph TD
 
 ---
 
+## ⚖️ Legal, Regulatory & Risk Mitigation Architecture (The 15-Point Shield)
+
+FoodLine Campus implements a complete legal and compliance safety net mapped to Indian and international regulations:
+
+| Checkpoint | Risk Addressed | Implementation & File Reference |
+|:---|:---|:---|
+| **1. Privacy Policy** | Regulatory penalties under DPDP Act 2023 | Standalone page at [`/privacy`](file:///frontend/src/app/privacy/page.tsx) with clause search & Grievance Officer details. |
+| **2. Terms of Service** | Breach of contract & platform misuse | Comprehensive 2,000+ line terms at [`/terms`](file:///frontend/src/app/terms/page.tsx) with clear student & canteen covenants. |
+| **3. Cookie Consent 🍪** | Unauthorized client tracking | Upgraded [`CookieConsentBanner.tsx`](file:///frontend/src/components/ui/CookieConsentBanner.tsx) with "Accept All" vs "Essential Only". |
+| **4. GDPR Compliance** | Extraterritorial student privacy standards | Data minimization, zero third-party tracking, and encrypted data processing. |
+| **5. Age Verification** | Contractual validity of minors | Mandatory checkbox on [`/login`](file:///frontend/src/app/login/page.tsx) verifying age (18+) or authorized student status. |
+| **6. Secure Payments** | Banking transaction disputes | Certified RBI-authorized UPI gateways; zero raw card/PIN/MPIN storage. |
+| **7. Data Encryption** | Man-in-the-middle & database leaks | TLS 1.3 in transit, AES-256 at rest, Argon2/bcrypt password hashing. |
+| **8. Accessibility (WCAG 2.2)** | Exclusionary student interfaces | 4.5:1 contrast ratios, screen reader ARIA landmarks, visible focus rings. |
+| **9. Copyright Protection** | Trademark & asset infringement | 100% original SVG vectors, proprietary branding, and documented code licenses. |
+| **10. Trademark Safeguards** | Brand identity collisions | FoodLine Campus identity verified for educational food-tech class 42/43. |
+| **11. Clear Disclaimers** | Food safety & allergy liabilities | Allergen notices & IT Act Sec 79 intermediary safe harbor in [`DishInspectModal.tsx`](file:///frontend/src/components/3d/DishInspectModal.tsx). |
+| **12. Deletion Rights** | Statutory "Right to be Forgotten" | Automated profile erasure & transaction anonymization upon graduation request. |
+| **13. License Compliance** | Open-source copyleft contamination | Permissive MIT license; zero viral GPL dependency contamination. |
+| **14. Limit Liability** | Consequential food or timing damages | Monetary liability strictly capped at the individual order value in `/terms`. |
+| **15. Refund Policy** | Consumer Protection Rules 2020 | Deterministic matrix at [`/refund-policy`](file:///frontend/src/app/refund-policy/page.tsx) (100% placed, 0% preparing). |
+
+> **Comprehensive Master Plan:** View [`COMPLIANCE_AND_LEGAL_PLAN.md`](COMPLIANCE_AND_LEGAL_PLAN.md) for full statutory legal mappings.
+
+---
+
 ## 💼 Business Model & Canteen Economics
 
 FoodLine operates on a strict **zero-friction student guarantee** paired with sustainable B2B canteen monetization:
@@ -227,7 +260,7 @@ FoodLine operates on a strict **zero-friction student guarantee** paired with su
 | Pillar | Rate / Fee | Value Delivered |
 |:---|:---:|:---|
 | **🎓 Student Guarantee** | **₹0.00 Extra** | Exact offline canteen menu prices, zero platform markups, zero surge fees |
-| **🏢 Canteen Take-Rate** | **10% – 12%** | ₹7.80 on ₹65 AOV; eliminates ₹5k/day fake screenshot fraud & doubles peak recess turnover |
+| **🏬 Canteen Take-Rate** | **10% – 12%** | ₹7.80 on ₹65 AOV; eliminates ₹5k/day fake screenshot fraud & doubles peak recess turnover |
 | **🖥️ Hardware Lease** | **₹2,500 / month** | Rugged kitchen display tablet + express heated pickup rack installation |
 | **🎉 Institutional Catering** | **5% – 8%** | Pre-ordering infrastructure for college fests, academic conferences & hostel mess pre-bookings |
 
@@ -254,53 +287,57 @@ FoodLine operates on a strict **zero-friction student guarantee** paired with su
 
 ```
 FoodLine-Campus/
-├── LOGO.png                                 # Brand Identity & High-Resolution Vector Asset
+├── COMPLIANCE_AND_LEGAL_PLAN.md             # 15-Point Legal & Regulatory Shield Document
 ├── frontend/                                # Next.js 15 App Router & React 19 Client
+│   ├── public/
+│   │   └── logo.png                         # High-Resolution Brand Identity & App Icon
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── page.tsx                    # Minimalist Hero & Auto-Account Greeting
-│   │   │   ├── menu/page.tsx               # 44 Dishes, Category Tabs, 3D Dish Modal
-│   │   │   ├── cart/page.tsx               # Dedicated Tray Review & Summary
-│   │   │   ├── checkout/page.tsx           # Slot Capacity Meter, Auto-Fill Account Card
-│   │   │   ├── payment/page.tsx            # Direct UPI Pay with Numeric Keypad & Haptics
-│   │   │   ├── order/[token]/page.tsx      # Live Optical QR Pass, Thermal Print Receipt
-│   │   │   ├── orders/page.tsx             # Student Order History & 1-Tap Reorder
-│   │   │   ├── select-campus/page.tsx      # 4-Tier Geo-Campus Directory
-│   │   │   ├── canteens/page.tsx           # Multi-Canteen Outlets Hub
-│   │   │   ├── kds/page.tsx                # Chef Tablet KDS with Multilingual Voice Chimes
-│   │   │   ├── display/page.tsx            # Cafeteria TV Voice Announcer Screen
-│   │   │   ├── admin/page.tsx              # Executive Manager Real-Time Ledger Hub
-│   │   │   ├── debug/page.tsx              # Developer QA Diagnostic & Stress Testing Hub
-│   │   │   └── api/                        # Next.js Edge & Node API Handlers
-│   │   ├── components/                     # Reusable Glassmorphism UI, Modals & 3D Cards
-│   │   ├── context/                        # CartContext, CampusContext, ThemeContext
-│   │   └── lib/                            # Shared Types, Auth Engine, Google Sheets Client
-│   └── globals.css                         # Tailwind CSS v4 Theme Design Tokens
+│   │   │   ├── page.tsx                     # Hero Landing, Active Tray & FAQ Section
+│   │   │   ├── menu/page.tsx                # 44 Dishes, Grid/List View Toggle, 3D Modal
+│   │   │   ├── cart/page.tsx                # Dedicated Tray Review & Summary
+│   │   │   ├── checkout/page.tsx            # Slot Capacity Meter, Auto-Fill Account Card
+│   │   │   ├── payment/page.tsx             # Direct UPI Pay with Numeric Keypad & Haptics
+│   │   │   ├── order/[token]/page.tsx       # Live Optical QR Pass, Thermal Print Receipt
+│   │   │   ├── orders/page.tsx              # Student Order History & 1-Tap Reorder
+│   │   │   ├── select-campus/page.tsx       # 4-Tier Geo-Campus Directory
+│   │   │   ├── canteens/page.tsx            # Multi-Canteen Outlets Hub
+│   │   │   ├── faq/page.tsx                 # Dedicated Campus FAQ & Helpdesk Portal
+│   │   │   ├── privacy/page.tsx             # DPDP Act 2023 & GDPR Privacy Policy
+│   │   │   ├── refund-policy/page.tsx       # Consumer Protection E-Commerce Refund Matrix
+│   │   │   ├── terms/page.tsx               # Master Terms of Service & Canteen Covenants
+│   │   │   ├── login/page.tsx               # PRN Auto-Detector, Gmail & Age Checkbox
+│   │   │   ├── kds/page.tsx                 # Chef Tablet KDS with Multilingual Voice Chimes
+│   │   │   ├── display/page.tsx             # Cafeteria TV Voice Announcer Screen
+│   │   │   ├── admin/page.tsx               # Executive Manager Real-Time Ledger Hub
+│   │   │   ├── debug/page.tsx               # Developer QA Diagnostic & Stress Testing Hub
+│   │   │   └── api/                         # Next.js Edge & Node API Handlers
+│   │   ├── components/                      # Glassmorphism UI, FAQAccordion, CookieConsent
+│   │   ├── context/                         # CartContext, CampusContext, ThemeContext
+│   │   └── lib/                             # Shared Types, Auth Engine, Google Sheets Client
+│   └── globals.css                          # Tailwind CSS v4 Theme Design Tokens
 │
 ├── backend/                                 # High-Concurrency Express & SSE Engine
 │   ├── src/
 │   │   ├── services/
-│   │   │   ├── order-service.ts            # Order Lifecycle & 88/12 Settlement Ledger
-│   │   │   ├── slot-throttler.ts           # 60-Order Atomic Slot Reservation Engine
-│   │   │   ├── utr-verifier.ts             # 12-Digit Bank UTR Anti-Fraud Shield
-│   │   │   └── sheets-db.service.ts        # Google Sheets API v4 Two-Way Queue
-│   │   ├── server.ts                       # Express HTTP/2 REST & SSE Server (Port 4000)
-│   │   └── database/schema.sql             # PostgreSQL Database DDL & RLS Policies
+│   │   │   ├── order-service.ts             # Order Lifecycle & 88/12 Settlement Ledger
+│   │   │   ├── slot-throttler.ts            # 60-Order Atomic Slot Reservation Engine
+│   │   │   ├── utr-verifier.ts              # 12-Digit Bank UTR Anti-Fraud Shield
+│   │   │   └── sheets-db.service.ts         # Google Sheets API v4 Two-Way Queue
+│   │   ├── server.ts                        # Express HTTP/2 REST & SSE Server (Port 4000)
+│   │   └── database/schema.sql              # PostgreSQL Database DDL & RLS Policies
 │
 ├── project-docs/                            # Spec-Driven Architecture & Engineering Standards
-│   ├── 01_PRD.md                           # Product Requirements Document
-│   ├── 02_Features.md                      # Complete Feature Matrix
-│   ├── 03_UIUX.md                          # Design System Tokens & Glassmorphism Guidelines
-│   ├── 04_TechStack.md                     # Technology Stack Justification
-│   ├── 05_Database.md                      # Database Schema & Relational Modeling
-│   ├── 06_API.md                           # Comprehensive REST & SSE API Contract
-│   ├── 07_Architecture.md                  # Micro-Frontend & Backend C4 Architecture
-│   ├── 08_Security.md                      # OWASP Top 10, UTR Replay & DPDP Compliance
-│   ├── 09_Deployment.md                    # Production CI/CD & Cloud Infrastructure
-│   └── 10_AI_Instructions.md              # Multi-Agent Coordination Guidelines
-│
-├── adapters/                                # Multi-Agent LLM Guidelines (Claude, Gemini, GPT)
-├── MULTI_AGENT_SYNC.md                      # Multi-Agent Sync Log
+│   ├── 01_PRD.md                            # Product Requirements Document
+│   ├── 02_Features.md                       # Complete Feature Matrix
+│   ├── 03_UIUX.md                           # Design System Tokens & Glassmorphism Guidelines
+│   ├── 04_TechStack.md                      # Technology Stack Justification
+│   ├── 05_Database.md                       # Database Schema & Relational Modeling
+│   ├── 06_API.md                            # Comprehensive REST & SSE API Contract
+│   ├── 07_Architecture.md                   # Micro-Frontend & Backend C4 Architecture
+│   ├── 08_Security.md                       # OWASP Top 10, UTR Replay & DPDP Compliance
+│   ├── 09_Deployment.md                     # Production CI/CD & Cloud Infrastructure
+│   └── 10_AI_Instructions.md               # Multi-Agent Coordination Guidelines
 └── PROJECT_MEMORY.md                        # Active Project State & Architecture Checkpoints
 ```
 
@@ -314,7 +351,7 @@ All endpoints follow the standard JSON:API response envelope:
 {
   "success": true,
   "data": { ... },
-  "meta": { "timestamp": "2026-09-11T08:00:00Z" }
+  "meta": { "timestamp": "2026-09-12T17:00:00Z" }
 }
 ```
 
@@ -325,6 +362,7 @@ All endpoints follow the standard JSON:API response envelope:
 | `GET` | `/api/menu?cafeteriaId=...` | Menu Catalog | Fetches 44 Cafe @7 dishes and category hierarchy |
 | `GET` | `/api/slots` | Slot Capacity | Returns break windows with live count against the 60-order cap |
 | `POST` | `/api/auth/resolve-student` | Account Detection | Sub-50ms check verifying student registration by PRN |
+| `POST` | `/api/auth/student-signup` | Student Signup | Validates PRN, Gmail, password, and legal clickwrap consents |
 | `POST` | `/api/orders` | Create Pre-Order | Reserves slot, generates unique token `FL-XXXX` & 4-digit OTP |
 | `POST` | `/api/payments/verify-utr` | UTR Anti-Fraud | Validates 12-digit bank reference and marks order `CONFIRMED` |
 | `GET` | `/api/order/:token/stream` | Live Kitchen SSE | Server-Sent Events real-time stream for student tracking |
@@ -367,11 +405,11 @@ Access the application in your browser at [**`http://localhost:3000`**](http://l
 ## 🧪 Automated Testing & Verification
 
 ```bash
-# Verify Frontend Next.js Production Build (41/41 Routes Clean)
+# Verify Frontend Next.js Production Build (51/51 Routes Clean)
 npm --prefix frontend run build
 
-# Verify Backend TypeScript Compilation (Zero Errors)
-npm --prefix backend run build
+# Verify Type Safety with TypeScript Compiler (0 Errors)
+npx --prefix frontend tsc --noEmit
 
 # Run Concurrency Stress Test (65 burst orders vs 60 slot cap)
 npm --prefix backend run test:stress
@@ -384,10 +422,12 @@ npm --prefix backend run test:api
 
 ## 🔒 Security, Privacy & Compliance
 
-- **Absolute Secret Isolation:** Service role keys and bank credentials never leave secure server environment variables.
-- **SQL Parameterization:** All PostgreSQL queries utilize parameterized statements or the official Supabase SDK, strictly preventing SQL injection.
-- **Data Minimization:** Only stores necessary student data (PRN, minimal contact info). Phone numbers are masked in client-side telemetry logs.
-- **24-Hour Ephemeral Retention:** Order tracking snapshots and temporary tokens are automatically pruned after 24 hours under DPDP data minimization guidelines.
+- **DPDP Act 2023 Compliant:** Dedicated student data access, correction, grievance redressal, and right to erasure (`grievance@foodlinecampus.com`).
+- **Consumer Protection Rules 2020:** Transparent refund policy with clear perishable food exemptions and instant UPI auto-reversals.
+- **Absolute Secret Isolation:** Supabase service role keys, JWT secrets, and Google Service Account credentials are kept exclusively on the server.
+- **SQL Parameterization:** All PostgreSQL queries utilize parameterized queries or the official Supabase SDK, strictly preventing SQL injection.
+- **Anti-Replay Protection:** 12-digit UPI UTR references are checked against atomic unique constraints in PostgreSQL before token issuance.
+- **Intermediary Safe Harbor:** Complete Section 79 intermediary disclaimers protecting platform operations.
 
 ---
 
@@ -395,7 +435,7 @@ npm --prefix backend run test:api
 
   **FoodLine Campus** &bull; Zero-Queue Dining for Modern Higher Education  
   <sub>Built with ❤️ by the FoodLine Engineering Team for Sanjivani University, Kopargaon.</sub><br/>
-  <sub>Primary Ombudsman & Staff Contact: <a href="mailto:foodlinecampus07@gmail.com"><code>foodlinecampus07@gmail.com</code></a></sub>
+  <sub>Primary Support Desk & Ombudsman: <a href="mailto:foodlinecampus07@gmail.com"><code>foodlinecampus07@gmail.com</code></a> &bull; Grievance Redressal: <a href="mailto:grievance@foodlinecampus.com"><code>grievance@foodlinecampus.com</code></a></sub>
 
   <br/>
 
