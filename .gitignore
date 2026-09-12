@@ -41,7 +41,9 @@ credentials.json
 # Local Scratch, Heavy Media & Internal Test Suites
 test-api.http
 scratch/
-LOGO.png
+/LOGO.png
+!frontend/public/logo.png
+!frontend/public/logo.svg
 RUN THIS PROMPT IN EVERY AI U USE
 FRONTEND_SUMMARY.md
 GAP_ANALYSIS.md
@@ -74,3 +76,5 @@ outbox/
 .freebuff/
 .gemini/
 mcp_config*.json
+
+
