@@ -1,0 +1,66 @@
+services:
+  # ---------------------------------------------------------------------------
+  # FoodLine Backend REST API, Slot Throttling Engine & SSE Streamer
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: foodline-backend
+    env: node
+    plan: free
+    region: singapore
+    rootDir: backend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: STAFF_AUTH_PASSKEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: GOOGLE_SHEETS_SPREADSHEET_ID
+        sync: false
+      - key: GOOGLE_SHEETS_SERVICE_ACCOUNT_EMAIL
+        sync: false
+      - key: GOOGLE_SHEETS_PRIVATE_KEY
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: MERCHANT_UPI_ID
+        value: 9960091371@slc
+
+  # ---------------------------------------------------------------------------
+  # FoodLine Frontend Web Application (Next.js 15 App Router)
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: foodline-frontend
+    env: node
+    plan: free
+    region: singapore
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: foodline-backend
+          property: host
+      - key: BACKEND_API_URL
+        fromService:
+          type: web
+          name: foodline-backend
+          property: host

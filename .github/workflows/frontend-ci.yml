@@ -1,0 +1,41 @@
+name: FoodLine Frontend CI
+
+on:
+  push:
+    branches: [ main, frontend ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ main, frontend ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+
+jobs:
+  frontend-lint-and-build:
+    name: Frontend Lint & Production Compilation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install Dependencies
+        run: npm --prefix frontend ci
+
+      - name: TypeScript Type Check
+        run: npx --prefix frontend tsc --noEmit
+
+      - name: Build Frontend (Next.js 15 App Router)
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NODE_ENV: production
+        run: npm --prefix frontend run build

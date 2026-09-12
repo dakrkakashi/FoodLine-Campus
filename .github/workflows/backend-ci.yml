@@ -1,0 +1,47 @@
+name: FoodLine Backend CI
+
+on:
+  push:
+    branches: [ main, backend ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [ main, backend ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  backend-test-and-build:
+    name: Backend Quality, Security & Compilation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: 'backend/package-lock.json'
+
+      - name: Install Dependencies
+        run: npm --prefix backend ci
+
+      - name: TypeScript Type Check
+        run: npx --prefix backend tsc --noEmit
+
+      - name: Run Vitest Unit & Integration Tests
+        run: npm --prefix backend run test
+
+      - name: Run Automated Security Suite (23 checks)
+        run: npm --prefix backend run test:security
+
+      - name: Run REST Endpoint Audit
+        run: npm --prefix backend run test:api
+
+      - name: Build Backend (TypeScript Compilation)
+        run: npm --prefix backend run build
