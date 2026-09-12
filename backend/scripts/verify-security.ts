@@ -1,6 +1,35 @@
+import http from 'http';
 import { server } from '../src/server.js';
 
 const BASE_URL = 'http://localhost:4000';
+function sendRawHttpRequest(method: string, requestPath: string): Promise<{ status: number; body: any }> {
+  return new Promise((resolve, reject) => {
+    const req = http.request(
+      {
+        host: 'localhost',
+        port: 4000,
+        path: requestPath,
+        method,
+      },
+      (res) => {
+        let rawData = '';
+        res.on('data', (chunk) => (rawData += chunk));
+        res.on('end', () => {
+          let parsed = {};
+          try {
+            parsed = JSON.parse(rawData);
+          } catch {
+            parsed = { raw: rawData };
+          }
+          resolve({ status: res.statusCode || 0, body: parsed });
+        });
+      }
+    );
+    req.on('error', reject);
+    req.end();
+  });
+}
+
 
 async function wait(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -498,6 +527,105 @@ async function runSecurityTests() {
     passed++;
   } else {
     console.error(`   ❌ [FAIL] Expected HTTP 400 for path traversal, got ${resTraversal.status}`);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 19: HTTP Parameter Pollution (HPP) Defense
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 19: HTTP Parameter Pollution (HPP) Guard...');
+  const resHpp = await fetch(`${BASE_URL}/api/slots?slotId=s1&slotId=s2`);
+  if (resHpp.status === 200) {
+    console.log('   ✅ [PASS] Polluted query parameters handled safely without server crash or array injection.\n');
+    passed++;
+  } else {
+    console.error(`   ❌ [FAIL] Expected HTTP 200 with sanitized query, got ${resHpp.status}`);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 20: SSRF & Cloud Metadata Protection
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 20: SSRF & Cloud Metadata Protection Guard...');
+  try {
+    const { isSafeOutboundUrl } = await import('../src/lib/ssrf-guard.js');
+    const cloudMetadata = isSafeOutboundUrl('http://169.254.169.254/latest/meta-data/');
+    const loopback = isSafeOutboundUrl('http://127.0.0.1:6379/keys');
+    const privateSubnet = isSafeOutboundUrl('http://10.0.0.5/internal');
+    const fileScheme = isSafeOutboundUrl('file:///etc/passwd');
+    const legitApi = isSafeOutboundUrl('https://api.foodline.campus/v1/orders');
+
+    const blockedAllMalicious = !cloudMetadata.safe && !loopback.safe && !privateSubnet.safe && !fileScheme.safe;
+    const allowedLegit = legitApi.safe;
+
+    if (blockedAllMalicious && allowedLegit) {
+      console.log('   ✅ [PASS] AWS/Cloud Metadata IP (169.254.169.254) strictly blocked.');
+      console.log('   ✅ [PASS] Localhost loopback & private subnets (127.0.0.1, 10.0.0.0/8) blocked.');
+      console.log('   ✅ [PASS] Dangerous schemes (file://) blocked.');
+      console.log('   ✅ [PASS] Public HTTPS endpoints permitted.\n');
+      passed++;
+    } else {
+      console.error(`   ❌ [FAIL] SSRF validation failed: blockedAll=${blockedAllMalicious}, allowedLegit=${allowedLegit}`);
+      failed++;
+    }
+  } catch (err: any) {
+    console.error('   ❌ [FAIL] Error in Test 20:', err.message);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 21: Prohibited HTTP Methods (Anti-XST TRACE/TRACK Rejection)
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 21: Prohibited HTTP Method Restriction (Anti-XST)...');
+  const rawTraceRes = await sendRawHttpRequest('TRACE', '/api/auth/resolve-student');
+
+  if (rawTraceRes.status === 405) {
+    console.log('   ✅ [PASS] Dangerous HTTP TRACE method rejected with HTTP 405 Method Not Allowed!');
+    console.log(`      Message: "${rawTraceRes.body.message}"\n`);
+    passed++;
+  } else {
+    console.error(`   ❌ [FAIL] Expected HTTP 405 for TRACE method, got ${rawTraceRes.status}`);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 22: Strict Content-Type Validation on Mutating Requests
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 22: Strict Content-Type Guard for Mutating Payloads...');
+  const resBadType = await fetch(`${BASE_URL}/api/auth/resolve-student`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'text/plain',
+    },
+    body: 'prn=2023SUCS0142',
+  });
+
+  if (resBadType.status === 415) {
+    const typeData = await resBadType.json();
+    console.log('   ✅ [PASS] Mutating payload with text/plain rejected with HTTP 415 Unsupported Media Type!');
+    console.log(`      Message: "${typeData.message}"\n`);
+    passed++;
+  } else {
+    console.error(`   ❌ [FAIL] Expected HTTP 415 for non-JSON mutating request, got ${resBadType.status}`);
+    failed++;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Test 23: Stack Trace & Internal File Path Leakage Prevention
+  // ---------------------------------------------------------------------------
+  console.log('🧪 Test 23: Stack Trace & Path Leakage Prevention...');
+  const resNotFound = await fetch(`${BASE_URL}/api/non-existent-endpoint-test-security-leak`);
+  const notFoundText = await resNotFound.text();
+
+  const noStackTrace = !notFoundText.includes('at ') && !notFoundText.includes('node_modules');
+  const noWindowsPath = !notFoundText.includes('E:\\') && !notFoundText.includes('C:\\');
+  const noSqlExposed = !notFoundText.includes('SELECT') && !notFoundText.includes('postgres://');
+
+  if (noStackTrace && noWindowsPath && noSqlExposed) {
+    console.log('   ✅ [PASS] Error responses do not leak stack traces, local disk paths, or DB schemas.\n');
+    passed++;
+  } else {
+    console.error(`   ❌ [FAIL] Info leakage detected in error response: ${notFoundText}`);
     failed++;
   }
 

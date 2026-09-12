@@ -22,7 +22,16 @@ import {
   orderLookupLimiter,
   notificationPreviewLimiter,
 } from './middleware/rate-limiter.js';
-import { sanitizeInputsMiddleware, payloadSizeGuard, SecurityValidators, csrfOriginGuard, pathTraversalGuard } from './middleware/sanitizer.js';
+import {
+  sanitizeInputsMiddleware,
+  payloadSizeGuard,
+  SecurityValidators,
+  csrfOriginGuard,
+  pathTraversalGuard,
+  httpMethodGuard,
+  hppGuard,
+  strictContentTypeGuard,
+} from './middleware/sanitizer.js';
 import { requireAuth } from './middleware/auth.middleware.js';
 import { logger } from './lib/logger.js';
 
@@ -51,8 +60,14 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// HTTP Method Restriction: Block TRACE, TRACK, DEBUG (Anti-XST)
+app.use(httpMethodGuard);
+
 // Path Traversal Defense: Block directory traversal attempts
 app.use(pathTraversalGuard);
+
+// HTTP Parameter Pollution (HPP) Defense
+app.use(hppGuard);
 
 // Reject oversized payloads (>64KB) and sanitize all user inputs
 app.use(payloadSizeGuard(64 * 1024));
@@ -81,6 +96,9 @@ app.use(
 
 // CSRF & Cross-Origin State Mutation Guard
 app.use(csrfOriginGuard(allowedOrigins));
+
+// Strict Content-Type Guard for mutating requests
+app.use(strictContentTypeGuard);
 
 app.use(express.json({ limit: '64kb' }));
 app.use(sanitizeInputsMiddleware);

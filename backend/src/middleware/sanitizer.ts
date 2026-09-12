@@ -1,3 +1,4 @@
+import { securityLogger } from '../lib/security-logger.js';
 import { Request, Response, NextFunction } from 'express';
 
 /**
@@ -131,6 +132,14 @@ export function csrfOriginGuard(allowedOrigins: (string | RegExp)[] = []) {
     });
 
     if (!isAllowed) {
+      securityLogger.log({
+        eventType: 'CSRF_BLOCKED',
+        severity: 'HIGH',
+        clientIp: req.ip,
+        path: req.originalUrl || req.url,
+        method: req.method,
+        details: { origin },
+      });
       res.status(403).json({
         success: false,
         error: 'Forbidden: Cross-Origin Request Blocked',
@@ -167,6 +176,13 @@ export function pathTraversalGuard(req: Request, res: Response, next: NextFuncti
     rawUrl.includes('\\') ||
     decodedUrl.includes('\\')
   ) {
+    securityLogger.log({
+      eventType: 'PATH_TRAVERSAL_ATTEMPT',
+      severity: 'CRITICAL',
+      clientIp: req.ip,
+      path: req.originalUrl || req.url,
+      method: req.method,
+    });
     res.status(400).json({
       success: false,
       error: 'Path Traversal Detected',
@@ -241,3 +257,83 @@ export const SecurityValidators = {
     return { valid: true };
   },
 };
+
+
+/**
+ * HTTP Method Guard: Disallows dangerous or unsupported verbs (TRACE, TRACK, DEBUG, CONNECT).
+ */
+export function httpMethodGuard(req: Request, res: Response, next: NextFunction): void {
+  const dangerousMethods = ['TRACE', 'TRACK', 'DEBUG', 'CONNECT'];
+  if (dangerousMethods.includes(req.method.toUpperCase())) {
+    securityLogger.log({
+      eventType: 'UNTRUSTED_METHOD',
+      severity: 'HIGH',
+      clientIp: req.ip,
+      path: req.originalUrl || req.url,
+      method: req.method,
+    });
+    res.status(405).json({
+      success: false,
+      error: 'Method Not Allowed',
+      message: `HTTP ${req.method} method is strictly prohibited for security.`,
+    });
+    return;
+  }
+  next();
+}
+
+/**
+ * HTTP Parameter Pollution (HPP) Guard:
+ * Prevents attackers from sending duplicate query parameters (e.g. ?id=1&id=2) to manipulate logic.
+ */
+export function hppGuard(req: Request, res: Response, next: NextFunction): void {
+  if (req.query && typeof req.query === 'object') {
+    let polluted = false;
+    for (const key of Object.keys(req.query)) {
+      if (Array.isArray(req.query[key])) {
+        polluted = true;
+        const arr = req.query[key] as any[];
+        req.query[key] = arr[arr.length - 1];
+      }
+    }
+    if (polluted) {
+      securityLogger.log({
+        eventType: 'HPP_POLLUTION_ATTEMPT',
+        severity: 'MEDIUM',
+        clientIp: req.ip,
+        path: req.originalUrl || req.url,
+        method: req.method,
+      });
+    }
+  }
+  next();
+}
+
+/**
+ * Strict Content-Type Guard for mutating JSON endpoints.
+ */
+export function strictContentTypeGuard(req: Request, res: Response, next: NextFunction): void {
+  const isMutating = ['POST', 'PUT', 'PATCH'].includes(req.method.toUpperCase());
+  const contentLength = req.headers['content-length'];
+  const hasBody = contentLength && parseInt(contentLength, 10) > 0;
+
+  if (isMutating && hasBody) {
+    const contentType = req.headers['content-type'] || '';
+    if (!contentType.toLowerCase().includes('application/json')) {
+      securityLogger.log({
+        eventType: 'MALFORMED_INPUT',
+        severity: 'MEDIUM',
+        clientIp: req.ip,
+        path: req.originalUrl || req.url,
+        method: req.method,
+      });
+      res.status(415).json({
+        success: false,
+        error: 'Unsupported Media Type',
+        message: 'Mutating requests with a body must supply Content-Type: application/json.',
+      });
+      return;
+    }
+  }
+  next();
+}
