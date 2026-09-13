@@ -344,3 +344,39 @@ ALTER PUBLICATION supabase_realtime ADD TABLE orders;
 ALTER PUBLICATION supabase_realtime ADD TABLE menu_items;
 ALTER PUBLICATION supabase_realtime ADD TABLE pickup_slots;
 ALTER PUBLICATION supabase_realtime ADD TABLE audit_logs;
+
+-- ==============================================================================
+-- 13. PERFORMANCE & CONCURRENCY INDEXES
+-- ==============================================================================
+CREATE INDEX IF NOT EXISTS idx_orders_kds_lookup
+  ON orders (cafeteria_id, status, created_at DESC)
+  WHERE status IN ('CONFIRMED', 'PREPARING', 'READY');
+
+CREATE INDEX IF NOT EXISTS idx_orders_user_history
+  ON orders (user_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_orders_slot_capacity
+  ON orders (slot_id, status)
+  WHERE status NOT IN ('CANCELLED');
+
+CREATE INDEX IF NOT EXISTS idx_orders_token_lookup
+  ON orders (order_token);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_order_fk
+  ON order_items (order_id);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_menu_item_fk
+  ON order_items (menu_item_id);
+
+CREATE INDEX IF NOT EXISTS idx_menu_items_canteen_available
+  ON menu_items (cafeteria_id, is_available, category_id);
+
+CREATE INDEX IF NOT EXISTS idx_payments_utr_lookup
+  ON payments (utr_number)
+  WHERE utr_number IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_payments_status_reconcile
+  ON payments (status, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_payments_order_fk
+  ON payments (order_id);

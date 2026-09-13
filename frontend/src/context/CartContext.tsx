@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 
 export interface CartItem {
   id: string;
@@ -68,7 +68,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [selectedSlot]);
 
-  const addItem = (item: { id: string; name: string; price: number; category?: string; tag?: string; maxStock?: number | null }) => {
+  const addItem = useCallback((item: { id: string; name: string; price: number; category?: string; tag?: string; maxStock?: number | null }) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       const effectiveMax = item.maxStock !== undefined ? item.maxStock : existing?.maxStock;
@@ -87,9 +87,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
       return [...prev, { ...item, quantity: 1, maxStock: effectiveMax }];
     });
-  };
+  }, []);
 
-  const updateQuantity = (id: string, quantity: number, maxStock?: number | null) => {
+  const updateQuantity = useCallback((id: string, quantity: number, maxStock?: number | null) => {
     setItems((prev) => {
       if (quantity <= 0) {
         return prev.filter((i) => i.id !== id);
@@ -103,9 +103,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         return i;
       });
     });
-  };
+  }, []);
 
-  const removeItem = (id: string) => {
+  const removeItem = useCallback((id: string) => {
     setItems((prev) => {
       const existing = prev.find((i) => i.id === id);
       if (existing && existing.quantity > 1) {
@@ -115,39 +115,59 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
       return prev.filter((i) => i.id !== id);
     });
-  };
+  }, []);
 
-  const deleteItem = (id: string) => {
+  const deleteItem = useCallback((id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
-  };
+  }, []);
 
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setItems([]);
     setSelectedSlot(null);
     try {
       localStorage.removeItem('foodline_cart');
       localStorage.removeItem('foodline_slot');
     } catch (e) {}
-  };
+  }, []);
 
-  const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const totalCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalAmount = useMemo(
+    () => items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [items]
+  );
+
+  const totalCount = useMemo(
+    () => items.reduce((sum, item) => sum + item.quantity, 0),
+    [items]
+  );
+
+  const contextValue = useMemo(
+    () => ({
+      items,
+      addItem,
+      removeItem,
+      deleteItem,
+      updateQuantity,
+      clearCart,
+      totalAmount,
+      totalCount,
+      selectedSlot,
+      setSelectedSlot,
+    }),
+    [
+      items,
+      addItem,
+      removeItem,
+      deleteItem,
+      updateQuantity,
+      clearCart,
+      totalAmount,
+      totalCount,
+      selectedSlot,
+    ]
+  );
 
   return (
-    <CartContext.Provider
-      value={{
-        items,
-        addItem,
-        removeItem,
-        deleteItem,
-        updateQuantity,
-        clearCart,
-        totalAmount,
-        totalCount,
-        selectedSlot,
-        setSelectedSlot,
-      }}
-    >
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );

@@ -4,7 +4,19 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Navbar } from '@/components/navbar';
 import { createClient } from '@/utils/supabase/client';
 import { ProgressBar } from '@/components/ui/ProgressBar';
-import { HourlyChart } from '@/components/analytics/HourlyChart';
+import dynamic from 'next/dynamic';
+
+const HourlyChart = dynamic(
+  () => import('@/components/analytics/HourlyChart').then((mod) => mod.HourlyChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-44 w-full flex items-center justify-center text-xs text-zinc-500 font-bold">
+        Loading analytics graph...
+      </div>
+    ),
+  }
+);
 import {
   Store,
   Zap,

@@ -6,8 +6,13 @@ import {
   PreparingColumn,
   ReadyColumn,
   DisplayTicker,
-  AudioSettingsDrawer,
 } from '@/components/display';
+import dynamic from 'next/dynamic';
+
+const AudioSettingsDrawer = dynamic(
+  () => import('@/components/display').then((mod) => mod.AudioSettingsDrawer),
+  { ssr: false }
+);
 import { useRealtimeOrders } from '@/hooks/useRealtimeOrders';
 import { useWakeLock } from '@/hooks/useWakeLock';
 import { getSoundSettings, saveSoundSettings } from '@/lib/voice-announcer';
