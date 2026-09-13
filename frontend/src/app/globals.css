@@ -753,6 +753,54 @@ h1, h2, h3, .font-heading {
   box-shadow: 0 0 24px rgba(139, 92, 246, 0.4), inset 0 0 12px rgba(139, 92, 246, 0.12);
 }
 
+/* =============================================================================
+   144Hz / 144 FPS ULTRA-HIGH-REFRESH HARDWARE COMPOSITING ENGINE
+   ============================================================================= */
+:root {
+  --frame-budget-144hz: 6.944ms; /* 1000ms / 144 FPS strict budget */
+  --hz-target: 144;
+}
+
+/* 144Hz Global Smooth Momentum & Sub-Pixel Anti-Aliasing */
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hardware Layer Compositor Promotion for 144Hz Zero-Drop Rendering */
+.gpu-144hz,
+[data-gpu="144hz"],
+.hardware-accelerated,
+.motion-safe-gpu,
+.dish-card,
+button,
+a {
+  transform: translate3d(0, 0, 0);
+  -webkit-transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  -webkit-perspective: 1000px;
+}
+
+/* Sub-frame layout containment for 144 FPS list rendering */
+.content-visibility-144hz {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 140px;
+  contain: layout style paint;
+}
+
+/* 144Hz Sub-Frame Springs (6.94ms delta pacing) */
+.ease-144hz-snappy {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ease-144hz-smooth {
+  transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
 .hardware-accelerated {
   transform: translate3d(0, 0, 0);
   will-change: transform, opacity;

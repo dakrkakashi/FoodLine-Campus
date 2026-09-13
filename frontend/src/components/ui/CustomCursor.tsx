@@ -14,16 +14,16 @@ export function CustomCursor() {
   const lastPosRef = useRef({ x: -100, y: -100, time: 0 });
 
   // 1. Snappy Laser Core (stiffness 1200, damping 35)
-  const dotX = useSpring(-100, { stiffness: 1200, damping: 35 });
-  const dotY = useSpring(-100, { stiffness: 1200, damping: 35 });
+  const dotX = useSpring(-100, { stiffness: 1200, damping: 35, restDelta: 0.0001, restSpeed: 0.0001 });
+  const dotY = useSpring(-100, { stiffness: 1200, damping: 35, restDelta: 0.0001, restSpeed: 0.0001 });
 
   // 2. Interactive Orbital Ring (stiffness 500, damping 28)
-  const ringX = useSpring(-100, { stiffness: 500, damping: 28 });
-  const ringY = useSpring(-100, { stiffness: 500, damping: 28 });
+  const ringX = useSpring(-100, { stiffness: 500, damping: 28, restDelta: 0.0001, restSpeed: 0.0001 });
+  const ringY = useSpring(-100, { stiffness: 500, damping: 28, restDelta: 0.0001, restSpeed: 0.0001 });
 
   // 3. Ethereal Ambient Trailing Nebula Flare (stiffness 180, damping 22)
-  const trailX = useSpring(-100, { stiffness: 180, damping: 22 });
-  const trailY = useSpring(-100, { stiffness: 180, damping: 22 });
+  const trailX = useSpring(-100, { stiffness: 180, damping: 22, restDelta: 0.0001, restSpeed: 0.0001 });
+  const trailY = useSpring(-100, { stiffness: 180, damping: 22, restDelta: 0.0001, restSpeed: 0.0001 });
 
   // Do not render custom cursor on KDS tablets or Display monitors
   const isKioskMode = pathname?.startsWith('/kds') || pathname?.startsWith('/display');

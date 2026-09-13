@@ -15,6 +15,7 @@ import { MeshGradientBackground } from '@/components/ui/MeshGradientBackground';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { CookieConsentBanner } from '@/components/ui/CookieConsentBanner';
+import { HighRefreshRateBadge } from '@/components/ui/HighRefreshRateBadge';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -32,6 +33,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                   <FloatingThemeTrigger />
                   <BackToTop />
                   <CookieConsentBanner />
+                  <HighRefreshRateBadge />
                 </div>
                 {children}
                 <MobileBottomNav />
