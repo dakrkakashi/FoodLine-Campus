@@ -25,6 +25,7 @@ import {
   X,
   Sparkles,
   HelpCircle,
+  Zap,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/lib/auth/useAuth';
@@ -241,6 +242,7 @@ export function MobileBottomNav() {
               </div>
 
               <div className="flex flex-col gap-1.5 px-1 pb-2">
+                <SheetLink href="/how-it-works" icon={Zap} label="How FoodLine Works" onClick={() => { playTab(); closeMore(); }} />
                 {user ? (
                   <>
                     <SheetLink href="/canteens" icon={Store} label="Campus Canteens" onClick={() => { playTab(); closeMore(); }} />
@@ -260,6 +262,7 @@ export function MobileBottomNav() {
                   </>
                 ) : (
                   <>
+                    <SheetLink href="/canteens" icon={Store} label="Campus Canteens" onClick={() => { playTab(); closeMore(); }} />
                     <SheetLink href="/login" icon={GraduationCap} label="Student PRN Login" onClick={() => { playTab(); closeMore(); }} />
                     <SheetLink href="/faq" icon={HelpCircle} label="Campus FAQ & Help" onClick={() => { playTab(); closeMore(); }} />
                   </>

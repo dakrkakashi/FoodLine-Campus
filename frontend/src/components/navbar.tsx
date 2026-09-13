@@ -19,6 +19,7 @@ import {
   MoreHorizontal,
   HelpCircle,
   GraduationCap,
+  Zap,
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useTheme, THEMES, ThemeName } from '@/context/ThemeContext';
@@ -101,9 +102,9 @@ export function Navbar() {
               <Receipt size={16} />
               <span>My Orders</span>
             </NavLink>
-            <NavLink href="/faq" onClick={playTab}>
-              <HelpCircle size={16} />
-              <span>FAQ</span>
+            <NavLink href="/how-it-works" onClick={playTab}>
+              <Zap size={16} />
+              <span>How It Works</span>
             </NavLink>
 
             <div className="relative">
@@ -134,6 +135,9 @@ export function Navbar() {
                     <DesktopMoreLink href="/select-campus" onClick={() => { playTab(); setDesktopMoreOpen(false); }}>
                       <Building2 size={15} /> Change Campus
                     </DesktopMoreLink>
+                    <DesktopMoreLink href="/how-it-works" onClick={() => { playTab(); setDesktopMoreOpen(false); }}>
+                      <Zap size={15} /> How It Works
+                    </DesktopMoreLink>
                     <DesktopMoreLink href="/faq" onClick={() => { playTab(); setDesktopMoreOpen(false); }}>
                       <HelpCircle size={15} /> Campus Help & FAQ
                     </DesktopMoreLink>
@@ -162,6 +166,10 @@ export function Navbar() {
           </nav>
         ) : (
           <nav className="hidden md:flex items-center gap-1.5 shrink-0" aria-label="Main Navigation">
+            <NavLink href="/how-it-works" onClick={playTab}>
+              <Zap size={16} />
+              <span>How It Works</span>
+            </NavLink>
             <NavLink href="/canteens" onClick={playTab}>
               <Store size={16} />
               <span>Canteens</span>
