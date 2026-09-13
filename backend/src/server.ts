@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import dotenv from 'dotenv';
 import { MenuService } from './services/menu-service.js';
 import { SlotThrottlerService } from './services/slot-throttler.js';
@@ -42,6 +43,19 @@ const PORT = process.env.PORT || 4000;
 
 // Security Hardening: Disable fingerprinting headers
 app.disable('x-powered-by');
+
+// Production-grade response compression (>1KB, bypass SSE streams)
+app.use(
+  compression({
+    filter: (req: Request, res: Response) => {
+      if (req.headers['x-no-compression'] || req.path.includes('/stream')) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+    threshold: 1024,
+  })
+);
 
 // Production-grade security headers
 app.use((_req: Request, res: Response, next: NextFunction) => {

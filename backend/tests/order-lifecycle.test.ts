@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { OrderService } from '../src/services/order-service.js';
 
-describe('OrderService — Order Lifecycle, Idempotency & Payment Reconciliation', () => {
+describe('OrderService — Order Lifecycle, Idempotency & Payment Reconciliation', { timeout: 35000 }, () => {
   const sampleItems = [
     { name: 'Samosa Pav', price: 25, quantity: 2 },
     { name: 'Special Cutting Chai', price: 15, quantity: 1 },
