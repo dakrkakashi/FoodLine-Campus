@@ -59,6 +59,11 @@ export function MobileBottomNav() {
     };
   }, [moreOpen]);
 
+  // Do not show student bottom navigation on kitchen displays or KDS
+  if (pathname?.startsWith('/kds') || pathname?.startsWith('/display')) {
+    return null;
+  }
+
   // Bottom tabs configuration
   // Rule: max 5 tabs on mobile. Everything else goes into "More".
   const navItems = [

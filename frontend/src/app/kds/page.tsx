@@ -86,7 +86,7 @@ export default function KitchenDisplayPage() {
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set());
 
   // KDS Audio Chime & Speech Suite
-  const { playKitchenReadyChime, playPop, unlockAudio } = useSoundFX();
+  const { playKitchenReadyChime, playPop, playClick, unlockAudio } = useSoundFX();
   const readyChimePlayedTokensRef = React.useRef<Set<string>>(new Set());
   const isInitialLoadRef = React.useRef<boolean>(true);
   const [audioUnlocked, setAudioUnlocked] = useState(false);
@@ -174,6 +174,10 @@ export default function KitchenDisplayPage() {
     }
     return { label: `⏱️ ${mins < 1 ? 'Just now' : `${mins}m`}`, color: 'bg-white/10 text-zinc-300 border-white/10' };
   };
+
+  // 3-Window Mobile & KDS Navigation
+  const [mobileWindow, setMobileWindow] = useState<'pending' | 'making' | 'done'>('pending');
+  const [doneSubTab, setDoneSubTab] = useState<'ready' | 'collected'>('ready');
 
   // OTP Verification Modal State
   const [verifyingOrder, setVerifyingOrder] = useState<KdsOrder | null>(null);
@@ -721,7 +725,7 @@ export default function KitchenDisplayPage() {
     );
   }, [orders, kdsSearch]);
 
-  const pendingOrders = filteredOrders.filter((o) => o.status === 'CONFIRMED');
+  const pendingOrders = filteredOrders.filter((o) => o.status === 'CONFIRMED' || o.status === 'PENDING');
   const preparingOrders = filteredOrders.filter((o) => o.status === 'PREPARING');
   const readyOrders = filteredOrders.filter((o) => o.status === 'READY');
   const collectedOrders = filteredOrders.filter((o) => o.status === 'COLLECTED');
@@ -737,16 +741,16 @@ export default function KitchenDisplayPage() {
 
   return (
     <div className="min-h-screen bg-(--bg-canvas) text-(--text-primary) flex flex-col h-screen overflow-hidden select-none transition-colors duration-300">
-      {/* Tablet Autoplay Audio Unlock Warning Banner */}
+      {/* Compact Autoplay Audio Unlock Warning Banner */}
       {!audioUnlocked && (
         <div
           onClick={unlockAudioContext}
-          className="flex-none bg-linear-to-r from-amber-600/30 via-orange-600/30 to-amber-600/30 border-b border-amber-500/40 px-4 py-2.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-amber-600/40 transition backdrop-blur-md z-50"
+          className="flex-none bg-linear-to-r from-amber-600/30 via-orange-600/30 to-amber-600/30 border-b border-amber-500/40 px-3 sm:px-4 py-2 sm:py-2.5 flex items-center justify-between gap-2 sm:gap-3 cursor-pointer hover:bg-amber-600/40 transition backdrop-blur-md z-50"
         >
-          <div className="flex items-center gap-2.5 text-xs sm:text-sm font-bold text-amber-200">
-            <span className="text-base animate-bounce">🔔</span>
-            <span>
-              <strong>Tablet Audio Chime Muted:</strong> Tap anywhere on screen or click here to enable automatic order READY chimes for kitchen staff.
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-amber-200 truncate">
+            <span className="text-base animate-bounce shrink-0">🔔</span>
+            <span className="truncate">
+              <strong>Tablet Audio Muted:</strong> Tap to enable kitchen order chimes.
             </span>
           </div>
           <button
@@ -754,7 +758,7 @@ export default function KitchenDisplayPage() {
               e.stopPropagation();
               unlockAudioContext();
             }}
-            className="flex-none px-3.5 py-1 bg-amber-400 hover:bg-amber-300 active:scale-95 text-black text-xs font-black rounded-lg transition shadow-md cursor-pointer"
+            className="flex-none px-3 py-1 bg-amber-400 hover:bg-amber-300 active:scale-95 text-black text-xs font-black rounded-lg transition shadow-md cursor-pointer"
           >
             Enable Sound
           </button>
@@ -762,42 +766,42 @@ export default function KitchenDisplayPage() {
       )}
 
       {/* Top Staff & Kiosk Header */}
-      <header className="flex-none bg-(--bg-card)/95 backdrop-blur-xl border-b border-(--border-glass) px-5 py-3.5 flex items-center justify-between gap-4 flex-wrap transition-colors duration-300">
-        <div className="flex items-center gap-3">
+      <header className="flex-none bg-(--bg-card)/95 backdrop-blur-xl border-b border-(--border-glass) px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between gap-2 sm:gap-4 flex-wrap transition-colors duration-300">
+        <div className="flex items-center gap-2 sm:gap-3">
           <Link
             href="/"
-            className="w-10 h-10 rounded-xl bg-linear-to-tr from-accent-orange to-accent-amber flex items-center justify-center font-black text-xl text-black shadow-lg shadow-accent-orange/25 hover:scale-105 active:scale-95 transition cursor-pointer"
+            className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-linear-to-tr from-accent-orange to-accent-amber flex items-center justify-center font-black text-lg sm:text-xl text-black shadow-lg shadow-accent-orange/25 hover:scale-105 active:scale-95 transition cursor-pointer shrink-0"
           >
-            🍽
+            🍽️
           </Link>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg sm:text-xl font-black text-(--text-primary) leading-tight">Cafe @7 KDS</h1>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <h1 className="text-base sm:text-xl font-black text-(--text-primary) leading-tight">Cafe @7 KDS</h1>
+              <span className="px-1.5 sm:px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-400 text-[9px] sm:text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
                 Live Sync
               </span>
             </div>
-            <div className="text-[11px] font-semibold text-(--text-secondary) flex items-center gap-2 mt-0.5">
-              <span>Sanjivani University</span>
-              <span>•</span>
+            <div className="text-[10px] sm:text-[11px] font-semibold text-(--text-secondary) flex items-center gap-1.5 sm:gap-2 mt-0.5">
+              <span className="hidden sm:inline">Sanjivani University</span>
+              <span className="hidden sm:inline">•</span>
               <span className="font-mono text-(--text-primary) font-bold">{currentTime || '12:00:00 AM'}</span>
             </div>
           </div>
         </div>
 
-        {/* Center: Shift Order Metrics Strip */}
+        {/* Center: Shift Order Metrics Strip (visible on large screens) */}
         <div className="hidden xl:flex items-center gap-2 bg-black/20 dark:bg-black/40 border border-(--border-glass) rounded-2xl p-1.5 px-3">
           <div className="flex items-center gap-1.5 text-xs font-bold text-amber-400 px-2.5 py-1 rounded-xl bg-amber-500/10">
-            <span>🔥</span>
-            <span>{pendingOrders.length} New</span>
+            <span>⏳</span>
+            <span>{pendingOrders.length} Pending</span>
           </div>
           <div className="flex items-center gap-1.5 text-xs font-bold text-accent-orange px-2.5 py-1 rounded-xl bg-accent-orange/10">
             <span>🍳</span>
-            <span>{preparingOrders.length} Cooking</span>
+            <span>{preparingOrders.length} Making</span>
           </div>
           <div className="flex items-center gap-1.5 text-xs font-bold text-accent-teal px-2.5 py-1 rounded-xl bg-accent-teal/10">
-            <span>⚡</span>
+            <span>✅</span>
             <span>{readyOrders.length} Ready</span>
           </div>
           <div className="flex items-center gap-1.5 text-xs font-bold text-(--text-secondary) px-2.5 py-1 rounded-xl bg-black/5 dark:bg-white/5">
@@ -807,48 +811,38 @@ export default function KitchenDisplayPage() {
         </div>
 
         {/* Right Action Tools */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Quick Search */}
-          <div className="relative max-w-37.5 sm:max-w-45">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-(--text-muted)" />
+          <div className="relative w-28 sm:w-44">
+            <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-(--text-muted)" />
             <input
               type="text"
-              placeholder="Search token / OTP..."
+              placeholder="Search..."
               value={kdsSearch}
               onChange={(e) => setKdsSearch(e.target.value)}
-              className="w-full bg-(--bg-canvas) border border-(--border-glass) rounded-xl pl-8 pr-3 py-1.5 text-xs text-(--text-primary) placeholder-(--text-muted) focus:outline-none focus:border-accent-orange transition-colors"
+              className="w-full bg-(--bg-canvas) border border-(--border-glass) rounded-xl pl-7 pr-2.5 py-1.5 text-xs text-(--text-primary) placeholder-(--text-muted) focus:outline-none focus:border-accent-orange transition-colors"
             />
           </div>
 
           {/* Fullscreen Button */}
           <button
             onClick={toggleFullscreen}
-            className="w-9 h-9 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-(--border-glass) flex items-center justify-center text-(--text-secondary) hover:text-(--text-primary) transition cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-(--border-glass) flex items-center justify-center text-(--text-secondary) hover:text-(--text-primary) transition cursor-pointer"
             title={isFullscreen ? 'Exit Fullscreen' : 'Enter Kiosk Fullscreen'}
           >
-            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+            {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
           </button>
-
-          {/* Tablet Audio Autoplay Unlock Indicator/Button */}
-          {!audioUnlocked && (
-            <button
-              onClick={unlockAudioContext}
-              className="px-3 py-1.5 rounded-xl text-xs font-black bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition cursor-pointer flex items-center gap-1.5 animate-pulse"
-              title="Tap to unblock kitchen audio chime on tablet Safari/Chrome"
-            >
-              <span>🔔 Enable Chime</span>
-            </button>
-          )}
 
           {/* Sound Toggle */}
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`px-3 py-2 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition cursor-pointer border ${
+            className={`h-8 sm:h-9 px-2 sm:px-3 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition cursor-pointer border ${
               soundEnabled ? 'bg-black/5 dark:bg-white/10 text-(--text-primary) border-(--border-glass)' : 'bg-red-950/30 text-red-400 border-red-500/30'
             }`}
+            title={soundEnabled ? 'Mute Kitchen Audio' : 'Unmute Kitchen Audio'}
           >
             {soundEnabled ? <Volume2 size={14} className="text-accent-teal" /> : <VolumeX size={14} className="text-red-400" />}
-            <span className="hidden sm:inline">{soundEnabled ? 'Sound ON' : 'Sound OFF'}</span>
+            <span className="hidden md:inline">{soundEnabled ? 'Sound' : 'Muted'}</span>
           </button>
 
           {/* Multilingual Voice Announcer Toggle */}
@@ -863,25 +857,24 @@ export default function KitchenDisplayPage() {
               setAnnouncementLang(next);
               VoiceAnnouncer.announceOrderReady('FL-DEMO', { lang: next });
             }}
-            className="px-3 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition cursor-pointer border bg-black/5 dark:bg-white/10 text-(--text-primary) border-(--border-glass) hover:bg-black/10 dark:hover:bg-white/15"
+            className="h-8 sm:h-9 px-2 sm:px-3 rounded-xl text-xs font-black flex items-center gap-1 sm:gap-1.5 transition cursor-pointer border bg-black/5 dark:bg-white/10 text-(--text-primary) border-(--border-glass) hover:bg-black/10 dark:hover:bg-white/15"
             title="Cycle Kitchen Voice Language (मराठी -> हिन्दी -> English)"
           >
             <span>🗣️</span>
-            <span className="text-accent-amber">
-              {announcementLang === 'mr' ? 'मराठी' : announcementLang === 'hi' ? 'हिन्दी' : 'English'}
+            <span className="text-accent-amber font-bold text-[11px] sm:text-xs">
+              {announcementLang === 'mr' ? 'मराठी' : announcementLang === 'hi' ? 'हिन्दी' : 'ENG'}
             </span>
           </button>
-
 
           {/* Stock Manager */}
           <button
             onClick={() => setShowStockoutModal(true)}
-            className="px-3.5 py-2 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber text-black text-xs font-black shadow-lg shadow-accent-orange/20 hover:scale-105 active:scale-95 transition cursor-pointer flex items-center gap-1.5"
+            className="h-8 sm:h-9 px-2.5 sm:px-3.5 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber text-black text-xs font-black shadow-lg shadow-accent-orange/20 hover:scale-105 active:scale-95 transition cursor-pointer flex items-center gap-1.5 shrink-0"
           >
             <span>📦</span>
-            <span className="hidden sm:inline">Stock Manager</span>
+            <span className="hidden sm:inline">Stock</span>
             {soldOutCount > 0 && (
-              <span className="px-1.5 py-0.5 rounded-full bg-black/40 text-white text-[10px] font-black">
+              <span className="px-1.5 py-0.2 rounded-full bg-black/40 text-white text-[10px] font-black">
                 {soldOutCount}
               </span>
             )}
@@ -889,18 +882,85 @@ export default function KitchenDisplayPage() {
         </div>
       </header>
 
-      {/* Kanban Board */}
-      <main className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 p-4 overflow-hidden h-full">
-        {/* COLUMN 1: INCOMING CONFIRMED */}
-        <div className="flex flex-col bg-(--bg-card) rounded-2xl border border-(--border-glass) overflow-hidden shadow-xl transition-colors duration-300">
-          <div className="p-3 bg-linear-to-r from-accent-orange/20 to-transparent border-b border-accent-orange/30 flex items-center justify-between">
+      {/* Mobile 3-Window Segmented Control (Pinned on Mobile screens < lg) */}
+      <div className="flex-none flex items-center gap-1.5 p-2 bg-(--bg-card) border-b border-(--border-glass) lg:hidden">
+        <button
+          type="button"
+          onClick={() => {
+            playClick();
+            setMobileWindow('pending');
+          }}
+          className={`flex-1 py-2.5 px-2 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            mobileWindow === 'pending'
+              ? 'bg-linear-to-r from-amber-500 to-orange-500 text-black shadow-lg shadow-amber-500/25 scale-102'
+              : 'text-(--text-secondary) hover:text-(--text-primary) bg-black/5 dark:bg-white/5'
+          }`}
+        >
+          <span>⏳ Pending</span>
+          <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+            mobileWindow === 'pending' ? 'bg-black/25 text-black' : 'bg-black/10 dark:bg-white/15 text-(--text-primary)'
+          }`}>
+            {pendingOrders.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            playClick();
+            setMobileWindow('making');
+          }}
+          className={`flex-1 py-2.5 px-2 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            mobileWindow === 'making'
+              ? 'bg-linear-to-r from-accent-orange to-accent-amber text-black shadow-lg shadow-accent-orange/25 scale-102'
+              : 'text-(--text-secondary) hover:text-(--text-primary) bg-black/5 dark:bg-white/5'
+          }`}
+        >
+          <span>🍳 Making</span>
+          <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+            mobileWindow === 'making' ? 'bg-black/25 text-black' : 'bg-black/10 dark:bg-white/15 text-(--text-primary)'
+          }`}>
+            {preparingOrders.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            playClick();
+            setMobileWindow('done');
+          }}
+          className={`flex-1 py-2.5 px-2 rounded-xl font-black text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+            mobileWindow === 'done'
+              ? 'bg-linear-to-r from-accent-teal to-emerald-400 text-black shadow-lg shadow-accent-teal/25 scale-102'
+              : 'text-(--text-secondary) hover:text-(--text-primary) bg-black/5 dark:bg-white/5'
+          }`}
+        >
+          <span>✅ Done</span>
+          <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+            mobileWindow === 'done' ? 'bg-black/25 text-black' : 'bg-black/10 dark:bg-white/15 text-(--text-primary)'
+          }`}>
+            {readyOrders.length}
+          </span>
+        </button>
+      </div>
+
+      {/* 3-Window Board Layout (1 full window on Mobile, 3 columns on Desktop) */}
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4 p-2 sm:p-4 overflow-hidden h-full">
+        {/* ========================================================= */}
+        {/* WINDOW 1: ⏳ PENDING (Incoming Orders)                     */}
+        {/* ========================================================= */}
+        <div className={`flex-col bg-(--bg-card) rounded-2xl border border-(--border-glass) overflow-hidden shadow-xl transition-all duration-300 ${
+          mobileWindow === 'pending' ? 'flex' : 'hidden lg:flex'
+        }`}>
+          <div className="p-3 bg-linear-to-r from-amber-500/20 to-transparent border-b border-amber-500/30 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-base">🔥</span>
-              <span className="font-black text-xs text-accent-orange uppercase tracking-wider">
-                1. Incoming Confirmed
+              <span className="text-base">⏳</span>
+              <span className="font-black text-xs text-amber-500 uppercase tracking-wider">
+                1. Pending Orders
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-accent-orange text-black text-xs font-black shadow-sm">
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-black text-xs font-black shadow-sm">
               {pendingOrders.length}
             </span>
           </div>
@@ -912,7 +972,7 @@ export default function KitchenDisplayPage() {
                   ✨
                 </div>
                 <div className="text-sm font-bold text-(--text-primary)">All Clear</div>
-                <p className="text-xs text-(--text-muted)">No incoming orders waiting</p>
+                <p className="text-xs text-(--text-muted)">No pending incoming orders waiting</p>
               </div>
             ) : (
               pendingOrders.map((order) => {
@@ -921,7 +981,7 @@ export default function KitchenDisplayPage() {
                 return (
                   <div
                     key={order.id}
-                    className="bg-(--bg-glass-heavy) border border-(--border-glass) hover:border-accent-orange/50 p-4 rounded-2xl shadow-lg space-y-3 transition-all duration-300"
+                    className="bg-(--bg-glass-heavy) border border-(--border-glass) hover:border-amber-500/50 p-4 rounded-2xl shadow-lg space-y-3 transition-all duration-300"
                   >
                     <div className="flex items-center justify-between border-b border-(--border-glass) pb-2.5">
                       <div>
@@ -962,16 +1022,19 @@ export default function KitchenDisplayPage() {
                     </div>
 
                     {order.notes && (
-                      <div className="text-[11px] bg-accent-amber/10 text-accent-amber p-2 rounded-lg border border-accent-amber/20 font-medium">
+                      <div className="text-[11px] bg-amber-500/10 text-amber-500 p-2 rounded-lg border border-amber-500/20 font-medium">
                         Note: {order.notes}
                       </div>
                     )}
 
                     <button
-                      onClick={() => handleUpdateStatus(order.id, 'PREPARING')}
-                      className="w-full py-2.5 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber hover:opacity-95 text-black font-black text-xs shadow-lg shadow-accent-orange/30 transition cursor-pointer flex items-center justify-center gap-1.5"
+                      onClick={() => {
+                        playClick();
+                        handleUpdateStatus(order.id, 'PREPARING');
+                      }}
+                      className="w-full py-3 rounded-xl bg-linear-to-r from-amber-500 to-orange-500 hover:opacity-95 active:scale-98 text-black font-black text-xs shadow-lg shadow-amber-500/30 transition cursor-pointer flex items-center justify-center gap-1.5"
                     >
-                      <span>Start Preparing</span>
+                      <span>Start Making</span>
                       <span>➔</span>
                     </button>
                   </div>
@@ -981,16 +1044,20 @@ export default function KitchenDisplayPage() {
           </div>
         </div>
 
-        {/* COLUMN 2: ON STOVE / PREPARATION */}
-        <div className="flex flex-col bg-(--bg-card) rounded-2xl border border-(--border-glass) overflow-hidden shadow-xl transition-colors duration-300">
-          <div className="p-3 bg-linear-to-r from-accent-amber/20 to-transparent border-b border-accent-amber/30 flex items-center justify-between">
+        {/* ========================================================= */}
+        {/* WINDOW 2: 🍳 MAKING (On Stove / In Preparation)           */}
+        {/* ========================================================= */}
+        <div className={`flex-col bg-(--bg-card) rounded-2xl border border-(--border-glass) overflow-hidden shadow-xl transition-all duration-300 ${
+          mobileWindow === 'making' ? 'flex' : 'hidden lg:flex'
+        }`}>
+          <div className="p-3 bg-linear-to-r from-accent-orange/20 to-transparent border-b border-accent-orange/30 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-base">🍳</span>
-              <span className="font-black text-xs text-accent-amber uppercase tracking-wider">
-                2. On Stove / Prep
+              <span className="font-black text-xs text-accent-orange uppercase tracking-wider">
+                2. Making / On Stove
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-accent-amber text-black text-xs font-black shadow-sm">
+            <span className="px-2.5 py-0.5 rounded-full bg-accent-orange text-black text-xs font-black shadow-sm">
               {preparingOrders.length}
             </span>
           </div>
@@ -1001,7 +1068,7 @@ export default function KitchenDisplayPage() {
                 <ChefExpressIllustration size={120} />
                 <div className="text-sm font-black text-(--text-primary)">Stoves Are Free</div>
                 <p className="text-xs text-(--text-secondary) max-w-50 leading-relaxed">
-                  Tap <strong className="text-accent-orange">"Start Preparing ➔"</strong> on incoming tickets to queue cooking.
+                  Tap <strong className="text-accent-orange">"Start Making ➔"</strong> on pending tickets to queue cooking.
                 </p>
               </div>
             ) : (
@@ -1011,13 +1078,13 @@ export default function KitchenDisplayPage() {
                 return (
                   <div
                     key={order.id}
-                    className="bg-(--bg-glass-heavy) border-2 border-accent-amber/40 p-4 rounded-2xl shadow-lg space-y-3 transition-all duration-300"
+                    className="bg-(--bg-glass-heavy) border-2 border-accent-orange/40 p-4 rounded-2xl shadow-lg space-y-3 transition-all duration-300"
                   >
                     <div className="flex items-center justify-between border-b border-(--border-glass) pb-2.5">
                       <div>
                         <span className="font-black text-xl text-(--text-primary) tracking-tight">{order.order_token}</span>
-                        <div className="text-[10px] text-accent-amber font-bold mt-0.5 flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-accent-amber animate-pulse" />
+                        <div className="text-[10px] text-accent-orange font-bold mt-0.5 flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-accent-orange animate-pulse" />
                           <span>Active on Stove</span>
                         </div>
                       </div>
@@ -1031,7 +1098,7 @@ export default function KitchenDisplayPage() {
                       {order.order_items?.map((item) => (
                         <div key={item.id} className="flex justify-between items-center font-bold">
                           <div className="flex items-center gap-1.5">
-                            <span className="px-1.5 py-0.5 rounded-md bg-accent-amber/20 text-accent-amber font-black text-[11px]">
+                            <span className="px-1.5 py-0.5 rounded-md bg-accent-orange/20 text-accent-orange font-black text-[11px]">
                               {item.quantity}x
                             </span>
                             <span>{item.item_name}</span>
@@ -1042,16 +1109,19 @@ export default function KitchenDisplayPage() {
                     </div>
 
                     {order.notes && (
-                      <div className="text-[11px] bg-accent-amber/10 text-accent-amber p-2 rounded-lg border border-accent-amber/20 font-medium">
+                      <div className="text-[11px] bg-accent-orange/10 text-accent-orange p-2 rounded-lg border border-accent-orange/20 font-medium">
                         Note: {order.notes}
                       </div>
                     )}
 
                     <button
-                      onClick={() => handleUpdateStatus(order.id, 'READY')}
-                      className="w-full py-2.5 rounded-xl bg-linear-to-r from-accent-teal to-emerald-500 hover:opacity-95 text-black font-black text-xs shadow-lg shadow-accent-teal/30 transition cursor-pointer flex items-center justify-center gap-1.5"
+                      onClick={() => {
+                        playClick();
+                        handleUpdateStatus(order.id, 'READY');
+                      }}
+                      className="w-full py-3 rounded-xl bg-linear-to-r from-accent-teal to-emerald-500 hover:opacity-95 active:scale-98 text-black font-black text-xs shadow-lg shadow-accent-teal/30 transition cursor-pointer flex items-center justify-center gap-1.5"
                     >
-                      <span>Mark Ready for Pickup</span>
+                      <span>Mark as Done (Ready)</span>
                       <span>✓</span>
                     </button>
                   </div>
@@ -1061,32 +1131,78 @@ export default function KitchenDisplayPage() {
           </div>
         </div>
 
-        {/* COLUMN 3: READY AT COUNTER */}
-        <div className="flex flex-col bg-(--bg-card) rounded-2xl border border-(--border-glass) overflow-hidden shadow-xl transition-colors duration-300">
-          <div className="p-3 bg-linear-to-r from-accent-teal/20 to-transparent border-b border-accent-teal/30 flex items-center justify-between">
+        {/* ========================================================= */}
+        {/* WINDOW 3: ✅ DONE (Ready at Counter + Shift Completed)    */}
+        {/* ========================================================= */}
+        <div className={`flex-col bg-(--bg-card) rounded-2xl border border-(--border-glass) overflow-hidden shadow-xl transition-all duration-300 ${
+          mobileWindow === 'done' ? 'flex' : 'hidden lg:flex'
+        }`}>
+          {/* Header with Sub-tabs for Ready vs Completed History */}
+          <div className="p-3 bg-linear-to-r from-accent-teal/20 to-transparent border-b border-accent-teal/30 flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-base">⚡</span>
+              <span className="text-base">✅</span>
               <span className="font-black text-xs text-accent-teal uppercase tracking-wider">
-                3. Ready at Counter
+                3. Done
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-accent-teal text-black text-xs font-black shadow-sm">
-              {readyOrders.length}
-            </span>
+
+            {/* Sub-Tab Selector */}
+            <div className="flex items-center gap-1 bg-black/10 dark:bg-black/40 p-1 rounded-xl border border-(--border-glass)">
+              <button
+                type="button"
+                onClick={() => {
+                  playClick();
+                  setDoneSubTab('ready');
+                }}
+                className={`px-2.5 py-1 rounded-lg text-xs font-black transition cursor-pointer flex items-center gap-1 ${
+                  doneSubTab === 'ready'
+                    ? 'bg-accent-teal text-black shadow-sm'
+                    : 'text-(--text-secondary) hover:text-(--text-primary)'
+                }`}
+              >
+                <span>Ready</span>
+                <span className={`px-1 py-0.2 text-[10px] rounded-full font-black ${
+                  doneSubTab === 'ready' ? 'bg-black/20 text-black' : 'bg-black/10 dark:bg-white/10'
+                }`}>
+                  {readyOrders.length}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  playClick();
+                  setDoneSubTab('collected');
+                }}
+                className={`px-2.5 py-1 rounded-lg text-xs font-black transition cursor-pointer flex items-center gap-1 ${
+                  doneSubTab === 'collected'
+                    ? 'bg-accent-orange text-black shadow-sm'
+                    : 'text-(--text-secondary) hover:text-(--text-primary)'
+                }`}
+              >
+                <span>History</span>
+                <span className={`px-1 py-0.2 text-[10px] rounded-full font-black ${
+                  doneSubTab === 'collected' ? 'bg-black/20 text-black' : 'bg-black/10 dark:bg-white/10'
+                }`}>
+                  {collectedOrders.length}
+                </span>
+              </button>
+            </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin">
-            {readyOrders.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
-                <CampusExpressIllustration size={120} />
-                <div className="text-sm font-black text-(--text-primary)">Counter Clear</div>
-                <p className="text-xs text-(--text-secondary) max-w-50 leading-relaxed">
-                  All prepared trays have been collected by students.
-                </p>
-              </div>
-            ) : (
-              readyOrders.map((order) => {
-                return (
+          {/* Subtab Content: Ready for Pickup */}
+          {doneSubTab === 'ready' && (
+            <div className="flex-1 overflow-y-auto p-3 space-y-3 scrollbar-thin">
+              {readyOrders.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
+                  <CampusExpressIllustration size={120} />
+                  <div className="text-sm font-black text-(--text-primary)">Counter Clear</div>
+                  <p className="text-xs text-(--text-secondary) max-w-50 leading-relaxed">
+                    All ready food trays have been collected by students.
+                  </p>
+                </div>
+              ) : (
+                readyOrders.map((order) => (
                   <div
                     key={order.id}
                     className="bg-(--bg-glass-heavy) border-2 border-accent-teal/40 p-4 rounded-2xl shadow-lg space-y-3 transition-all duration-300"
@@ -1125,7 +1241,7 @@ export default function KitchenDisplayPage() {
                           setEnteredOtp('');
                           setOtpError('');
                         }}
-                        className="col-span-2 py-2.5 rounded-xl bg-linear-to-r from-accent-teal to-emerald-500 hover:opacity-95 text-black font-black text-xs shadow-lg shadow-accent-teal/30 transition cursor-pointer flex items-center justify-center gap-1.5"
+                        className="col-span-2 py-2.5 rounded-xl bg-linear-to-r from-accent-teal to-emerald-500 hover:opacity-95 active:scale-98 text-black font-black text-xs shadow-lg shadow-accent-teal/30 transition cursor-pointer flex items-center justify-center gap-1.5"
                       >
                         <span>🔐</span>
                         <span>Verify OTP & Release</span>
@@ -1133,61 +1249,54 @@ export default function KitchenDisplayPage() {
 
                       <button
                         onClick={() => handleDirectRelease(order.id, order.order_token)}
-                        className="col-span-1 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border border-(--border-glass) text-(--text-secondary) hover:text-(--text-primary) font-bold text-[11px] transition cursor-pointer"
+                        className="col-span-1 py-2.5 rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 active:scale-98 border border-(--border-glass) text-(--text-secondary) hover:text-(--text-primary) font-bold text-[11px] transition cursor-pointer"
                         title="Direct release if student phone died"
                       >
                         Direct ➔
                       </button>
                     </div>
                   </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-
-        {/* COLUMN 4: COMPLETED & COLLECTED */}
-        <div className="flex flex-col bg-(--bg-card) rounded-2xl border border-(--border-glass) overflow-hidden shadow-xl transition-colors duration-300">
-          <div className="p-3 bg-black/5 dark:bg-white/5 border-b border-(--border-glass) flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-base">📦</span>
-              <span className="font-black text-xs text-(--text-secondary) uppercase tracking-wider">
-                4. Completed
-              </span>
+                ))
+              )}
             </div>
-            <span className="px-2 py-0.5 rounded-full bg-black/10 dark:bg-white/10 text-(--text-primary) text-xs font-black">
-              {collectedOrders.length}
-            </span>
-          </div>
+          )}
 
-          {/* Revenue and summary ticker */}
-          <div className="px-3 py-2 bg-black/10 dark:bg-black/40 border-b border-(--border-glass) flex items-center justify-between text-[11px] text-(--text-secondary) font-bold">
-            <span>Shift Revenue:</span>
-            <span className="font-mono font-black text-emerald-500 dark:text-emerald-400">₹{totalCollectedAmount.toFixed(0)}</span>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 opacity-90 scrollbar-thin">
-            {collectedOrders.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-6 text-(--text-muted)">
-                <div className="text-sm font-bold">No completed orders yet</div>
+          {/* Subtab Content: Shift History / Collected Orders */}
+          {doneSubTab === 'collected' && (
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Revenue and summary ticker */}
+              <div className="px-3 py-2.5 bg-black/10 dark:bg-black/40 border-b border-(--border-glass) flex items-center justify-between text-xs font-bold">
+                <span className="text-(--text-secondary)">Total Shift Revenue:</span>
+                <span className="font-mono font-black text-emerald-500 dark:text-emerald-400 text-sm">
+                  ₹{totalCollectedAmount.toFixed(0)}
+                </span>
               </div>
-            ) : (
-              collectedOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className="bg-(--bg-glass-heavy) border border-(--border-glass) p-3 rounded-xl flex items-center justify-between hover:opacity-100 transition"
-                >
-                  <div>
-                    <span className="font-bold text-(--text-primary) text-sm">{order.order_token}</span>
-                    <div className="text-[10px] text-(--text-muted) font-medium">₹{order.total_amount}</div>
+
+              <div className="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-thin">
+                {collectedOrders.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center p-6 text-(--text-muted)">
+                    <div className="text-sm font-bold">No completed orders yet</div>
+                    <p className="text-xs text-(--text-secondary) mt-1">Orders verified with OTP will appear here.</p>
                   </div>
-                  <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 dark:text-emerald-400">
-                    Collected ✓
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
+                ) : (
+                  collectedOrders.map((order) => (
+                    <div
+                      key={order.id}
+                      className="bg-(--bg-glass-heavy) border border-(--border-glass) p-3 rounded-xl flex items-center justify-between hover:opacity-100 transition"
+                    >
+                      <div>
+                        <span className="font-bold text-(--text-primary) text-sm">{order.order_token}</span>
+                        <div className="text-[10px] text-(--text-muted) font-medium">₹{order.total_amount}</div>
+                      </div>
+                      <span className="text-[10px] uppercase font-black px-2 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 dark:text-emerald-400">
+                        Collected ✓
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
