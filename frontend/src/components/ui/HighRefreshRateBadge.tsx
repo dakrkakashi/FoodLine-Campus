@@ -17,7 +17,7 @@ export function HighRefreshRateBadge({ className = '' }: HighRefreshRateBadgePro
   if (isDismissed) return null;
 
   return (
-    <div className={`fixed bottom-4 left-4 z-40 select-none ${className}`}>
+    <div className={`fixed bottom-20 sm:bottom-4 left-3 sm:left-4 z-40 select-none ${className}`}>
       <AnimatePresence mode="wait">
         {!isExpanded ? (
           <motion.button
@@ -28,16 +28,16 @@ export function HighRefreshRateBadge({ className = '' }: HighRefreshRateBadgePro
             transition={{ type: 'spring', stiffness: 500, damping: 28 }}
             onClick={() => setIsExpanded(true)}
             title="Click to view 144Hz GPU & Frame Pacing Telemetry"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#191614]/90 hover:bg-[#24201D] border border-white/10 hover:border-[#00D4AA]/40 backdrop-blur-xl shadow-lg cursor-pointer transition-colors"
+            className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-full bg-[#191614]/90 hover:bg-[#24201D] border border-white/10 hover:border-[#00D4AA]/40 backdrop-blur-xl shadow-lg cursor-pointer transition-colors"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D4AA] opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D4AA]" />
             </span>
-            <span className="text-[11px] font-black font-mono tracking-tight text-[#FAF9F6]">
+            <span className="text-[10px] sm:text-[11px] font-black font-mono tracking-tight text-[#FAF9F6]">
               {fps > 0 ? fps : 144} FPS
             </span>
-            <span className="text-[10px] font-bold text-[#00D4AA] uppercase tracking-wider">
+            <span className="text-[9px] sm:text-[10px] font-bold text-[#00D4AA] uppercase tracking-wider">
               {refreshRate}Hz
             </span>
           </motion.button>
@@ -48,7 +48,7 @@ export function HighRefreshRateBadge({ className = '' }: HighRefreshRateBadgePro
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 12 }}
             transition={{ type: 'spring', stiffness: 450, damping: 26 }}
-            className="w-64 rounded-2xl bg-[#191614]/95 border border-[#00D4AA]/30 p-3.5 backdrop-blur-2xl shadow-2xl text-[#FAF9F6]"
+            className="w-60 sm:w-64 rounded-2xl bg-[#191614]/95 border border-[#00D4AA]/30 p-3.5 backdrop-blur-2xl shadow-2xl text-[#FAF9F6]"
           >
             <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-white/10">
               <div className="flex items-center gap-1.5 text-xs font-black">
@@ -59,7 +59,7 @@ export function HighRefreshRateBadge({ className = '' }: HighRefreshRateBadgePro
                 <button
                   type="button"
                   onClick={() => setIsExpanded(false)}
-                  className="text-xs text-[#8E8EA0] hover:text-[#FAF9F6] p-1 rounded-md"
+                  className="text-xs text-[#8E8EA0] hover:text-[#FAF9F6] p-1 rounded-md cursor-pointer"
                   aria-label="Collapse"
                 >
                   <X size={12} />
@@ -78,7 +78,7 @@ export function HighRefreshRateBadge({ className = '' }: HighRefreshRateBadgePro
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-[#8E8EA0]">Frame Budget</span>
-                <span className="font-mono font-bold text-[#FFB347]">{frameTimeMs}ms (vs 16.6ms standard)</span>
+                <span className="font-mono font-bold text-[#FFB347]">{frameTimeMs}ms (vs 16.6ms)</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-[#8E8EA0]">Compositing</span>
@@ -87,11 +87,11 @@ export function HighRefreshRateBadge({ className = '' }: HighRefreshRateBadgePro
             </div>
 
             <div className="mt-2.5 pt-2 border-t border-white/10 text-[9.5px] text-[#8E8EA0] flex items-center justify-between">
-              <span>60fps lock disabled</span>
+              <span>High Refresh Native</span>
               <button
                 type="button"
                 onClick={() => setIsDismissed(true)}
-                className="text-[#FF6B2C] hover:underline font-bold"
+                className="text-[#FF6B2C] hover:underline font-bold cursor-pointer"
               >
                 Hide HUD
               </button>

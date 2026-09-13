@@ -24,7 +24,7 @@ export function DockedFloatingCart({ className = '' }: DockedFloatingCartProps) 
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 90, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 350, damping: 28 }}
-          className={`fixed bottom-5 left-4 right-4 sm:left-auto sm:right-8 sm:w-[420px] z-40 select-none ${className}`}
+          className={`fixed bottom-20 sm:bottom-6 left-4 right-4 sm:left-auto sm:right-8 sm:w-[420px] z-40 select-none ${className}`}
         >
           <div className="relative rounded-2xl bg-[#191614]/95 backdrop-blur-2xl border border-white/12 p-3.5 sm:p-4 shadow-[0_16px_48px_rgba(0,0,0,0.7)] flex items-center justify-between gap-3.5 overflow-hidden">
             {/* Ambient Brand Accent Glow */}
@@ -60,10 +60,10 @@ export function DockedFloatingCart({ className = '' }: DockedFloatingCartProps) 
             <Link
               href="/cart"
               onClick={() => playPop()}
-              className="relative px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider text-black bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-[#FF6B2C]/30 flex items-center gap-1.5 shrink-0"
+              className="relative inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FF8C38] text-black font-black text-sm shadow-[0_0_24px_rgba(255,107,44,0.4)] hover:brightness-110 active:scale-95 transition-all cursor-pointer shrink-0"
             >
-              <span>View Tray</span>
-              <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
+              <span>View Cart</span>
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </motion.div>
