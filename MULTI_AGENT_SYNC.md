@@ -1660,3 +1660,10 @@ Open questions: <bullet list, or "none">
 pm --prefix backend run build: **0 TypeScript errors (Exit code 0)**.
   >    - 
 pm --prefix frontend run build: **All 51 routes compiled successfully (Exit code 0)**.
+
+- **[2026-09-13 19:54 IST] Codex — Hydration mismatch prevention**:
+  > 1. Updated `frontend/next.config.mjs`: development `/_next/static/*` responses now use `Cache-Control: no-store, max-age=0`; production keeps immutable caching for content-hashed assets.
+  > 2. Root cause: immutable caching was serving stale Webpack development chunks alongside newly-rendered SSR HTML, producing the DotPattern SVG / Navbar structural mismatch.
+  > 3. Verification: `npm --prefix frontend run build` compiled and type-checked, then stopped during page-data collection on the pre-existing missing route `/api/admin/orders` (`PageNotFoundError`), unrelated to this config-only change.
+  > 4. Live verification: restarted `npm run dev`; `/` returns HTTP 200 and `/_next/static/chunks/app/page.js` now returns `Cache-Control: no-store, max-age=0`. `npx tsc --noEmit` passes. Playwright could not launch because its Chromium binary is not installed locally.
+  > 5. Git hygiene: added the local Playwright HTML/report output directories to `.gitignore`; those generated files are deliberately not synchronized to GitHub.

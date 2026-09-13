@@ -5,6 +5,8 @@ node_modules/
 
 # Testing & Coverage
 /coverage/
+frontend/playwright-report/
+frontend/test-results/
 
 # Next.js & Build Output
 .next/

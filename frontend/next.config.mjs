@@ -89,7 +89,13 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            // Development chunks use stable paths (for example, app/page.js).
+            // Caching those as immutable allows an old client bundle to hydrate
+            // against freshly rendered server HTML after a code change.
+            value:
+              process.env.NODE_ENV === 'production'
+                ? 'public, max-age=31536000, immutable'
+                : 'no-store, max-age=0',
           },
         ],
       },
