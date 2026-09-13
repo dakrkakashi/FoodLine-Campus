@@ -16,8 +16,6 @@ import {
   Building2,
   Volume2,
   VolumeX,
-  Sun,
-  Moon,
   MoreHorizontal,
   HelpCircle,
   GraduationCap,
@@ -30,10 +28,11 @@ import { Logo } from '@/components/ui/Logo';
 import { UserAvatar } from '@/components/auth/UserAvatar';
 import { usePermissions } from '@/lib/auth/usePermissions';
 import { useAuth } from '@/lib/auth/useAuth';
+import { AnimatedThemeToggler } from '@/components/magicui';
 
 export function Navbar() {
   const { totalCount } = useCart();
-  const { theme, setTheme, mode, toggleMode, config } = useTheme();
+  const { theme, setTheme, config } = useTheme();
   const { selectedCampus } = useCampus();
   const { muted, toggleMute, playClick, playTab } = useSoundFX();
   const { isStaffOrAbove, isManagerOrAbove } = usePermissions();
@@ -188,21 +187,12 @@ export function Navbar() {
             {muted ? <VolumeX size={15} className="text-zinc-400" /> : <Volume2 size={15} className="text-accent-teal" />}
           </button>
 
-          <button
-            onClick={() => {
-              toggleMode();
-              playClick();
-            }}
-            title={mode === 'light' ? 'Switch to Night Mode (Dark)' : 'Switch to Day Mode (Light)'}
-            aria-label={mode === 'light' ? 'Switch to Night Mode' : 'Switch to Day Mode'}
-            className="p-2 min-w-[38px] min-h-[38px] rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] transition cursor-pointer flex items-center justify-center focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden shrink-0"
-          >
-            {mode === 'light' ? (
-              <Sun size={15} className="text-amber-500" />
-            ) : (
-              <Moon size={15} className="text-indigo-400" />
-            )}
-          </button>
+          {/* Animated Theme Toggler from MagicUI */}
+          <AnimatedThemeToggler
+            size="md"
+            onClick={playClick}
+            className="bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border-[var(--border-glass)]"
+          />
 
           <div className="relative shrink-0">
             <button

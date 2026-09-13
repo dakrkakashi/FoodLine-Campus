@@ -21,3 +21,4 @@ export { Magnetic } from './Magnetic';
 export { MeshGradientBackground } from './MeshGradientBackground';
 export { MorphingStepper } from './MorphingStepper';
 export { HighRefreshRateBadge } from './HighRefreshRateBadge';
+export { Pointer } from './pointer';

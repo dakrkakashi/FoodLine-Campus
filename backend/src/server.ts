@@ -34,6 +34,7 @@ import {
   strictContentTypeGuard,
 } from './middleware/sanitizer.js';
 import { requireAuth } from './middleware/auth.middleware.js';
+import { paginateRecords } from './lib/cursor-pagination.js';
 import { logger } from './lib/logger.js';
 
 dotenv.config();
@@ -576,6 +577,48 @@ app.post('/api/orders', orderPlacementLimiter, async (req: Request, res: Respons
   } catch (error: any) {
     const status = error.message && error.message.includes('capacity') ? 409 : 400;
     res.status(status).json({ success: false, error: error.message });
+  }
+});
+
+
+// -----------------------------------------------------------------------------
+// 3a. GET /api/orders (Cursor-Based Pagination & Filtering)
+// -----------------------------------------------------------------------------
+app.get('/api/orders', orderLookupLimiter, async (req: Request, res: Response) => {
+  try {
+    const cursor = (req.query.cursor as string) || null;
+    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 20;
+    const status = req.query.status as string | undefined;
+    const studentPrn = req.query.studentPrn as string | undefined;
+
+    let orders = OrderService.getAllOrders();
+
+    if (status) {
+      orders = orders.filter((o) => o.status === status);
+    }
+    if (studentPrn) {
+      orders = orders.filter((o) => o.studentPrn === studentPrn);
+    }
+
+    const paginated = paginateRecords(orders, {
+      cursor,
+      limit,
+      sortDirection: 'desc',
+    });
+
+    res.json({
+      success: true,
+      data: paginated.items,
+      pagination: {
+        nextCursor: paginated.nextCursor,
+        hasMore: paginated.hasMore,
+        limit: paginated.limit,
+        totalReturned: paginated.totalReturned,
+      },
+      meta: { timestamp: new Date().toISOString() },
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 

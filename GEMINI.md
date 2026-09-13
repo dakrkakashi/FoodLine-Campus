@@ -53,7 +53,7 @@
 - **Branch Ownership:**
   - Antigravity IDE works on `FoodLine-Backend` on branch `backend` (and backend engine APIs).
   - Antigravity CLI (`agy`) works on `FoodLine-Frontend` on branch `frontend` (and frontend UI).
-  - Master merges happen only into `PPT OTHER TASKES` on branch `main`.
+  - Master merges happen only into `PPT OTHER TASKES` on branch `main``.
 - **Clean Git Commits:** Write conventional commits (`feat:`, `fix:`, `refactor:`, `docs:`). Never use `git reset --hard` or destructive operations without explicit confirmation.
 
 ---
@@ -75,6 +75,19 @@
 ---
 
 ## 8. 🎨 Official Brand Logo Standard
-- **Master Brand Asset**: `/run/media/darkkakashi/PC NVME/StartUp Project (FOODLINE CAMPUS)/PPT OTHER TASKES/LOGO.png` (2048x2048 PNG) is the official master logo for FoodLine Campus.
+- **Master Brand Asset**: `LOGO.png` (2048x2048 PNG) is the official master logo for FoodLine Campus.
 - **Mandatory Usage**: Always use `LOGO.png` / `/logo.png` across all UI components (`Logo.tsx`), web app icons, favicons, PWA manifests, splash screens, Android launcher icons (`mipmap`), and presentations. Never replace or swap it with placeholder icons.
 
+---
+
+## 9. 🧠 Antigravity IDE Master Specification & MCP Blueprint Integration (Zero Architectural Drift)
+- **Master Reference Document**: All architectural patterns and execution steps strictly follow `ANTIGRAVITY_IDE_MCP_EXECUTION_PLAN.md`.
+- **The 5 Pillars of Vibe Coding (T.F.C.D.C.)**:
+  1. *Thinking*: Navigate Logical, Analytical, Computational, and Procedural levels before coding.
+  2. *Frameworks*: React 19, Next.js 15, Tailwind v4, Express, Node.js, and Supabase Postgres.
+  3. *Checkpoints*: Git-first version control, feature branches, micro-commits, zero-risk rollbacks.
+  4. *Debugging*: Methodical patient feedback loop, exact line numbers, full log forwarding, minimal diffs.
+  5. *Context*: Rich sensory inputs (PRDs, Figma tokens, live database schemas, error traces).
+- **Vibe Check Chain-Pattern Interrupt**: Call `node scripts/vibe-check-hook.js` or evaluate `vibe_check_plan` to interrupt pattern inertia before destructive execution.
+- **Zero Exposed Credentials**: Never commit secrets. Stdio is mandatory for local tools; `dangerouslyOmitAuth` is strictly prohibited in production.
+- **Self-Grading UI Pipeline**: Run Playwright end-to-end tests (`npm --prefix frontend run test:e2e`) to verify visual layout against design tokens before merging UI tasks.

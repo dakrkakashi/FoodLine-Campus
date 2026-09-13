@@ -68,6 +68,8 @@ model_capabilities.yaml
 graphify-out/
 AGENTS.md
 OPENCODE.md
+CLAUDE.md
+.cursorrules
 inbox/
 outbox/
 
@@ -77,4 +79,9 @@ outbox/
 .gemini/
 mcp_config*.json
 
-
+# Local / Scratch Files
+UNESSAERY FILES/
+ANTIGRAVITY_IDE_MCP_EXECUTION_PLAN.md
+scripts/magicui-tool.js
+scripts/verify-mcp-ecosystem.mjs
+scripts/vibe-check-hook.js
