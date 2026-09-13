@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Moon, Sun } from "lucide-react";
 import { motion } from "motion/react";
 import { useTheme } from "@/context/ThemeContext";
@@ -17,8 +17,14 @@ export function AnimatedThemeToggler({
   onClick,
   ...props
 }: AnimatedThemeTogglerProps) {
+  const [mounted, setMounted] = useState(false);
   const themeContext = useTheme();
-  const isDark = themeContext?.mode ? themeContext.mode === "dark" : true;
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && themeContext?.mode ? themeContext.mode === "dark" : true;
 
   const handleToggle = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (themeContext?.toggleMode) {
@@ -45,7 +51,7 @@ export function AnimatedThemeToggler({
       onClick={handleToggle}
       aria-label="Toggle dark/light theme"
       className={cn(
-        "relative inline-flex items-center justify-center rounded-xl border border-white/10 bg-stone-900/60 p-2 text-stone-300 transition-colors hover:border-accent-orange/40 hover:bg-stone-800/80 hover:text-white dark:bg-stone-900/80 dark:text-stone-200",
+        "relative inline-flex items-center justify-center rounded-xl border border-white/10 bg-black/5 p-2 text-stone-300 transition-colors hover:border-accent-orange/40 hover:bg-black/10 hover:text-white dark:bg-white/5 dark:text-stone-200",
         sizeClasses,
         className,
       )}

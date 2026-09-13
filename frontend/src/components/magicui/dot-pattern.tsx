@@ -13,6 +13,7 @@ interface DotPatternProps extends React.SVGProps<SVGSVGElement> {
   cr?: number;
   className?: string;
   glow?: boolean;
+  id?: string;
 }
 
 export function DotPattern({
@@ -25,9 +26,11 @@ export function DotPattern({
   cr = 1,
   className,
   glow = false,
+  id: customId,
   ...props
 }: DotPatternProps) {
-  const id = useId();
+  const generatedId = useId();
+  const patternId = customId || generatedId;
 
   return (
     <svg
@@ -41,7 +44,7 @@ export function DotPattern({
     >
       <defs>
         <pattern
-          id={id}
+          id={patternId}
           width={width}
           height={height}
           patternUnits="userSpaceOnUse"
@@ -52,7 +55,7 @@ export function DotPattern({
           <circle id="pattern-circle" cx={cx} cy={cy} r={cr} />
         </pattern>
       </defs>
-      <rect width="100%" height="100%" strokeWidth={0} fill={`url(#${id})`} />
+      <rect width="100%" height="100%" strokeWidth={0} fill={`url(#${patternId})`} />
     </svg>
   );
 }

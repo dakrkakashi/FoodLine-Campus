@@ -24,8 +24,9 @@ export default function IntroductionPage() {
 
   return (
     <PageTransition className="relative min-h-screen flex flex-col justify-between bg-(--bg-canvas) text-(--text-primary) font-sans antialiased selection:bg-accent-orange/20 selection:text-accent-orange overflow-x-hidden">
-      {/* Background Dot Matrix Pattern */}
+      {/* Background Dot Matrix Pattern with deterministic ID */}
       <DotPattern
+        id="landing-dot-pattern"
         width={24}
         height={24}
         cx={1}
@@ -58,17 +59,16 @@ export default function IntroductionPage() {
         </h1>
 
         {/* Body Copy in Plain Human English with 1.6 Line Height */}
-        <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto mb-8 sm:mb-10 leading-[1.6] font-normal">
-          In a 15-minute college break, most of your time is lost standing in a packed canteen line just to buy a paper token. FoodLine lets you pick what you want from your phone during class, pay with UPI, and walk up to counter #2 to grab your hot food when the bell rings.
+        <p className="text-base sm:text-lg md:text-xl text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed font-normal">
+          Pick your food, choose your break time, and show your phone at the counter. Food is already packed and waiting for you. No crowds. No payment delays.
         </p>
 
-        {/* Detected User Greeting */}
-        {user && (
-          <div className="mb-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-xs text-neutral-700 dark:text-neutral-200 font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span>
-              Signed in as <strong>{profile?.full_name || user.user_metadata?.full_name || 'Campus Student'}</strong>
-            </span>
+        {/* Live Welcome Banner for Logged-In Users */}
+        {user && profile && (
+          <div className="mb-8 p-4 bg-accent-orange/10 border border-accent-orange/20 rounded-xl text-accent-orange text-sm font-semibold flex items-center justify-center gap-2">
+            <span>Welcome back, {profile.full_name || 'Student'}!</span>
+            <span className="text-neutral-400">•</span>
+            <span className="text-neutral-500 dark:text-neutral-400">PRN: {profile.prn}</span>
           </div>
         )}
 
@@ -105,20 +105,20 @@ export default function IntroductionPage() {
           {/* Real Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             <div className="p-4 sm:p-5 rounded-xl bg-neutral-50 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800">
-              <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white">32 sec</div>
-              <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-[1.5]">Average counter pickup time</div>
+              <div className="text-2xl sm:text-3xl font-black text-accent-orange mb-1">32s</div>
+              <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400">Average Pickup</div>
             </div>
             <div className="p-4 sm:p-5 rounded-xl bg-neutral-50 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800">
-              <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white">450+</div>
-              <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-[1.5]">Meals served every day</div>
+              <div className="text-2xl sm:text-3xl font-black text-accent-orange mb-1">0</div>
+              <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400">Time Standing in Line</div>
             </div>
             <div className="p-4 sm:p-5 rounded-xl bg-neutral-50 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800">
-              <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white">₹0</div>
-              <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-[1.5]">Extra platform or student fee</div>
+              <div className="text-2xl sm:text-3xl font-black text-accent-orange mb-1">100%</div>
+              <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400">Digital Receipts</div>
             </div>
             <div className="p-4 sm:p-5 rounded-xl bg-neutral-50 dark:bg-neutral-900/80 border border-neutral-200 dark:border-neutral-800">
-              <div className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white">100%</div>
-              <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1 leading-[1.5]">Ready at the exact break bell</div>
+              <div className="text-2xl sm:text-3xl font-black text-accent-orange mb-1">4-Digit</div>
+              <div className="text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-400">Anti-Theft OTP</div>
             </div>
           </div>
 
@@ -133,51 +133,50 @@ export default function IntroductionPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-neutral-200 dark:border-neutral-800">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-accent-orange/10 text-accent-orange flex items-center justify-center font-bold">
-                  <Receipt size={20} />
+                  FL
                 </div>
                 <div>
-                  <div className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">Actual Student Pickup Pass</div>
-                  <div className="text-sm sm:text-base font-bold text-neutral-900 dark:text-white">Cafe @7 — Engineering Building</div>
+                  <h3 className="font-bold text-base text-neutral-900 dark:text-white">Cafe @7 Pickup Pass</h3>
+                  <p className="text-xs text-neutral-500">Order #FL-4512 • Verified via UPI</p>
                 </div>
               </div>
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold self-start sm:self-auto">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-semibold w-fit">
                 <CheckCircle2 size={14} />
-                <span>Ready for pickup at Counter 2</span>
+                <span>Ready for Pickup</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-5">
-              <div className="space-y-3">
-                <div className="text-xs font-semibold uppercase tracking-wider text-neutral-400">Order Items</div>
-                <div className="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
-                  <div className="flex justify-between">
-                    <span>2× Samosa Pav</span>
-                    <span className="font-semibold text-neutral-900 dark:text-white">₹50</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>1× Special Cutting Chai</span>
-                    <span className="font-semibold text-neutral-900 dark:text-white">₹15</span>
-                  </div>
-                  <div className="pt-2 border-t border-neutral-200 dark:border-neutral-800 flex justify-between font-bold text-neutral-900 dark:text-white">
-                    <span>Total Paid via UPI</span>
-                    <span>₹65</span>
-                  </div>
+            <div className="py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border-b border-neutral-200 dark:border-neutral-800">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-neutral-400 mb-1">Your 4-Digit Pickup OTP</p>
+                <div className="text-4xl sm:text-5xl font-mono font-black tracking-widest text-accent-orange">
+                  4 1 8 8
                 </div>
-                <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 pt-1">
-                  <Clock3 size={13} />
-                  <span>Reserved Slot: 11:50 AM – 12:10 PM (Lunch Break)</span>
-                </div>
+                <p className="text-xs text-neutral-500 mt-2">Show this to the counter staff to collect your tray.</p>
               </div>
 
-              <div className="flex flex-col justify-center items-center p-5 rounded-xl bg-white dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700 text-center">
-                <div className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1">
-                  Your 4-Digit Pickup Code
+              <div className="space-y-2 text-sm w-full sm:w-auto">
+                <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
+                  <Clock3 size={16} className="text-neutral-400" />
+                  <span>Pickup Slot: <strong className="text-neutral-900 dark:text-white">11:15 AM - 11:20 AM</strong></span>
                 </div>
-                <div className="text-4xl font-black tracking-widest text-neutral-900 dark:text-white my-1 font-mono">
-                  9065
+                <div className="flex items-center gap-2 text-neutral-700 dark:text-neutral-300">
+                  <Receipt size={16} className="text-neutral-400" />
+                  <span>Items: <strong className="text-neutral-900 dark:text-white">1x Samosa Pav, 1x Cutting Chai</strong></span>
                 </div>
-                <div className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
-                  Show this code at Counter 2 to take your food immediately. No receipts or physical tokens needed.
+              </div>
+            </div>
+
+            <div className="pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-neutral-500">
+              <span>Student PRN: 2024BCSE0042</span>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span>Kitchen Screen Notified</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  <span>Tray Pre-Packed</span>
                 </div>
               </div>
             </div>
@@ -229,47 +228,73 @@ export default function IntroductionPage() {
           </div>
         </section>
 
-        {/* Dedicated Campus Canteen FAQ Section */}
-        <section id="faq" className="w-full scroll-mt-24 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+        {/* How It Works */}
+        <section className="w-full max-w-3xl mx-auto pt-6 border-t border-neutral-200 dark:border-neutral-800">
+          <div className="text-center mb-10">
+            <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
+              How FoodLine works at Sanjivani
+            </h2>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+              Three simple steps to save your 15-minute break
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+            <div className="p-5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800/80">
+              <div className="w-8 h-8 rounded-lg bg-accent-orange text-white flex items-center justify-center font-bold text-sm mb-3">
+                1
+              </div>
+              <h3 className="font-bold text-sm text-neutral-900 dark:text-white mb-1">Pick & Pre-Pay</h3>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                Order before your lecture finishes. Pay directly via UPI (GPay, PhonePe, Paytm).
+              </p>
+            </div>
+
+            <div className="p-5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800/80">
+              <div className="w-8 h-8 rounded-lg bg-accent-orange text-white flex items-center justify-center font-bold text-sm mb-3">
+                2
+              </div>
+              <h3 className="font-bold text-sm text-neutral-900 dark:text-white mb-1">Tray Pre-Packed</h3>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                The kitchen screen queues your meal. Canteen staff pack and tag your tray before the bell rings.
+              </p>
+            </div>
+
+            <div className="p-5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800/80">
+              <div className="w-8 h-8 rounded-lg bg-accent-orange text-white flex items-center justify-center font-bold text-sm mb-3">
+                3
+              </div>
+              <h3 className="font-bold text-sm text-neutral-900 dark:text-white mb-1">Show 4-Digit OTP</h3>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                Walk straight to the FoodLine Express counter, recite your 4 digits, grab your food, and eat.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Frequently Asked Questions */}
+        <section className="w-full max-w-3xl mx-auto pt-16">
+          <div className="text-center mb-8">
+            <h2 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
+              Got Questions?
+            </h2>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+              Everything you need to know about FoodLine at Cafe @7
+            </p>
+          </div>
           <FAQAccordion />
         </section>
       </main>
 
-      {/* Clean Minimal Footer */}
-      <footer className="border-t border-neutral-200 dark:border-neutral-800 py-8 px-4 text-xs text-neutral-500 dark:text-neutral-400 bg-neutral-50/50 dark:bg-neutral-950/50">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-neutral-900 dark:text-white">FoodLine Campus</span>
-            <span>—</span>
-            <span>Sanjivani University, Kopargaon</span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4 sm:gap-5 font-medium">
-            <Link href="/faq" className="hover:text-neutral-900 dark:hover:text-white transition">
-              FAQ & Help
-            </Link>
-            {user && (
-              <Link href="/canteens" className="hover:text-neutral-900 dark:hover:text-white transition">
-                Canteens
-              </Link>
-            )}
-            <Link href={user ? '/profile' : '/login'} className="hover:text-neutral-900 dark:hover:text-white transition">
-              {user ? 'My Profile' : 'Student Login'}
-            </Link>
-            <Link href="/privacy" className="hover:text-neutral-900 dark:hover:text-white transition">
-              Privacy
-            </Link>
-            <Link href="/refund-policy" className="hover:text-neutral-900 dark:hover:text-white transition">
-              Refund Policy
-            </Link>
-            <Link href="/terms" className="hover:text-neutral-900 dark:hover:text-white transition">
-              Terms
-            </Link>
-          </div>
-        </div>
-        <div className="max-w-4xl mx-auto mt-4 pt-4 border-t border-neutral-200/60 dark:border-neutral-800/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-neutral-400 dark:text-neutral-500 text-center sm:text-left">
-          <span>&copy; {new Date().getFullYear()} FoodLine Campus. All rights reserved.</span>
-          <span>Intermediary Food Technology Platform &bull; DPDP & IT Act Compliant</span>
+      {/* Footer */}
+      <footer className="w-full py-8 border-t border-neutral-200 dark:border-neutral-800 text-center text-xs text-neutral-400">
+        <p>Built exclusively for Sanjivani University campus community.</p>
+        <div className="flex justify-center gap-4 mt-3 font-medium">
+          <Link href="/terms" className="hover:text-accent-orange transition">Terms of Service</Link>
+          <span>•</span>
+          <Link href="/privacy" className="hover:text-accent-orange transition">Privacy Policy</Link>
+          <span>•</span>
+          <Link href="/refund-policy" className="hover:text-accent-orange transition">Refund Policy</Link>
         </div>
       </footer>
     </PageTransition>
