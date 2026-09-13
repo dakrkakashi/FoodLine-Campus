@@ -48,6 +48,7 @@ export function AnimatedThemeToggler({
   return (
     <button
       type="button"
+      suppressHydrationWarning
       onClick={handleToggle}
       aria-label="Toggle dark/light theme"
       className={cn(

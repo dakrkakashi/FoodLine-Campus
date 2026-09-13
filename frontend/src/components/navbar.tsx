@@ -187,12 +187,14 @@ export function Navbar() {
             {muted ? <VolumeX size={15} className="text-zinc-400" /> : <Volume2 size={15} className="text-accent-teal" />}
           </button>
 
-          {/* Animated Theme Toggler from MagicUI */}
-          <AnimatedThemeToggler
-            size="md"
-            onClick={playClick}
-            className="bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border-[var(--border-glass)]"
-          />
+          {/* Animated Theme Toggler from MagicUI with hydration mismatch suppression */}
+          <div suppressHydrationWarning className="shrink-0 flex items-center justify-center">
+            <AnimatedThemeToggler
+              size="md"
+              onClick={playClick}
+              className="bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 border-[var(--border-glass)]"
+            />
+          </div>
 
           <div className="relative shrink-0">
             <button
