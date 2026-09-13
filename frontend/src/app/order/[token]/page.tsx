@@ -22,7 +22,12 @@ import { PageTransition, SpotlightCard, fireFireworks, Magnetic } from '@/compon
 import { BorderBeam } from '@/components/magicui';
 import { ChefExpressIllustration, CampusExpressIllustration } from '@/components/illustrations';
 import { createClient } from '@/utils/supabase/client';
-import { ThermalReceiptModal } from '@/components/order/ThermalReceiptModal';
+import dynamic from 'next/dynamic';
+
+const ThermalReceiptModal = dynamic(
+  () => import('@/components/order/ThermalReceiptModal').then((mod) => mod.ThermalReceiptModal),
+  { ssr: false }
+);
 import { CopyButton } from '@/components/ui/CopyButton';
 
 interface OrderItem {

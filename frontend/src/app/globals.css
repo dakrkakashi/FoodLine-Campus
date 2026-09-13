@@ -1037,3 +1037,20 @@ a {
     color: #555555 !important;
   }
 }
+
+
+/* High-Performance 144Hz DOM Containment & Hardware Layering */
+.dish-card-contain {
+  contain: layout style paint;
+  transform: translateZ(0);
+}
+
+.kds-card-contain {
+  contain: layout style paint;
+  transform: translateZ(0);
+}
+
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 160px;
+}

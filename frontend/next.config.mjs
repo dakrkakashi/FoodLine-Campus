@@ -47,9 +47,22 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  compress: true,
+  poweredByHeader: false,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
   outputFileTracingRoot: __dirname,
   experimental: {
-    optimizePackageImports: ['lucide-react', 'recharts', 'motion'],
+    optimizePackageImports: [
+      'lucide-react',
+      'recharts',
+      'motion',
+      '@react-three/fiber',
+      '@react-three/drei',
+      'three',
+      'canvas-confetti',
+    ],
   },
   images: {
     unoptimized: process.env.NEXT_IMAGE_UNOPTIMIZED === 'true',
@@ -70,6 +83,15 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: securityHeaders,
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
       },
     ];
   },

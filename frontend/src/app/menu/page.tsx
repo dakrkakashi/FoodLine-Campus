@@ -28,10 +28,20 @@ import { Badge } from '@/components/ui/Badge';
 import { InventoryBadge } from '@/components/ui/InventoryBadge';
 import { MorphingStepper } from '@/components/ui/MorphingStepper';
 import { PageTransition, SpotlightCard, SteamEffect, AnimatedCounter, FoodParticles, Magnetic } from '@/components/ui';
-import { DishInspectModal, DishInspectItem } from '@/components/3d/DishInspectModal';
+import dynamic from 'next/dynamic';
+import type { DishInspectItem } from '@/components/3d/DishInspectModal';
 import { ChefExpressIllustration, EmptyMenuIllustration } from '@/components/illustrations';
 import { CampusCombosBar } from '@/components/menu/CampusCombosBar';
-import { CampusCounterMap } from '@/components/campus/CampusCounterMap';
+
+const DishInspectModal = dynamic(
+  () => import('@/components/3d/DishInspectModal').then((mod) => mod.DishInspectModal),
+  { ssr: false }
+);
+
+const CampusCounterMap = dynamic(
+  () => import('@/components/campus/CampusCounterMap').then((mod) => mod.CampusCounterMap),
+  { ssr: false }
+);
 import { BudgetAndTimetableBar } from '@/components/menu/BudgetAndTimetableBar';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
@@ -611,7 +621,7 @@ export default function MenuPage() {
               return (
                 <div
                   key={dish.id}
-                  className={`h-full transition-transform duration-200 ${isAvailable ? 'hover:-translate-y-1' : ''}`}
+                  className={`h-full transition-transform duration-200 dish-card-contain ${isAvailable ? 'hover:-translate-y-1' : ''}`}
                 >
                   <SpotlightCard
                     spotlightColor="var(--accent-orange-glow, rgba(255, 107, 44, 0.18))"

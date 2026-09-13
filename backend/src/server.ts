@@ -397,6 +397,7 @@ app.get('/health', async (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------
 app.get('/api/campuses/geo', async (req: Request, res: Response) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     const geo = await CampusService.getGeoHierarchy();
     res.json({
       success: true,
@@ -410,6 +411,7 @@ app.get('/api/campuses/geo', async (req: Request, res: Response) => {
 
 app.get('/api/campuses/:campusId/canteens', async (req: Request, res: Response) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
     const campusId = String(req.params.campusId);
     const result = await CampusService.getCanteensByCampus(campusId);
     res.json({
@@ -457,6 +459,7 @@ app.post('/api/auth/resolve-student', studentResolveLimiter, async (req: Request
 // -----------------------------------------------------------------------------
 app.get('/api/menu', async (req: Request, res: Response) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=15, stale-while-revalidate=60');
     const category = (req.query.category || req.query.categoryId) as string | undefined;
     const cafeteriaId = (req.query.cafeteriaId || req.query.canteenId) as string | undefined;
     const items = await MenuService.getAllItems(category, cafeteriaId);
@@ -494,6 +497,7 @@ app.get('/api/menu', async (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------
 app.get('/api/slots', async (req: Request, res: Response) => {
   try {
+    res.setHeader('Cache-Control', 'public, max-age=5, stale-while-revalidate=15');
     const slots = await SlotThrottlerService.getAllSlots();
     res.json({
       success: true,
