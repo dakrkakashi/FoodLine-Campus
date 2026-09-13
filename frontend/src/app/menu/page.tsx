@@ -26,10 +26,13 @@ import { useCampus } from '@/context/CampusContext';
 import { DishCardSkeleton } from '@/components/ui/Skeleton';
 import { Badge } from '@/components/ui/Badge';
 import { InventoryBadge } from '@/components/ui/InventoryBadge';
+import { MorphingStepper } from '@/components/ui/MorphingStepper';
 import { PageTransition, SpotlightCard, SteamEffect, AnimatedCounter, FoodParticles, Magnetic } from '@/components/ui';
 import { DishInspectModal, DishInspectItem } from '@/components/3d/DishInspectModal';
 import { ChefExpressIllustration, EmptyMenuIllustration } from '@/components/illustrations';
 import { CampusCombosBar } from '@/components/menu/CampusCombosBar';
+import { CampusCounterMap } from '@/components/campus/CampusCounterMap';
+import { BudgetAndTimetableBar } from '@/components/menu/BudgetAndTimetableBar';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 interface MenuItem {
@@ -70,6 +73,8 @@ export default function MenuPage() {
   const [inspectingDish, setInspectingDish] = useState<DishInspectItem | null>(null);
   const [mounted, setMounted] = useState(false);
   const [gridMode, setGridMode] = useState<'grid' | 'list'>('grid');
+  const [isUnderFifty, setIsUnderFifty] = useState(false);
+  const [showCounterMap, setShowCounterMap] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -291,7 +296,8 @@ export default function MenuPage() {
         item.name.toLowerCase().includes(search.toLowerCase()) ||
         (item.tag && item.tag.toLowerCase().includes(search.toLowerCase())) ||
         (item.category && item.category.toLowerCase().includes(search.toLowerCase()));
-      return matchesCat && matchesSearch;
+      const matchesBudget = !isUnderFifty || Number(item.price) <= 50;
+      return matchesCat && matchesSearch && matchesBudget;
     });
   }, [menuItems, selectedCategory, search, isCategoryMatch]);
 
@@ -411,6 +417,43 @@ export default function MenuPage() {
                 <span className="hidden sm:inline">List</span>
               </button>
             </div>
+          </div>
+
+          {/* Campus Budget, Lecture Sync & Sunlight Contrast Bar */}
+          <div className="flex flex-col gap-3">
+            <BudgetAndTimetableBar
+              isBudgetFilterActive={isUnderFifty}
+              onBudgetFilterChange={setIsUnderFifty}
+            />
+
+            {/* Collapsible Sanjivani Live Counter Map Toggle */}
+            <div className="flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setShowCounterMap(!showCounterMap)}
+                className="text-xs font-bold text-[#FFB347] hover:text-[#FF6B2C] flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <MapPin size={14} />
+                <span>{showCounterMap ? 'Hide Live Campus Counter Map' : 'View Sanjivani Live Counter Map & Wait Times'}</span>
+              </button>
+            </div>
+
+            {/* Live Isometric Counter Map */}
+            <AnimatePresence>
+              {showCounterMap && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden mb-2"
+                >
+                  <CampusCounterMap
+                    selectedCategory={selectedCategory}
+                    onSelectCategory={(cat) => setSelectedCategory(cat)}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Category Filter Pills Container with Complete Scroll Option Suite */}
@@ -646,63 +689,24 @@ export default function MenuPage() {
                           </div>
                         </div>
 
-                        {qty === 0 ? (
-                          <motion.button
-                            whileHover={isAvailable && (stockQty === null || stockQty === undefined || stockQty > 0) ? { scale: 1.06 } : {}}
-                            whileTap={isAvailable && (stockQty === null || stockQty === undefined || stockQty > 0) ? { scale: 0.94 } : {}}
-                            disabled={!isAvailable || (stockQty !== null && stockQty !== undefined && stockQty <= 0)}
-                            onClick={() =>
-                              addItem({
-                                id: dish.id,
-                                name: dish.name,
-                                price: Number(dish.price),
-                                tag: dish.tag,
-                                category: getCategoryName(dish.category_id, dish.category),
-                                maxStock: stockQty,
-                              })
-                            }
-                            className={`rounded-xl sm:rounded-2xl bg-linear-to-r from-accent-orange to-accent-amber text-black font-black shadow-lg shadow-accent-orange/20 cursor-pointer flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed ${
-                              gridMode === 'grid' ? 'px-2.5 sm:px-5 py-1.5 sm:py-2.5 text-[11px] sm:text-xs' : 'px-4 sm:px-5 py-2 sm:py-2.5 text-xs'
-                            }`}
-                          >
-                            <span>Add</span>
-                            <span className="text-sm sm:text-base font-black">+</span>
-                          </motion.button>
-                        ) : (
-                          <div className="flex items-center gap-1 sm:gap-1.5 bg-black/5 dark:bg-black/40 border border-(--border-glass) rounded-xl sm:rounded-2xl p-0.5 sm:p-1 shadow-inner">
-                            <motion.button
-                              whileTap={{ scale: 0.9 }}
-                              onClick={() => removeItem(dish.id)}
-                              className="w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-(--text-primary) font-black text-xs sm:text-sm flex items-center justify-center transition cursor-pointer"
-                            >
-                              −
-                            </motion.button>
-                            <span className="w-5 sm:w-8 text-center font-black text-xs sm:text-base text-accent-amber">{qty}</span>
-                            <motion.button
-                              whileTap={!isMaxStockReached ? { scale: 0.9 } : {}}
-                              disabled={isMaxStockReached}
-                              onClick={() =>
-                                !isMaxStockReached &&
-                                addItem({
-                                  id: dish.id,
-                                  name: dish.name,
-                                  price: Number(dish.price),
-                                  tag: dish.tag,
-                                  category: getCategoryName(dish.category_id),
-                                  maxStock: stockQty,
-                                })
-                              }
-                              className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm flex items-center justify-center transition ${
-                                isMaxStockReached
-                                  ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-40 shadow-none'
-                                  : 'bg-accent-orange hover:brightness-110 text-black shadow-md shadow-accent-orange/30 cursor-pointer'
-                              }`}
-                              title={isMaxStockReached ? `Maximum stock of ${stockQty} reached` : 'Add one more'}
-                            >
-                              +
-                            </motion.button>
-                          </div>
-                        )}
+                        <MorphingStepper
+                          quantity={qty}
+                          disabled={!isAvailable || (stockQty !== null && stockQty !== undefined && stockQty <= 0)}
+                          isMaxReached={isMaxStockReached}
+                          itemName={dish.name}
+                          size={gridMode === 'grid' ? 'sm' : 'md'}
+                          onAdd={() =>
+                            addItem({
+                              id: dish.id,
+                              name: dish.name,
+                              price: Number(dish.price),
+                              tag: dish.tag,
+                              category: getCategoryName(dish.category_id, dish.category),
+                              maxStock: stockQty,
+                            })
+                          }
+                          onRemove={() => removeItem(dish.id)}
+                        />
                       </div>
                     </SpotlightCard>
                 </div>

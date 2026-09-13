@@ -30,7 +30,7 @@ import { useAuth } from '@/lib/auth/useAuth';
 import { Stepper, ProgressBar, PageTransition, SpotlightCard, fireConfettiSuccess, fireFireworks, Magnetic } from '@/components/ui';
 import { Meteors } from '@/components/magicui/meteors';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
-import { EmptyCartIllustration, SlotClockIllustration, CampusExpressIllustration } from '@/components/illustrations';
+import { EmptyCartIllustration, SlotClockIllustration, CampusExpressIllustration, OrderSuccessIllustration } from '@/components/illustrations';
 import { saveOrderToHistory } from '@/lib/order-history-store';
 import { getCampusTimeIST, parseTimeToMinutes } from '@/lib/campus-time';
 
@@ -998,7 +998,7 @@ export default function CheckoutPage() {
             >
               {/* Dynamic Campus Express Station Illustration */}
               <div className="flex justify-center -mt-2 mb-2">
-                <CampusExpressIllustration size={135} />
+                <OrderSuccessIllustration size={150} />
               </div>
 
               <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-accent-teal/15 border border-accent-teal/30 text-accent-teal text-xs font-black uppercase tracking-wider mb-2">

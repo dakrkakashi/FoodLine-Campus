@@ -15,21 +15,27 @@
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
   --color-border-glass: var(--border-glass);
+  --color-diet-veg: var(--diet-veg-border);
+  --color-diet-nonveg: var(--diet-nonveg-border);
+  --color-diet-egg: var(--diet-egg-border);
+  --color-slot-relaxed: var(--slot-relaxed);
+  --color-slot-rush: var(--slot-rush);
+  --color-slot-critical: var(--slot-critical);
 }
 
 :root {
-  /* Canvas & Surfaces */
-  --bg-canvas: #07070B;
-  --bg-card: #12121A;
-  --bg-card-hover: #191924;
-  --bg-card-active: #212130;
-  --bg-glass: rgba(18, 18, 26, 0.72);
-  --bg-glass-heavy: rgba(12, 12, 18, 0.88);
-  --border-glass: rgba(255, 255, 255, 0.08);
+  /* Canvas & Warm Bistro Surfaces (Stone-950 Warm Roasted Charcoal) */
+  --bg-canvas: #0C0A09;
+  --bg-card: #191614;
+  --bg-card-hover: #24201D;
+  --bg-card-active: #2F2A26;
+  --bg-glass: rgba(25, 22, 20, 0.75);
+  --bg-glass-heavy: rgba(18, 16, 14, 0.92);
+  --border-glass: rgba(255, 255, 255, 0.09);
   --border-glass-hover: rgba(255, 255, 255, 0.22);
-  --border-glass-active: rgba(255, 107, 44, 0.5);
+  --border-glass-active: rgba(255, 107, 44, 0.55);
 
-  /* Brand & Vibrant Accents */
+  /* Brand & Vibrant Culinary Accents */
   --accent-orange: #FF6B2C;
   --accent-orange-glow: rgba(255, 107, 44, 0.4);
   --accent-amber: #FFB347;
@@ -41,16 +47,43 @@
   --accent-blue: #3B82F6;
   --accent-rose: #F43F5E;
 
+  /* Authentic Indian FSSAI Dietary Standard Tokens */
+  --diet-veg-border: #00C261;
+  --diet-veg-bg: rgba(0, 194, 97, 0.12);
+  --diet-nonveg-border: #E11D48;
+  --diet-nonveg-bg: rgba(225, 29, 72, 0.12);
+  --diet-egg-border: #F59E0B;
+  --diet-egg-bg: rgba(245, 158, 11, 0.12);
+
+  /* Slot Urgency Semantic Scale */
+  --slot-relaxed: #10B981;
+  --slot-moderate: #06B6D4;
+  --slot-rush: #F59E0B;
+  --slot-critical: #FF6B2C;
+  --slot-closed: #52525B;
+
   /* RGB Components for Smooth Lighting & Zero-Banding Gradients */
   --accent-primary-rgb: 255, 107, 44;
   --accent-secondary-rgb: 255, 179, 71;
   --accent-accent-rgb: 0, 212, 170;
 
-  /* Typography */
-  --text-primary: #F5F5F7;
-  --text-secondary: #A1A1AA;
-  --text-muted: #71717A;
-  --text-inverse: #07070B;
+  /* Typography (WCAG 2.2 AAA / AA Compliant) */
+  --text-primary: #FAF9F6;
+  --text-secondary: #B4B4C0;
+  --text-muted: #8E8EA0;
+  --text-inverse: #0C0A09;
+}
+
+/* Sunlight Walkway High-Contrast Profile */
+[data-contrast="sunlight"] {
+  --bg-canvas: #000000 !important;
+  --bg-card: #111111 !important;
+  --bg-card-hover: #1E1E1E !important;
+  --border-glass: #FFFFFF !important;
+  --text-primary: #FFFFFF !important;
+  --text-secondary: #EDEDED !important;
+  --text-muted: #D1D1D6 !important;
+  --accent-orange: #FF4500 !important;
 }
 
 :root[data-mode="light"],

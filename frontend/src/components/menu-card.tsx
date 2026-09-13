@@ -3,11 +3,11 @@
 import React from 'react';
 import { MenuItem } from '../lib/types';
 import { formatINR } from '../lib/utils';
-import { VegIcon, ClockIcon } from './icons';
+import { VegIcon, NonVegIcon, EggIcon, ClockIcon } from './icons';
 import { useCart } from '../context/CartContext';
 import { useInventory } from '../context/InventoryContext';
 import { InventoryBadge } from './ui/InventoryBadge';
-import { useSoundFX } from '../hooks/useSoundFX';
+import { MorphingStepper } from './ui/MorphingStepper';
 import { useToast } from '../context/ToastContext';
 
 interface MenuCardProps {
@@ -17,7 +17,6 @@ interface MenuCardProps {
 export function MenuCard({ item }: MenuCardProps) {
   const { items, addItem, removeItem } = useCart();
   const { getEffectiveAvailability, isLowStock, getStockQuantity } = useInventory();
-  const { playPop, playClick } = useSoundFX();
   const { cart: toastCart } = useToast();
 
   const cartItem = items.find((i) => i.id === item.id);
@@ -26,12 +25,16 @@ export function MenuCard({ item }: MenuCardProps) {
   const lowStock = isLowStock(item);
   const stockQty = getStockQuantity(item.id);
   const isMaxStockReached = stockQty !== null && stockQty !== undefined && quantity >= stockQty;
+  const isSoldOut = !isAvailable || (stockQty !== null && stockQty !== undefined && stockQty <= 0);
+
+  const isEgg = item.name.toLowerCase().includes('egg') || (item.category && item.category.toLowerCase().includes('egg'));
+  const isNonVeg = item.category && (item.category.toLowerCase().includes('non-veg') || item.category.toLowerCase().includes('chicken'));
 
   const tagColor =
     item.tag === 'Bestseller'
       ? 'border-accent-amber/40 text-accent-amber bg-accent-amber/10'
       : item.tag === 'Student Fav'
-      ? 'border-accent-teal/40 text-accent-teal bg-accent-teal/10'
+      ? 'border-[#00D4AA]/40 text-[#00D4AA] bg-[#00D4AA]/10'
       : item.tag === 'Fast Grab'
       ? 'border-accent-purple/40 text-accent-purple bg-accent-purple/10'
       : 'border-(--border-glass) text-(--text-secondary) bg-black/5 dark:bg-white/5';
@@ -49,14 +52,33 @@ export function MenuCard({ item }: MenuCardProps) {
       <InventoryBadge item={item} size="sm" position="top-right" />
 
       <div>
-        {/* Top Badges */}
+        {/* Top Dietary & Highlight Badges */}
         <div className="flex items-center justify-between gap-2 mb-2.5">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/20 border border-emerald-500/20">
-            <VegIcon className="w-3.5 h-3.5" />
-            <span className="text-[10px] uppercase font-black tracking-wider text-emerald-500 dark:text-emerald-400">
-              Pure Veg
-            </span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-black/20 dark:bg-white/5 border border-white/10">
+            {isNonVeg ? (
+              <>
+                <NonVegIcon className="w-3.5 h-3.5" />
+                <span className="text-[10px] uppercase font-black tracking-wider text-[#E11D48]">
+                  Non-Veg
+                </span>
+              </>
+            ) : isEgg ? (
+              <>
+                <EggIcon className="w-3.5 h-3.5" />
+                <span className="text-[10px] uppercase font-black tracking-wider text-[#F59E0B]">
+                  Contains Egg
+                </span>
+              </>
+            ) : (
+              <>
+                <VegIcon className="w-3.5 h-3.5" />
+                <span className="text-[10px] uppercase font-black tracking-wider text-[#00C261]">
+                  Pure Veg
+                </span>
+              </>
+            )}
           </div>
+
           {item.tag && !lowStock && isAvailable && (
             <span
               className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${tagColor}`}
@@ -78,7 +100,7 @@ export function MenuCard({ item }: MenuCardProps) {
         </div>
       </div>
 
-      {/* Footer Price & Add Button */}
+      {/* Footer Price & Morphing Stepper */}
       <div className="flex items-center justify-between pt-3 border-t border-(--border-glass) mt-auto">
         <div>
           <span className="text-[10px] text-(--text-muted) uppercase font-bold tracking-wider block">
@@ -89,77 +111,26 @@ export function MenuCard({ item }: MenuCardProps) {
           </span>
         </div>
 
-        {!isAvailable || (stockQty !== null && stockQty !== undefined && stockQty <= 0) ? (
-          <span className="text-xs font-bold px-3 py-1.5 rounded-xl bg-red-500/10 text-red-500 dark:text-red-400 border border-red-500/20 select-none">
-            Sold Out
-          </span>
-        ) : quantity === 0 ? (
-          <button
-            type="button"
-            onClick={() => {
-              playPop();
-              toastCart(`Added ${item.name} to Tray!`);
-              addItem({
-                id: item.id,
-                name: item.name,
-                price: item.price,
-                category: item.category,
-                tag: item.tag,
-                maxStock: stockQty,
-              });
-            }}
-            aria-label={`Add ${item.name} to tray for ${formatINR(item.price)}`}
-            className="min-h-[40px] px-4 py-2 rounded-xl bg-linear-to-r from-accent-orange to-accent-amber hover:brightness-110 text-black font-black text-xs shadow-lg shadow-accent-orange/25 transition active:scale-95 cursor-pointer flex items-center gap-1.5 focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
-          >
-            <span>+ Add</span>
-          </button>
-        ) : (
-          <div className="flex items-center gap-1.5 bg-black/5 dark:bg-white/5 border border-accent-orange/40 rounded-2xl p-1 shadow-md shadow-accent-orange/10">
-            <button
-              type="button"
-              onClick={() => {
-                playClick();
-                removeItem(item.id);
-              }}
-              aria-label={`Decrease quantity for ${item.name}`}
-              className="w-9 h-9 min-w-[36px] rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-(--text-primary) font-black text-sm flex items-center justify-center transition active:scale-90 cursor-pointer focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden"
-            >
-              −
-            </button>
-            <span
-              className="text-xs font-black font-mono text-accent-teal min-w-5 text-center"
-              aria-label={`Quantity: ${quantity}`}
-            >
-              {quantity}
-            </span>
-            <button
-              type="button"
-              disabled={isMaxStockReached}
-              onClick={() => {
-                if (!isMaxStockReached) {
-                  playPop();
-                  addItem({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    category: item.category,
-                    tag: item.tag,
-                    maxStock: stockQty,
-                  });
-                }
-              }}
-              aria-label={`Increase quantity for ${item.name}`}
-              className={`w-9 h-9 min-w-[36px] rounded-xl font-black text-sm flex items-center justify-center transition focus-visible:ring-2 focus-visible:ring-accent-orange focus-visible:outline-hidden ${
-                isMaxStockReached
-                  ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-40'
-                  : 'bg-accent-orange hover:brightness-110 text-black active:scale-90 cursor-pointer shadow-sm'
-              }`}
-              title={isMaxStockReached ? `Maximum stock of ${stockQty} reached` : 'Add one more'}
-            >
-              +
-            </button>
-          </div>
-        )}
+        <MorphingStepper
+          quantity={quantity}
+          disabled={isSoldOut}
+          isMaxReached={isMaxStockReached}
+          itemName={item.name}
+          onAdd={() => {
+            toastCart(`Added ${item.name} to Tray!`);
+            addItem({
+              id: item.id,
+              name: item.name,
+              price: item.price,
+              category: item.category,
+              tag: item.tag,
+              maxStock: stockQty,
+            });
+          }}
+          onRemove={() => {
+            removeItem(item.id);
+          }}
+        />
       </div>
     </div>
   );

@@ -48,11 +48,50 @@ export function ArrowRightIcon({ className = "w-4 h-4" }: { className?: string }
   );
 }
 
+/**
+ * FSSAI Indian Standard Pure Vegetarian Indicator
+ * Green square with centered solid green circle
+ */
 export function VegIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
-    <div className={`inline-flex items-center justify-center border border-emerald-500 rounded p-[2px] ${className}`}>
-      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+    <div
+      title="Pure Vegetarian (FSSAI Certified)"
+      aria-label="Pure Vegetarian"
+      className={`inline-flex items-center justify-center border-[1.5px] border-[#00C261] rounded-xs bg-[#00C261]/10 p-[2px] shrink-0 ${className}`}
+    >
+      <div className="w-1.5 h-1.5 rounded-full bg-[#00C261]" />
     </div>
   );
 }
 
+/**
+ * FSSAI Indian Standard Non-Vegetarian Indicator
+ * Crimson square with centered solid crimson triangle
+ */
+export function NonVegIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <div
+      title="Non-Vegetarian"
+      aria-label="Non-Vegetarian"
+      className={`inline-flex items-center justify-center border-[1.5px] border-[#E11D48] rounded-xs bg-[#E11D48]/10 p-[2px] shrink-0 ${className}`}
+    >
+      <div className="w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-b-[6px] border-b-[#E11D48]" />
+    </div>
+  );
+}
+
+/**
+ * Indian Standard Contains Egg Indicator
+ * Amber square with centered solid amber oval
+ */
+export function EggIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <div
+      title="Contains Egg"
+      aria-label="Contains Egg"
+      className={`inline-flex items-center justify-center border-[1.5px] border-[#F59E0B] rounded-xs bg-[#F59E0B]/10 p-[2px] shrink-0 ${className}`}
+    >
+      <div className="w-1.5 h-2 rounded-full bg-[#F59E0B]" />
+    </div>
+  );
+}

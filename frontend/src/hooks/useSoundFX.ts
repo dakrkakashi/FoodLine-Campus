@@ -17,6 +17,16 @@ function getAudioContext(): AudioContext | null {
   return sharedAudioCtx;
 }
 
+function triggerHaptic(pattern: number | number[]) {
+  if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+    try {
+      navigator.vibrate(pattern);
+    } catch {
+      // Ignore vibration error on unsupported platforms
+    }
+  }
+}
+
 export function useSoundFX() {
   const [muted, setMuted] = useState(false);
 
@@ -70,17 +80,31 @@ export function useSoundFX() {
     }
   };
 
-  const playClick = () => playSynth(600, 'sine', 0.08, 0.08);
-  const playPop = () => playSynth(880, 'triangle', 0.12, 0.1);
+  const playClick = () => {
+    triggerHaptic(8);
+    playSynth(600, 'sine', 0.08, 0.08);
+  };
+
+  const playPop = () => {
+    triggerHaptic(18);
+    playSynth(880, 'triangle', 0.12, 0.1);
+  };
+
   const playSuccess = () => {
+    triggerHaptic([35, 50, 60]);
     playSynth(523.25, 'sine', 0.15, 0.1); // C5
     setTimeout(() => playSynth(659.25, 'sine', 0.15, 0.1), 80); // E5
     setTimeout(() => playSynth(783.99, 'sine', 0.25, 0.12), 160); // G5
     setTimeout(() => playSynth(1046.5, 'sine', 0.35, 0.15), 240); // C6
   };
-  const playTab = () => playSynth(400, 'sine', 0.06, 0.05);
+
+  const playTab = () => {
+    triggerHaptic(6);
+    playSynth(400, 'sine', 0.06, 0.05);
+  };
 
   const playKitchenReadyChime = () => {
+    triggerHaptic([60, 40, 100]);
     if (muted || typeof window === 'undefined') return;
     try {
       const ctx = getAudioContext();
