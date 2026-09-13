@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://foodline-campus.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://campus.foodline.in';
   const now = new Date();
 
   return [
@@ -18,10 +18,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/orders`,
+      url: `${baseUrl}/canteens`,
       lastModified: now,
-      changeFrequency: 'always',
-      priority: 0.8,
+      changeFrequency: 'daily',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/faq`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.7,
     },
     {
       url: `${baseUrl}/login`,
@@ -30,7 +36,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.5,
     },
     {
+      url: `${baseUrl}/onboarding`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.4,
+    },
+    {
       url: `${baseUrl}/terms`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: now,
+      changeFrequency: 'monthly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/refund-policy`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.3,

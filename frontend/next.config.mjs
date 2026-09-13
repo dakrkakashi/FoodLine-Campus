@@ -48,11 +48,22 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: __dirname,
-  eslint: {
-    ignoreDuringBuilds: true,
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts', 'motion'],
   },
   images: {
-    unoptimized: true,
+    unoptimized: process.env.NEXT_IMAGE_UNOPTIMIZED === 'true',
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
   },
   async headers() {
     return [

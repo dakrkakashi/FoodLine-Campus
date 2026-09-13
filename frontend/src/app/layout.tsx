@@ -1,6 +1,26 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter, Outfit, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/Providers';
+import { OrganizationSchema } from '@/components/seo/JsonLd';
+
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-outfit',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-mono',
+});
 
 export const viewport: Viewport = {
   themeColor: '#07070B',
@@ -10,42 +30,51 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
 };
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://campus.foodline.in';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://foodline-campus.vercel.app'),
+  metadataBase: new URL(siteUrl),
   title: {
     default: 'FoodLine Campus — Express Pre-Ordering & Pickup',
     template: '%s | FoodLine Campus',
   },
-  description: 'Skip the line, not the meal. Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
+  description:
+    'Skip the line, not the meal. Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
   keywords: [
     'canteen pre-ordering',
     'Sanjivani University',
     'Cafe @7',
-    'foodline',
-    'campus food delivery',
+    'foodline campus',
+    'campus food pre-order',
     'express pickup',
     'break slot reservation',
+    'student meal delivery',
   ],
+  alternates: {
+    canonical: './',
+  },
   openGraph: {
     title: 'FoodLine Campus — Express Pre-Ordering & Pickup',
-    description: 'Skip the line, not the meal. Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
-    url: 'https://foodline-campus.vercel.app',
+    description:
+      'Skip the line, not the meal. Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
+    url: siteUrl,
     siteName: 'FoodLine Campus',
     locale: 'en_IN',
     type: 'website',
     images: [
       {
         url: '/logo.png',
-        width: 512,
-        height: 512,
-        alt: 'FoodLine Campus Logo',
+        width: 1200,
+        height: 630,
+        alt: 'FoodLine Campus — Express Pre-Ordering Platform',
       },
     ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: 'FoodLine Campus — Express Pre-Ordering & Pickup',
-    description: 'Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
+    description:
+      'Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
     images: ['/logo.png'],
   },
   manifest: '/manifest.json',
@@ -67,6 +96,9 @@ export const metadata: Metadata = {
     title: 'FoodLine Campus',
   },
   applicationName: 'FoodLine Campus',
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 export default function RootLayout({
@@ -75,14 +107,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html
+      lang="en"
+      className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable} dark`}
+    >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="mobile-web-app-capable" content="yes" />
@@ -99,6 +128,7 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        <OrganizationSchema />
         <Providers>
           <div id="main-content" tabIndex={-1} className="outline-hidden">
             {children}
