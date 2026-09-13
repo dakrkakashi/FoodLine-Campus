@@ -50,6 +50,7 @@ export function Navbar() {
 
   return (
     <header
+      suppressHydrationWarning
       className={`sticky top-0 z-50 w-full max-w-[100vw] overflow-x-clip px-3 sm:px-6 pb-2 pt-safe transition-all duration-300 print:hidden ${
         scrolled
           ? 'bg-[var(--bg-glass-heavy)] backdrop-blur-2xl border-b border-[var(--border-glass)] shadow-md'

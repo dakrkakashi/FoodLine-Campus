@@ -11,6 +11,7 @@ export function PageTransition({ children, className }: { children: React.ReactN
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       className={className}
+      suppressHydrationWarning
     >
       {children}
     </motion.div>

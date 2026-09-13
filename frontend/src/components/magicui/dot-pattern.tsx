@@ -35,6 +35,7 @@ export function DotPattern({
   return (
     <svg
       aria-hidden="true"
+      suppressHydrationWarning
       className={cn(
         "pointer-events-none absolute inset-0 h-full w-full fill-white/10 [mask-image:radial-gradient(ellipse_at_center,white,transparent_80%)]",
         glow && "fill-accent-orange/30",
