@@ -194,6 +194,48 @@ px nlf) across all frontend and backend dependencies.
 
 ---
 
+---
+
+### 16. Corporate Structure & LLP Formation
+* **Legal Framework:** Limited Liability Partnership Act, 2008 & Ministry of Corporate Affairs (MCA).
+* **Current Status in FoodLine:** Operating as FoodLine Campus LLP (Pending formal MCA registration).
+* **Action Items:**
+  1. Draft and execute formal LLP Partnership Deed with 50-50 partner equity division.
+  2. Complete MCA name reservation (RUN-LLP) and FiLLiP filing for "FoodLine Campus LLP".
+  3. Establish registered office at Sanjivani University Campus, Kopargaon, Ahmednagar District, Maharashtra — 423603.
+  4. Establish territorial dispute jurisdiction exclusively with competent courts in Ahmednagar District, Maharashtra.
+
+---
+
+### 17. Payment Gateway Integration & Financial Model (Razorpay)
+* **Legal Framework:** RBI Guidelines for Payment Aggregators & Payment Gateways, PCI-DSS v4, Information Technology Act Section 79.
+* **Current Status in FoodLine:** Direct UPI VPA (`9960091371@slc`) with 12-digit UTR verification; transitioning to integrated Razorpay Payment Gateway.
+* **Financial Model:**
+  - Canteen Merchant Payout: 96% of order item subtotal.
+  - Platform Commission: 4% platform take-rate for cloud operations, real-time slot metering, and technical infrastructure.
+  - Student Pricing: 100% counter price match + transparent 4% platform fee at checkout.
+  - UPI MDR: 0% under NPCI zero-MDR mandate for UPI.
+* **Action Items:**
+  1. Complete Razorpay merchant account onboarding and KYC under FoodLine Campus LLP.
+  2. Implement webhook-driven payment verification to supersede manual UTR entry while retaining UTR as fallback rail.
+  3. Ensure 100% full refund (including 4% platform fee) for pre-preparation cancellations and kitchen stockouts within 5–7 business days (instant for UPI).
+  4. Maintain PCI-DSS Level 1 compliant tokenization without storing card numbers or UPI MPINs.
+
+---
+
+### 18. Co-Founder Agreement & Governance
+* **Legal Framework:** Indian Partnership Act, 1932 / LLP Act, 2008, Indian Contract Act, 1872.
+* **Current Status in FoodLine:** Active 50-50 partnership between co-founders.
+* **Action Items:**
+  1. **Equity Division:** Formal 50-50 profit and equity split codified in partnership documentation.
+  2. **Role Demarcation:**
+     - CEO & Product Lead: University relations, vendor management, campus marketing, ground operations.
+     - CTO & Tech Lead: Software architecture, slot throttling, high-concurrency systems, security and infrastructure.
+  3. **Vesting & IP Assignment:** Standard 4-year vesting schedule with 1-year cliff; full proprietary IP assignment of codebase and algorithms to FoodLine Campus LLP.
+  4. **Deadlock & Dispute Resolution:** Mediation via university business incubator followed by binding arbitration in Ahmednagar District, Maharashtra.
+
+---
+
 ## Deliverables & File Mapping
 
 | Item | Requirement | Target File / Location | Priority |

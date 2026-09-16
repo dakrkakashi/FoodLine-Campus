@@ -19,7 +19,8 @@ import {
   Search,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
-import { PageTransition, SpotlightCard } from '@/components/ui';
+import { PageTransition } from '@/components/ui/PageTransition';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import { useCampus } from '@/context/CampusContext';
 import { Canteen } from '@/lib/types';
 
@@ -59,7 +60,7 @@ export default function CanteensPage() {
   };
 
   return (
-    <PageTransition className="min-h-screen bg-(--bg-canvas) text-(--text-primary) pb-32 relative overflow-hidden transition-colors duration-500">
+    <PageTransition className="min-h-screen bg-(--bg-canvas) text-(--text-primary) pb-32 relative overflow-x-clip transition-colors duration-500">
       <Navbar />
 
       <main className="max-w-6xl mx-auto px-4 pt-6 relative z-10">

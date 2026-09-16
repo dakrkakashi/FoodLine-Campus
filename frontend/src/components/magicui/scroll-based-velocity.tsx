@@ -52,8 +52,10 @@ function ParallaxText({ children, baseVelocity = 100, className }: ParallaxProps
       if (containerRef.current && textRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
         const textWidth = textRef.current.offsetWidth;
-        const newRepetitions = Math.ceil(containerWidth / textWidth) + 2;
-        setRepetitions(newRepetitions);
+        if (textWidth > 0) {
+          const newRepetitions = Math.ceil(containerWidth / textWidth) + 2;
+          setRepetitions(Math.max(2, Math.min(newRepetitions, 20)));
+        }
       }
     };
 
@@ -101,7 +103,7 @@ export function ScrollBasedVelocity({
   numRows = 2,
 }: VelocityScrollProps) {
   return (
-    <section className="relative w-full">
+    <section className="relative w-full max-w-full overflow-hidden">
       {Array.from({ length: numRows }).map((_, idx) => (
         <ParallaxText
           key={idx}

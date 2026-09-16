@@ -84,7 +84,7 @@ During live pilot operations at Sanjivani University (featuring flagship partner
 ### 2.3 Business Model & Unit Economics
 FoodLine Campus employs an operator-aligned, high-volume performance model:
 - **Student Pricing:** 100% free. No app download fee, no convenience fee, no markup over physical canteen prices.
-- **Canteen Operator Commission:** 3.5% performance commission per completed order (~₹2.275 per ₹65 order).
+- **Canteen Operator Commission:** 4% platform commission per completed order (~₹2.60 per ₹65 order).
 - **Direct-to-Bank Payments:** All UPI transactions settle directly into the canteen vendor's bank account via vendor UPI VPA, eliminating platform intermediary custody and RBI merchant aggregatorship risk.
 - **Canteen Break-Even:** A canteen operator breaks even on FoodLine software adoption at just **659 orders/month**, whereas average campus volume exceeds 1,500 to 2,000 orders/day during semester runs.
 

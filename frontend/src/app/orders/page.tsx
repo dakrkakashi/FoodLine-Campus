@@ -24,7 +24,8 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
-import { PageTransition, SpotlightCard } from '@/components/ui';
+import { PageTransition } from '@/components/ui/PageTransition';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import { CopyButton } from '@/components/ui/CopyButton';
 import { getLocalOrderHistory, SavedOrder } from '@/lib/order-history-store';
 import { useCart } from '@/context/CartContext';

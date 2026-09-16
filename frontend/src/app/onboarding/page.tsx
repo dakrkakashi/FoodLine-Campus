@@ -17,7 +17,8 @@ import {
   GraduationCap,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
-import { PageTransition, SpotlightCard } from '@/components/ui';
+import { PageTransition } from '@/components/ui/PageTransition';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { Meteors } from '@/components/magicui/meteors';
 
@@ -72,7 +73,7 @@ export default function OnboardingPage() {
   const slide = SLIDES[currentSlide];
 
   return (
-    <PageTransition className="min-h-screen bg-(--bg-canvas) text-(--text-primary) pb-24 relative overflow-hidden flex flex-col justify-between transition-colors duration-500">
+    <PageTransition className="min-h-screen bg-(--bg-canvas) text-(--text-primary) pb-24 relative overflow-x-clip flex flex-col justify-between transition-colors duration-500">
       {/* Background Meteors */}
       <div className="absolute inset-0 pointer-events-none">
         <Meteors number={20} />

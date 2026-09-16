@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Navbar } from '@/components/navbar';
 import { createClient } from '@/utils/supabase/client';
 import { ProgressBar } from '@/components/ui/ProgressBar';
@@ -56,7 +56,7 @@ import {
   Download,
   Upload,
 } from 'lucide-react';
-import { fireConfettiSuccess } from '@/components/ui';
+import { fireConfettiSuccess } from '@/components/ui/Confetti';
 
 interface SlotData {
   id: string;
@@ -142,9 +142,14 @@ export default function AdminAnalyticsPage() {
     prep_time_mins: 5,
   });
 
+  const isFetchingRef = useRef(false);
+  const isMountedRef = useRef(true);
+
   const fetchAnalytics = async () => {
+    if (isFetchingRef.current) return;
     try {
-      setIsRefreshing(true);
+      isFetchingRef.current = true;
+      if (isMountedRef.current) setIsRefreshing(true);
 
       const [adminOrdersRes, menuRes] = await Promise.all([
         fetch('/api/admin/orders').then((r) => r.json()).catch(() => null),
@@ -180,32 +185,37 @@ export default function AdminAnalyticsPage() {
         if (menuDbRes.data) setMenuItems(menuDbRes.data);
       }
     } catch (e) {
-      console.error('Error loading manager data:', e);
+      if (isMountedRef.current) console.error('Error loading manager data:', e);
     } finally {
-      setLoading(false);
-      setIsRefreshing(false);
+      isFetchingRef.current = false;
+      if (isMountedRef.current) {
+        setLoading(false);
+        setIsRefreshing(false);
+      }
     }
   };
 
   useEffect(() => {
+    isMountedRef.current = true;
     fetchAnalytics();
 
     const pollInterval = setInterval(() => {
-      fetchAnalytics();
+      if (isMountedRef.current) fetchAnalytics();
     }, 5000);
 
     const supabase = createClient();
     const channel = supabase
       .channel('admin-analytics-live')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-        fetchAnalytics();
+        if (isMountedRef.current) fetchAnalytics();
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'pickup_slots' }, () => {
-        fetchAnalytics();
+        if (isMountedRef.current) fetchAnalytics();
       })
       .subscribe();
 
     return () => {
+      isMountedRef.current = false;
       clearInterval(pollInterval);
       supabase.removeChannel(channel);
     };
@@ -218,19 +228,22 @@ export default function AdminAnalyticsPage() {
     return orders.reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
   }, [orders]);
 
-  // Canteen Income: 100% pure food subtotal (total / 1.035)
+  // Canteen Income: 96% canteen payout (96/4 commission model)
   const canteenIncome = useMemo(() => {
     return orders.reduce((sum, o) => {
       const total = Number(o.total_amount) || 0;
-      const foodSubtotal = total / 1.035;
-      return sum + foodSubtotal;
+      return sum + total * 0.96;
     }, 0);
   }, [orders]);
 
-  // Founder Income: 3.5% Fast-Pass platform take rate
+  // Platform Income: 4% Platform Commission
+  // Note: 50% allocated to co-founder under 50-50 partnership agreement
   const founderIncome = useMemo(() => {
-    return Math.max(0, totalGrossGMV - canteenIncome);
-  }, [totalGrossGMV, canteenIncome]);
+    return orders.reduce((sum, o) => {
+      const total = Number(o.total_amount) || 0;
+      return sum + total * 0.04;
+    }, 0);
+  }, [orders]);
 
   // Payment Mode Split: UPI vs COD
   const { upiCount, codCount, upiRevenue, codRevenue } = useMemo(() => {
@@ -310,8 +323,8 @@ export default function AdminAnalyticsPage() {
     }));
   }, [orders]);
 
-  const canteenPercent = totalGrossGMV > 0 ? ((canteenIncome / totalGrossGMV) * 100).toFixed(1) : '96.6';
-  const founderPercent = totalGrossGMV > 0 ? ((founderIncome / totalGrossGMV) * 100).toFixed(1) : '3.4';
+  const canteenPercent = totalGrossGMV > 0 ? ((canteenIncome / totalGrossGMV) * 100).toFixed(1) : '96.0';
+  const founderPercent = totalGrossGMV > 0 ? ((founderIncome / totalGrossGMV) * 100).toFixed(1) : '4.0';
 
   // Group order items by order ID for fast lookup
   const itemsByOrderId = useMemo(() => {
@@ -573,8 +586,8 @@ export default function AdminAnalyticsPage() {
 📦 *Total Orders Handled:* ${totalOrders}
 💰 *Gross Total GMV:* ₹${totalGrossGMV.toFixed(2)}
 ────────────────────────
-👨‍🍳 *CANTEEN NET PAYOUT (96.6%):* ₹${canteenIncome.toFixed(2)}
-⚡ *Fast-Pass Platform Take (3.4%):* ₹${founderIncome.toFixed(2)}
+👨‍🍳 *CANTEEN NET PAYOUT (96%):* ₹${canteenIncome.toFixed(2)}
+⚡ *Platform Commission (4%):* ₹${founderIncome.toFixed(2)}
 ────────────────────────
 💳 *Payment Mode Reconciliation:*
 ⚡ *UPI Online:* ${upiCount} orders (₹${upiRevenue.toFixed(2)})
@@ -600,8 +613,8 @@ export default function AdminAnalyticsPage() {
       'Status',
       'Payment Mode',
       'Gross Amount (INR)',
-      'Canteen Net Payout (96.6%)',
-      'Platform Fast-Pass (3.4%)',
+      'Canteen Net Payout (96%)',
+      'Platform Commission (4%)',
       'UTR Reference',
       'Pickup OTP',
       'Break Slot',
@@ -609,7 +622,7 @@ export default function AdminAnalyticsPage() {
     ];
     const rows = orders.map((o) => {
       const total = Number(o.total_amount) || 0;
-      const canteenShare = (total / 1.035).toFixed(2);
+      const canteenShare = (total * 0.96).toFixed(2);
       const platformTake = Math.max(0, total - Number(canteenShare)).toFixed(2);
       const slotLabel = o.pickup_slots?.label || 'Regular Break';
       const cleanUtr = o.utr_number || (o.notes?.match(/\d{12}/)?.[0] ?? 'N/A');
@@ -952,7 +965,7 @@ export default function AdminAnalyticsPage() {
                 </div>
                 <div className="text-[11px] text-accent-amber font-bold flex items-center gap-1 bg-accent-amber/10 w-fit px-2 py-0.5 rounded-lg border border-accent-amber/20">
                   <TrendingUp size={12} className="text-accent-orange" />
-                  <span>3.5% Fast-Pass Convenience Fee</span>
+                  <span>Platform Commission (4%)</span>
                 </div>
               </div>
 
@@ -1183,7 +1196,7 @@ export default function AdminAnalyticsPage() {
                         const isExpanded = expandedOrderId === order.id;
                         const items = itemsByOrderId.get(order.id) || [];
                         const total = Number(order.total_amount) || 0;
-                        const canteenShare = total / 1.035;
+                        const canteenShare = total * 0.96;
                         const founderTake = Math.max(0, total - canteenShare);
                         const slotLabel = order.pickup_slots?.label || 'Direct Counter';
 
@@ -1945,15 +1958,15 @@ export default function AdminAnalyticsPage() {
                   Canteen Net Payout (Cafe @7)
                 </div>
                 <div className="text-3xl font-black text-accent-teal font-mono">₹{canteenIncome.toFixed(2)}</div>
-                <div className="text-[11px] text-emerald-400/80 mt-1 font-bold">100% Food Subtotal (96.6% Split)</div>
+                <div className="text-[11px] text-emerald-400/80 mt-1 font-bold">Canteen Net Payout (96% Split)</div>
               </div>
 
               <div className="p-5 rounded-3xl bg-(--bg-card) border border-accent-orange/30 shadow-xl">
                 <div className="text-[10px] uppercase font-black tracking-wider text-accent-orange mb-1">
-                  Founder Fast-Pass Platform Take
+                  Platform Commission (4%)
                 </div>
                 <div className="text-3xl font-black text-accent-amber font-mono">₹{founderIncome.toFixed(2)}</div>
-                <div className="text-[11px] text-amber-300/80 mt-1 font-bold">3.5% Fast-Pass Tech Surcharge</div>
+                <div className="text-[11px] text-amber-300/80 mt-1 font-bold">4% Platform Commission (50-50 Partner Split)</div>
               </div>
             </div>
 
@@ -2005,8 +2018,8 @@ export default function AdminAnalyticsPage() {
                       <th className="py-3 px-4">Order Token</th>
                       <th className="py-3 px-4">Mode</th>
                       <th className="py-3 px-4">Gross Amount</th>
-                      <th className="py-3 px-4">Canteen Payout (96.6%)</th>
-                      <th className="py-3 px-4">Platform Take (3.4%)</th>
+                      <th className="py-3 px-4">Canteen Payout (96%)</th>
+                      <th className="py-3 px-4">Platform Commission (4%)</th>
                       <th className="py-3 px-4">UTR Reference / Notes</th>
                       <th className="py-3 px-4">Timestamp</th>
                     </tr>
@@ -2015,7 +2028,7 @@ export default function AdminAnalyticsPage() {
                     {orders.map((order) => {
                       const isCod = order.notes?.includes('COD');
                       const total = Number(order.total_amount) || 0;
-                      const canteenShare = total / 1.035;
+                      const canteenShare = total * 0.96;
                       const founderTake = Math.max(0, total - canteenShare);
 
                       return (

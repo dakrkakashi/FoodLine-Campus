@@ -1,24 +1,6 @@
-export { Button } from './Button';
-export { Badge } from './Badge';
-export { Stepper } from './Stepper';
-export { ProgressBar } from './ProgressBar';
-export { Skeleton, DishCardSkeleton } from './Skeleton';
-export { PageTransition } from './PageTransition';
-export { AnimatedCard } from './AnimatedCard';
-export { NoiseOverlay } from './NoiseOverlay';
-export { SpotlightCard } from './SpotlightCard';
-export { AnimatedText } from './AnimatedText';
-export { fireConfettiSuccess, fireFireworks } from './Confetti';
-export { CustomCursor } from './CustomCursor';
-export { TiltCard } from './TiltCard';
-export { CampusVisualizer } from './CampusVisualizer';
-export { Logo } from './Logo';
-export { SteamEffect } from './SteamEffect';
-export { AnimatedCounter } from './AnimatedCounter';
-export { FoodParticles } from './FoodParticles';
-export { GlobalClickEffect } from './GlobalClickEffect';
-export { Magnetic } from './Magnetic';
-export { MeshGradientBackground } from './MeshGradientBackground';
-export { MorphingStepper } from './MorphingStepper';
-export { HighRefreshRateBadge } from './HighRefreshRateBadge';
-export { Pointer } from './pointer';
+/**
+ * @deprecated Barrels are forbidden in this project to prevent bundle bloat.
+ * Import UI components directly from their specific file path:
+ * e.g. import { SpotlightCard } from '@/components/ui/SpotlightCard';
+ */
+export {};

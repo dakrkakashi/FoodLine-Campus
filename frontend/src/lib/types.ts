@@ -131,11 +131,11 @@ export interface OrderItem {
 
 export interface OrderFinancials {
   itemTotal: number;
-  studentPlatformFee: number; // ₹0 or 3.5%
-  paymentGatewayMdr: number;   // 0%
+  studentPlatformFee: number; // 4% platform commission
+  paymentGatewayMdr: number;   // 0% (UPI)
   totalAmountPaid: number;
-  merchantPayoutAmount: number; // 88%
-  platformShareAmount: number;  // 12%
+  merchantPayoutAmount: number; // 96%
+  platformShareAmount: number;  // 4%
 }
 
 export interface OrderCompliance {

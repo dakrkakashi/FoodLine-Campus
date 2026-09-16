@@ -1,6 +1,6 @@
-'use client';
 
 import React from 'react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -11,28 +11,27 @@ import {
   ShieldCheck,
   Zap,
   Smartphone,
-  ChevronRight,
   HelpCircle,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
-import { PageTransition } from '@/components/ui';
-import { useSoundFX } from '@/hooks/useSoundFX';
-import { useAuth } from '@/lib/auth/useAuth';
-import {
-  DotPattern,
-  ShineBorder,
-  Android,
-  CoolMode,
-  SparklesText,
-  AnimatedGradientText,
-} from '@/components/magicui';
+import { HowItWorksCTA } from '@/components/how-it-works/HowItWorksCTA';
+import { PageTransition } from '@/components/ui/PageTransition';
+import { DotPattern } from '@/components/magicui/dot-pattern';
+import { ShineBorder } from '@/components/magicui/shine-border';
+import { Android } from '@/components/magicui/android';
+import { SparklesText } from '@/components/magicui/sparkles-text';
+import { AnimatedGradientText } from '@/components/magicui/animated-gradient-text';
+
+
+export const metadata: Metadata = {
+  title: 'How It Works | FoodLine Campus',
+  description:
+    'How FoodLine eliminates canteen lines, guarantees 32-second pickups, and saves your 15-minute lecture break at Cafe @7.',
+};
 
 export default function HowItWorksPage() {
-  const { playClick, playTab } = useSoundFX();
-  const { user } = useAuth();
-
   return (
-    <PageTransition className="relative min-h-screen flex flex-col justify-between bg-(--bg-canvas) text-(--text-primary) font-sans antialiased selection:bg-accent-orange/20 selection:text-accent-orange overflow-x-hidden">
+    <PageTransition className="relative min-h-screen flex flex-col justify-between bg-(--bg-canvas) text-(--text-primary) font-sans antialiased selection:bg-accent-orange/20 selection:text-accent-orange overflow-x-clip">
       {/* Background Dot Matrix Pattern with deterministic ID */}
       <DotPattern
         id="how-it-works-dot-pattern"
@@ -46,7 +45,7 @@ export default function HowItWorksPage() {
 
       <Navbar />
 
-      <main className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 pt-10 sm:pt-14 pb-20 sm:pb-28 flex-1 flex flex-col items-center text-center">
+      <main className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 pt-8 sm:pt-14 pb-24 sm:pb-28 flex-1 flex flex-col items-center text-center min-w-0">
         {/* Breadcrumb / Tag Pill */}
         <div className="mb-6">
           <AnimatedGradientText className="cursor-default">
@@ -275,32 +274,12 @@ export default function HowItWorksPage() {
             Order your snacks now and pick them up hot the second your lecture bell rings.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-            <CoolMode options={{ particleCount: 20 }}>
-              <Link
-                href={user ? '/menu' : '/login'}
-                onClick={playClick}
-                className="w-full sm:w-auto px-8 py-3.5 bg-accent-orange hover:bg-accent-orange/90 text-white font-bold text-sm rounded-xl transition shadow-lg shadow-accent-orange/25 hover:shadow-accent-orange/40 flex items-center justify-center gap-2 active:scale-98"
-              >
-                <span>{user ? 'Open Cafe @7 Menu' : 'Sign In with PRN'}</span>
-                <ArrowRight size={16} />
-              </Link>
-            </CoolMode>
-
-            <Link
-              href="/faq"
-              onClick={playTab}
-              className="w-full sm:w-auto px-6 py-3.5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)] font-bold text-sm rounded-xl transition flex items-center justify-center gap-2"
-            >
-              <HelpCircle size={16} />
-              <span>Campus FAQ</span>
-            </Link>
-          </div>
+          <HowItWorksCTA />
         </section>
       </main>
 
       {/* Footer */}
-      <footer className="w-full py-8 border-t border-neutral-200 dark:border-neutral-800 text-center text-xs text-neutral-400">
+      <footer className="w-full py-8 pb-28 sm:pb-8 border-t border-neutral-200 dark:border-neutral-800 text-center text-xs text-neutral-400">
         <p>Built exclusively for Sanjivani University campus community.</p>
         <div className="flex justify-center gap-4 mt-3 font-medium">
           <Link href="/" className="hover:text-accent-orange transition">Home</Link>

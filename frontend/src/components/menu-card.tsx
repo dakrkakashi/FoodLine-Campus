@@ -14,7 +14,7 @@ interface MenuCardProps {
   item: MenuItem;
 }
 
-export function MenuCard({ item }: MenuCardProps) {
+function MenuCardComponent({ item }: MenuCardProps) {
   const { items, addItem, removeItem } = useCart();
   const { getEffectiveAvailability, isLowStock, getStockQuantity } = useInventory();
   const { cart: toastCart } = useToast();
@@ -135,3 +135,13 @@ export function MenuCard({ item }: MenuCardProps) {
     </div>
   );
 }
+
+export const MenuCard = React.memo(MenuCardComponent, (prev, next) => {
+  return (
+    prev.item.id === next.item.id &&
+    prev.item.price === next.item.price &&
+    prev.item.name === next.item.name &&
+    prev.item.tag === next.item.tag &&
+    prev.item.is_available === next.item.is_available
+  );
+});

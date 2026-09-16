@@ -7,7 +7,7 @@ interface MeshGradientBackgroundProps {
   className?: string;
 }
 
-export function MeshGradientBackground({ opacity = 1, className = '' }: MeshGradientBackgroundProps) {
+function MeshGradientBackgroundComponent({ opacity = 1, className = '' }: MeshGradientBackgroundProps) {
   return (
     <div
       aria-hidden="true"
@@ -48,9 +48,9 @@ export function MeshGradientBackground({ opacity = 1, className = '' }: MeshGrad
         }}
       />
 
-      {/* 4. Tactile Dot Matrix Grid with Smooth Radial Vignette (Linear / Raycast Elegance) */}
+      {/* 4. Fine Matrix Dot Sub-Grid (Provides spatial structure) */}
       <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.045] pointer-events-none"
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
         style={{
           backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px)`,
           backgroundSize: '32px 32px',
@@ -69,3 +69,5 @@ export function MeshGradientBackground({ opacity = 1, className = '' }: MeshGrad
     </div>
   );
 }
+
+export const MeshGradientBackground = React.memo(MeshGradientBackgroundComponent);

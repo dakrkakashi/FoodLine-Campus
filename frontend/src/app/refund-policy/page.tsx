@@ -1,8 +1,5 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'motion/react';
 import {
   RotateCcw,
   Clock,
@@ -13,7 +10,6 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
-import { PageTransition } from '@/components/ui';
 
 interface RefundRule {
   state: string;
@@ -31,11 +27,11 @@ const RULES: RefundRule[] = [
     badge: '100% Refund Available',
     badgeColor: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
     cancellable: true,
-    refundPercentage: '100% Full Refund',
+    refundPercentage: '100% Full Refund (Subtotal + 4% Platform Fee)',
     description: 'If you placed an accidental order or wish to cancel before the kitchen marks the item as preparing, 100% immediate cancellation is permitted.',
     conditions: [
       'Cancellation must be requested before canteen staff changes order status to PREPARING.',
-      'The entire payment is returned directly to the originating payment method (UPI VPA or Bank Account).',
+      'The entire payment (including the 4% platform fee) is returned directly to the originating payment method (UPI VPA or Bank Account).',
     ],
   },
   {
@@ -49,6 +45,7 @@ const RULES: RefundRule[] = [
       'Canteen kitchen staff allocate and cook fresh perishable ingredients once an order is accepted.',
       'Cancellations are strictly disabled after the token status moves to PREPARING or READY.',
       'Students are requested to arrive at the designated counter within their assigned time window.',
+      'No refund of dish subtotal or 4% platform fee is permitted once cooking has commenced.',
     ],
   },
   {
@@ -56,10 +53,11 @@ const RULES: RefundRule[] = [
     badge: 'Auto 100% Refund',
     badgeColor: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
     cancellable: true,
-    refundPercentage: '100% Full Refund + Immediate Alert',
+    refundPercentage: '100% Full Refund (Subtotal + 4% Platform Fee)',
     description: 'If ingredients run out or the kitchen cannot fulfill your dish due to equipment or rush limitations, the order is automatically cancelled with a full refund.',
     conditions: [
       'Processed automatically without requiring manual student dispute intervention.',
+      '100% full refund of dish subtotal plus the 4% platform fee is returned.',
       'An instant notification is sent to your registered Gmail address with cancellation details.',
     ],
   },
@@ -79,7 +77,7 @@ const RULES: RefundRule[] = [
 
 export default function RefundPolicyPage() {
   return (
-    <PageTransition className="min-h-screen flex flex-col justify-between bg-neutral-50 dark:bg-neutral-950 font-sans text-neutral-900 dark:text-neutral-100">
+    <div className="min-h-screen flex flex-col justify-between bg-neutral-50 dark:bg-neutral-950 font-sans text-neutral-900 dark:text-neutral-100">
       <Navbar />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-10 pb-20 flex-1 w-full space-y-8">
@@ -128,20 +126,20 @@ export default function RefundPolicyPage() {
           <div className="p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-1.5">
             <div className="flex items-center gap-2 text-emerald-500 font-bold text-xs">
               <Clock size={16} />
-              <span>Instant UPI Reversal</span>
+              <span>Refund Timelines</span>
             </div>
             <p className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed">
-              Approved refunds via UPI are initiated back to the student originating VPA handle typically within minutes.
+              UPI refunds settle within minutes to 24–48 hours. Gateway (Razorpay) card/netbanking refunds take 5–7 business days.
             </p>
           </div>
 
           <div className="p-4 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 space-y-1.5">
             <div className="flex items-center gap-2 text-accent-orange font-bold text-xs">
               <Banknote size={16} />
-              <span>No Hidden Deductions</span>
+              <span>Full 100% Reversal</span>
             </div>
             <p className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-relaxed">
-              Eligible refunds are processed at 100% of the dish price. No cancellation penalty or handling fee is charged to students.
+              Pre-preparation cancellations and kitchen rejections refund 100% of the total amount, including the 4% platform fee.
             </p>
           </div>
 
@@ -164,10 +162,8 @@ export default function RefundPolicyPage() {
 
           <div className="space-y-4">
             {RULES.map((rule, idx) => (
-              <motion.div
+              <div
                 key={idx}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
                 className="p-5 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-xs space-y-3"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -194,7 +190,7 @@ export default function RefundPolicyPage() {
                     </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -210,7 +206,7 @@ export default function RefundPolicyPage() {
           <ul className="space-y-1.5 text-xs text-neutral-500 dark:text-neutral-400 pl-4 list-disc">
             <li><strong>Auto-Reversal:</strong> Under NPCI banking guidelines, uncredited UPI transactions are automatically reversed back to your bank account within 24 to 48 banking hours.</li>
             <li><strong>Counter Verification:</strong> If the canteen counter manager can view your payment reference on their dashboard, they will manually activate your token.</li>
-            <li><strong>Support Escalation:</strong> You can submit your 12-digit UPI UTR number directly to our campus support email for manual verification.</li>
+            <li><strong>Support Escalation:</strong> You can submit your 12-digit UPI UTR number or payment reference directly to our campus grievance desk at <a href="mailto:foodlinecampus07@gmail.com" className="text-accent-orange underline font-semibold">foodlinecampus07@gmail.com</a>.</li>
           </ul>
         </div>
 
@@ -231,6 +227,6 @@ export default function RefundPolicyPage() {
           </Link>
         </div>
       </main>
-    </PageTransition>
+    </div>
   );
 }

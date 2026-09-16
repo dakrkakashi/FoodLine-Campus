@@ -9,7 +9,7 @@ interface SlotPickerProps {
   onSelectSlot: (slot: PickupSlot) => void;
 }
 
-export function SlotPicker({ slots, selectedSlot, onSelectSlot }: SlotPickerProps) {
+function SlotPickerComponent({ slots, selectedSlot, onSelectSlot }: SlotPickerProps) {
   return (
     <div className="space-y-3.5">
       <div className="flex items-center justify-between">
@@ -91,3 +91,5 @@ export function SlotPicker({ slots, selectedSlot, onSelectSlot }: SlotPickerProp
     </div>
   );
 }
+
+export const SlotPicker = React.memo(SlotPickerComponent);

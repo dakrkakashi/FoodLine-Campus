@@ -126,11 +126,12 @@ export interface PickupSlot {
 
 export interface OrderFinancials {
   itemTotal: number;
-  studentPlatformFee: number; // ₹0
-  paymentGatewayMdr: number;   // 0%
+  studentPlatformFee?: number;
+  platformFee?: number;        // 4% platform commission
+  paymentGatewayMdr: number;   // 0% for direct UPI; updated when Razorpay gateway is active
   totalAmountPaid: number;
-  merchantPayoutAmount: number; // 88%
-  platformShareAmount: number;  // 12%
+  merchantPayoutAmount: number; // 96%
+  platformShareAmount: number;  // 4%
 }
 
 export interface OrderCompliance {

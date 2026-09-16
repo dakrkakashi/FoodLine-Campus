@@ -86,7 +86,7 @@ FoodLine Campus is scaling the B2B2C campus dining rail across Indian higher edu
 
 ## Unit Economics & Take Rate
 - **Average Order Value (AOV)**: ₹65 per meal combo.
-- **Performance Commission Model**: 3.5% take rate per completed order (₹2.275 net/order).
+- **Performance Commission Model**: 4% take rate per completed order (₹2.60 net/order).
 - **Canteen Break-Even Threshold**: ~659 orders/month vs pilot run-rate of 1,500 - 2,000 orders/month.
 - **TAM / SAM / SOM**: ₹35,000 Cr ($4.2B) Indian campus dining TAM growing at 18.4% CAGR.
 `;

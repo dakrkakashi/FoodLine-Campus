@@ -38,6 +38,13 @@ export function CopyButton({
         document.execCommand('copy');
         document.body.removeChild(textarea);
       }
+
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        try {
+          navigator.vibrate(40);
+        } catch {}
+      }
+
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {

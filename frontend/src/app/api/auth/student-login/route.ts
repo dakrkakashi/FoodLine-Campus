@@ -2,12 +2,11 @@ import { NextResponse, NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import { getSupabaseFrontendRuntimeConfig } from '@/lib/supabase/runtime';
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ylweomuodekukjjpjrgx.supabase.co';
-const SUPABASE_ANON =
-  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  '';
+const runtime = getSupabaseFrontendRuntimeConfig(process.env);
+const SUPABASE_URL = runtime.url || '';
+const SUPABASE_ANON = runtime.anonKey || '';
 
 export async function POST(request: NextRequest) {
   const rateLimitResponse = checkRateLimit(request, {
@@ -31,9 +30,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!SUPABASE_ANON) {
+    if (!runtime.isConfigured || !SUPABASE_URL || !SUPABASE_ANON) {
       return NextResponse.json(
-        { success: false, error: 'Supabase anon key is not configured.' },
+        { success: false, error: runtime.reason || 'Supabase auth is not configured.' },
         { status: 503 }
       );
     }

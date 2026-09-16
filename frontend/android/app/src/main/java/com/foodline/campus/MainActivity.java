@@ -70,10 +70,18 @@ public class MainActivity extends BridgeActivity {
             webView.setLayerType(WebView.LAYER_TYPE_HARDWARE, null);
             WebSettings settings = webView.getSettings();
             if (settings != null) {
-                settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
                 settings.setDomStorageEnabled(true);
                 settings.setDatabaseEnabled(true);
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (this.bridge != null && this.bridge.getWebView() != null && this.bridge.getWebView().canGoBack()) {
+            this.bridge.getWebView().goBack();
+        } else {
+            super.onBackPressed();
         }
     }
 }

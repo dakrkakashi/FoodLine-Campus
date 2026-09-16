@@ -4,13 +4,16 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { DisplayOrder } from '@/lib/types';
 import { createClient } from '@/utils/supabase/client';
 import { getCounterForOrder } from '@/lib/display-utils';
-import { announceOrderReady, getSoundSettings } from '@/lib/voice-announcer';
+import { announceOrderReady } from '@/lib/voice-announcer';
 
 export function useRealtimeOrders() {
   const [orders, setOrders] = useState<DisplayOrder[]>([]);
   const [isConnected, setIsConnected] = useState(true);
   const [demoMode, setDemoMode] = useState(false);
   const announcedTokensRef = useRef<Set<string>>(new Set());
+  const isSubscribedRef = useRef(false);
+  const pollTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isMountedRef = useRef(true);
 
   const fetchOrders = useCallback(async () => {
     try {
@@ -30,7 +33,7 @@ export function useRealtimeOrders() {
         rawData = data;
       }
 
-      if (rawData) {
+      if (rawData && isMountedRef.current) {
         const enriched: DisplayOrder[] = rawData.map((o: any) => {
           return {
             ...o,
@@ -45,12 +48,26 @@ export function useRealtimeOrders() {
     }
   }, []);
 
-  useEffect(() => {
-    fetchOrders();
+  const startFallbackPolling = useCallback(() => {
+    if (pollTimerRef.current) return;
+    pollTimerRef.current = setInterval(() => {
+      // Only execute fetch if mounted and not subscribed to realtime
+      if (isMountedRef.current && !isSubscribedRef.current) {
+        fetchOrders();
+      }
+    }, 6000);
+  }, [fetchOrders]);
 
-    const pollInterval = setInterval(() => {
-      fetchOrders();
-    }, 4000);
+  const stopFallbackPolling = useCallback(() => {
+    if (pollTimerRef.current) {
+      clearInterval(pollTimerRef.current);
+      pollTimerRef.current = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    fetchOrders();
 
     // Check demo mode from localStorage
     if (typeof window !== 'undefined') {
@@ -93,6 +110,7 @@ export function useRealtimeOrders() {
               announceOrderReady(updated.order_token, enrichedOrder.counter || 1);
             }
 
+            if (!isMountedRef.current) return;
             setOrders((prev) => {
               const idx = prev.findIndex((o) => o.id === updated.id);
               if (idx >= 0) {
@@ -105,17 +123,27 @@ export function useRealtimeOrders() {
           }
         )
         .subscribe((status) => {
-          setIsConnected(status === 'SUBSCRIBED');
+          const subscribed = status === 'SUBSCRIBED';
+          setIsConnected(subscribed);
+          isSubscribedRef.current = subscribed;
+
+          if (subscribed) {
+            stopFallbackPolling();
+          } else {
+            startFallbackPolling();
+          }
         });
 
       return () => {
-        clearInterval(pollInterval);
+        isMountedRef.current = false;
+        stopFallbackPolling();
         supabase.removeChannel(channel);
       };
     } catch (e) {
       console.warn('Realtime display subscription fallback:', e);
+      startFallbackPolling();
     }
-  }, [fetchOrders]);
+  }, [fetchOrders, startFallbackPolling, stopFallbackPolling]);
 
   // Filter Derived Views (Only real orders from database)
   const preparingOrders = orders.filter((o) => o.status === 'PREPARING' || o.status === 'CONFIRMED');

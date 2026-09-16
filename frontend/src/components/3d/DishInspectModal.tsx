@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Clock, Sparkles, CheckCircle2, ShoppingBag } from 'lucide-react';
 import { Food3DViewer } from './Food3DViewer';
@@ -52,6 +52,24 @@ export function getDishModelType(name: string): 'burger' | 'coffee' | 'dosa' {
 export function DishInspectModal({ item, onClose }: DishInspectModalProps) {
   const { items: cartItems, addItem, removeItem } = useCart();
   const { getStockQuantity } = useInventory();
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    if (!item) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCloseRef.current();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [item]);
 
   if (!item) return null;
 
@@ -136,7 +154,7 @@ export function DishInspectModal({ item, onClose }: DishInspectModalProps) {
             {/* Fresh Preparation Signals */}
             <div className="grid grid-cols-2 gap-2 text-xs text-[var(--text-primary)] pt-2 border-t border-[var(--border-glass)]">
               <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 border border-[var(--border-glass)] rounded-xl p-2.5">
-                <Clock size={15} className="text-[#FFB347]" />
+                <Clock size={15} className="text-[#FFB347] font-bold" />
                 <span>
                   Prep time: <strong>~{item.prep_time_mins || 5} mins</strong>
                 </span>
@@ -158,51 +176,57 @@ export function DishInspectModal({ item, onClose }: DishInspectModalProps) {
             </div>
 
             {/* Action Bar */}
-            <div className="flex items-center justify-between pt-4 border-t border-[var(--border-glass)]">
-              <div className="text-xs text-[var(--text-secondary)]">
-                {quantity > 0 ? (
-                  <span>
-                    In Cart:{' '}
-                    <strong className="text-[var(--text-primary)]">
-                      {quantity} (₹{quantity * item.price})
-                    </strong>
-                  </span>
-                ) : (
-                  <span>Instant slot reservation</span>
-                )}
+            <div className="pt-2 border-t border-[var(--border-glass)] flex items-center justify-between gap-4">
+              <div>
+                <span className="text-[10px] text-[var(--text-muted)] block font-bold uppercase">Total in Tray</span>
+                <span className="text-lg font-black text-[var(--text-primary)]">
+                  {quantity > 0 ? `${quantity} added (₹${quantity * item.price})` : 'Not in tray'}
+                </span>
               </div>
 
-              {quantity === 0 ? (
-                <button
-                  disabled={!isAvailable || (stockQty !== null && stockQty !== undefined && stockQty <= 0)}
-                  onClick={() =>
-                    addItem({
-                      id: item.id,
-                      name: item.name,
-                      price: item.price,
-                      tag: item.tag,
-                      category: item.category,
-                      maxStock: stockQty,
-                    })
-                  }
-                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-white font-black text-sm shadow-lg shadow-[#FF6B2C]/20 hover:scale-[1.02] active:scale-95 transition cursor-pointer flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <ShoppingBag size={16} />
-                  <span>Add to Order Tray</span>
-                </button>
-              ) : (
-                <div className="flex items-center gap-2 bg-black/5 dark:bg-black/60 border border-[var(--border-glass)] rounded-2xl p-1.5">
+              <div className="flex items-center gap-2">
+                {quantity > 0 ? (
+                  <div className="flex items-center gap-3 bg-black/5 dark:bg-white/5 p-1.5 rounded-2xl border border-[var(--border-glass)]">
+                    <button
+                      onClick={() => {
+                        if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+                          try { navigator.vibrate(30); } catch {}
+                        }
+                        removeItem(item.id);
+                      }}
+                      className="w-9 h-9 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-lg font-bold transition active:scale-95 cursor-pointer flex items-center justify-center"
+                    >
+                      -
+                    </button>
+                    <span className="font-mono font-bold text-base min-w-[20px] text-center">
+                      {quantity}
+                    </span>
+                    <button
+                      disabled={isMaxStockReached}
+                      onClick={() => {
+                        if (!isMaxStockReached) {
+                          if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+                            try { navigator.vibrate(30); } catch {}
+                          }
+                          addItem({
+                            id: item.id,
+                            name: item.name,
+                            price: item.price,
+                            tag: item.tag,
+                            category: item.category,
+                            maxStock: stockQty,
+                          });
+                        }
+                      }}
+                      className="w-9 h-9 rounded-xl bg-[#FF6B2C] text-black hover:bg-[#FF6B2C]/90 font-bold text-lg transition active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center"
+                    >
+                      +
+                    </button>
+                  </div>
+                ) : (
                   <button
-                    onClick={() => removeItem(item.id)}
-                    className="w-8 h-8 rounded-xl bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 text-[var(--text-primary)] font-black text-sm flex items-center justify-center transition cursor-pointer"
-                  >
-                    −
-                  </button>
-                  <span className="w-8 text-center font-black text-base text-[#FFB347]">{quantity}</span>
-                  <button
-                    disabled={isMaxStockReached}
-                    onClick={() =>
-                      !isMaxStockReached &&
+                    disabled={!isAvailable}
+                    onClick={() => {
                       addItem({
                         id: item.id,
                         name: item.name,
@@ -210,18 +234,15 @@ export function DishInspectModal({ item, onClose }: DishInspectModalProps) {
                         tag: item.tag,
                         category: item.category,
                         maxStock: stockQty,
-                      })
-                    }
-                    className={`w-8 h-8 rounded-xl font-black text-sm flex items-center justify-center transition ${
-                      isMaxStockReached
-                        ? 'bg-zinc-800 text-zinc-600 cursor-not-allowed opacity-40'
-                        : 'bg-[#FF6B2C] text-white hover:bg-[#FF6B2C]/90 cursor-pointer'
-                    }`}
+                      });
+                    }}
+                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-extrabold text-sm shadow-xl shadow-[#FF6B2C]/20 transition active:scale-95 cursor-pointer flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    +
+                    <ShoppingBag size={16} />
+                    <span>{isAvailable ? 'Add to Tray' : 'Sold Out'}</span>
                   </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </motion.div>

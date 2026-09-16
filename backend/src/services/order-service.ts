@@ -124,18 +124,17 @@ export class OrderService {
       };
     }
 
-    // 2. Financials calculation (88% merchant payout, 12% platform fee, ₹0 student fee)
+    // 2. Financials calculation (96% merchant payout, 4% platform commission)
     const totalAmount = items.reduce(
       (sum: number, item: any) => sum + (item.price || item.item?.price || 0) * (item.quantity || 1),
       0
     );
 
     const itemTotal = totalAmount;
-    const studentPlatformFee = 0; // ₹0
-    const paymentGatewayMdr = 0;   // 0%
+    const paymentGatewayMdr = 0; // 0% for direct UPI UTR; updated when Razorpay gateway is active
     const totalAmountPaid = itemTotal;
-    const merchantPayoutAmount = Math.round(itemTotal * 0.88 * 100) / 100;
-    const platformShareAmount = Math.round(itemTotal * 0.12 * 100) / 100;
+    const merchantPayoutAmount = Math.round(itemTotal * 0.96 * 100) / 100;
+    const platformShareAmount = Math.round(itemTotal * 0.04 * 100) / 100;
 
     const now = new Date().toISOString();
     const formattedItems: CartItem[] = items.map((i: any) => ({
@@ -171,7 +170,6 @@ export class OrderService {
       counterId: 'COUNTER_1',
       financials: {
         itemTotal,
-        studentPlatformFee,
         paymentGatewayMdr,
         totalAmountPaid,
         merchantPayoutAmount,

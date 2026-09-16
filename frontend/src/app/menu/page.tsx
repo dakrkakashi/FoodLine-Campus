@@ -27,11 +27,17 @@ import { DishCardSkeleton } from '@/components/ui/Skeleton';
 import { Badge } from '@/components/ui/Badge';
 import { InventoryBadge } from '@/components/ui/InventoryBadge';
 import { MorphingStepper } from '@/components/ui/MorphingStepper';
-import { PageTransition, SpotlightCard, SteamEffect, AnimatedCounter, FoodParticles, Magnetic } from '@/components/ui';
+import { PageTransition } from '@/components/ui/PageTransition';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
+import { SteamEffect } from '@/components/ui/SteamEffect';
+import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
+import { FoodParticles } from '@/components/ui/FoodParticles';
+import { Magnetic } from '@/components/ui/Magnetic';
 import dynamic from 'next/dynamic';
 import type { DishInspectItem } from '@/components/3d/DishInspectModal';
 import { ChefExpressIllustration, EmptyMenuIllustration } from '@/components/illustrations';
 import { CampusCombosBar } from '@/components/menu/CampusCombosBar';
+import { MenuGridItem } from '@/components/menu/MenuGridItem';
 
 const DishInspectModal = dynamic(
   () => import('@/components/3d/DishInspectModal').then((mod) => mod.DishInspectModal),
@@ -176,8 +182,8 @@ export default function MenuPage() {
       // Natural horizontal swipe
       return;
     }
-    if (e.shiftKey || Math.abs(e.deltaY) > 0) {
-      // Convert vertical roll into horizontal scroll if hovering over track
+    if (e.shiftKey) {
+      // Convert vertical roll into horizontal scroll ONLY if user holds Shift
       el.scrollLeft += e.deltaY;
     }
   };
@@ -311,8 +317,52 @@ export default function MenuPage() {
     });
   }, [menuItems, selectedCategory, search, isCategoryMatch]);
 
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const cat of categories) {
+      counts[cat.id] = menuItems.filter((item) => isCategoryMatch(item, cat.name)).length;
+    }
+    return counts;
+  }, [categories, menuItems, isCategoryMatch]);
+
+  const handleInspectDish = useCallback(
+    (dish: MenuItem, categoryName: string, isAvailable: boolean) => {
+      setInspectingDish({
+        id: dish.id,
+        name: dish.name,
+        tag: dish.tag,
+        price: Number(dish.price),
+        prep_time_mins: dish.prep_time_mins,
+        category: categoryName,
+        is_available: isAvailable,
+      });
+    },
+    []
+  );
+
+  const handleAddDish = useCallback(
+    (dish: MenuItem, categoryName: string, stockQty: number | null | undefined) => {
+      addItem({
+        id: dish.id,
+        name: dish.name,
+        price: Number(dish.price),
+        tag: dish.tag,
+        category: categoryName,
+        maxStock: stockQty,
+      });
+    },
+    [addItem]
+  );
+
+  const handleRemoveDish = useCallback(
+    (dishId: string) => {
+      removeItem(dishId);
+    },
+    [removeItem]
+  );
+
   return (
-    <PageTransition className="min-h-screen pb-36 text-(--text-primary) font-sans selection:bg-accent-orange/20 selection:text-accent-orange relative overflow-x-hidden">
+    <PageTransition className="min-h-screen pb-36 text-(--text-primary) font-sans selection:bg-accent-orange/20 selection:text-accent-orange relative overflow-x-clip">
       {/* Background Interactive Food Floating Orbs */}
       <FoodParticles />
 
@@ -550,7 +600,7 @@ export default function MenuPage() {
                 </motion.button>
               </Magnetic>
               {categories.map((cat) => {
-                const count = menuItems.filter((item) => isCategoryMatch(item, cat.name)).length;
+                const count = categoryCounts[cat.id] || 0;
                 return (
                   <Magnetic key={cat.id} strength={0.15}>
                     <motion.button
@@ -615,111 +665,23 @@ export default function MenuPage() {
               const qty = getCartQuantity(dish.id);
               const isAvailable = getEffectiveAvailability(dish);
               const stockQty = getStockQuantity(dish.id);
-              const isMaxStockReached = stockQty !== null && stockQty !== undefined && qty >= stockQty;
               const tagVariant = dish.tag ? TAG_VARIANT[dish.tag] || 'custom' : null;
+              const categoryName = getCategoryName(dish.category_id, dish.category);
 
               return (
-                <div
+                <MenuGridItem
                   key={dish.id}
-                  className={`h-full transition-transform duration-200 dish-card-contain ${isAvailable ? 'hover:-translate-y-1' : ''}`}
-                >
-                  <SpotlightCard
-                    spotlightColor="var(--accent-orange-glow, rgba(255, 107, 44, 0.18))"
-                    className={`h-full flex flex-col justify-between group relative border border-(--border-glass) hover:border-accent-orange/50 hover:shadow-[0_0_24px_var(--accent-orange-glow)] transition-all duration-200 bg-(--bg-card) backdrop-blur-md shadow-sm dark:shadow-none ${
-                      gridMode === 'grid' ? 'p-3.5 sm:p-6 rounded-2xl sm:rounded-4xl' : 'p-5 sm:p-6 rounded-3xl sm:rounded-4xl'
-                    } ${
-                      !isAvailable ? 'opacity-50 grayscale pointer-events-none' : ''
-                    }`}
-                  >
-                    <InventoryBadge item={dish} size="sm" position="top-right" />
-                    {/* Zero-Lag Culinary Steam Effect (shows on hover) */}
-                    {isAvailable && (dish.prep_time_mins || dish.name.toLowerCase().includes('dosa') || dish.name.toLowerCase().includes('chai') || dish.name.toLowerCase().includes('maggi') || dish.name.toLowerCase().includes('thali') || dish.name.toLowerCase().includes('pav')) && (
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <SteamEffect count={2} />
-                      </div>
-                    )}
-                    {!isAvailable && (
-                      <div className="absolute inset-0 z-20 bg-black/40 dark:bg-black/60 rounded-2xl sm:rounded-4xl flex items-center justify-center backdrop-blur-[2px]">
-                        <span className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl bg-red-500/20 dark:bg-red-950 border border-red-500/40 text-red-600 dark:text-red-400 text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
-                          <Info size={13} /> Sold Out
-                        </span>
-                      </div>
-                    )}
-
-                      <div>
-                        <div className="flex items-center justify-between gap-1.5 mb-2.5 sm:mb-4">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <Badge variant="veg" />
-                            {tagVariant && <Badge variant={tagVariant}>{dish.tag}</Badge>}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            {dish.prep_time_mins && (
-                              <span className="text-[10px] sm:text-[11px] font-bold text-(--text-secondary) flex items-center gap-0.5 sm:gap-1 bg-black/5 dark:bg-white/5 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg">
-                                ⏱️ {dish.prep_time_mins}m
-                              </span>
-                            )}
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setInspectingDish({
-                                  id: dish.id,
-                                  name: dish.name,
-                                  tag: dish.tag,
-                                  price: Number(dish.price),
-                                  prep_time_mins: dish.prep_time_mins,
-                                  category: getCategoryName(dish.category_id, dish.category),
-                                  is_available: isAvailable,
-                                });
-                              }}
-                              className="text-[9px] sm:text-[10px] font-bold text-accent-amber bg-accent-orange/10 hover:bg-accent-orange/25 border border-accent-orange/30 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-lg transition active:scale-95 cursor-pointer flex items-center gap-0.5 sm:gap-1 shrink-0"
-                              title="Inspect dish in 3D"
-                            >
-                              <span>3D</span>
-                              <Sparkles size={10} className="text-accent-amber" />
-                            </button>
-                          </div>
-                        </div>
-
-                        <h3 className={`font-black text-(--text-primary) group-hover:text-accent-amber transition-colors leading-snug mb-1 line-clamp-2 ${
-                          gridMode === 'grid' ? 'text-xs sm:text-lg' : 'text-sm sm:text-lg'
-                        }`}>
-                          {dish.name}
-                        </h3>
-                        <span className="text-[9px] sm:text-[10px] font-black text-(--text-muted) uppercase tracking-wider line-clamp-1">
-                          {getCategoryName(dish.category_id, dish.category) || dish.tag || 'Fresh Made'}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-4 sm:mt-6 pt-2.5 sm:pt-4 border-t border-(--border-glass)">
-                        <div>
-                          <span className="text-[9px] sm:text-[10px] text-(--text-muted) uppercase tracking-wider font-bold">Price</span>
-                          <div className={`font-black text-(--text-primary) ${gridMode === 'grid' ? 'text-base sm:text-xl' : 'text-lg sm:text-xl'}`}>
-                            ₹{Number(dish.price).toFixed(0)}
-                          </div>
-                        </div>
-
-                        <MorphingStepper
-                          quantity={qty}
-                          disabled={!isAvailable || (stockQty !== null && stockQty !== undefined && stockQty <= 0)}
-                          isMaxReached={isMaxStockReached}
-                          itemName={dish.name}
-                          size={gridMode === 'grid' ? 'sm' : 'md'}
-                          onAdd={() =>
-                            addItem({
-                              id: dish.id,
-                              name: dish.name,
-                              price: Number(dish.price),
-                              tag: dish.tag,
-                              category: getCategoryName(dish.category_id, dish.category),
-                              maxStock: stockQty,
-                            })
-                          }
-                          onRemove={() => removeItem(dish.id)}
-                        />
-                      </div>
-                    </SpotlightCard>
-                </div>
+                  dish={dish}
+                  gridMode={gridMode}
+                  qty={qty}
+                  isAvailable={isAvailable}
+                  stockQty={stockQty}
+                  categoryName={categoryName}
+                  tagVariant={tagVariant}
+                  onInspect={handleInspectDish}
+                  onAdd={handleAddDish}
+                  onRemove={handleRemoveDish}
+                />
               );
             })}
           </div>

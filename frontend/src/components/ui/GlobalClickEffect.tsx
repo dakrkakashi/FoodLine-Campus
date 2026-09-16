@@ -2,13 +2,21 @@
  
 import React, { useEffect, useRef } from 'react';
  
-export function GlobalClickEffect() {
+function GlobalClickEffectComponent() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Only run on desktop/laptop mouse pointers; touch screens use native touch feedback
+    // to preserve 144Hz frame pacing and eliminate DOM churn on mobile WebViews
+    if (typeof window === 'undefined') return;
+    if (window.matchMedia('(pointer: coarse)').matches || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
     const handlePointerDown = (e: PointerEvent) => {
-      // Only primary clicks / taps
-      if (e.button !== 0 && e.pointerType === 'mouse') return;
+      // Only primary mouse clicks
+      if (e.pointerType === 'touch' || e.pointerType === 'pen') return;
+      if (e.button !== 0) return;
       if (!containerRef.current) return;
 
       const ripple = document.createElement('div');
@@ -30,7 +38,7 @@ export function GlobalClickEffect() {
         <span class="absolute w-2 h-2 -ml-1 -mt-1 rounded-full bg-[var(--accent-teal,#00D4AA)] animate-click-spark-3 shadow-[0_0_8px_var(--accent-teal,#00D4AA)]"></span>
         <span class="absolute w-1.5 h-1.5 -ml-0.75 -mt-0.75 rounded-full bg-[var(--accent-amber,#FFB347)] animate-click-spark-4 shadow-[0_0_6px_var(--accent-amber,#FFB347)]"></span>
         <span class="absolute w-2 h-2 -ml-1 -mt-1 rounded-full bg-[var(--accent-purple,#8B5CF6)] animate-click-spark-5 shadow-[0_0_8px_var(--accent-purple,#8B5CF6)]"></span>
-        <span class="absolute w-1.5 h-1.5 -ml-0.75 -mt-0.75 rounded-full bg-[var(--accent-teal,#00D4AA)] animate-click-spark-6 shadow-[0_0_6px_var(--accent-teal,#00D4AA)]"></span>
+        <span class="absolute w-1.5 h-1.5 -ml-0.75 -mt-0.75 rounded-full bg-[var(--accent-teal,#00D4AA)] animate-click-spark-6 shadow-[0_0_8px_var(--accent-teal,#00D4AA)]"></span>
         <span class="absolute w-2 h-2 -ml-1 -mt-1 rounded-full bg-[var(--accent-orange,#FF6B2C)] animate-click-spark-7 shadow-[0_0_8px_var(--accent-orange,#FF6B2C)]"></span>
         <span class="absolute w-1.5 h-1.5 -ml-0.75 -mt-0.75 rounded-full bg-white animate-click-spark-8 shadow-[0_0_8px_#FFF]"></span>
       `;
@@ -54,3 +62,5 @@ export function GlobalClickEffect() {
     />
   );
 }
+
+export const GlobalClickEffect = React.memo(GlobalClickEffectComponent);

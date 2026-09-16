@@ -56,7 +56,7 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: [
       'lucide-react',
-      'recharts',
+      '@supabase/supabase-js',
       'motion',
       '@react-three/fiber',
       '@react-three/drei',
@@ -76,6 +76,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'images.unsplash.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'api.qrserver.com',
+      },
     ],
   },
   async headers() {
@@ -83,30 +87,6 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: securityHeaders,
-      },
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            // Development chunks use stable paths (for example, app/page.js).
-            // Caching those as immutable allows an old client bundle to hydrate
-            // against freshly rendered server HTML after a code change.
-            value:
-              process.env.NODE_ENV === 'production'
-                ? 'public, max-age=31536000, immutable'
-                : 'no-store, max-age=0',
-          },
-        ],
-      },
-    ];
-  },
-  async redirects() {
-    return [
-      {
-        source: '/account',
-        destination: '/profile',
-        permanent: false,
       },
     ];
   },

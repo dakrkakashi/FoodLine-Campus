@@ -25,6 +25,6 @@ Live operations at Sanjivani University across 5 campus food outlets (flagship: 
 
 ## 4. Business Model & Unit Economics
 - **Student Guarantee:** 100% free. No app fee, no convenience fee, exact counter menu prices.
-- **Revenue Model:** 3.5% performance commission per completed order (~₹2.275 net on ₹65 AOV).
+- **Revenue Model:** 4% platform commission per completed order (~₹2.60 net on ₹65 AOV).
 - **Direct-to-Vendor UPI:** UPI payments route directly to vendor bank VPAs. Zero capital custody, eliminating RBI payment aggregator licensing friction.
 - **Break-Even Threshold:** A canteen partner breaks even on software adoption at just **659 orders/month**, while typical university canteen volumes reach 1,500–2,000 orders/day during semester runs.

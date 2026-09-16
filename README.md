@@ -16,7 +16,7 @@
 
   <p align="center">
     <b>📍 Pilot Deployment:</b> Sanjivani University, Kopargaon &nbsp;|&nbsp; 
-    <b>🏛️ Partner Outlets:</b> Cafe @7 + 4 Campus Canteens &nbsp;|&nbsp;
+    <b>🏛️ Operating Entity:</b> FoodLine Campus LLP (Pending formal MCA registration) &nbsp;|&nbsp;
     <b>🛡️ Security:</b> 12-Digit Bank UTR Anti-Fraud &bull; DPDP Act 2023 Compliant
   </p>
 
@@ -175,7 +175,7 @@ graph TD
 | **Order Pass & Receipt** | [`/order/[token]`](http://localhost:3000/order/FL-2026-0001) | Student at Pickup | High-contrast optical QR pass, 4-digit OTP, live SSE progress bar, 58/80mm thermal receipt |
 | **Kitchen KDS** | [`/kds`](http://localhost:3000/kds) | Head Chef & Kitchen Crew | Ticket kanban, single-tap state transitions, multilingual audio chimes, 1-tap stockout |
 | **TV Voice Announcer** | [`/display`](http://localhost:3000/display) | Cafeteria Overhead Screen | Large-font order tickets, Marathi/Hindi/English speech synthesis, harmonic audio chimes |
-| **Executive Ledger** | [`/admin`](http://localhost:3000/admin) | Canteen Manager | Real-time sales telemetry, 88/12 settlement breakdown, inventory toggle, hourly rush charts |
+| **Executive Ledger** | [`/admin`](http://localhost:3000/admin) | Canteen Manager | Real-time sales telemetry, 96/4 settlement breakdown, inventory toggle, hourly rush charts |
 | **Diagnostic Lab** | [`/debug`](http://localhost:3000/debug) | Engineering & QA | Slot governor burst simulation (65 req test), SSE heartbeat probe, UTR validator test |
 
 ---
@@ -255,14 +255,14 @@ FoodLine Campus implements a complete legal and compliance safety net mapped to 
 
 ## 💼 Business Model & Canteen Economics
 
-FoodLine operates on a strict **zero-friction student guarantee** paired with sustainable B2B canteen monetization:
+FoodLine operates on a transparent digital intermediary model operated by **FoodLine Campus LLP** with clear 96/4 merchant settlement:
 
 | Pillar | Rate / Fee | Value Delivered |
 |:---|:---:|:---|
-| **🎓 Student Guarantee** | **₹0.00 Extra** | Exact offline canteen menu prices, zero platform markups, zero surge fees |
-| **🏬 Canteen Take-Rate** | **10% – 12%** | ₹7.80 on ₹65 AOV; eliminates ₹5k/day fake screenshot fraud & doubles peak recess turnover |
-| **🖥️ Hardware Lease** | **₹2,500 / month** | Rugged kitchen display tablet + express heated pickup rack installation |
-| **🎉 Institutional Catering** | **5% – 8%** | Pre-ordering infrastructure for college fests, academic conferences & hostel mess pre-bookings |
+| **🎓 Student Pricing** | **Counter Rate + 4% Platform Fee** | 100% matching offline chalkboard menu prices; transparent 4% platform fee covers cloud infrastructure, real-time slot metering, and technical maintenance. ₹0 surge fees. |
+| **🏬 Canteen Merchant Settlement** | **96% Payout** | Canteens retain 96% of order item sales; eliminates ₹5k/day fake screenshot fraud & doubles peak recess turnover. |
+| **🖥️ Hardware Lease** | **₹2,500 / month** | Rugged kitchen display tablet + express heated pickup rack installation (optional turnkey hardware). |
+| **🎉 Institutional Catering** | **4% Commission** | Pre-ordering infrastructure for college fests, academic conferences & hostel mess pre-bookings. |
 
 ---
 
@@ -320,7 +320,7 @@ FoodLine-Campus/
 ├── backend/                                 # High-Concurrency Express & SSE Engine
 │   ├── src/
 │   │   ├── services/
-│   │   │   ├── order-service.ts             # Order Lifecycle & 88/12 Settlement Ledger
+│   │   │   ├── order-service.ts             # Order Lifecycle & 96/4 Settlement Ledger
 │   │   │   ├── slot-throttler.ts            # 60-Order Atomic Slot Reservation Engine
 │   │   │   ├── utr-verifier.ts              # 12-Digit Bank UTR Anti-Fraud Shield
 │   │   │   └── sheets-db.service.ts         # Google Sheets API v4 Two-Way Queue

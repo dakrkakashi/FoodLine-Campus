@@ -809,8 +809,8 @@ app.get('/api/admin/metrics', requireAuth(['admin', 'canteen_manager']), async (
   try {
     const allOrders = OrderService.getAllOrders();
     const gmv = allOrders.reduce((sum, o) => sum + (o.status !== 'CANCELLED' ? o.totalAmount : 0), 0);
-    const merchantNet = Math.round(gmv * 0.88 * 100) / 100;
-    const platformRevenue = Math.round(gmv * 0.12 * 100) / 100;
+    const merchantNet = Math.round(gmv * 0.96 * 100) / 100;
+    const platformRevenue = Math.round(gmv * 0.04 * 100) / 100;
     const studentSavings = allOrders.length * 15; // ₹15 average surge savings
     const slots = await SlotThrottlerService.getAllSlots();
 

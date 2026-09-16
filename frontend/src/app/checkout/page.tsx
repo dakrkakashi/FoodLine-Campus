@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft,
@@ -27,12 +28,18 @@ import { Navbar } from '@/components/navbar';
 import { useCart } from '@/context/CartContext';
 import { useInventory } from '@/context/InventoryContext';
 import { useAuth } from '@/lib/auth/useAuth';
-import { Stepper, ProgressBar, PageTransition, SpotlightCard, fireConfettiSuccess, fireFireworks, Magnetic } from '@/components/ui';
+import { Stepper } from '@/components/ui/Stepper';
+import { ProgressBar } from '@/components/ui/ProgressBar';
+import { PageTransition } from '@/components/ui/PageTransition';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
+import { fireConfettiSuccess, fireFireworks } from '@/components/ui/Confetti';
+import { Magnetic } from '@/components/ui/Magnetic';
 import { Meteors } from '@/components/magicui/meteors';
 import { ShimmerButton } from '@/components/magicui/shimmer-button';
 import { EmptyCartIllustration, OrderSuccessIllustration } from '@/components/illustrations';
 import { saveOrderToHistory } from '@/lib/order-history-store';
 import { getCampusTimeIST, parseTimeToMinutes } from '@/lib/campus-time';
+import { CampusClockBadge } from '@/components/checkout/CampusClockBadge';
 
 interface Slot {
   id: string;
@@ -94,11 +101,12 @@ export default function CheckoutPage() {
     }
   }, [user, profile, studentName, studentPrn]);
 
-  // Live campus clock updater (auto-detects IST campus time every 1s)
+  // Live campus clock updater (checked every 30s to update slot expiry without re-rendering parent page every second)
   useEffect(() => {
     const timer = setInterval(() => {
-      setCampusClock(getCampusTimeIST());
-    }, 1000);
+      const current = getCampusTimeIST();
+      setCampusClock((prev) => (prev.totalMinutes !== current.totalMinutes ? current : prev));
+    }, 30000);
     return () => clearInterval(timer);
   }, []);
 
@@ -131,10 +139,12 @@ export default function CheckoutPage() {
   }, [celebrationData, countdown, router]);
 
   useEffect(() => {
+    let isMounted = true;
     async function loadSlots() {
       try {
         const res = await fetch('/api/slots');
         const json = await res.json();
+        if (!isMounted) return;
         if (json.success && json.data) {
           const fetchedSlots: Slot[] = json.data;
           setSlots(fetchedSlots);
@@ -164,10 +174,13 @@ export default function CheckoutPage() {
           }
         }
       } catch (err) {
-        console.error('Failed to load slots:', err);
+        if (isMounted) console.error('Failed to load slots:', err);
       }
     }
     loadSlots();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleDayChange = (newDay: 'TODAY' | 'TOMORROW') => {
@@ -189,7 +202,7 @@ export default function CheckoutPage() {
   };
 
   const subtotal = totalAmount;
-  const platformMarginRate = 0.035; // 3.5% FoodLine Fast-Pass Convenience Fee
+  const platformMarginRate = 0.04; // 4% FoodLine Platform Fee
   const platformFee = Number((subtotal * platformMarginRate).toFixed(2));
   const finalPayable = Number((subtotal + platformFee).toFixed(2));
 
@@ -206,13 +219,21 @@ export default function CheckoutPage() {
   };
 
   const copyUpiId = () => {
-    navigator.clipboard.writeText(upiId);
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(upiId).catch(() => {});
+    }
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate(40);
+      } catch {}
+    }
     setCopiedUpi(true);
     setTimeout(() => setCopiedUpi(false), 2000);
   };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setErrorMsg('');
 
     if (items.length === 0) {
@@ -306,6 +327,12 @@ export default function CheckoutPage() {
         createdAt: json.data.createdAt || new Date().toISOString(),
       });
 
+      // Persist student details in localStorage for seamless one-tap checkout next time
+      if (typeof window !== 'undefined') {
+        if (studentPrn) localStorage.setItem('foodline_last_prn', studentPrn);
+        if (studentName) localStorage.setItem('foodline_last_name', studentName);
+      }
+
       // Clear local cart
       clearCart();
 
@@ -323,7 +350,8 @@ export default function CheckoutPage() {
       });
       setIsSubmitting(false);
     } catch (err: any) {
-      setErrorMsg(err.message || 'An unexpected error occurred. Please retry.');
+      const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
+      setErrorMsg(isOffline ? 'You appear to be offline. Please check your campus Wi-Fi or mobile data.' : (err.message || 'An unexpected error occurred. Please retry.'));
       setIsSubmitting(false);
     }
   };
@@ -529,7 +557,7 @@ export default function CheckoutPage() {
               </div>
 
               <div className="mt-6 pt-4 border-t border-(--border-glass) flex items-center justify-between">
-                <span className="text-xs font-bold text-(--text-secondary) uppercase tracking-wider">Total Payable (0% Fee)</span>
+                <span className="text-xs font-bold text-(--text-secondary) uppercase tracking-wider">Tray Subtotal</span>
                 <span className="text-2xl font-black text-(--text-primary)">₹{totalAmount.toFixed(0)}</span>
               </div>
             </SpotlightCard>
@@ -560,7 +588,7 @@ export default function CheckoutPage() {
                     <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                   </span>
                   <span className="font-bold text-(--text-primary)">
-                    Campus Clock: <span className="font-mono text-accent-orange font-black">{campusClock.displayWithSeconds || campusClock.displayTime12h} IST</span>
+                    Campus Clock: <CampusClockBadge />
                   </span>
                 </div>
                 <span className="text-[10px] text-(--text-secondary) font-medium hidden sm:inline-block">
@@ -752,7 +780,15 @@ export default function CheckoutPage() {
 
                 {/* QR Code Container */}
                 <div className="relative bg-white p-4 rounded-3xl mx-auto w-fit shadow-2xl flex flex-col items-center border-2 border-black/10 dark:border-white/20">
-                  <img src={upiQrUrl} alt="UPI QR Code" className="w-48 h-48 object-contain rounded-xl" />
+                  <Image
+                    src={upiQrUrl}
+                    alt="UPI QR Code"
+                    width={192}
+                    height={192}
+                    priority
+                    unoptimized
+                    className="w-48 h-48 object-contain rounded-xl"
+                  />
                   <div className="mt-3 text-center">
                     <div className="text-[10px] font-black text-black tracking-widest uppercase">
                       Scan with PhonePe, GPay, Paytm
@@ -876,8 +912,8 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between text-xs text-(--text-secondary)">
                     <span className="flex items-center gap-1">
-                      FoodLine Fast-Pass Convenience Fee
-                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300 font-black">3.5%</span>
+                      FoodLine Platform Fee (4%)
+                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-600 dark:text-amber-300 font-black">4%</span>
                     </span>
                     <span className="font-mono font-bold text-accent-amber">+₹{platformFee.toFixed(2)}</span>
                   </div>

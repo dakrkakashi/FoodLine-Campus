@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Palette, X, Check, Sparkles, Sliders, Moon, Sun, Wand2, RefreshCw } from 'lucide-react';
 import { useTheme, THEMES, ThemeName, CustomColors } from '@/context/ThemeContext';
 import { useSoundFX } from '@/hooks/useSoundFX';
-import { fireConfettiSuccess } from '@/components/ui';
+import { fireConfettiSuccess } from '@/components/ui/Confetti';
 
 interface ThemeCustomizerModalProps {
   isOpen: boolean;

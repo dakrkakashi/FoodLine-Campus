@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, use } from 'react';
+import React, { useEffect, useState, use, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -18,8 +18,11 @@ import {
   QrCode,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
-import { PageTransition, SpotlightCard, fireFireworks, Magnetic } from '@/components/ui';
-import { BorderBeam } from '@/components/magicui';
+import { PageTransition } from '@/components/ui/PageTransition';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
+import { fireFireworks } from '@/components/ui/Confetti';
+import { Magnetic } from '@/components/ui/Magnetic';
+import { BorderBeam } from '@/components/magicui/border-beam';
 import { ChefExpressIllustration, CampusExpressIllustration } from '@/components/illustrations';
 import { createClient } from '@/utils/supabase/client';
 import dynamic from 'next/dynamic';
@@ -69,7 +72,28 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'live' | 'disconnected'>('connecting');
   const [showReceiptModal, setShowReceiptModal] = useState(false);
 
+  const hasAlertedRef = useRef(false);
+
+  const triggerReadyAlert = useCallback(() => {
+    if (hasAlertedRef.current) return;
+    hasAlertedRef.current = true;
+    fireFireworks();
+    try {
+      const sound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+      sound.play().catch(() => {
+        // Autoplay policy or offline audio - silently handled
+      });
+    } catch (e) {}
+
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate([200, 100, 200, 100, 400]);
+      } catch (e) {}
+    }
+  }, []);
+
   useEffect(() => {
+    let isMounted = true;
     const supabase = createClient();
 
     async function loadOrder() {
@@ -77,14 +101,15 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
         // 1. Fetch from server API with service role (bypasses RLS)
         const res = await fetch(`/api/orders?token=${encodeURIComponent(token)}`);
         const json = await res.json();
+        if (!isMounted) return;
         if (json?.success && Array.isArray(json.data) && json.data.length > 0) {
           const freshOrder = json.data[0];
+          if (freshOrder.status === 'COLLECTED') {
+            clearInterval(pollInterval);
+          }
           setOrder((prev) => {
             if (prev && prev.status !== 'READY' && freshOrder.status === 'READY') {
-              fireFireworks();
-              try {
-                new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play();
-              } catch (e) {}
+              triggerReadyAlert();
             }
             return {
               ...(prev || {}),
@@ -102,7 +127,10 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
           .eq('order_token', token)
           .single();
 
-        if (data) {
+        if (data && isMounted) {
+          if (data.status === 'COLLECTED') {
+            clearInterval(pollInterval);
+          }
           setOrder(data);
           setConnectionStatus('live');
         }
@@ -130,7 +158,11 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
           filter: `order_token=eq.${token}`,
         },
         (payload: any) => {
+          if (!isMounted) return;
           if (payload.new) {
+            if (payload.new.status === 'COLLECTED') {
+              clearInterval(pollInterval);
+            }
             setOrder((prev) => ({
               ...(prev || {}),
               ...payload.new,
@@ -138,10 +170,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
               pickup_slots: prev?.pickup_slots,
             }));
             if (payload.new.status === 'READY') {
-              fireFireworks();
-              try {
-                new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play();
-              } catch (e) {}
+              triggerReadyAlert();
             }
           }
         }
@@ -152,12 +181,21 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
 
     // Also connect to SSE stream
     const sse = new EventSource(`/api/order/${token}/stream`);
-    sse.onopen = () => setConnectionStatus('live');
+    sse.onopen = () => {
+      if (isMounted) setConnectionStatus('live');
+    };
+    sse.onerror = () => {
+      if (isMounted) setConnectionStatus('disconnected');
+    };
     sse.onmessage = (event) => {
+      if (!isMounted) return;
       try {
         const data = JSON.parse(event.data);
         const incoming = data.payload || data.order;
         if (incoming) {
+          if (incoming.status === 'COLLECTED') {
+            clearInterval(pollInterval);
+          }
           setOrder((prev) => ({
             ...(prev || {}),
             ...incoming,
@@ -165,21 +203,19 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
             pickup_slots: incoming.pickup_slots || prev?.pickup_slots,
           }));
           if (incoming.status === 'READY') {
-            fireFireworks();
-            try {
-              new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3').play();
-            } catch (e) {}
+            triggerReadyAlert();
           }
         }
       } catch (e) {}
     };
 
     return () => {
+      isMounted = false;
       clearInterval(pollInterval);
       supabase.removeChannel(channel);
       sse.close();
     };
-  }, [token]);
+  }, [token, triggerReadyAlert]);
 
   const getStepIndex = (status?: string) => {
     switch (status) {
@@ -202,7 +238,7 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
   )}`;
 
   return (
-    <PageTransition className="min-h-screen bg-(--bg-canvas) text-(--text-primary) pb-24 relative overflow-hidden transition-colors duration-500">
+    <PageTransition className="min-h-screen bg-(--bg-canvas) text-(--text-primary) pb-24 relative overflow-x-clip transition-colors duration-500">
       <Navbar />
 
       <main className="max-w-3xl mx-auto px-4 pt-6 relative z-10">
@@ -393,7 +429,6 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
           </div>
         </SpotlightCard>
 
-
         {/* Live Stepper Tracker */}
         <SpotlightCard className="p-6 md:p-8 rounded-[2.5rem] bg-(--bg-card) border border-(--border-glass) shadow-2xl mb-8 relative overflow-hidden">
           <div className="flex items-center justify-between gap-4 mb-6">
@@ -517,6 +552,5 @@ export default function OrderTrackingPage(props: { params: Promise<{ token: stri
         />
       </main>
     </PageTransition>
-
   );
 }

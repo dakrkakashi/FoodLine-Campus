@@ -29,7 +29,7 @@ import { Logo } from '@/components/ui/Logo';
 import { UserAvatar } from '@/components/auth/UserAvatar';
 import { usePermissions } from '@/lib/auth/usePermissions';
 import { useAuth } from '@/lib/auth/useAuth';
-import { AnimatedThemeToggler } from '@/components/magicui';
+import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler';
 
 export function Navbar() {
   const { totalCount } = useCart();

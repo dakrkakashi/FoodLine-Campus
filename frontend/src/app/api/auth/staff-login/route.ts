@@ -2,12 +2,16 @@ import { NextResponse, NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import crypto from 'crypto';
+import { getSupabaseFrontendRuntimeConfig } from '@/lib/supabase/runtime';
 
-const DEFAULT_SUPABASE_URL = 'https://ylweomuodekukjjpjrgx.supabase.co';
-const DEFAULT_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlsd2VvbXVvZGVrdWtqanBqcmd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0NTczMDMsImV4cCI6MjEwMzAzMzMwM30.g75fot8jU_36gPD6sQCL81MUUZUfoJLDxL9eSsFAHaE';
+const runtime = getSupabaseFrontendRuntimeConfig(process.env);
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || DEFAULT_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
+if (!runtime.isConfigured || !runtime.url || !runtime.anonKey) {
+  throw new Error(`[auth/staff-login] ${runtime.reason}`);
+}
+
+const supabaseUrl = runtime.url;
+const supabaseKey = runtime.anonKey;
 
 // Constant-time string comparison to prevent timing side-channel attacks
 function timingSafeCompare(a: string, b: string): boolean {

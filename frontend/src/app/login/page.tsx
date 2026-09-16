@@ -5,7 +5,9 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'motion/react';
 import { GraduationCap, Shield, Lock, Mail, KeyRound, ArrowRight, Loader2, Sparkles, User as UserIcon, CheckCircle2, Eye, EyeOff, Building2, Copy, Check, X, HelpCircle } from 'lucide-react';
-import { PageTransition, SpotlightCard, fireConfettiSuccess } from '@/components/ui';
+import { PageTransition } from '@/components/ui/PageTransition';
+import { SpotlightCard } from '@/components/ui/SpotlightCard';
+import { fireConfettiSuccess } from '@/components/ui/Confetti';
 import { useAuth } from '@/lib/auth/useAuth';
 
 function LoginFormContent() {
@@ -336,7 +338,7 @@ function LoginFormContent() {
   };
 
   return (
-    <PageTransition className="min-h-screen bg-(--bg-canvas) text-(--text-primary) flex flex-col justify-between px-4 py-8 relative overflow-hidden transition-colors duration-500">
+    <PageTransition className="min-h-screen bg-(--bg-canvas) text-(--text-primary) flex flex-col justify-between px-4 py-8 relative overflow-x-clip transition-colors duration-500">
       {/* Top Header */}
       <header className="max-w-md mx-auto w-full flex items-center justify-between z-10 mb-6">
         <Link href="/" className="flex items-center gap-2.5 group cursor-pointer">

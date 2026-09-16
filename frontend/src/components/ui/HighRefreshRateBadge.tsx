@@ -17,7 +17,7 @@ export function HighRefreshRateBadge({ className = '' }: HighRefreshRateBadgePro
   if (isDismissed) return null;
 
   return (
-    <div className={`fixed bottom-20 sm:bottom-4 left-3 sm:left-4 z-40 select-none ${className}`}>
+    <div className={`hidden md:block fixed bottom-4 left-4 z-40 select-none ${className}`}>
       <AnimatePresence mode="wait">
         {!isExpanded ? (
           <motion.button

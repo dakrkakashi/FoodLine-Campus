@@ -269,7 +269,7 @@
 - **Date & Time:** 2026-09-06 (Hinglish Founder Pitch Script Delivered & Windows Native Build Verified - 100% Complete)
 - **Hinglish Founder Pitch Script (`FoodLine_Hinglish_Pitch_Script.txt`):**
   1. Delivered complete slide-by-slide Hinglish (English + Hindi mix) script covering all 14 slides with time breakdown (6–8 minutes).
-  2. Incorporated real pilot traction (544+ meals delivered, ₹35,360+ GMV, 82% retention, <45s pickup) and the **3.5% commission / platform fee model** (₹2.275 net/order, 659 orders/mo break-even threshold).
+  2. Incorporated real pilot traction (544+ meals delivered, ₹35,360+ GMV, 82% retention, <45s pickup) and the **4% commission / platform fee model** (₹2.60 net/order, 659 orders/mo break-even threshold).
   3. Formulated punchy investor-grade power lines and presenter tips for live delivery.
 - **LightningCSS Windows Native Build Resolution:**
   1. **Root Cause**: `@tailwindcss/postcss` on Windows x64 requires the platform-specific native binary `lightningcss.win32-x64-msvc.node`.

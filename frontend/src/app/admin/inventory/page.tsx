@@ -20,7 +20,7 @@ import {
   ChefHat,
 } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
-import { PageTransition } from '@/components/ui';
+import { PageTransition } from '@/components/ui/PageTransition';
 import { InventoryStatus } from '@/lib/types';
 import { fetchInventoryStatus, postMorningPrep, patchPersistentStock } from '@/lib/api';
 

@@ -2,10 +2,10 @@
 
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Sparkles, Plus, Check, Flame, ArrowRight } from 'lucide-react';
+import { Sparkles, Plus, Check, Flame } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useSoundFX } from '@/hooks/useSoundFX';
-import { fireConfettiSuccess } from '@/components/ui';
+import { fireConfettiSuccess } from '@/components/ui/Confetti';
 
 interface ComboBundle {
   id: string;

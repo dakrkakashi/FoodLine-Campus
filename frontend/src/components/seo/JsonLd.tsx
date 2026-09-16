@@ -10,7 +10,7 @@ export function OrganizationSchema() {
     '@type': 'Organization',
     name: 'FoodLine Campus',
     url: 'https://campus.foodline.in',
-    logo: 'https://campus.foodline.in/logo.png',
+    logo: 'https://campus.foodline.in/icons/icon-512x512.png',
     description:
       'Next-Generation Campus Pre-Ordering, Break Slot Throttling & 30-Second Express Pickup Platform.',
     sameAs: [
@@ -59,7 +59,7 @@ export function CanteenSchema({
   name = 'Cafe @7 — Sanjivani University',
   description = 'Sanjivani University Central Campus Food Court & Express Pickup Canteen',
   url = 'https://campus.foodline.in/canteens',
-  image = 'https://campus.foodline.in/logo.png',
+  image = 'https://campus.foodline.in/icons/icon-512x512.png',
 }: {
   name?: string;
   description?: string;

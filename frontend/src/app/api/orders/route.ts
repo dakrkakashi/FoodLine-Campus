@@ -281,7 +281,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const platformConvenienceFee = Number((subtotal * 0.035).toFixed(2));
+    const platformConvenienceFee = Number((subtotal * 0.04).toFixed(2));
     const totalAmount = Number((subtotal + platformConvenienceFee).toFixed(2));
 
     if (body.paymentMethod === 'COD') {

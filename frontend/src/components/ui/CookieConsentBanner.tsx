@@ -40,7 +40,7 @@ export function CookieConsentBanner() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 30 }}
           transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-          className="fixed bottom-24 inset-x-4 sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-md z-40 p-4 rounded-2xl bg-[var(--bg-card,#12121A)]/95 backdrop-blur-2xl border border-[var(--border-glass)] shadow-2xl text-(--text-primary) text-xs print:hidden"
+          className="fixed bottom-[4.75rem] inset-x-3 sm:bottom-6 sm:left-6 sm:right-auto sm:max-w-md z-50 p-3.5 sm:p-4 rounded-2xl bg-[var(--bg-card,#12121A)]/95 backdrop-blur-2xl border border-[var(--border-glass)] shadow-2xl text-(--text-primary) text-xs print:hidden"
         >
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-xl bg-accent-orange/15 text-accent-orange shrink-0 mt-0.5">

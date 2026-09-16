@@ -4,8 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, useSpring } from 'motion/react';
 
-export function CustomCursor() {
-  const pathname = usePathname();
+function CustomCursorContent() {
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
@@ -25,14 +24,7 @@ export function CustomCursor() {
   const trailX = useSpring(-100, { stiffness: 180, damping: 22, restDelta: 0.0001, restSpeed: 0.0001 });
   const trailY = useSpring(-100, { stiffness: 180, damping: 22, restDelta: 0.0001, restSpeed: 0.0001 });
 
-  // Do not render custom cursor on KDS tablets or Display monitors
-  const isKioskMode = pathname?.startsWith('/kds') || pathname?.startsWith('/display');
-
   useEffect(() => {
-    if (isKioskMode) return;
-    if (typeof window === 'undefined') return;
-    if (window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768) return;
-
     const handleMouseMove = (e: MouseEvent) => {
       const now = performance.now();
       const last = lastPosRef.current;
@@ -87,9 +79,9 @@ export function CustomCursor() {
       document.removeEventListener('mouseenter', handleMouseEnter);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, [dotX, dotY, ringX, ringY, trailX, trailY, isVisible, isKioskMode]);
+  }, [dotX, dotY, ringX, ringY, trailX, trailY, isVisible]);
 
-  if (isKioskMode || !isVisible) return null;
+  if (!isVisible) return null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[99999] overflow-hidden select-none">
@@ -127,8 +119,8 @@ export function CustomCursor() {
             isHovered
               ? 'border-2 border-dashed border-[var(--accent-amber,#FFB347)] bg-[var(--accent-orange,#FF6B2C)]/20 shadow-[0_0_24px_var(--accent-orange,#FF6B2C)]'
               : 'border-[1.75px] border-[var(--accent-orange,#FF6B2C)] bg-[var(--accent-orange,#FF6B2C)]/10 shadow-[0_0_16px_var(--accent-orange,#FF6B2C)]'
-          } backdrop-blur-[1.5px]`}>
-        </div>
+          } backdrop-blur-[1.5px]`}
+        />
 
         {/* Orbiting Satellite Micro-Particles */}
         <div className={`absolute inset-0 m-auto w-full h-full pointer-events-none ${isHovered ? 'animate-cursor-orbit-fast' : 'animate-cursor-orbit'}`}>
@@ -149,4 +141,24 @@ export function CustomCursor() {
       />
     </div>
   );
+}
+
+export function CustomCursor() {
+  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window === 'undefined') return;
+
+    const isTouch = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+    const isKiosk = pathname?.startsWith('/kds') || pathname?.startsWith('/display');
+
+    setShouldRender(!isTouch && !isKiosk);
+  }, [pathname]);
+
+  if (!mounted || !shouldRender) return null;
+
+  return <CustomCursorContent />;
 }

@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodLine Campus — Finance & Legal Playbook</title>
+<style>
+  :root {
+    --bg: #f8fafc;
+    --surface: #ffffff;
+    --surface-2: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --primary: #e11d48;
+    --primary-dark: #be123c;
+    --primary-soft: #fff1f2;
+    --accent: #0d9488;
+    --accent-soft: #f0fdfa;
+    --amber: #d97706;
+    --amber-soft: #fffbeb;
+    --green: #16a34a;
+    --green-soft: #f0fdf4;
+    --red: #dc2626;
+    --red-soft: #fef2f2;
+    --violet: #7c3aed;
+    --violet-soft: #f5f3ff;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 1px 3px rgba(15,23,42,.06), 0 4px 16px rgba(15,23,42,.05);
+    --shadow-lg: 0 4px 12px rgba(15,23,42,.08), 0 12px 32px rgba(15,23,42,.08);
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+    --mono: 'SF Mono', 'Fira Code', Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #fff1f2 0%, #f8fafc 45%, #f0fdfa 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 64px 0 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -120px; right: -80px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(225,29,72,.08), transparent 70%);
+  }
+  .hero .container { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--primary-soft);
+    color: var(--primary-dark);
+    border: 1px solid #fecdd3;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .3px;
+  }
+  .hero-badge .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: .5; transform: scale(.8); }
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 4.5vw, 44px);
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin: 20px 0 12px;
+    line-height: 1.15;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(120deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p.sub {
+    color: var(--text-muted);
+    font-size: 17px;
+    max-width: 620px;
+    margin-bottom: 28px;
+  }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    max-width: 640px;
+  }
+  .hero-stat {
+    background: rgba(255,255,255,.7);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    backdrop-filter: blur(4px);
+  }
+  .hero-stat .num { font-size: 22px; font-weight: 800; color: var(--primary-dark); }
+  .hero-stat .lbl { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+  /* TOC */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 24px;
+    margin: 40px 0;
+  }
+  .toc h3 { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text-muted); margin-bottom: 14px; }
+  .toc ol { list-style: none; counter-reset: toc; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 8px; }
+  .toc li { counter-increment: toc; }
+  .toc a {
+    display: flex; align-items: center; gap: 10px;
+    color: var(--text);
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background .15s;
+  }
+  .toc a:hover { background: var(--surface-2); }
+  .toc a::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  /* Sections */
+  section { margin: 64px 0; scroll-margin-top: 40px; }
+
+  .sec-head { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .sec-head .icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700;
+    color: var(--surface);
+    background: var(--primary);
+    flex-shrink: 0;
+  }
+  .sec-head .tint-teal .icon { background: var(--accent); }
+  .sec-head .tint-amber .icon { background: var(--amber); }
+  .sec-head .tint-green .icon { background: var(--green); }
+  .sec-head .tint-violet .icon { background: var(--violet); }
+  .sec-head .tint-red .icon { background: var(--red); }
+
+  h2 { font-size: clamp(22px, 3vw, 30px); font-weight: 800; letter-spacing: -.01em; }
+  .sec-desc { color: var(--text-muted); font-size: 15px; margin-bottom: 24px; }
+
+  /* Verdict card */
+  .verdict {
+    background: var(--green-soft);
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid var(--green);
+    border-radius: var(--radius-sm);
+    padding: 18px 22px;
+    margin-bottom: 24px;
+  }
+  .verdict strong { color: var(--green); text-transform: uppercase; font-size: 13px; letter-spacing: .6px; }
+  .verdict p { margin-top: 4px; font-size: 15.5px; font-weight: 600; }
+
+  .verdict.warn {
+    background: var(--amber-soft);
+    border-color: #fde68a;
+    border-left-color: var(--amber);
+  }
+  .verdict.warn strong { color: var(--amber); }
+
+  /* Cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .card h4 { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .card p, .card li { font-size: 14px; color: var(--text-muted); }
+  .card ul { list-style: none; }
+  .card li { padding: 5px 0; position: relative; padding-left: 18px; }
+  .card li::before { content: '›'; position: absolute; left: 0; color: var(--primary); font-weight: 700; }
+
+  .card.highlight { border-color: #fecdd3; background: linear-gradient(180deg, #fff1f2, #fffbfb); }
+  .card.highlight h4 { color: var(--primary-dark); }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+
+  /* Tables */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow-x: auto;
+    box-shadow: var(--shadow);
+    margin: 20px 0;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 480px; }
+  thead th {
+    text-align: left;
+    padding: 14px 18px;
+    background: var(--surface-2);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: var(--text-muted);
+    font-weight: 700;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  tbody td { padding: 13px 18px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #fafafa; }
+  td .rec { color: var(--green); font-weight: 700; }
+  td .opt { color: var(--amber); font-weight: 700; }
+  td .no { color: var(--red); font-weight: 700; }
+  td.mono, .mono { font-family: var(--mono); font-size: 13px; }
+
+  /* Code / calc block */
+  .calc {
+    background: #0f172a;
+    color: #e2e8f0;
+    border-radius: var(--radius-sm);
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 13.5px;
+    line-height: 1.9;
+    overflow-x: auto;
+    margin: 20px 0;
+    white-space: pre;
+  }
+  .calc .cmt { color: #64748b; }
+  .calc .num { color: #fbbf24; }
+  .calc .hl { color: #34d399; font-weight: 700; }
+
+  /* Callout */
+  .callout {
+    border-radius: var(--radius-sm);
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 14.5px;
+    border: 1px solid;
+  }
+  .callout ul { margin-left: 20px; }
+  .callout li { margin: 4px 0; }
+  .callout.info { background: var(--accent-soft); border-color: #99f6e4; }
+  .callout.warn { background: var(--amber-soft); border-color: #fde68a; }
+  .callout.danger { background: var(--red-soft); border-color: #fecaca; }
+  .callout .ct { font-weight: 700; display: block; margin-bottom: 4px; }
+  .callout.info .ct { color: var(--accent); }
+  .callout.warn .ct { color: var(--amber); }
+  .callout.danger .ct { color: var(--red); }
+
+  /* Steps / timeline */
+  .timeline { list-style: none; margin: 20px 0; }
+  .timeline li {
+    position: relative;
+    padding: 0 0 28px 40px;
+    border-left: 2px solid var(--border);
+    margin-left: 14px;
+  }
+  .timeline li:last-child { border-left-color: transparent; padding-bottom: 0; }
+  .timeline li::before {
+    content: '';
+    position: absolute;
+    left: -9px; top: 2px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 3px solid var(--primary);
+  }
+  .timeline li:nth-child(even)::before { border-color: var(--accent); }
+  .timeline .tl-wk { font-weight: 700; font-size: 17px; display: block; }
+  .timeline .tl-act { font-size: 14.5px; color: var(--text-muted); display: block; margin-top: 4px; }
+  .timeline .tl-cost { font-family: var(--mono); font-size: 13px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 2px 10px; display: inline-block; margin-top: 8px; }
+
+  /* Progress bars */
+  .meter { margin: 14px 0; }
+  .meter .mt-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; font-weight: 600; }
+  .meter .mt-row span:last-child { color: var(--text-muted); font-family: var(--mono); }
+  .meter .bar { height: 26px; background: var(--surface-2); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+  .meter .fill { height: 100%; display: flex; align-items: center; padding: 0 10px; color: #fff; font-size: 11.5px; font-weight: 700; border-radius: 7px; }
+
+  /* Section divider labels */
+  .divider { display: flex; align-items: center; gap: 14px; margin: 48px 0 24px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .divider span { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    padding: 32px 0;
+    margin-top: 80px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  footer .dim { color: #94a3b8; margin-top: 6px; font-size: 12px; }
+
+  /* Sticky mini-nav */
+  .mininav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .mininav .container { display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; }
+  .mininav .brand { font-weight: 800; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .mininav .brand .lg { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; font-weight: 800; }
+  .mininav nav { display: flex; gap: 4px; overflow-x: auto; }
+  .mininav nav a {
+    color: var(--text-muted); text-decoration: none;
+    font-size: 12.5px; font-weight: 600;
+    padding: 6px 12px; border-radius: 999px;
+    white-space: nowrap;
+  }
+  .mininav nav a:hover { background: var(--surface-2); color: var(--text); }
+
+  /* ===== MOBILE + TABLET ===== */
+
+  /* ---------- NAV ---------- */
+  .mobile-nav {
+    display: none;
+    position: sticky; top: 0; z-index: 60;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 18px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-nav-scroll {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .mobile-nav-scroll::-webkit-scrollbar { display: none; }
+  .mobile-nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 13px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: background .15s, color .15s;
+  }
+  .mobile-nav a:active { background: var(--primary-soft); color: var(--primary-dark); }
+
+  /* ---------- TABLES ---------- */
+  .table-wrap {
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius);
+    position: relative;
+  }
+  .table-wrap::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 36px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.9));
+    border-radius: 0 var(--radius) var(--radius) 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  .table-wrap.has-scroll::after { opacity: 1; }
+
+  /* ---------- CALC BLOCKS ---------- */
+  .calc {
+    font-size: 12.5px;
+    line-height: 1.85;
+    padding: 16px 18px;
+    border-radius: 12px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 16px 0;
+  }
+
+  /* ---------- CARD GRID ---------- */
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .card {
+    padding: 18px;
+    border-radius: 14px;
+  }
+  .card:hover { transform: none; }
+  .card h4 { font-size: 14.5px; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    padding: 44px 0 32px;
+    position: relative;
+  }
+  .hero::after { display: none; }
+  .hero h1 { font-size: 26px; line-height: 1.2; }
+  .hero p.sub { font-size: 15px; line-height: 1.55; }
+  .hero-stats {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    max-width: 100%;
+  }
+  .hero-stat { padding: 12px 14px; }
+  .hero-stat .num { font-size: 20px; }
+
+  /* ---------- TOC ---------- */
+  .toc {
+    padding: 18px;
+    border-radius: 14px;
+  }
+  .toc ol {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .toc a {
+    padding: 10px 14px;
+    font-size: 13.5px;
+  }
+
+  /* ---------- SECTION ---------- */
+  section { margin: 48px 0; scroll-margin-top: 60px; }
+
+  .sec-head { gap: 10px; }
+  .sec-head .icon { width: 34px; height: 34px; font-size: 16px; }
+  h2 { font-size: 22px; }
+
+  /* ---------- VERDICT ---------- */
+  .verdict { padding: 16px 18px; border-radius: 12px; }
+  .verdict strong { font-size: 12px; }
+  .verdict p { font-size: 14.5px; }
+
+  /* ---------- CALLOUT ---------- */
+  .callout { padding: 14px 16px; font-size: 13.5px; border-radius: 12px; }
+
+  /* ---------- TIMELINE ---------- */
+  .timeline { margin-left: 0; }
+  .timeline li { padding-left: 36px; margin-left: 10px; }
+  .timeline .tl-wk { font-size: 15px; }
+  .timeline .tl-act { font-size: 13.5px; }
+
+  /* ---------- METER ---------- */
+  .meter .mt-row { font-size: 12px; }
+  .meter .bar { height: 24px; }
+  .meter .fill { font-size: 11px; }
+
+  /* ---------- DIVIDER ---------- */
+  .divider { margin: 36px 0 20px; }
+  .divider span { font-size: 11px; letter-spacing: .8px; }
+
+  /* ---------- FOOTER ---------- */
+  footer { padding: 24px 16px; margin-top: 48px; font-size: 12px; }
+
+  /* ---------- CONTAINER ---------- */
+  .container { padding: 0 16px; }
+
+  /* ---------- TAG IN CARD ---------- */
+  .card li { font-size: 13px; }
+
+  /* ---------- MININAV SHOW MOBILE NAV INSTEAD ---------- */
+  @media (max-width: 768px) {
+    .mininav nav { display: none; }
+    .mobile-nav { display: block; }
+    section { scroll-margin-top: 112px; }
+  }
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 24px; }
+    .hero-stats { grid-template-columns: 1fr 1fr; }
+    .grid { gap: 12px; }
+    .card { padding: 16px; }
+    .card h4 { font-size: 14px; }
+    .card p { font-size: 13px; }
+    .card li { font-size: 12.5px; padding: 4px 0 4px 16px; }
+    .callout { padding: 12px 14px; font-size: 13px; }
+    .verdict p { font-size: 14px; }
+    table { font-size: 13px; min-width: 0; }
+    thead th { padding: 11px 14px; font-size: 11px; }
+    tbody td { padding: 11px 14px; font-size: 12.5px; }
+  }
+
+  /* Extra small (<380px) — compact everything */
+  @media (max-width: 380px) {
+    .container { padding: 0 12px; }
+    .hero { padding: 36px 0 24px; }
+    .hero h1 { font-size: 22px; }
+    .hero p.sub { font-size: 14px; }
+    .hero-stat .num { font-size: 18px; }
+    .hero-stat .lbl { font-size: 11px; }
+    .card h4 { font-size: 13.5px; }
+    .card li { font-size: 12px; }
+    .timeline .tl-wk { font-size: 14px; }
+    .timeline .tl-act { font-size: 13px; }
+    .calc { font-size: 11.5px; padding: 14px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="mininav">
+  <div class="container">
+    <div class="brand"><span class="lg">FL</span> FoodLine Campus</div>
+    <nav>
+      <a href="#entity">Entity</a>
+      <a href="#gst">GST</a>
+      <a href="#payments">Payments</a>
+      <a href="#partnership">Partnership</a>
+      <a href="#razorpay">Razorpay</a>
+      <a href="#action-plan">Action Plan</a>
+      <a href="#risks">Risks</a>
+    </nav>
+  </div>
+</div>
+<div class="mobile-nav" id="mobileNav">
+  <div class="mobile-nav-scroll">
+    <a href="#entity">Entity</a>
+    <a href="#gst">GST</a>
+    <a href="#payments">Payments</a>
+    <a href="#partnership">Partnership</a>
+    <a href="#razorpay">Razorpay</a>
+    <a href="#action-plan">Action Plan</a>
+    <a href="#risks">Risks</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="container">
+    <span class="hero-badge"><span class="dot"></span> Finance &amp; Legal Playbook · v1.0</span>
+    <h1>FoodLine Campus<br><span class="grad">Finance &amp; Legal Master Plan</span></h1>
+    <p class="sub">Complete blueprint for entity formation, GST compliance, free payment processing, and the 50-50 partnership structure — built for your Cafe @7 launch.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">₹5–10K</div><div class="lbl">LLP Setup Cost</div></div>
+      <div class="hero-stat"><div class="num">18%</div><div class="lbl">GST on Commission</div></div>
+      <div class="hero-stat"><div class="num">0%</div><div class="lbl">UPI Gateway Fee</div></div>
+      <div class="hero-stat"><div class="num">50:50</div><div class="lbl">Partner Split</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <h3>On this page</h3>
+    <ol>
+      <li><a href="#entity">Entity Structure (LLP)</a></li>
+      <li><a href="#gst">GST on Platform Commission</a></li>
+      <li><a href="#payments">Free Payment Gateway</a></li>
+      <li><a href="#partnership">50-50 Partnership Setup</a></li>
+      <li><a href="#razorpay">Razorpay Step-by-Step</a></li>
+      <li><a href="#action-plan">30-Day Action Plan</a></li>
+      <li><a href="#risks">Risks &amp; Caveats</a></li>
+    </ol>
+  </div>
+
+  <!-- 1. ENTITY -->
+  <section id="entity">
+    <div class="sec-head">
+      <div class="icon">1</div>
+      <h2>Entity Structure — LLP</h2>
+    </div>
+    <p class="sec-desc">Register a Limited Liability Partnership (LLP) before launch. It's the cheapest structure that gives you limited liability, a business bank account, and a clean 50-50 ownership split.</p>
+
+    <div class="verdict">
+      <strong>Verdict</strong>
+      <p>Register an LLP now. It costs ₹5,000–10,000, protects your personal assets, and converts to a Pvt Ltd later when you raise venture money.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Factor</th>
+            <th>Informal (No Entity)</th>
+            <th>LLP (Recommended)</th>
+            <th>Pvt Ltd</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Registration cost</td>
+            <td class="no">₹0</td>
+            <td class="rec">₹5,000–10,000</td>
+            <td>₹15,000–25,000</td>
+          </tr>
+          <tr>
+            <td>Annual compliance</td>
+            <td class="no">₹0</td>
+            <td class="rec">₹10,000–15,000</td>
+            <td>₹50,000–1,00,000</td>
+          </tr>
+          <tr>
+            <td>Separate bank account</td>
+            <td>No (personal)</td>
+            <td class="rec">Yes</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td>Limited liability</td>
+            <td class="no">No</td>
+            <td class="rec">Yes</td>
+            <td>Yes</td>
+          </tr>
+          <tr>
+            <td>Investor credibility</td>
+            <td class="no">Zero</td>
+            <td>Moderate</td>
+            <td class="rec">High</td>
+          </tr>
+          <tr>
+            <td>GST registration</td>
+            <td>Per individual</td>
+            <td class="rec">On the LLP</td>
+            <td>On the company</td>
+          </tr>
+          <tr>
+            <td>Tax rate</td>
+            <td>30% personal slab</td>
+            <td>30% on LLP profits</td>
+            <td class="rec">25% (&lt; ₹400Cr turnover)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid">
+      <div class="card highlight">
+        <h4>Why LLP, not Pvt Ltd</h4>
+        <ul>
+          <li>You're pre-revenue, pre-launch — don't pay for corporate machinery you don't need yet</li>
+          <li>Pvt Ltd needs board meetings, annual returns &amp; mandatory audit even at ₹0 revenue</li>
+          <li>Convert LLP → Pvt Ltd later under Section 366, Companies Act</li>
+          <li>Clean 50-50 structure + limited liability from day one</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Registration checklist</h4>
+        <ul>
+          <li>Both partners' PAN cards</li>
+          <li>Address proof (both partners)</li>
+          <li>Name reservation: "FoodLine Campus LLP"</li>
+          <li>LLP Agreement (drafted on stamp paper)</li>
+          <li>Form FiLLiP on the <a class="tag" href="https://www.mca.gov.in" target="_blank" rel="noopener">MCA Portal</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="ct">Timeline &amp; Cost</span>
+      Approval in 7–15 days. Total cost ₹5,000–10,000 including stamp paper and professional fees. Do this the same week you read this.
+    </div>
+  </section>
+
+  <!-- 2. GST -->
+  <section id="gst">
+    <div class="sec-head">
+      <div class="icon">2</div>
+      <h2>GST on Your 4% Platform Commission</h2>
+    </div>
+    <p class="sec-desc">You don't need GST registration yet. When you cross ₹20 lakh commission turnover, you charge 18% GST on the platform fee only — never on the food.</p>
+
+    <div class="verdict">
+      <strong>Verdict</strong>
+      <p>No GST registration needed now. You're ₹4/order × ~16 years away from the ₹20L threshold. Register only on your commission income level (not on food).</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Who charges GST</th>
+            <th>Rate</th>
+            <th>When</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Food (₹100 item)</td>
+            <td>Canteen owner</td>
+            <td class="mono">5%</td>
+            <td>Already on canteen's bill</td>
+          </tr>
+          <tr>
+            <td>Platform fee (₹4)</td>
+            <td class="rec">You (the LLP)</td>
+            <td class="mono">18%</td>
+            <td>Only when annual commission &gt; ₹20L</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-size:16px;margin:24px 0 8px;">The math, full walkthrough</h3>
+    <div class="calc">Student pays          = ₹104.00   <span class="cmt"># ₹100 food + ₹4 platform fee</span>
+Your commission      = ₹<span class="num">4.00</span>
+GST on commission    = ₹<span class="num">0.72</span>   <span class="cmt"># 18% of ₹4</span>
+Your net commission  = ₹<span class="hl">3.28</span>
+
+<span class="cmt">// BELOW ₹20L turnover — current state</span>
+Commission turnover  = &lt; ₹20,00,000/yr
+  → No GST registration needed
+  → You pocket ₹4.00 per order
+  → Canteen handles food GST alone
+
+<span class="cmt">// ABOVE ₹20L turnover — future state</span>
+  → Register LLP for GST
+  → Charge 18% GST on ₹4 commission
+  → File GSTR-1 &amp; GSTR-3B monthly
+  → You keep ₹3.28 per order</div>
+
+    <h3 style="font-size:16px;margin:24px 0 8px;">When do you cross ₹20L?</h3>
+    <div class="calc">At ₹100 AOV × 4% commission  = ₹<span class="num">4</span>/order
+Threshold                    = ₹20,00,000
+Orders needed                = 20,00,000 ÷ 4  = <span class="hl">5,00,000</span>
+
+At 100 orders/day × 300 days = 30,000 orders/yr
+Years to GST threshold       = 5,00,000 ÷ 30,000 = <span class="hl">~16.7 years</span></div>
+
+    <div class="grid">
+      <div class="card highlight">
+        <h4>SAC Code for your fee</h4>
+        <ul>
+          <li><span class="tag">SAC 998314</span> — Other IT services n.e.c. (online platform services)</li>
+          <li>Same category Swiggy &amp; Zomato use for commission income</li>
+          <li>Apply this when you register — not now</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Are you a Section 9(5) e-commerce operator?</h4>
+        <ul>
+          <li>No — payment flows straight to the canteen's UPI, you never custody food money</li>
+          <li>Section 9(5) CGST applies only to operators who collect payment on suppliers' behalf</li>
+          <li class="mono" style="color:var(--red)">⚠ If you switch to collecting ₹104 first, you become a 9(5) operator and must register immediately regardless of turnover</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. PAYMENTS -->
+  <section id="payments">
+    <div class="sec-head">
+      <div class="icon">3</div>
+      <h2>Free Payment Gateway</h2>
+    </div>
+    <p class="sec-desc">Razorpay charges 0% for UPI — and ~95% of your campus payments will be UPI. Net gateway cost at pilot scale: under ₹400/month.</p>
+
+    <div class="verdict">
+      <strong>Verdict</strong>
+      <p>Use Razorpay. UPI = 0% fee. Add a 2% convenience fee on card payments so everyone's pushed to UPI. Your gateway cost stays near zero.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Payment Method</th>
+            <th>Razorpay Fee</th>
+            <th>Projected Share at Campus</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>UPI</td>
+            <td class="rec">0%</td>
+            <td>90–95%</td>
+          </tr>
+          <tr>
+            <td>Credit / Debit Card</td>
+            <td class="mono">2%</td>
+            <td>5–10%</td>
+          </tr>
+          <tr>
+            <td>Net Banking</td>
+            <td class="mono">2%</td>
+            <td>&lt; 1%</td>
+          </tr>
+          <tr>
+            <td>Wallets (Paytm, PhonePe)</td>
+            <td class="mono">2%</td>
+            <td>&lt; 1%</td>
+          </tr>
+          <tr>
+            <td>International Cards</td>
+            <td class="mono">3%</td>
+            <td>0%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-size:16px;margin:24px 0 8px;">Your campus cost projection</h3>
+    <div class="calc">100 orders/day @ ₹104 AOV:
+
+  UPI orders      = 95 × ₹0       = ₹<span class="num">0.00</span>
+  Card orders     =  5 × ₹2.08    = ₹<span class="num">10.40</span>/day
+
+  Monthly gateway cost = ₹10.40 × 30 = <span class="hl">₹312/month</span>
+  <span class="cmt"># Effectively free — automation replaces 2–3 hrs/day manual UTR work</span></div>
+
+    <div class="grid">
+      <div class="card highlight">
+        <h4>Pricing strategy — push everyone to UPI</h4>
+        <ul>
+          <li>UPI payment: ₹104.00 (no extra charge)</li>
+          <li>Card payment: ₹106.04 (+2% convenience fee)</li>
+          <li>Students already live on UPI — this costs you almost nothing</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Direct UPI collection (no gateway)</h4>
+        <ul>
+          <li>Free, zero fees — what you do today</li>
+          <li>Manual UTR reconciliation = full-time job at 500+ orders</li>
+          <li>Fine for pilot scale (50/day), fatal at scale</li>
+          <li class="rec">Use Razorpay once live volume passes ~100 orders/day</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. PARTNERSHIP -->
+  <section id="partnership">
+    <div class="sec-head">
+      <div class="icon">4</div>
+      <h2>50-50 Partnership — You &amp; Kanakshree</h2>
+    </div>
+    <p class="sec-desc">The LLP agreement makes the split legally enforceable. GST is on the LLP, profits flow 50:50 to each partner, and each partner pays income tax at their own slab.</p>
+
+    <div class="verdict warn">
+      <strong>Recommendation</strong>
+      <p>Localize the 50-50 split in the LLP agreement today. Verbal partnership agreements are India's #1 source of startup disputes.</p>
+    </div>
+
+    <h3 style="font-size:16px;margin:24px 0 8px;">With an LLP (recommended)</h3>
+    <div class="calc">FoodLine Campus LLP collects 4% commission
+LLP charges 18% GST on commission       <span class="cmt"># only &gt; ₹20L turnover</span>
+LLP net income → distributed <span class="hl">50:50</span>
+
+Each partner gets: ₹2.00 / order
+  (before personal income tax)
+
+<span class="cmt">// Personal income tax — New Regime (FY 2026-27)</span>
+Annual income        Tax
+&lt; ₹3,00,000         <span class="hl">0%</span>
+₹3–7L                5%
+₹7–10L               10%
+₹10–12L              15%
+₹12–15L              20%
+&gt; ₹15L                30%</div>
+
+    <h3 style="font-size:16px;margin:24px 0 8px;">Without an LLP (current state)</h3>
+    <div class="calc">2% commission directly to each person
+Each partner income @100 orders/day:
+  ₹2 × 100 × 300 days = ₹<span class="num">60,000</span>/year
+
+→ No GST needed (below ₹20L each)
+→ BUT: no limited liability
+→ BUT: no business bank account
+→ BUT: no legal dispute framework
+→ BUT: zero investor credibility</div>
+
+    <div class="callout warn">
+      <span class="ct">The one document you must not skip</span>
+      The <strong>LLP Agreement</strong> captures ownership, profit split, roles, exit rules, and what happens on a dispute. Both partners sign on stamp paper. This is the document thao protects your ₹2/order and her ₹2/order — don't rely on friendship.
+    </div>
+  </section>
+
+  <!-- 5. RAZORPAY -->
+  <section id="razorpay">
+    <div class="sec-head">
+      <div class="icon">5</div>
+      <h2>Razorpay Setup — Step by Step</h2>
+    </div>
+    <p class="sec-desc">Register, integrate, and go live. 2–3 days for KYC, 1–2 days for integration.</p>
+
+    <ol class="timeline">
+      <li>
+        <span class="tl-wk">Step 1 · Register</span>
+        <span class="tl-act">Create a Razorpay account in the LLP business name (you need the LLP registered first).</span>
+        <span class="tl-cost">₹0</span>
+      </li>
+      <li>
+        <span class="tl-wk">Step 2 · KYC Submission</span>
+        <span class="tl-act">Submit LLP PAN, Partnership Deed, business bank account, Aadhaar + PAN of authorized signatory, address proof.</span>
+        <span class="tl-cost">₹0</span>
+      </li>
+      <li>
+        <span class="tl-wk">Step 3 · Integration</span>
+        <span class="tl-act">Integrate Razorpay Checkout via JS SDK or API. Create an order for ₹104 (₹100 + 4% platform fee), student pays through checkout.</span>
+        <span class="tl-cost">Developer time</span>
+      </li>
+      <li>
+        <span class="tl-wk">Step 4 · Webhooks &amp; Automation</span>
+        <span class="tl-act">Razorpay sends a confirmation webhook → your backend auto-confirms the order. Kills the manual UTR reconciliation workflow.</span>
+        <span class="tl-cost">₹0</span>
+      </li>
+      <li>
+        <span class="tl-wk">Step 5 · Go Live</span>
+        <span class="tl-act">UPI = free, cards = 2% convenience fee passes to the student. Launch at Cafe @7.</span>
+        <span class="tl-cost">₹0</span>
+      </li>
+    </ol>
+
+    <div class="callout info">
+      <span class="ct">Why Razorpay beats your current UTR model</span>
+      Instant confirmation, zero manual entry, no fake-UTR risk, automatic reconciliation. At 500 orders/day this automation saves you the equivalent of a part-time salary.
+    </div>
+  </section>
+
+  <!-- 6. ACTION PLAN -->
+  <section id="action-plan">
+    <div class="sec-head">
+      <div class="icon">6</div>
+      <h2>30-Day Action Plan</h2>
+    </div>
+    <p class="sec-desc">Total setup investment: <strong style="color:var(--primary-dark)">₹5,000–12,000</strong> for a legally clean, investor-ready launch.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Week</th>
+            <th>Action</th>
+            <th>Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mono">Week 1</td>
+            <td>Register LLP (Form FiLLiP on MCA portal) — both partners' PAN + address proof</td>
+            <td class="mono">₹5,000–10,000</td>
+          </tr>
+          <tr>
+            <td class="mono">Week 1</td>
+            <td>Open LLP bank account (SBI / ICICI / HDFC)</td>
+            <td class="mono">₹0–2,000</td>
+          </tr>
+          <tr>
+            <td class="mono">Week 2</td>
+            <td>Apply for Razorpay account with LLP KYC</td>
+            <td class="mono">₹0</td>
+          </tr>
+          <tr>
+            <td class="mono">Week 2</td>
+            <td>Draft Canteen Partner Agreement (see playbook)</td>
+            <td class="mono">₹0</td>
+          </tr>
+          <tr>
+            <td class="mono">Week 3</td>
+            <td>Integrate Razorpay in the app</td>
+            <td class="mono">₹0*</td>
+          </tr>
+          <tr>
+            <td class="mono">Week 3</td>
+            <td>Pitch to HOD with clean legal structure in hand</td>
+            <td class="mono">₹0</td>
+          </tr>
+          <tr>
+            <td class="mono">Week 4</td>
+            <td>Sign agreement with Cafe @7 &amp; go live</td>
+            <td class="mono">₹0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="meter">
+      <div class="mt-row"><span>LLP Registration</span><span>Week 1</span></div>
+      <div class="bar"><div class="fill" style="width:14%; background:linear-gradient(90deg,#e11d48,#f43f5e);">NOW</div></div>
+    </div>
+    <div class="meter">
+      <div class="mt-row"><span>Razorpay Live</span><span>Week 3</span></div>
+      <div class="bar"><div class="fill" style="width:43%; background:linear-gradient(90deg,#0d9488,#2dd4bf);">Week 2–3</div></div>
+    </div>
+    <div class="meter">
+      <div class="mt-row"><span>Canteen Live</span><span>Week 4</span></div>
+      <div class="bar"><div class="fill" style="width:57%; background:linear-gradient(90deg,#0d9488,#34d399);">Week 3–4</div></div>
+    </div>
+    <div class="meter">
+      <div class="mt-row"><span>HOD Pitch</span><span>Week 3</span></div>
+      <div class="bar"><div class="fill" style="width:43%; background:linear-gradient(90deg,#7c3aed,#a78bfa);">Week 3</div></div>
+    </div>
+  </section>
+
+  <!-- 7. RISKS -->
+  <section id="risks">
+    <div class="sec-head">
+      <div class="icon">7</div>
+      <h2>Risks &amp; Caveats</h2>
+    </div>
+    <p class="sec-desc">Five things that can break this plan — and how each one is handled.</p>
+
+    <div class="card" style="margin-bottom:16px;">
+      <h4>1 · LLP → Pvt Ltd conversion fees</h4>
+      <p>If you raise real VC money, conversion costs ₹50,000–1,00,000 and takes 3–6 months. Not a problem — just plan it when the round is real.</p>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <h4>2 · GST at scale</h4>
+      <p>18% GST on commission is unavoidable past ₹20L turnover. Budget it into your financial model from day one so margins aren't a surprise.</p>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <h4>3 · UTR verification doesn't scale</h4>
+      <p>Works at pilot, breaks at 500+ orders/day. Razorpay is the exit ramp — implement before volume grows, not after.</p>
+    </div>
+    <div class="card" style="margin-bottom:16px;">
+      <h4>4 · No canteen agreement = existential risk</h4>
+      <p>Without a signed agreement, the canteen owner can walk away with your students any day. The Canteen Partner Agreement is your #1 contract priority after incorporation.</p>
+    </div>
+    <div class="card">
+      <h4>5 · Verbal partnership split</h4>
+      <p>Friendship-founded 50-50 splits are the most common startup litigation in India. The LLP Agreement removes ambiguity: ownership, roles, exit, dispute resolution — in writing.</p>
+    </div>
+  </section>
+
+  <!-- DIVIDER -->
+  <div class="divider"><span>Quick Reference Numbers</span></div>
+
+  <section>
+    <div class="grid">
+      <div class="card">
+        <h4>Fees &amp; Costs</h4>
+        <ul>
+          <li><span class="tag">LLP</span> ₹5,000–10,000 setup</li>
+          <li><span class="tag">GST</span> 18% on commission (future)</li>
+          <li><span class="tag">Razorpay UPI</span> 0% forever</li>
+          <li><span class="tag">Razorpay cards</span> 2% (pass to student)</li>
+          <li><span class="tag">FSSAI food</span> 5% (canteen's job)</li>
+        </ul>
+      </div>
+      <div class="card highlight">
+        <h4>Key Codes &amp; Slabs</h4>
+        <ul>
+          <li><span class="tag">SAC 998314</span> Platform commission (services)</li>
+          <li><span class="tag">₹20L</span> GST registration threshold (services, Maharashtra)</li>
+          <li><span class="tag">Sec 366</span> LLP → Pvt Ltd conversion</li>
+          <li><span class="tag">Sec 9(5) CGST</span> Not applicable (no payment custody)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div>FoodLine Campus — Finance &amp; Legal Playbook</div>
+  <div class="dim">Prepared for Shivam &amp; Kanakshree · Pilot: Cafe @7, Sanjivani University · This is decision support, not a substitute for a licensed CA/advocate on binding filings.</div>
+</footer>
+
+<script>
+(function() {
+  /* ---- Active mobile-nav highlight on scroll ---- */
+  var sections = document.querySelectorAll('section[id]');
+  var navLinks = document.querySelectorAll('.mobile-nav a');
+  function setActive() {
+    var scrollY = window.scrollY + 120;
+    var current = '';
+    sections.forEach(function(sec) {
+      if (sec.offsetTop <= scrollY) current = sec.id;
+    });
+    navLinks.forEach(function(a) {
+      a.style.background = '';
+      a.style.color = '';
+      if (a.getAttribute('href') === '#' + current) {
+        a.style.background = 'var(--primary)';
+        a.style.color = '#fff';
+      }
+    });
+  }
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+
+  /* ---- Table overflow scroll edge hint ---- */
+  document.querySelectorAll('.table-wrap').forEach(function(wrap) {
+    var tbl = wrap.querySelector('table');
+    if (!tbl || tbl.offsetWidth <= wrap.offsetWidth) return;
+    wrap.classList.add('has-scroll');
+    wrap.addEventListener('scroll', function() {
+      var atEnd = wrap.scrollLeft + wrap.offsetWidth >= tbl.offsetWidth - 4;
+      wrap.classList.toggle('has-scroll', !atEnd);
+    }, { passive: true });
+  });
+
+  /* ---- Smooth close mobile nav on tap ---- */
+  navLinks.forEach(function(a) {
+    a.addEventListener('click', function() {
+      var bar = document.querySelector('.mobile-nav-scroll');
+      bar.scrollTo({ left: a.offsetLeft - 40, behavior: 'smooth' });
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

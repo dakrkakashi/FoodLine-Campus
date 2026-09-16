@@ -33,7 +33,7 @@ export function UserAvatar() {
     return (
       <Link
         href="/login"
-        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black text-xs font-black shadow-lg shadow-accent-orange/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+        className="flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-linear-to-r from-accent-orange via-accent-amber to-accent-amber text-black text-xs font-black shadow-lg shadow-accent-orange/20 hover:scale-105 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
       >
         <LogIn className="w-3.5 h-3.5" />
         <span>Student Login</span>

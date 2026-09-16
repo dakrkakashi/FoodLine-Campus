@@ -618,6 +618,16 @@ Open questions: <bullet list, or "none">
   >      - Updated `GET /api/menu` categories array to return standard `Category[]` objects with IDs and icons matching shared contracts.
   > 3. Verification & Compilation:
   >    - `npm --prefix frontend run build`: 41/41 routes compiled with 100% 0 errors.
+
+- **[2026-09-14] GitHub Copilot**:
+  > "Runtime configuration stabilization complete:
+  > 1. Removed the remaining hardcoded Supabase URL and implicit anon-key fallback from `frontend/src/app/api/auth/student-login/route.ts` and `frontend/src/app/api/auth/student-signup/route.ts`.
+  > 2. Hardened `backend/src/config/runtime.ts` so missing or placeholder URLs remain unconfigured instead of being invented.
+  > 3. Updated `backend/src/lib/supabase.ts` to retain a type-safe inert client while all database operations remain gated by `isSupabaseConfigured`.
+  > 4. Added regression coverage in `backend/tests/runtime-config.test.ts` for missing runtime URL configuration.
+  > 5. Verification: root `npm run build` passed; backend TypeScript compilation passed and frontend Next.js production build generated 52/52 routes successfully.
+  > 6. Assumptions made: existing unrelated UI changes in the working tree were preserved.
+  > 7. Open questions: production deployment still requires real Supabase environment variables to be configured in the hosting provider."
   >    - `npm --prefix backend run build`: TypeScript compiler passed cleanly with 0 errors.
   >    - Live API query verification: 8/8 categories verified with active dish counts (56 total dishes).
   >    - All categories filter seamlessly with zero 'No dishes found' false positives."
@@ -1667,3 +1677,107 @@ pm --prefix frontend run build: **All 51 routes compiled successfully (Exit code
   > 3. Verification: `npm --prefix frontend run build` compiled and type-checked, then stopped during page-data collection on the pre-existing missing route `/api/admin/orders` (`PageNotFoundError`), unrelated to this config-only change.
   > 4. Live verification: restarted `npm run dev`; `/` returns HTTP 200 and `/_next/static/chunks/app/page.js` now returns `Cache-Control: no-store, max-age=0`. `npx tsc --noEmit` passes. Playwright could not launch because its Chromium binary is not installed locally.
   > 5. Git hygiene: added the local Playwright HTML/report output directories to `.gitignore`; those generated files are deliberately not synchronized to GitHub.
+- **[2026-09-14 18:15 IST] Antigravity IDE & OpenCode — Frontend Performance & Bundle Optimization Plan Executed (100% Complete & Verified)**:
+  > 1. **Phase 1: Dead Dependency Purge**:
+  >    - Uninstalled unneeded heavy dependencies: `recharts` (~7.3 MB) and `animejs` / `@types/animejs` (~2.1 MB).
+  >    - Ran npm prune removing 40 extraneous packages from `frontend/node_modules`.
+  > 2. **Phase 2: Barrel Import Elimination**:
+  >    - Replaced barrel imports (`@/components/ui`, `@/components/magicui`, `@/lib/supabase`) with direct file paths across 30+ files, eliminating circular dependency hazards and enabling fine-grained tree-shaking.
+  > 3. **Phase 3: Component-Level Render Optimization**:
+  >    - Wrapped core UI components (`Badge`, `ProgressBar`, `Stepper`, `Skeleton`, `PageTransition`, `UserAvatar`, `CookieConsentBanner`) in `React.memo` with explicit `displayName`.
+  > 4. **Phase 4: Server Component Conversions**:
+  >    - Converted static/content pages (`/terms`, `/privacy`, `/refund-policy`, `/faq`, `/how-it-works`, `/payment`) from `'use client'` monoliths to Server Components with minimal client interactive leaves.
+  >    - Route client bundle drops:
+  >      * `/how-it-works`: 18.2 kB → 4.01 kB (**78.0% drop**)
+  >      * `/privacy`: 14.2 kB → 1.34 kB (**90.6% drop**)
+  >      * `/refund-policy`: 8.76 kB → 204 B (**97.7% drop**)
+  >      * `/faq`: 8.35 kB → 1.92 kB (**77.0% drop**)
+  >      * `/payment`: 8.70 kB → 1.42 kB (**83.7% drop**)
+  >      * Shared JS chunks: 120 kB → 102 kB (**15% drop**)
+  > 5. **Phase 5: Menu Page Optimization**:
+  >    - Extracted `MenuGridItem.tsx` wrapped in `React.memo` with custom comparator to eliminate re-rendering 44+ dish cards on single-item cart additions/removals.
+  >    - Memoized category pill counts via `useMemo` and stabilized event handlers with `useCallback`.
+  > 6. **Phase 6: Provider Architecture Cleanup**:
+  >    - Extracted 7 decorative components outside business context providers in `Providers.tsx`, isolating them from frequent auth/cart/inventory updates.
+  >    - Removed `HighRefreshRateBadge` and continuous rAF telemetry loop from global providers.
+  >    - Memoized `MeshGradientBackground` and `GlobalClickEffect`.
+  > 7. **Phase 7: CSS & Asset Optimization**:
+  >    - Removed global GPU promotion (`transform: translate3d(0,0,0)`) on all `button, a` tags from `globals.css`, avoiding excessive compositor layer creation.
+  >    - Replaced raw `<img>` QR code at checkout with Next.js optimized `<Image priority ... />` and added `api.qrserver.com` to `remotePatterns`.
+  > 8. **Phase 8: Real-Time & Display Page Fixes**:
+  >    - Eliminated the double-fetch anti-pattern in `useRealtimeOrders.ts` by gating 4s polling as a strict fallback only when Supabase realtime websocket is disconnected.
+  > 9. **Phase 9: Public Folder & Config Cleanup**:
+  >    - Moved internal marketing files (`presentation.html`, `canteen-pitch.html`) out of `public/` to `frontend/docs/marketing/`.
+  >    - Deleted duplicate 58.2 KB `public/logo.png` and redirected references to `/icons/icon-512x512.png`.
+  >    - Compressed `icon-512x512-maskable.png` from 253.5 KB to 32.6 KB (**87.1% reduction**).
+> 10. **Plan Completion & Production Build Verification**:
+>     - Verified build: `npm --prefix frontend run build` → 52/52 routes compiled cleanly in 9.0s with 0 errors!
+>     - Updated `plans/active/FRONTEND_OPTIMIZATION_PLAN.md` with all checkboxes checked and moved to `plans/completed/FRONTEND_OPTIMIZATION_PLAN.md`.
+
+---
+
+## 🔧 Legal & Finance Framework Sync — 2026-09-12
+
+> **Plan Filed:** `plans/LEGAL_FINANCE_SYNC_PLAN.md` (Status: `PENDING`)
+
+### Synced Financial Model (Single Source of Truth)
+The project previously had **three conflicting monetization models**. The corrected model is now locked:
+
+| Item | Old Value | New Value |
+|---|---|---|
+| Platform fee rate | 3.5% (student) / 12% (backend split) | **4% platform commission on total order value** |
+| Student-facing charge | "Fast-Pass Convenience Fee" | "Platform Fee (4%)" |
+| Merchant (canteen) payout | 88% | **96%** |
+| Platform share | 12% | **4%** |
+| GST on commission | Not defined | **18%** on commission (only when turnover > ₹20L) |
+| AOV unit economics | ₹7.80/order @10-12% | **₹2.60/order @4%** |
+
+### Entity & Partnership
+- **Entity:** FoodLine Campus LLP (registration PENDING → Form FiLLiP on MCA portal, ₹5K–10K)
+- **Ownership:** 50-50 split between Shivam & Kanakshree Patel (documented in LLP Agreement)
+- **Partner split per order:** ₹2.00 each on ₹100 AOV @ 4% commission
+
+### Payment Infrastructure
+- **Razorpay** selected as payment gateway (UPI = 0% fee, cards = 2% passed to student)
+- Direct UPI + UTR model retained for pilot; Razorpay for scale (100+ orders/day)
+
+### Legal Changes Queued
+- Terms: Fill `[TBD]` entity name, Grievance Officer, jurisdiction (Ahmednagar, Maharashtra), 4% fee clause
+- Privacy: LLP as data fiduciary under DPDP Act 2023; Razorpay as payment processor
+- Refund policy: 4% fee refundable in full only before kitchen acceptance (PREPARING)
+- Remove all "Shark Tank" references from published docs
+- Compliance plan: expanded 15 → 18 points (added LLP, Razorpay, Canteen Partner Agreement)
+
+### New Artifacts
+- `FoodLine_Finance_Legal_Playbook.html` (root) — interactive light-theme finance & legal blueprint
+- `plans/LEGAL_FINANCE_SYNC_PLAN.md` — full implementation plan with file-level tasks for execution
+
+---
+
+## ⚖️ Legal & Finance Synchronization Completed - 2026-09-15
+
+> **Plan Completed:** `plans/completed/LEGAL_FINANCE_SYNC_PLAN.md` (Status: `COMPLETED`)
+
+### Implementation Summary:
+1. **Core Financial Model Alignment (96% Canteen / 4% Platform Split):**
+   - **Frontend Checkout (`frontend/src/app/checkout/page.tsx`):** Standardized `platformMarginRate = 0.04` (4% platform fee); updated UI to display "Tray Subtotal" and "FoodLine Platform Fee (4%)"; verified exact calculation `subtotal + (subtotal * 0.04)`.
+   - **Backend Settlement Ledger (`backend/src/services/order-service.ts`):** Codified 96% merchant payout (`itemTotal * 0.96`) and 4% platform share (`itemTotal * 0.04`); eliminated legacy `studentPlatformFee = 0` variable.
+   - **Type Definitions (`backend/src/lib/types.ts` & `frontend/src/lib/types.ts`):** Aligned `OrderFinancials` interface to document the 96%/4% split with optional `platformFee` field.
+   - **Backend Admin Metrics (`backend/src/server.ts`):** Aligned `/api/admin/metrics` to calculate `merchantNet = gmv * 0.96` and `platformRevenue = gmv * 0.04`.
+   - **Admin Analytics Dashboard (`frontend/src/app/admin/page.tsx`):** Replaced legacy `1.035` and `88/12` calculations with `0.96` merchant share and `0.04` platform share (50-50 co-founder split documented); updated all UI labels, CSV exports, WhatsApp summaries, and charts to "Platform Commission (4%)".
+
+2. **Legal Entity & Statutory Intermediary Status:**
+   - **Operating Entity:** Formally designated as `FoodLine Campus LLP (Pending formal MCA registration)`.
+   - **Operating & Registered Desk:** Student Welfare Complex, Sanjivani University, Kopargaon, Ahmednagar District, Maharashtra — 423603.
+   - **Intermediary Safe Harbor:** Codified technology intermediary status under Section 79 of the Information Technology Act, 2000. Not a Food Business Operator (FBO) under FSSAI.
+   - **Seller of Record:** Formally designated to Cafe @7 (FSSAI Reg: `11522036000142`).
+   - **Statutory Grievance Officer:** Grievance Officer, FoodLine Campus LLP (`foodlinecampus07@gmail.com`, phone: `+91-99600-91371`), with 48-hour acknowledgment and 15-business-day resolution SLA.
+   - **Territorial Dispute Jurisdiction:** Competent courts situated in Ahmednagar District, Maharashtra.
+
+3. **Legal Content & Policy Pages Synchronization:**
+   - **Terms & Conditions (`frontend/src/components/legal/TermsContent.tsx`):** Embedded LLP entity details, Section 79 intermediary declaration, transparent 4% platform commission clause, Razorpay gateway fallback, 100% refund clause, and Grievance Officer desk.
+   - **Privacy Policy (`frontend/src/app/privacy/page.tsx`):** Codified FoodLine Campus LLP as Data Fiduciary under DPDP Act 2023, designated Razorpay as authorized PCI-DSS v4 processor, updated 24h operational purge policy, and set official privacy contact to `foodlinecampus07@gmail.com`.
+   - **Refund Policy (`frontend/src/app/refund-policy/page.tsx`):** Clarified 100% full refund (subtotal + 4% platform fee) on pre-cooking cancellations and kitchen stockouts; documented Razorpay SLA (instant UPI to 24–48 hours, 5–7 business days for cards); updated grievance escalation desk.
+   - **Terms Source Reference (`FoodLine_Campus_Terms_Source.md`):** Resolved 100% of `[TBD]` placeholders with LLP details, Grievance Officer, Ahmednagar jurisdiction, and 4% fee clause; marked pre-publication checklist `[x]`.
+   - **Compliance Roadmap (`COMPLIANCE_AND_LEGAL_PLAN.md`):** Appended Phase 6 (items 16–18: LLP Corporate Formation, Razorpay Gateway & 96/4 Split, 50-50 Co-founder Governance) and mapped deliverables.
+   - **Repository README (`README.md`):** Aligned business model and canteen economics table to 96/4 settlement and 4% platform fee; updated operating entity to FoodLine Campus LLP; confirmed zero "Shark Tank" pitch artifacts in open repository README.

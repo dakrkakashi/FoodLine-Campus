@@ -1,15 +1,12 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, MessageSquare, Phone, Mail, HelpCircle, Sparkles } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Mail, HelpCircle, Sparkles } from 'lucide-react';
 import { Navbar } from '@/components/navbar';
 import { FAQAccordion } from '@/components/FAQAccordion';
-import { PageTransition } from '@/components/ui';
 
 export default function FAQPage() {
   return (
-    <PageTransition className="min-h-screen flex flex-col justify-between bg-(--bg-canvas) text-(--text-primary) font-sans antialiased">
+    <div className="min-h-screen flex flex-col justify-between bg-(--bg-canvas) text-(--text-primary) font-sans antialiased">
       <Navbar />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-10 pb-20 flex-1 w-full">
@@ -77,9 +74,9 @@ export default function FAQPage() {
         </div>
       </main>
 
-      <footer className="border-t border-neutral-200 dark:border-neutral-800 py-6 px-4 text-xs text-neutral-500 dark:text-neutral-400 text-center">
+      <footer className="border-t border-neutral-200 dark:border-neutral-800 py-6 pb-28 sm:pb-6 px-4 text-xs text-neutral-500 dark:text-neutral-400 text-center">
         FoodLine Campus Ecosystem • Sanjivani University, Kopargaon
       </footer>
-    </PageTransition>
+    </div>
   );
 }

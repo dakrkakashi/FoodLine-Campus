@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/logo.png',
+        url: '/icons/icon-512x512.png',
         width: 1200,
         height: 630,
         alt: 'FoodLine Campus — Express Pre-Ordering Platform',
@@ -75,14 +75,14 @@ export const metadata: Metadata = {
     title: 'FoodLine Campus — Express Pre-Ordering & Pickup',
     description:
       'Order ahead from class for 30-sec express collection at Sanjivani University Cafe @7.',
-    images: ['/logo.png'],
+    images: ['/icons/icon-512x512.png'],
   },
   manifest: '/manifest.json',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
-      { url: '/logo.png', type: 'image/png' },
-      { url: '/logo.svg', type: 'image/svg+xml' },
+      { url: '/icons/icon-512x512.png', type: 'image/png' },
+      { url: '/logo.png', type: 'image/png', sizes: 'any' },
       { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
       { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
@@ -125,7 +125,7 @@ export default function RootLayout({
         <meta name="application-name" content="FoodLine Campus" />
         <meta name="theme-color" content="#07070B" />
       </head>
-      <body className="min-h-screen bg-(--bg-canvas,#07070B) text-(--text-primary) antialiased selection:bg-(--accent-orange,#FF6B2C) selection:text-white font-sans relative overflow-x-hidden transition-colors duration-300">
+      <body className="min-h-screen w-full max-w-full bg-(--bg-canvas,#07070B) text-(--text-primary) antialiased selection:bg-(--accent-orange,#FF6B2C) selection:text-white font-sans relative overflow-x-clip transition-colors duration-300">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-4 py-2 bg-accent-orange text-white text-xs font-bold rounded-xl shadow-lg ring-2 ring-white transition"
@@ -134,7 +134,7 @@ export default function RootLayout({
         </a>
         <OrganizationSchema />
         <Providers>
-          <div id="main-content" tabIndex={-1} className="outline-hidden">
+          <div id="main-content" tabIndex={-1} className="w-full max-w-full outline-hidden min-w-0 flex-1 flex flex-col">
             {children}
           </div>
         </Providers>

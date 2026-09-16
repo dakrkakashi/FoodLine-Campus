@@ -47,7 +47,7 @@ CREATE TABLE cafeterias (
     upi_id VARCHAR(255) NOT NULL DEFAULT '9960091371@slc',
     fssai_license_no VARCHAR(50) DEFAULT '11522036000142',
     is_pure_veg BOOLEAN DEFAULT TRUE,
-    commission_rate NUMERIC(4, 2) DEFAULT 0.035, -- 3.5% fast-pass fee
+    commission_rate NUMERIC(4, 2) DEFAULT 0.04, -- 4% platform commission
     is_active BOOLEAN DEFAULT TRUE,
     is_open BOOLEAN DEFAULT TRUE,
     prep_time_mins INT DEFAULT 5,

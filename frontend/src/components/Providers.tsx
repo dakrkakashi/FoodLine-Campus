@@ -15,26 +15,26 @@ import { MeshGradientBackground } from '@/components/ui/MeshGradientBackground';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { BackToTop } from '@/components/ui/BackToTop';
 import { CookieConsentBanner } from '@/components/ui/CookieConsentBanner';
-import { HighRefreshRateBadge } from '@/components/ui/HighRefreshRateBadge';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
+      {/* Decorative components isolated outside business providers */}
+      <div className="print:hidden">
+        <MeshGradientBackground opacity={0.65} />
+        <CustomCursor />
+        <GlobalClickEffect />
+        <OfflineBanner />
+        <FloatingThemeTrigger />
+        <BackToTop />
+        <CookieConsentBanner />
+      </div>
+
       <AuthProvider>
         <CampusProvider>
           <CartProvider>
             <InventoryProvider>
               <ToastProvider>
-                <div className="print:hidden">
-                  <MeshGradientBackground opacity={0.65} />
-                  <CustomCursor />
-                  <GlobalClickEffect />
-                  <OfflineBanner />
-                  <FloatingThemeTrigger />
-                  <BackToTop />
-                  <CookieConsentBanner />
-                  <HighRefreshRateBadge />
-                </div>
                 {children}
                 <MobileBottomNav />
               </ToastProvider>
