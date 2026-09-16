@@ -4,10 +4,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { getSupabaseFrontendRuntimeConfig } from '@/lib/supabase/runtime';
 
-const runtime = getSupabaseFrontendRuntimeConfig(process.env);
-const SUPABASE_URL = runtime.url || '';
-const SUPABASE_ANON = runtime.anonKey || '';
-
 export async function POST(request: NextRequest) {
   const rateLimitResponse = checkRateLimit(request, {
     maxRequests: 5,
@@ -17,6 +13,10 @@ export async function POST(request: NextRequest) {
   if (rateLimitResponse) return rateLimitResponse;
 
   try {
+    const runtime = getSupabaseFrontendRuntimeConfig(process.env);
+    const SUPABASE_URL = runtime.url || '';
+    const SUPABASE_ANON = runtime.anonKey || '';
+
     const body = await request.json();
     const { prn, password } = body;
 
@@ -38,18 +38,14 @@ export async function POST(request: NextRequest) {
     }
 
     const admin = createAdminClient();
-    if (!admin) {
-      return NextResponse.json(
-        { success: false, error: 'Server auth is not configured. Missing SUPABASE_SERVICE_ROLE_KEY.' },
-        { status: 503 }
-      );
-    }
+    const anon = createClient(SUPABASE_URL, SUPABASE_ANON);
+    const dbClient = admin || anon;
 
     // Resolve PRN → email from Supabase profiles (source of truth)
     const cleanNoZero = cleanPrn.replace(/^0+/, '');
     let profile: { id: string; email: string; full_name: string | null; prn: string | null } | null = null;
 
-    const { data: byPrn } = await admin
+    const { data: byPrn } = await dbClient
       .from('profiles')
       .select('id, email, full_name, prn')
       .ilike('prn', cleanPrn)
@@ -57,7 +53,7 @@ export async function POST(request: NextRequest) {
     profile = byPrn;
 
     if (!profile && cleanNoZero && cleanNoZero !== cleanPrn) {
-      const { data: alt } = await admin
+      const { data: alt } = await dbClient
         .from('profiles')
         .select('id, email, full_name, prn')
         .ilike('prn', cleanNoZero)
@@ -78,7 +74,6 @@ export async function POST(request: NextRequest) {
 
     const loginEmail = profile.email;
 
-    const anon = createClient(SUPABASE_URL, SUPABASE_ANON);
     const { data: authData, error: authError } = await anon.auth.signInWithPassword({
       email: loginEmail,
       password: cleanPass,
@@ -92,10 +87,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Touch last_login_at
-    await admin
-      .from('profiles')
-      .update({ last_login_at: new Date().toISOString() })
-      .eq('id', authData.user.id);
+    if (admin) {
+      await admin
+        .from('profiles')
+        .update({ last_login_at: new Date().toISOString() })
+        .eq('id', authData.user.id);
+    }
 
     const studentData = {
       id: authData.user.id,
@@ -108,7 +105,7 @@ export async function POST(request: NextRequest) {
     const cookiePayload = encodeURIComponent(JSON.stringify(studentData));
     const response = NextResponse.json({
       success: true,
-      message: 'Login successful!',
+      message: 'Signed in successfully!',
       student: studentData,
       session: {
         access_token: authData.session.access_token,
@@ -118,7 +115,7 @@ export async function POST(request: NextRequest) {
 
     response.cookies.set('foodline_student_session', cookiePayload, {
       path: '/',
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: 60 * 60 * 24 * 30, // 30 days
       sameSite: 'lax',
       httpOnly: false,
     });
@@ -126,7 +123,7 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (err: any) {
     return NextResponse.json(
-      { success: false, error: err.message || 'Failed to authenticate student.' },
+      { success: false, error: err.message || 'Internal server error.' },
       { status: 500 }
     );
   }
