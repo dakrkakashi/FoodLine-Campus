@@ -1,0 +1,23 @@
+# Dependencies and builds
+node_modules/
+dist/
+backend/dist/
+build/
+.next/
+out/
+coverage/
+frontend/playwright-report/
+frontend/test-results/
+
+# Android platform XMLs and binaries
+frontend/android/app/build/
+frontend/android/build/
+frontend/android/**/*.xml
+*.apk
+
+# Presentation decks, scratch and unused archives
+*.pptx
+*.ppt
+FoodLine_Pitch_Deck/
+UNESSAERY FILES/
+scratch/

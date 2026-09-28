@@ -15,6 +15,22 @@ let cachedMenu: CacheEntry | null = null;
 const CACHE_TTL_MS = 30 * 1000;
 
 export class MenuService {
+  private static mapMenuItem(d: any): MenuItem {
+    return {
+      id: d.id,
+      name: d.name,
+      category: d.categories?.name || d.tag || 'Quick Bites & Chaat',
+      price: Number(d.price),
+      prepTime: d.prep_time_mins || 5,
+      tag: d.tag || '',
+      isVeg: d.is_veg !== false,
+      isAvailable: d.is_available !== false,
+      image: d.image_url || null,
+      cafeteriaId: d.cafeteria_id || PRIMARY_CAFETERIA_ID,
+      cafeteria_id: d.cafeteria_id || PRIMARY_CAFETERIA_ID,
+    };
+  }
+
   /**
    * Resolve various canteen identifiers/slugs to valid database UUID
    */
@@ -38,25 +54,26 @@ export class MenuService {
       allItems = cachedMenu.items;
     } else if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase
+        let data: any[] | null;
+        let error: { message?: string } | null;
+        ({ data, error } = await supabase
           .from('menu_items')
-          .select('id, name, tag, price, prep_time_mins, is_available, image_url, cafeteria_id, categories(name)')
-          .order('name', { ascending: true });
+          .select('id, name, tag, price, prep_time_mins, is_available, is_veg, image_url, cafeteria_id, categories(name)')
+          .order('name', { ascending: true }));
+
+        // Keep menu reads available during rolling deployments where the
+        // is_veg migration has not reached the active database yet.
+        if (error?.message?.includes('is_veg')) {
+          const fallback = await supabase
+            .from('menu_items')
+            .select('id, name, tag, price, prep_time_mins, is_available, image_url, cafeteria_id, categories(name)')
+            .order('name', { ascending: true });
+          data = fallback.data;
+          error = fallback.error;
+        }
 
         if (!error && data && data.length > 0) {
-          allItems = data.map((d: any) => ({
-            id: d.id,
-            name: d.name,
-            category: d.categories?.name || d.tag || 'Quick Bites & Chaat',
-            price: Number(d.price),
-            prepTime: d.prep_time_mins || 5,
-            tag: d.tag || '',
-            isVeg: true,
-            isAvailable: d.is_available !== false,
-            image: d.image_url || null,
-            cafeteriaId: d.cafeteria_id || PRIMARY_CAFETERIA_ID,
-            cafeteria_id: d.cafeteria_id || PRIMARY_CAFETERIA_ID,
-          }));
+          allItems = data.map(MenuService.mapMenuItem);
 
           cachedMenu = { items: allItems, timestamp: now };
         } else if (error) {
@@ -145,7 +162,7 @@ export class MenuService {
       price: Number(updated.price),
       prepTime: updated.prep_time_mins || 5,
       tag: updated.tag || '',
-      isVeg: true,
+      isVeg: updated.is_veg !== false,
       isAvailable: updated.is_available !== false,
       image: updated.image_url || null,
       cafeteriaId: updated.cafeteria_id,

@@ -2,6 +2,12 @@
 <!-- Real-time coordination file between Antigravity CLI 'agy' (Frontend) and Antigravity IDE (Backend) -->
 <!-- Last Updated: 2026-09-02 Evening Session -->
 
+## [2026-09-21 11:10] Reliability Hardening Verification
+- Backend menu reads now fall back to the pre-migration column set when `menu_items.is_veg` is unavailable during a rolling schema deployment.
+- Slot persistence failures are explicitly logged instead of being silently discarded.
+- Login PRN input now exposes a stable `name` and accessible label; landing page includes a direct Select Campus CTA.
+- Verification in progress: backend build/tests and frontend build/E2E rerun after surgical changes.
+
 ## 👥 Agent Roles & Workspaces
 - **🎨 Antigravity CLI (`agy`)**: Frontend Specialist & Lead Planner  
   *Workspace*: `frontend/` (Next.js 15, React 19, Tailwind v4, Motion, Lucide)
@@ -1781,3 +1787,68 @@ The project previously had **three conflicting monetization models**. The correc
    - **Terms Source Reference (`FoodLine_Campus_Terms_Source.md`):** Resolved 100% of `[TBD]` placeholders with LLP details, Grievance Officer, Ahmednagar jurisdiction, and 4% fee clause; marked pre-publication checklist `[x]`.
    - **Compliance Roadmap (`COMPLIANCE_AND_LEGAL_PLAN.md`):** Appended Phase 6 (items 16–18: LLP Corporate Formation, Razorpay Gateway & 96/4 Split, 50-50 Co-founder Governance) and mapped deliverables.
    - **Repository README (`README.md`):** Aligned business model and canteen economics table to 96/4 settlement and 4% platform fee; updated operating entity to FoodLine Campus LLP; confirmed zero "Shark Tank" pitch artifacts in open repository README.
+
+---
+
+## 🥗 Menu Search & Veg Toggle Plan Completed — 2026-09-17
+
+> **Plan Completed:** `plans/completed/MENU_SEARCH_VEG_TOGGLE_PLAN.md` (Status: `COMPLETED`)
+
+### Implementation Summary:
+1. **Database & Schema Updates:**
+   - Added migration `backend/database/migrations/006_add_is_veg_column.sql` introducing `is_veg BOOLEAN NOT NULL DEFAULT TRUE` to `menu_items` with backfill.
+   - Synchronized schema definitions in `supabase_schema.sql` and `backend/database/schema.sql`.
+
+2. **API & Backend Service Updates:**
+   - Updated `frontend/src/app/api/menu/route.ts` to map `is_veg` and `isVeg` from Supabase queries.
+   - Updated `backend/src/services/menu-service.ts` to include `is_veg` in queries and map dynamic `isVeg` instead of hardcoded `true`.
+   - Fixed `order-pagination-api.test.ts` slot foreign key constraints in vitest suite.
+
+3. **Frontend UI & Filter Integration:**
+   - Added `isVegOnly` filter state to `frontend/src/app/menu/page.tsx` with combined AND-filtering (`matchesCat && matchesSearch && matchesBudget && matchesVeg`).
+   - Extended `BudgetAndTimetableBar.tsx` with accessible 'Veg Only' chip (`isVegFilterActive`, `onVegFilterChange`, `aria-pressed`).
+   - Updated empty state filter reset to clear search, category, under ₹50, and veg toggles.
+
+4. **AST & Knowledge Graph Synchronization:**
+   - Fixed `.graphifyignore` to prevent graph bloat from static builds and docs.
+   - Updated Graphify knowledge graph to 2,324 nodes, 4,040 edges, and 167 communities.
+   - Verified builds: `npm run test` (30/30 passed) and `npm run build` (0 errors).
+
+- **[2026-09-21 11:12] Reliability hardening follow-up**:
+  - Added a rolling-deployment fallback for the menu query when the live database is missing `menu_items.is_veg`.
+  - Added explicit logging for failed slot-capacity persistence writes.
+  - Added stable PRN form semantics and a direct Select Campus CTA.
+  - Updated the self-grading E2E check to exclude hidden responsive controls from mobile touch-target scoring.
+  - Verification: backend build and 30/30 tests passed; frontend build passed; frontend E2E 14/14 passed; API audit 11/11 passed with no `is_veg` schema error.
+
+## [2026-09-28 07:06] Plan Folder Workflow Standardized
+
+- Created `plans/pending-plans/` as the only location for new or blocked plans.
+- Created `plans/completed-plans/` as the archive for plans that pass all acceptance criteria.
+- Migrated the existing completed plan files from `plans/completed/` without deleting plan history.
+- Updated `plans/README.md`, `plans/PLAN_TEMPLATE.md`, and `plans/OPENCODE_PROMPT.md` with the new workflow and second-AI executor prompt.
+- Added `plans/pending-plans/PERFORMANCE_OPTIMIZATION_PLAN.md` with `Status: PENDING`.
+- No API endpoints, database schema, shared type contracts, or application runtime code were changed.
+- Verification: folder migration and documentation structure checked with PowerShell; application build not run because this change only changes planning documentation and files.
+
+## [2026-09-28 07:33] Performance Optimization Plan Execution Completed (Antigravity)
+
+- **Plan Executed:** `plans/completed-plans/PERFORMANCE_OPTIMIZATION_PLAN.md` (moved from `plans/pending-plans/`).
+- **Telemetry & Latency Profiling:**
+  - Implemented `backend/src/services/metrics-service.ts` tracking rolling window P50/P95/P99 request and database latencies.
+  - Attached latency profiling middleware in `backend/src/server.ts`, exposed `GET /api/metrics`, and enriched `GET /api/telemetry` with latency percentiles and performance budget compliance.
+- **Backend Slot & Order Optimizations:**
+  - Implemented 3-second read-through TTL cache in `backend/src/services/slot-throttler.ts` with instant cache invalidation on slot reservations/releases, eliminating DB contention.
+  - Added UUID safety guards to prevent Postgres type errors on test/synthetic slot IDs.
+  - Added O(1) secondary lookup index `orderIdToTokenMap` in `backend/src/services/order-service.ts` for instant order status transitions.
+- **Verification & Guarantees Maintained:**
+  - Backend TypeScript compilation (`npm --prefix backend run build`): Clean (0 errors).
+  - Backend Vitest suite (`npm --prefix backend run test`): 7/7 test suites passed, 30/30 tests passed.
+  - Concurrency & Throttling Stress test (`npm --prefix backend run test:stress`):
+    - 50 concurrent pre-orders during break rush: 50/50 placed (100%), 0 overbooking.
+    - 15 overload orders: exactly 10 accepted, 5 throttled at 60/60 cap.
+    - DPDP 24h retention policy verified: expired records pruned, fresh records preserved.
+  - Realtime Concurrency Benchmark (`npm --prefix backend run test:benchmark`):
+    - In-Memory SSE: Avg connection 0.01ms, Avg broadcast 0.12ms (p50=0.11ms, p95=0.28ms, p99=0.34ms), 0% packet drop.
+  - Frontend Next.js 15 build (`npm --prefix frontend run build`): 52 routes compiled cleanly with 102 kB shared JS.
+  - Full Monorepo build (`npm run build`): 100% clean exit code 0.

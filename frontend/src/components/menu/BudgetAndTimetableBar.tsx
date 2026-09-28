@@ -2,17 +2,21 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { IndianRupee, Clock, Sun, Sparkles, Filter } from 'lucide-react';
+import { IndianRupee, Clock, Sun, Sparkles, Filter, Leaf } from 'lucide-react';
 
 interface BudgetAndTimetableBarProps {
   onBudgetFilterChange?: (underFifty: boolean) => void;
   isBudgetFilterActive?: boolean;
+  onVegFilterChange?: (vegOnly: boolean) => void;
+  isVegFilterActive?: boolean;
   className?: string;
 }
 
 export function BudgetAndTimetableBar({
   onBudgetFilterChange,
   isBudgetFilterActive = false,
+  onVegFilterChange,
+  isVegFilterActive = false,
   className = '',
 }: BudgetAndTimetableBarProps) {
   const [isSunlightMode, setIsSunlightMode] = useState(false);
@@ -48,6 +52,24 @@ export function BudgetAndTimetableBar({
           <IndianRupee className="w-3.5 h-3.5 text-[#0C0A09] dark:text-inherit" strokeWidth={3} />
           <span>Hungry Under ₹50</span>
           {isBudgetFilterActive && (
+            <span className="w-1.5 h-1.5 rounded-full bg-black ml-0.5" />
+          )}
+        </button>
+
+        {/* "Veg Only" Pure Vegetarian Filter */}
+        <button
+          type="button"
+          onClick={() => onVegFilterChange?.(!isVegFilterActive)}
+          aria-pressed={isVegFilterActive}
+          className={`px-3.5 py-2 rounded-2xl text-xs font-black tracking-wide cursor-pointer transition-all flex items-center gap-1.5 border shadow-sm ${
+            isVegFilterActive
+              ? 'bg-[#22C55E] text-black border-[#22C55E] ring-2 ring-[#22C55E]/30 shadow-[#22C55E]/20'
+              : 'bg-[#191614]/80 text-[#FAF9F6] border-white/10 hover:border-white/20 hover:bg-[#24201D]'
+          }`}
+        >
+          <Leaf className={`w-3.5 h-3.5 ${isVegFilterActive ? 'text-black' : 'text-[#22C55E]'}`} strokeWidth={2.5} />
+          <span>Veg Only</span>
+          {isVegFilterActive && (
             <span className="w-1.5 h-1.5 rounded-full bg-black ml-0.5" />
           )}
         </button>

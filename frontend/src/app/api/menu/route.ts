@@ -105,6 +105,8 @@ export async function GET(request: Request) {
         price: Number(i.price),
         prep_time_mins: i.prep_time_mins || 5,
         is_available: i.is_available !== false,
+        is_veg: i.is_veg !== false,
+        isVeg: i.is_veg !== false,
         image_url: i.image_url || null,
         category: catInfo.category,
         category_id: catInfo.category_id,

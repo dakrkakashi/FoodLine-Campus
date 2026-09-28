@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 
 const PARTICLES = [
@@ -12,6 +12,32 @@ const PARTICLES = [
 ];
 
 export function FoodParticles() {
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduceMotion(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  if (reduceMotion) {
+    return (
+      <div aria-hidden="true" className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {PARTICLES.map((p, idx) => (
+          <span
+            key={idx}
+            className="absolute text-2xl sm:text-3xl select-none opacity-25"
+            style={{ top: p.top, left: p.left, right: p.right }}
+          >
+            {p.emoji}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
       {PARTICLES.map((p, idx) => (

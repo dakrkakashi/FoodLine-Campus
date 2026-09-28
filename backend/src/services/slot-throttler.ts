@@ -6,6 +6,17 @@ import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
 const slotState: Map<string, PickupSlot> = new Map();
 const slotHolds: Map<string, SlotHoldRecord> = new Map();
 
+// High-speed short-lived read cache for slots to prevent DB contention during peak bursts
+let cachedSlots: PickupSlot[] | null = null;
+let cachedSlotsTimestamp: number = 0;
+const SLOTS_CACHE_TTL_MS = 3000; // 3-second read-through TTL
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isValidUuid(id: string): boolean {
+  return UUID_REGEX.test(id);
+}
+
 function parseTimeToMinutes(timeStr: string): number {
   if (!timeStr) return 0;
   const str = timeStr.trim().toUpperCase();
@@ -52,10 +63,35 @@ for (const breakWindow of campusData.breaks) {
 
 export class SlotThrottlerService {
   /**
+   * Invalidate cached slots immediately upon reservation or capacity changes
+   */
+  public static invalidateCache(): void {
+    cachedSlots = null;
+    cachedSlotsTimestamp = 0;
+  }
+
+  /**
    * Get all pickup slots with live capacity counts and auto-time closure
    */
   public static async getAllSlots(): Promise<PickupSlot[]> {
     const currentCampusMinutes = getCampusCurrentMinutes();
+    const now = Date.now();
+
+    // Check read-through cache if within TTL
+    if (cachedSlots && (now - cachedSlotsTimestamp < SLOTS_CACHE_TTL_MS)) {
+      return cachedSlots.map((s) => {
+        const startMinutes = parseTimeToMinutes(s.startTime);
+        const isPast = currentCampusMinutes >= startMinutes;
+        const isFull = (s.currentBooked || 0) >= (s.maxCapacity || 60);
+        const status: 'OPEN' | 'FULL' | 'CLOSED_TIME_PASSED' = isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN';
+        return {
+          ...s,
+          isPast,
+          isClosed: isPast || isFull,
+          status,
+        };
+      });
+    }
 
     if (isSupabaseConfigured) {
       try {
@@ -66,10 +102,11 @@ export class SlotThrottlerService {
           .order('start_time', { ascending: true });
 
         if (!error && data && data.length > 0) {
-          return data.map((d: any) => {
+          const freshSlots: PickupSlot[] = data.map((d: any) => {
             const startMinutes = parseTimeToMinutes(d.start_time);
             const isPast = currentCampusMinutes >= startMinutes;
             const isFull = (d.current_booked || 0) >= (d.max_capacity || 60);
+            const status: 'OPEN' | 'FULL' | 'CLOSED_TIME_PASSED' = isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN';
             return {
               id: d.id,
               label: d.label,
@@ -81,28 +118,37 @@ export class SlotThrottlerService {
               isFull,
               isPast,
               isClosed: isPast || isFull,
-              status: isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN',
+              status,
               cafeteriaId: d.cafeteria_id,
               facultyReserved: d.faculty_reserved || 5,
             };
           });
+
+          cachedSlots = freshSlots;
+          cachedSlotsTimestamp = now;
+          return freshSlots;
         }
       } catch (err) {
         console.warn('Supabase slots fetch fallback to local cache:', err);
       }
     }
 
-    return Array.from(slotState.values()).map((slot) => {
+    const localSlots: PickupSlot[] = Array.from(slotState.values()).map((slot) => {
       const startMinutes = parseTimeToMinutes(slot.startTime);
       const isPast = currentCampusMinutes >= startMinutes;
       const isFull = (slot.currentBooked || 0) >= (slot.maxCapacity || 60);
+      const status: 'OPEN' | 'FULL' | 'CLOSED_TIME_PASSED' = isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN';
       return {
         ...slot,
         isPast,
         isClosed: isPast || isFull,
-        status: isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN',
+        status,
       };
     });
+
+    cachedSlots = localSlots;
+    cachedSlotsTimestamp = now;
+    return localSlots;
   }
 
   /**
@@ -157,6 +203,9 @@ export class SlotThrottlerService {
     slot.isFull = slot.currentBooked >= slot.maxCapacity;
     slotState.set(slotId, slot);
 
+    // Invalidate cached slots immediately
+    SlotThrottlerService.invalidateCache();
+
     // Record hold
     if (orderId) {
       const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
@@ -171,13 +220,17 @@ export class SlotThrottlerService {
       };
       slotHolds.set(orderId, hold);
 
-      // Async persist to Supabase if configured
-      if (isSupabaseConfigured) {
+      // Async persist to Supabase only if configured and slotId is a valid UUID
+      if (isSupabaseConfigured && isValidUuid(slotId)) {
         supabase
           .from('pickup_slots')
           .update({ current_booked: slot.currentBooked })
           .eq('id', slotId)
-          .then(() => {});
+          .then(({ error }) => {
+            if (error) {
+              console.error(`[SlotThrottler] Failed to persist reservation for ${slotId}:`, error.message);
+            }
+          });
       }
     }
 
@@ -195,12 +248,19 @@ export class SlotThrottlerService {
       slot.isFull = slot.currentBooked >= slot.maxCapacity;
       slotState.set(slotId, slot);
 
-      if (isSupabaseConfigured) {
+      // Invalidate cached slots immediately
+      SlotThrottlerService.invalidateCache();
+
+      if (isSupabaseConfigured && isValidUuid(slotId)) {
         supabase
           .from('pickup_slots')
           .update({ current_booked: slot.currentBooked })
           .eq('id', slotId)
-          .then(() => {});
+          .then(({ error }) => {
+            if (error) {
+              console.error(`[SlotThrottler] Failed to persist release for ${slotId}:`, error.message);
+            }
+          });
       }
     }
 
@@ -227,4 +287,3 @@ export class SlotThrottlerService {
     }
   }
 }
-

@@ -87,3 +87,7 @@ ANTIGRAVITY_IDE_MCP_EXECUTION_PLAN.md
 scripts/magicui-tool.js
 scripts/verify-mcp-ecosystem.mjs
 scripts/vibe-check-hook.js
+loop-log.md
+plan-*.md
+exec-*.md
+scan-*.md

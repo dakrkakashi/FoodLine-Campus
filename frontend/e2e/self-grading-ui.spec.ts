@@ -25,7 +25,9 @@ test.describe('Self-Grading UI & Design Token Loop', () => {
     await expect(logoOrTitle).toBeVisible();
 
     // 2. Self-grading criteria: Check interactive touch targets (min height 40px for mobile ergonomics)
-    const buttons = page.locator('button, a[role="button"]');
+    // Hidden desktop-only controls remain mounted on mobile for responsive
+    // transitions; grade only controls users can actually interact with.
+    const buttons = page.locator('button:visible, a[role="button"]:visible');
     const buttonCount = await buttons.count();
     
     let validTouchTargets = 0;

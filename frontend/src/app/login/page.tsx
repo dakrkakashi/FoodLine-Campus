@@ -558,6 +558,8 @@ function LoginFormContent() {
                   <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 text-(--text-muted) w-4 h-4" />
                   <input
                     type="text"
+                    name="prn"
+                    aria-label="Student PRN or roll number"
                     value={studentPrn}
                     onChange={(e) => setStudentPrn(e.target.value)}
                     required

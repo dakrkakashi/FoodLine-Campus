@@ -3,6 +3,30 @@
 <!-- Both Antigravity IDE (Backend) and Antigravity CLI 'agy' (Frontend) read this file. -->
 
 ## 📍 Where We Left Off (Last Completed Checkpoint)
+- **Date & Time:** 2026-09-28 (FoodLine Campus — Performance Optimization Plan Executed & Verified - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **Latency & Telemetry Profiling Engine (`backend/src/services/metrics-service.ts`)**:
+     - Built high-precision sliding-window latency tracker measuring P50/P95/P99 request and DB latencies.
+     - Added performance SLA compliance checks (API P50 < 200ms, P95 < 1000ms, P99 < 2000ms, DB P95 < 100ms).
+     - Integrated request profiler middleware into `backend/src/server.ts`, exposed `GET /api/metrics`, and enriched `GET /api/telemetry`.
+  2. **Sub-Millisecond Read-Through Slot Throttler Cache (`backend/src/services/slot-throttler.ts`)**:
+     - Added 3-second read-through TTL cache for `getAllSlots()` with instant invalidation on `reserveSlot()` and `releaseSlot()`.
+     - Added UUID regex safety guards to eliminate Postgres type errors on test/synthetic slot IDs.
+  3. **Order Service O(1) Indexing & DB Instrumentation (`backend/src/services/order-service.ts`)**:
+     - Added secondary index `orderIdToTokenMap` for O(1) order status transitions and token lookups.
+     - Added DB query latency profiling instrumented via `metricsService.recordDbLatency`.
+  4. **Strict Concurrency & Throttling Verification (`npm --prefix backend run test:stress`)**:
+     - 50 concurrent student pre-orders: 50/50 placed (100%), 0% overbooking rate.
+     - 15 overload boundary requests: exactly 10 accepted (reaching 60/60 limit) and 5 throttled.
+     - 24-hour DPDP order retention and cleanup: 1 expired order purged, fresh orders preserved.
+  5. **Realtime Concurrency Benchmark (`npm --prefix backend run test:benchmark`)**:
+     - In-Memory SSE (100 streams, 50 cycles): Avg connection 0.01ms, Avg broadcast 0.12ms (p50=0.11ms, p95=0.28ms, p99=0.34ms), 0% drop rate.
+  6. **Zero-Error Full Stack Compilation (`npm run build`)**:
+     - Backend TypeScript compilation: 0 errors (`npm --prefix backend run build`).
+     - Vitest suite: 7/7 test suites passed, 30/30 tests passed (`npm --prefix backend run test`).
+     - Frontend Next.js 15.5 build: 52 static/dynamic routes compiled in 6.5s (`npm --prefix frontend run build`).
+     - Plan `plans/completed-plans/PERFORMANCE_OPTIMIZATION_PLAN.md` completed and moved from `plans/pending-plans/`.
+
 - **Date & Time:** 2026-09-13 (Antigravity IDE & MCP Ecosystem Zero-Drift Blueprint Implementation - 100% Operational)
 - **Key Deliverables & System Milestones:**
   1. **Master Execution Plan (ANTIGRAVITY_IDE_MCP_EXECUTION_PLAN.md)**:
@@ -150,7 +174,7 @@
      - Installed all 6 companion skills (`banner-design`, `brand`, `design`, `design-system`, `slides`, `ui-styling`).
      - Global CLI commands `ui-ux-pro-max` and `ui-pro-max` available system-wide.
   3. **21st.dev MCP Server Installation**:
-     - Configured in `~/.gemini/config/mcp_config.json`, `.agents/mcp_config.json`, and `.vscode/mcp.json` with API key `21st_sk_9e66c7f5...`.
+     - Configured in `~/.gemini/config/mcp_config.json`, `.agents/mcp_config.json`, and `.vscode/mcp.json` with API key `[REDACTED_API_KEY]`.
      - Verified live JSON-RPC 2.0 handshake with `https://21st.dev/api/mcp` (HTTP 200, 21st v0.1.0 tools).
   4. **Compilation Guarantee**:
      - `npm --prefix backend run build` (tsc) ➔ 0 errors.

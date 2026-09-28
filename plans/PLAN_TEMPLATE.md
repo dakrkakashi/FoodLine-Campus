@@ -4,6 +4,8 @@
 > **Created By:** OpenCode  
 > **Target Execution Agent:** Antigravity  
 > **Created At:** [YYYY-MM-DD]  
+> **Pending Location:** `plans/pending-plans/`  
+> **Completed Location:** `plans/completed-plans/`  
 
 ---
 
@@ -62,3 +64,8 @@
 - **Completed At:** 
 - **Verification Output:** 
 - **Notes / Deviations:** 
+
+When all acceptance criteria pass, set the status to `COMPLETED`, append the
+execution log, update `PROJECT_MEMORY.md` and `MULTI_AGENT_SYNC.md`, and move
+the file to `plans/completed-plans/`. If blocked, set the status to `BLOCKED`,
+document the blocker, and leave the file in `plans/pending-plans/`.

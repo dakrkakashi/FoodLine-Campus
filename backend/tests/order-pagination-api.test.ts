@@ -8,7 +8,6 @@ describe('GET /api/orders — Cursor-Based Pagination API Endpoint', () => {
     // Seed at least 3 orders for pagination testing
     for (let i = 1; i <= 3; i++) {
       await OrderService.createOrder({
-        slotId: '11111111-1111-1111-1111-111111111111',
         items: [{ dishId: 'd01', name: `Test Dish ${i}`, price: 50, quantity: 1 }],
         studentPhone: '9876543210',
         studentName: `Student ${i}`,

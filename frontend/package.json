@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "playwright test",
     "test:e2e": "playwright test",
     "cap:sync": "cap sync android",
     "cap:open": "cap open android",

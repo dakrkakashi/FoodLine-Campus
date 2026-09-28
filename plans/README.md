@@ -1,58 +1,74 @@
-# 📋 Antigravity ⚡ OpenCode Planning & Execution Hub
+# Antigravity and OpenCode Planning Hub
 
-Welcome to the bridge between **OpenCode** (The Planner & Architect) and **Antigravity** (The Coder & Executor).
+OpenCode creates implementation plans. Antigravity executes, verifies, and
+archives them.
 
----
+## Workflow
 
-## 🔄 The Autonomous Workflow Loop
+1. OpenCode reads the project context and writes every new plan to
+   `plans/pending-plans/<FEATURE_NAME>_PLAN.md`.
+2. Antigravity scans `plans/pending-plans/` and selects a plan with
+   `Status: PENDING`.
+3. Antigravity changes the plan to `IN_PROGRESS`, implements the tasks, and runs
+   all required verification commands.
+4. After every acceptance criterion passes, Antigravity marks the plan
+   `COMPLETED`, appends the execution log, updates project synchronization
+   records, and moves it to `plans/completed-plans/`.
+5. If blocked, Antigravity marks the plan `BLOCKED`, records the evidence, and
+   leaves it in `plans/pending-plans/`.
 
-```mermaid
-graph LR
-    User[👤 User / Developer] -->|Feature Request| OC[🧠 OpenCode]
-    OC -->|Generates Plan| PlansFolder[📁 plans/*.md]
-    PlansFolder -->|Scanned & Parsed| AG[⚡ Antigravity]
-    AG -->|Executes Code & Verifies| Codebase[💻 Codebase / Tests]
-    AG -->|Moves to completed/| Done[✅ plans/completed/]
-```
+## Directory layout
 
-### 1. Planning Phase (OpenCode)
-- OpenCode receives the feature/bug requirement from the user.
-- OpenCode reads the project context (architecture, types, database schema).
-- OpenCode drafts a clear, actionable plan following [PLAN_TEMPLATE.md](./PLAN_TEMPLATE.md).
-- OpenCode saves the plan as `plans/<FEATURE_NAME>_PLAN.md` (or in `plans/`).
-
-### 2. Execution Phase (Antigravity)
-- When prompted, Antigravity scans `plans/` for pending plans.
-- Antigravity marks the plan status as `IN_PROGRESS` (or moves it to `plans/active/`).
-- Antigravity follows the tasks sequentially:
-  - Edits/creates frontend, backend, or database files.
-  - Ensures no regression and adheres strictly to TypeScript interfaces and database schemas.
-  - Runs validation commands (e.g., `npm run build`, lint, unit tests).
-- Once all acceptance criteria pass:
-  - Antigravity checks off all task items `[x]`.
-  - Antigravity appends the execution log and moves the plan to `plans/completed/`.
-
----
-
-## 📂 Directory Layout
-
-```
+```text
 plans/
-├── README.md                  # This guide
-├── PLAN_TEMPLATE.md           # Template for OpenCode to follow
-├── OPENCODE_PROMPT.md         # System prompt / instructions to copy into OpenCode
-├── active/                    # Plans currently being executed by Antigravity
-├── completed/                 # Successfully executed and verified plans
-└── <NAME>_PLAN.md             # New plans dropped by OpenCode waiting to be executed
+├── README.md
+├── PLAN_TEMPLATE.md
+├── OPENCODE_PROMPT.md
+├── pending-plans/             # New and blocked plans
+└── completed-plans/           # Verified completed plans
 ```
 
----
+Only `plans/pending-plans/` is used for new plans. Do not delete plans or skip
+verification to force a move.
 
-## 🚀 How to Trigger Antigravity Execution
+## Executor prompt
 
-Simply prompt Antigravity:
-> *"Scan `plans/` and execute the pending plan."*
-or
-> *"Execute the plan in `plans/<FILENAME>.md`."*
+Use this prompt with the second AI:
 
-Antigravity will automatically parse the file, write the required code, run the build checks, and report the outcome!
+```text
+You are the FoodLine Campus implementation and verification agent.
+
+Read PROJECT_MEMORY.md, MULTI_AGENT_SYNC.md, plans/README.md, and the selected
+plan before editing. Your source of truth is plans/pending-plans/.
+
+Select the requested plan, or the oldest valid plan if no filename is given.
+Confirm Status: PENDING, change it to IN_PROGRESS, and execute its tasks
+without unrelated changes. Preserve API contracts, database integrity,
+accessibility, security, and existing worktree changes.
+
+Run every verification command in the plan. At minimum, run:
+- Frontend: npm --prefix frontend run build
+- Backend: npm --prefix backend run build
+- Backend tests: npm --prefix backend run test
+- Cross-stack when applicable: npm run build
+
+Fix failures and rerun verification. Append an execution log with timestamps,
+changed files, commands, results, deviations, and risks.
+
+When all acceptance criteria pass, set Status: COMPLETED, update
+PROJECT_MEMORY.md and MULTI_AGENT_SYNC.md, then move the plan to
+plans/completed-plans/.
+
+If blocked, set Status: BLOCKED, document the exact blocker and attempted
+fixes, and leave the plan in plans/pending-plans/.
+
+Never delete plans, skip verification, expose secrets, or modify unrelated
+worktree changes.
+```
+
+## Trigger examples
+
+```text
+Scan plans/pending-plans/ and execute the pending plan.
+Execute plans/pending-plans/PERFORMANCE_OPTIMIZATION_PLAN.md.
+```

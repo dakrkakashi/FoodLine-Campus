@@ -60,6 +60,8 @@ interface MenuItem {
   category_id?: string;
   category?: string;
   is_available: boolean;
+  is_veg?: boolean;
+  isVeg?: boolean;
 }
 
 interface Category {
@@ -90,6 +92,7 @@ export default function MenuPage() {
   const [mounted, setMounted] = useState(false);
   const [gridMode, setGridMode] = useState<'grid' | 'list'>('grid');
   const [isUnderFifty, setIsUnderFifty] = useState(false);
+  const [isVegOnly, setIsVegOnly] = useState(false);
   const [showCounterMap, setShowCounterMap] = useState(false);
 
   useEffect(() => {
@@ -313,9 +316,10 @@ export default function MenuPage() {
         (item.tag && item.tag.toLowerCase().includes(search.toLowerCase())) ||
         (item.category && item.category.toLowerCase().includes(search.toLowerCase()));
       const matchesBudget = !isUnderFifty || Number(item.price) <= 50;
-      return matchesCat && matchesSearch && matchesBudget;
+      const matchesVeg = !isVegOnly || (item.isVeg !== false && item.is_veg !== false);
+      return matchesCat && matchesSearch && matchesBudget && matchesVeg;
     });
-  }, [menuItems, selectedCategory, search, isCategoryMatch]);
+  }, [menuItems, selectedCategory, search, isUnderFifty, isVegOnly, isCategoryMatch]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -484,6 +488,8 @@ export default function MenuPage() {
             <BudgetAndTimetableBar
               isBudgetFilterActive={isUnderFifty}
               onBudgetFilterChange={setIsUnderFifty}
+              isVegFilterActive={isVegOnly}
+              onVegFilterChange={setIsVegOnly}
             />
 
             {/* Collapsible Sanjivani Live Counter Map Toggle */}
@@ -653,6 +659,8 @@ export default function MenuPage() {
               onClick={() => {
                 setSearch('');
                 setSelectedCategory('All');
+                setIsUnderFifty(false);
+                setIsVegOnly(false);
               }}
               className="px-6 py-3 rounded-2xl bg-accent-orange/20 border border-accent-orange/30 text-accent-amber font-bold cursor-pointer hover:bg-accent-orange/30 transition"
             >

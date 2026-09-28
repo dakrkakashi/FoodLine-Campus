@@ -6,11 +6,19 @@ import { sseBroadcaster } from './sse-broadcaster.js';
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
 import { SheetsDbService } from './sheets-db.service.js';
 import { NotificationService } from './notification-service.js';
+import { metricsService } from './metrics-service.js';
 
 // In-memory active orders store
 const ordersStore: Map<string, Order> = new Map();
+// Secondary index: UUID id -> orderToken for O(1) status transitions and lookups
+const orderIdToTokenMap: Map<string, string> = new Map();
 // Pruned order tokens cache for 24h retention compliance
 const prunedOrderTokens: Set<string> = new Set();
+
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+function isValidUuid(id?: string): boolean {
+  return typeof id === 'string' && UUID_REGEX.test(id);
+}
 
 export interface CreateOrderInput {
   slotId?: string;
@@ -65,17 +73,11 @@ export class OrderService {
   public static async createOrder(input: CreateOrderInput): Promise<Order> {
     const { slotId, items, studentPhone, studentName, studentPrn, notes, userId, cafeteriaId, idempotencyKey } = input;
 
-    // Idempotency check: Return existing order if identical idempotency key was submitted within 24h
+    // Idempotency check: O(1) Map lookup
     if (idempotencyKey) {
       const cached = OrderService.idempotencyMap.get(idempotencyKey);
       if (cached && (Date.now() - cached.timestamp < 24 * 60 * 60 * 1000)) {
         return cached.order;
-      }
-      for (const existingOrder of ordersStore.values()) {
-        if (existingOrder.idempotencyKey === idempotencyKey) {
-          OrderService.idempotencyMap.set(idempotencyKey, { order: existingOrder, timestamp: Date.now() });
-          return existingOrder;
-        }
       }
     }
 
@@ -184,8 +186,9 @@ export class OrderService {
       updatedAt: now,
     };
 
-    // Store in memory & idempotency cache
+    // Store in memory & indexes
     ordersStore.set(orderToken, newOrder);
+    orderIdToTokenMap.set(orderId, orderToken);
     if (idempotencyKey) {
       OrderService.idempotencyMap.set(idempotencyKey, { order: newOrder, timestamp: Date.now() });
     }
@@ -193,9 +196,18 @@ export class OrderService {
     // Persist to Supabase if configured
     if (isSupabaseConfigured) {
       try {
+        const dbStart = performance.now();
         let dbOrder: any = null;
         let orderError: any = null;
         let activeToken = orderToken;
+
+        const resolvedCafeId = isValidUuid(cafeteriaId)
+          ? cafeteriaId!
+          : '754bd902-cafb-40a6-9cdd-96bc8760ad7f';
+
+        const resolvedSlotId = isValidUuid(slotId)
+          ? slotId!
+          : '20e848cf-9d4e-490d-b01f-59cad15bb766';
 
         for (let attempt = 0; attempt < 3; attempt++) {
           const res = await supabase
@@ -203,15 +215,9 @@ export class OrderService {
             .insert({
               id: orderId,
               order_token: activeToken,
-              user_id: userId || null,
-              cafeteria_id:
-                cafeteriaId && cafeteriaId !== 'b2222222-2222-2222-2222-222222222222' && cafeteriaId.length === 36
-                  ? cafeteriaId
-                  : '754bd902-cafb-40a6-9cdd-96bc8760ad7f',
-              slot_id:
-                slotId && slotId !== 'd1111111-1111-1111-1111-111111111111' && slotId.length === 36
-                  ? slotId
-                  : '20e848cf-9d4e-490d-b01f-59cad15bb766',
+              user_id: isValidUuid(userId) ? userId : null,
+              cafeteria_id: resolvedCafeId,
+              slot_id: resolvedSlotId,
               total_amount: totalAmount,
               status: 'PENDING_PAYMENT',
               pickup_otp: pickupOtp,
@@ -228,6 +234,7 @@ export class OrderService {
               ordersStore.delete(orderToken);
               newOrder.orderToken = activeToken;
               ordersStore.set(activeToken, newOrder);
+              orderIdToTokenMap.set(orderId, activeToken);
             }
             break;
           }
@@ -247,10 +254,12 @@ export class OrderService {
 
         if (!orderError && dbOrder) {
           newOrder.id = dbOrder.id;
+          orderIdToTokenMap.set(dbOrder.id, newOrder.orderToken);
+
           // Insert order items
           const orderItemsToInsert = formattedItems.map((fi) => ({
             order_id: dbOrder.id,
-            menu_item_id: fi.item.id && fi.item.id.length === 36 ? fi.item.id : null,
+            menu_item_id: isValidUuid(fi.item.id) ? fi.item.id : null,
             item_name: fi.item.name,
             quantity: fi.quantity,
             unit_price: fi.item.price,
@@ -258,6 +267,7 @@ export class OrderService {
           }));
 
           await supabase.from('order_items').insert(orderItemsToInsert);
+          metricsService.recordDbLatency('order_insert', performance.now() - dbStart);
         } else if (orderError) {
           console.warn('Supabase order insert error:', orderError.message, orderError.details);
         }
@@ -266,7 +276,7 @@ export class OrderService {
       }
     }
 
-    // 3. Persist directly to Google Sheets Orders Tab (No Google Form)
+    // 3. Persist directly to Google Sheets Orders Tab
     if (SheetsDbService.isConfigured()) {
       const itemsSummary = formattedItems
         .map((fi) => `${fi.quantity}x ${fi.item.name} (₹${fi.item.price})`)
@@ -302,11 +312,14 @@ export class OrderService {
 
     if (isSupabaseConfigured) {
       try {
+        const dbStart = performance.now();
         const { data, error } = await supabase
           .from('orders')
           .select('*, order_items(*), pickup_slots(*)')
           .eq('order_token', token)
           .single();
+
+        metricsService.recordDbLatency('get_order_by_token', performance.now() - dbStart);
 
         if (!error && data) {
           const isCompleted = data.status === 'COLLECTED' || data.status === 'CANCELLED';
@@ -364,6 +377,7 @@ export class OrderService {
             updatedAt: data.updated_at,
           };
           ordersStore.set(token, fetchedOrder);
+          orderIdToTokenMap.set(fetchedOrder.id, token);
           return fetchedOrder;
         }
       } catch (err) {
@@ -380,11 +394,14 @@ export class OrderService {
   public static async syncFromDatabase(limit: number = 100): Promise<void> {
     if (!isSupabaseConfigured) return;
     try {
+      const dbStart = performance.now();
       const { data, error } = await supabase
         .from('orders')
         .select('*, order_items(*), pickup_slots(*)')
         .order('created_at', { ascending: false })
         .limit(limit);
+
+      metricsService.recordDbLatency('sync_from_database', performance.now() - dbStart);
 
       if (!error && data) {
         for (const row of data) {
@@ -435,6 +452,7 @@ export class OrderService {
               updatedAt: row.updated_at,
             };
             ordersStore.set(row.order_token, mappedOrder);
+            orderIdToTokenMap.set(row.id, row.order_token);
           }
         }
       }
@@ -488,6 +506,7 @@ export class OrderService {
     // Update database
     if (isSupabaseConfigured) {
       try {
+        const dbStart = performance.now();
         await supabase
           .from('orders')
           .update({ 
@@ -496,6 +515,7 @@ export class OrderService {
             updated_at: order.updatedAt 
           })
           .eq('order_token', orderToken);
+        metricsService.recordDbLatency('confirm_utr_payment', performance.now() - dbStart);
       } catch (err) {
         console.warn('Supabase confirm order update failed:', err);
       }
@@ -538,10 +558,12 @@ export class OrderService {
 
     if (isSupabaseConfigured) {
       try {
+        const dbStart = performance.now();
         await supabase
           .from('orders')
           .update({ payment_status: 'VERIFIED', updated_at: order.updatedAt })
           .eq('order_token', orderToken);
+        metricsService.recordDbLatency('reconcile_payment', performance.now() - dbStart);
       } catch (err) {
         console.warn('Supabase reconcile payment update failed:', err);
       }
@@ -552,19 +574,14 @@ export class OrderService {
   }
 
   /**
-   * Transition order status (KDS)
+   * Transition order status (KDS) with O(1) indexed lookup
    */
   public static async transitionStatus(
     idOrToken: string,
     newStatus: OrderStatus
   ): Promise<Order> {
-    let targetOrder: Order | undefined;
-    for (const order of ordersStore.values()) {
-      if (order.id === idOrToken || order.orderToken === idOrToken) {
-        targetOrder = order;
-        break;
-      }
-    }
+    const token = orderIdToTokenMap.get(idOrToken) || idOrToken;
+    let targetOrder = ordersStore.get(token);
 
     if (!targetOrder) {
       targetOrder = await OrderService.getOrderByToken(idOrToken);
@@ -581,10 +598,12 @@ export class OrderService {
     // Update database
     if (isSupabaseConfigured) {
       try {
+        const dbStart = performance.now();
         await supabase
           .from('orders')
           .update({ status: newStatus, updated_at: targetOrder.updatedAt })
-          .or(`id.eq.${idOrToken},order_token.eq.${idOrToken}`);
+          .or(`id.eq.${targetOrder.id},order_token.eq.${targetOrder.orderToken}`);
+        metricsService.recordDbLatency('transition_order_status', performance.now() - dbStart);
       } catch (err) {
         console.warn('Supabase status transition update failed:', err);
       }
@@ -634,10 +653,12 @@ export class OrderService {
 
     if (isSupabaseConfigured) {
       try {
+        const dbStart = performance.now();
         await supabase
           .from('orders')
           .update({ status: 'COLLECTED', updated_at: order.updatedAt })
           .eq('order_token', orderToken);
+        metricsService.recordDbLatency('verify_pickup_otp', performance.now() - dbStart);
       } catch (err) {
         console.warn('Supabase verifyPickupOtp update failed:', err);
       }
@@ -674,6 +695,7 @@ export class OrderService {
 
       if (isCompleted && orderUpdatedAtMs <= cutoffTimestamp) {
         ordersStore.delete(token);
+        orderIdToTokenMap.delete(order.id);
         prunedOrderTokens.add(token);
         cleanedOrderTokens.push(token);
       }
@@ -682,6 +704,7 @@ export class OrderService {
     // 2. Cascade purge from Supabase database if configured
     if (isSupabaseConfigured && cleanedOrderTokens.length > 0) {
       try {
+        const dbStart = performance.now();
         const { data: dbOrders } = await supabase
           .from('orders')
           .select('id')
@@ -697,12 +720,14 @@ export class OrderService {
           .from('orders')
           .delete()
           .in('order_token', cleanedOrderTokens);
+        metricsService.recordDbLatency('cleanup_old_orders_cascade', performance.now() - dbStart);
       } catch (err) {
         console.warn('Supabase retention cleanup error:', err);
       }
     } else if (isSupabaseConfigured) {
       // Also check if any older records exist directly in Supabase
       try {
+        const dbStart = performance.now();
         const { data: expiredDbOrders } = await supabase
           .from('orders')
           .select('id, order_token')
@@ -721,6 +746,7 @@ export class OrderService {
             }
           }
         }
+        metricsService.recordDbLatency('cleanup_old_orders_scan', performance.now() - dbStart);
       } catch (err) {
         console.warn('Supabase retention DB scan error:', err);
       }

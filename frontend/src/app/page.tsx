@@ -94,6 +94,14 @@ export default function IntroductionPage() {
             <Sparkles size={16} className="text-accent-teal" />
             <span>See How It Works</span>
           </Link>
+
+          <Link
+            href="/select-campus"
+            onClick={playTab}
+            className="w-full sm:w-auto px-6 py-3.5 sm:py-4 text-(--text-secondary) hover:text-(--text-primary) border border-[var(--border-glass)] font-bold text-sm sm:text-base rounded-2xl transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span>Select Campus</span>
+          </Link>
         </div>
 
         {/* Infinite Velocity Marquee Banner */}

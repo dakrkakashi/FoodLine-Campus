@@ -1,7 +1,7 @@
 {
-  "name": "ppt-other-taskes",
+  "name": "foodline-campus",
   "version": "1.0.0",
-  "description": "",
+  "description": "FoodLine Campus: High-throughput campus dining, pre-ordering, and smart pick-up ecosystem",
   "main": "index.js",
   "scripts": {
     "dev": "npm --prefix frontend run dev",
@@ -12,19 +12,27 @@
     "dev:backend": "npm --prefix backend run dev",
     "build:frontend": "npm --prefix frontend run build",
     "build:backend": "npm --prefix backend run build",
-    "test:all": "npm --prefix backend run test:api && npm --prefix backend run test:security && npm --prefix backend run test:stress",
+    "test": "npm --prefix backend run test",
+    "test:all": "npm --prefix backend run test && npm --prefix backend run test:api && npm --prefix backend run test:security && npm --prefix backend run test:stress",
     "test:stress": "npm --prefix backend run test:stress",
     "dev:deck": "npx -y serve FoodLine_Pitch_Deck -l 3000",
     "build:deck": "python build_pitch_deck.py",
-    "graphify": "graphify extract . --code-only && graphify cluster-only . && graphify export wiki"
+    "graphify": "graphify extract . --code-only && graphify cluster-only . && graphify export wiki",
+    "graphify:update": "python -m graphify update . --force",
+    "graphify:diagnose": "python -m graphify diagnose multigraph"
   },
-  "keywords": [],
+  "keywords": [
+    "foodline",
+    "campus-dining",
+    "kds",
+    "order-throttling",
+    "nextjs",
+    "express"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "gsap": "^3.15.0",
-    "lottie-web": "^5.13.0",
     "motion": "^13.1.1"
   }
 }

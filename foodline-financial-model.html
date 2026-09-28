@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FoodLine Campus — Financial Model</title>
+<style>
+  :root{
+    --paper:#f7f5ef;
+    --ink:#20261f;
+    --ink-soft:#4c5548;
+    --line:#d9d3c2;
+    --accent:#c9871f;
+    --accent-deep:#8f5c10;
+    --green:#2f4d34;
+    --green-soft:#e7ede4;
+    --card:#ffffff;
+    --danger:#a8402f;
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --paper:#161a15;
+      --ink:#eae7dd;
+      --ink-soft:#b7bcaf;
+      --line:#3a4136;
+      --accent:#e0a94a;
+      --accent-deep:#f0c377;
+      --green:#8fb896;
+      --green-soft:#1f2a20;
+      --card:#1d221c;
+      --danger:#e0796a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#161a15;
+    --ink:#eae7dd;
+    --ink-soft:#b7bcaf;
+    --line:#3a4136;
+    --accent:#e0a94a;
+    --accent-deep:#f0c377;
+    --green:#8fb896;
+    --green-soft:#1f2a20;
+    --card:#1d221c;
+    --danger:#e0796a;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Iowan Old Style','Palatino Linotype',Georgia,serif;
+    line-height:1.6;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:64px 24px 96px;
+  }
+  header.hero{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:28px;
+    margin-bottom:40px;
+  }
+  .kicker{
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:13px;
+    letter-spacing:0.04em;
+    color:var(--accent-deep);
+    margin:0 0 10px;
+    font-weight:600;
+  }
+  h1{
+    font-size:clamp(32px,5vw,44px);
+    margin:0 0 14px;
+    line-height:1.15;
+    font-weight:600;
+  }
+  .subtitle{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:56ch;
+    margin:0;
+  }
+  .assumptions{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin:40px 0 56px;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  }
+  .a-cell{
+    background:var(--card);
+    padding:18px 14px;
+  }
+  .a-num{
+    font-size:22px;
+    font-weight:700;
+    color:var(--green);
+    display:block;
+  }
+  .a-label{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:4px;
+    display:block;
+  }
+  h2{
+    font-size:24px;
+    margin:56px 0 6px;
+    font-weight:600;
+    border-left:4px solid var(--accent);
+    padding-left:14px;
+  }
+  h3{
+    font-size:17px;
+    margin:28px 0 10px;
+    font-weight:700;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    color:var(--green);
+  }
+  p{ color:var(--ink); margin:10px 0; }
+  .lede{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:24px;
+  }
+  .formula{
+    font-family:'SF Mono',Consolas,monospace;
+    font-size:13.5px;
+    background:var(--green-soft);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:12px 16px;
+    margin:10px 0 18px;
+    color:var(--ink);
+    overflow-x:auto;
+    white-space:pre;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0 28px;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:14.5px;
+  }
+  th,td{
+    text-align:left;
+    padding:10px 12px;
+    border-bottom:1px solid var(--line);
+  }
+  th{
+    color:var(--ink-soft);
+    font-weight:600;
+    font-size:12.5px;
+  }
+  td.num, th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  tr.total td{
+    font-weight:700;
+    border-top:2px solid var(--ink);
+    border-bottom:none;
+    color:var(--green);
+  }
+  .callout{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--green);
+    border-radius:6px;
+    padding:16px 20px;
+    margin:24px 0;
+    font-size:14.5px;
+  }
+  .callout.warn{ border-left-color:var(--danger); }
+  .callout strong{ color:var(--green); }
+  .callout.warn strong{ color:var(--danger); }
+  .big-stat{
+    display:flex;
+    gap:40px;
+    flex-wrap:wrap;
+    margin:36px 0;
+    padding:24px 0;
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+  .stat{ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; }
+  .stat .v{
+    font-size:30px;
+    font-weight:700;
+    color:var(--green);
+    display:block;
+    font-family:'Iowan Old Style',Georgia,serif;
+  }
+  .stat .l{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:2px;
+    display:block;
+  }
+  footer{
+    margin-top:64px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  @media (max-width:600px){
+    .assumptions{ grid-template-columns:repeat(2,1fr); }
+    .wrap{ padding:40px 18px 72px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="kicker">FoodLine Campus · Financial Model</p>
+    <h1>How a ₹80 canteen order turns into ₹1.18 lakh a year in profit</h1>
+    <p class="subtitle">A walk-through of the revenue, cost, and break-even math behind FoodLine Campus's pilot at a single 2,500-student campus.</p>
+  </header>
+
+  <div class="assumptions">
+    <div class="a-cell"><span class="a-num">2,500</span><span class="a-label">Total students</span></div>
+    <div class="a-cell"><span class="a-num">1,000</span><span class="a-label">Active users (40%)</span></div>
+    <div class="a-cell"><span class="a-num">5</span><span class="a-label">Orders / user / month</span></div>
+    <div class="a-cell"><span class="a-num">₹80</span><span class="a-label">Average order value</span></div>
+  </div>
+
+  <h2>Order volume</h2>
+  <p class="lede">Everything else in this model is downstream of how many orders the platform processes in a year.</p>
+
+  <h3>Active users</h3>
+  <div class="formula">Total students × Active-user %
+= 2,500 × 40%
+= 1,000 active users</div>
+
+  <h3>Orders per month</h3>
+  <div class="formula">Active users × Orders per user/month
+= 1,000 × 5
+= 5,000 orders/month</div>
+
+  <h3>Orders per year</h3>
+  <div class="formula">Monthly orders × 12
+= 5,000 × 12
+= 60,000 orders/year</div>
+
+  <h2>GMV — Gross Merchandise Value</h2>
+  <p>GMV is the total value of food sold through the platform — not FoodLine's revenue. It's the base on which commission and payment-processing costs are calculated.</p>
+  <div class="formula">Annual orders × Average order value
+= 60,000 × ₹80
+= ₹48,00,000 (₹48 Lakh/year)</div>
+  <div class="callout warn"><strong>Note:</strong> ₹48L is money changing hands between students and canteens. FoodLine only earns a slice of it.</div>
+
+  <h2>Revenue — three streams</h2>
+  <p class="lede">Every order earns roughly ₹7 in direct revenue, plus a flat monthly SaaS fee per participating canteen.</p>
+
+  <h3>Commission (5% of GMV)</h3>
+  <div class="formula">GMV × 5%
+= ₹48,00,000 × 5%
+= ₹2,40,000/year</div>
+
+  <h3>Student convenience fee (₹3/order)</h3>
+  <div class="formula">Orders × ₹3
+= 60,000 × ₹3
+= ₹1,80,000/year</div>
+
+  <h3>SaaS fee (per canteen)</h3>
+  <p class="lede">Modeled for one participating canteen account on this campus, at ₹2,000/month.</p>
+  <div class="formula">₹2,000 × 12
+= ₹24,000/year</div>
+
+  <table>
+    <thead><tr><th>Revenue stream</th><th class="num">Annual</th></tr></thead>
+    <tbody>
+      <tr><td>Commission (5%)</td><td class="num">₹2,40,000</td></tr>
+      <tr><td>Convenience fee (₹3/order)</td><td class="num">₹1,80,000</td></tr>
+      <tr><td>SaaS fee (1 canteen)</td><td class="num">₹24,000</td></tr>
+      <tr class="total"><td>Total Revenue</td><td class="num">₹4,44,000</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout"><strong>Revenue per order ≈ ₹7</strong> — ₹4 commission + ₹3 convenience fee. SaaS revenue sits on top of this, independent of order volume.</div>
+
+  <h2>COGS — cost of goods sold</h2>
+  <p class="lede">The variable costs that scale directly with orders and GMV.</p>
+
+  <h3>Payment gateway (1.8% of GMV)</h3>
+  <div class="formula">GMV × 1.8%
+= ₹48,00,000 × 1.8%
+= ₹86,400/year</div>
+
+  <h3>Order processing (₹1/order)</h3>
+  <p class="lede">Covers SMS/notifications, operational handling, minor support, and order processing.</p>
+  <div class="formula">Annual orders × ₹1
+= 60,000 × ₹1
+= ₹60,000/year</div>
+
+  <table>
+    <thead><tr><th>Cost item</th><th class="num">Annual</th></tr></thead>
+    <tbody>
+      <tr><td>Payment gateway (1.8% of GMV)</td><td class="num">₹86,400</td></tr>
+      <tr><td>Order processing (₹1/order)</td><td class="num">₹60,000</td></tr>
+      <tr class="total"><td>Total COGS</td><td class="num">₹1,46,400</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Gross profit &amp; margin</h2>
+  <div class="formula">Revenue − COGS
+= ₹4,44,000 − ₹1,46,400
+= ₹2,97,600</div>
+  <div class="formula">Gross Profit ÷ Revenue × 100
+= ₹2,97,600 ÷ ₹4,44,000 × 100
+= 67.03%</div>
+  <div class="callout warn"><strong>Discrepancy in the source notes:</strong> an earlier summary line states gross margin as ~69%, but the detailed calculation above (₹2,97,600 ÷ ₹4,44,000) works out to 67.03%. Worth reconciling before this goes into a pitch deck.</div>
+
+  <h2>Operating expenses</h2>
+  <p class="lede">Fixed costs not tied to individual orders, assumed for the college-level pilot.</p>
+  <table>
+    <thead><tr><th>Expense</th><th class="num">Annual</th></tr></thead>
+    <tbody>
+      <tr><td>Campus operations</td><td class="num">₹60,000</td></tr>
+      <tr><td>Marketing</td><td class="num">₹30,000</td></tr>
+      <tr><td>Software / hosting / tools</td><td class="num">₹24,000</td></tr>
+      <tr><td>Support / admin</td><td class="num">₹36,000</td></tr>
+      <tr><td>Miscellaneous</td><td class="num">₹30,000</td></tr>
+      <tr class="total"><td>Total OPEX</td><td class="num">₹1,80,000</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Net profit</h2>
+  <div class="formula">Gross Profit − Operating Expenses
+= ₹2,97,600 − ₹1,80,000
+= ₹1,17,600/year</div>
+
+  <div class="big-stat">
+    <div class="stat"><span class="v">₹4.44L</span><span class="l">Total revenue</span></div>
+    <div class="stat"><span class="v">₹2.976L</span><span class="l">Gross profit</span></div>
+    <div class="stat"><span class="v">₹1.176L</span><span class="l">Net profit</span></div>
+    <div class="stat"><span class="v">~26–30%</span><span class="l">Net margin</span></div>
+  </div>
+
+  <h2>Break-even point</h2>
+  <p class="lede">SaaS revenue (₹24,000) offsets part of OPEX before order volume needs to cover the rest.</p>
+  <div class="formula">Annual OPEX − SaaS revenue
+= ₹1,80,000 − ₹24,000
+= ₹1,56,000</div>
+  <p>Dividing the remaining OPEX by contribution per order (₹4.56 — revenue per order minus variable cost per order):</p>
+  <div class="formula">₹1,56,000 ÷ ₹4.56
+≈ 34,211 orders/year</div>
+  <div class="callout"><strong>Break-even ≈ 34,200 orders/year</strong>, roughly equivalent to <strong>₹27 Lakh in GMV/year</strong> — well under the modeled 60,000-order pilot volume.</div>
+
+  <h2>Cash flow</h2>
+  <p>Under simple assumptions — digital payments, controlled canteen settlement, no major working-capital drag, no large one-time investment — operating cash flow tracks net profit closely.</p>
+  <div class="formula">Operating cash flow ≈ ₹1,17,600/year (≈ Net Profit)</div>
+
+  <h3>With an initial build cost</h3>
+  <p>If ₹1 lakh is spent upfront building the system, the first year looks different:</p>
+  <div class="formula">₹1,17,600 − ₹1,00,000
+= ₹17,600</div>
+  <div class="callout warn"><strong>Takeaway:</strong> the underlying business can be profitable while the first-year cash position is much thinner — the gap is entirely the one-time build investment, not the operating economics.</div>
+
+  <footer>
+    Model based on assumptions for a single 2,500-student campus pilot. Figures are illustrative and depend heavily on adoption rate, order frequency, and average order value holding as assumed.
+  </footer>
+
+</div>
+</body>
+</html>

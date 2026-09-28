@@ -14,6 +14,7 @@ import { CampusService } from './services/campus-service.js';
 import { checkGoogleSheetsConnection } from './config/googleSheets.js';
 import { SheetsDbService } from './services/sheets-db.service.js';
 import { NotificationService } from './services/notification-service.js';
+import { metricsService } from './services/metrics-service.js';
 import {
   generalApiLimiter,
   otpRateLimiter,
@@ -72,6 +73,16 @@ app.use((_req: Request, res: Response, next: NextFunction) => {
     'Content-Security-Policy',
     "default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' http://localhost:* https://*.supabase.co;"
   );
+  next();
+});
+
+// Telemetry & Latency Profiling Middleware (High-precision hrtime/performance.now)
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const start = performance.now();
+  res.on('finish', () => {
+    const durationMs = performance.now() - start;
+    metricsService.recordApiLatency(req.baseUrl + req.path, durationMs);
+  });
   next();
 });
 
@@ -322,6 +333,10 @@ app.get('/', (req: Request, res: Response) => {
         <div class="link-title">📊 Live Telemetry</div>
         <div class="link-path">GET /api/telemetry</div>
       </a>
+      <a class="link-card" href="/api/metrics">
+        <div class="link-title">⚡ SLA Latency Metrics</div>
+        <div class="link-path">GET /api/metrics</div>
+      </a>
       <a class="link-card" href="/api/campuses/geo">
         <div class="link-title">🗺️ Geo Campus Hierarchy</div>
         <div class="link-path">GET /api/campuses/geo</div>
@@ -333,10 +348,6 @@ app.get('/', (req: Request, res: Response) => {
       <a class="link-card" href="/api/slots">
         <div class="link-title">⏱️ Pickup Slots & Capacity</div>
         <div class="link-path">GET /api/slots</div>
-      </a>
-      <a class="link-card" href="/api/campuses/a1111111-1111-1111-1111-111111111111/canteens">
-        <div class="link-title">🏬 5 Sanjivani Canteens</div>
-        <div class="link-path">GET /api/campuses/:id/canteens</div>
       </a>
     </div>
 
@@ -362,6 +373,7 @@ app.get('/', (req: Request, res: Response) => {
     endpoints: {
       health: '/health',
       telemetry: '/api/telemetry',
+      metrics: '/api/metrics',
       geo: '/api/campuses/geo',
       canteens: '/api/campuses/:campusId/canteens',
       menu: '/api/menu',
@@ -404,6 +416,17 @@ app.get('/health', async (req: Request, res: Response) => {
       },
       sseActiveConnections: sseBroadcaster.getActiveConnectionsCount(),
     },
+  });
+});
+
+// -----------------------------------------------------------------------------
+// Dedicated SLA Latency Profiling Endpoint
+// -----------------------------------------------------------------------------
+app.get('/api/metrics', (_req: Request, res: Response) => {
+  res.json({
+    success: true,
+    data: metricsService.getMetricsSummary(),
+    meta: { timestamp: new Date().toISOString() },
   });
 });
 
@@ -938,6 +961,7 @@ app.get('/api/telemetry', async (req: Request, res: Response) => {
           totalBooked: slots.reduce((acc, s) => acc + s.currentBooked, 0),
         },
         database: dbHealth,
+        metrics: metricsService.getMetricsSummary(),
       },
       meta: { timestamp: new Date().toISOString() },
     });
