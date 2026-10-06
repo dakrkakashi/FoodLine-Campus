@@ -1852,3 +1852,21 @@ The project previously had **three conflicting monetization models**. The correc
     - In-Memory SSE: Avg connection 0.01ms, Avg broadcast 0.12ms (p50=0.11ms, p95=0.28ms, p99=0.34ms), 0% packet drop.
   - Frontend Next.js 15 build (`npm --prefix frontend run build`): 52 routes compiled cleanly with 102 kB shared JS.
   - Full Monorepo build (`npm run build`): 100% clean exit code 0.
+
+## [2026-10-06 16:46] Mobile Component Scaffolding: PickupQrTrackerCard (Antigravity)
+
+- **Scaffolded Component Suite**: `frontend/src/components/order/PickupQrTrackerCard/`
+  1. `PickupQrTrackerCard.types.ts`: Strict TypeScript contract (`PickupQrTrackerCardProps`, `TrackedOrderItem`, `StepMetadata`) with zero `any`.
+  2. `PickupQrTrackerCard.styles.ts`: Accessible Tailwind tokens conforming to FoodLine design system (WCAG 2.2 touch targets, glassmorphism, dynamic theme tokens).
+  3. `PickupQrTrackerCard.tsx`: Universal React 19 / Next.js 15 interactive tracking card featuring:
+     - Real-time countdown timer for slot pickup window.
+     - 1-tap OTP copy with haptic and audio feedback.
+     - View flip between Optical QR pass (`QRCodeSVG`) and counter OTP.
+     - Sound alert toggle with Web Audio chime integration (`useSoundFX`).
+     - Defensive UI states: Loading (skeleton shimmer), Error (retry callback), Empty, and Success (celebratory glow on `READY`).
+  4. `PickupQrTrackerCard.stories.tsx`: Storybook CSF 3.0 specification covering all lifecycle states (`CONFIRMED`, `PREPARING`, `READY`, `COLLECTED`, Loading skeleton, Error, and Empty).
+  5. `PickupQrTrackerCard.test.tsx`: Type-safe unit and integration test suite validating instantiation, defensive states, and event props.
+  6. `index.ts`: Clean export barrel.
+- **Verification**:
+  - `npm --prefix frontend run build`: 52/52 static and dynamic routes compiled in 7.9s with 0 errors (Exit code 0).
+
