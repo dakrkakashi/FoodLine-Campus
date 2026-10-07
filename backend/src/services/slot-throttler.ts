@@ -94,17 +94,21 @@ function parseTimeToMinutes(timeStr: string): number {
   return hours * 60 + minutes;
 }
 
+const istFormatter24 = new Intl.DateTimeFormat('en-IN', {
+  timeZone: 'Asia/Kolkata',
+  hour: 'numeric',
+  minute: 'numeric',
+  hour12: false,
+});
+
 function getCampusCurrentMinutes(): number {
-  const now = new Date();
-  const istFormatter24 = new Intl.DateTimeFormat('en-IN', {
-    timeZone: 'Asia/Kolkata',
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: false,
-  });
-  const parts = istFormatter24.formatToParts(now);
-  const hours = parseInt(parts.find((p) => p.type === 'hour')?.value || '0', 10);
-  const minutes = parseInt(parts.find((p) => p.type === 'minute')?.value || '0', 10);
+  const parts = istFormatter24.formatToParts(new Date());
+  let hours = 0;
+  let minutes = 0;
+  for (let i = 0; i < parts.length; i++) {
+    if (parts[i].type === 'hour') hours = parseInt(parts[i].value, 10);
+    else if (parts[i].type === 'minute') minutes = parseInt(parts[i].value, 10);
+  }
   return hours * 60 + minutes;
 }
 

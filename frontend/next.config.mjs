@@ -53,6 +53,14 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
   },
   outputFileTracingRoot: __dirname,
+  webpack: (config, { webpack }) => {
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(/^\.\/[a-zA-Z]:/, (resource) => {
+        resource.request = resource.request.replace(/^\.\//, '');
+      })
+    );
+    return config;
+  },
   experimental: {
     optimizePackageImports: [
       'lucide-react',

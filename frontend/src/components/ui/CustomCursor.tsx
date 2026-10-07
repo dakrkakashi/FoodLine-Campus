@@ -8,8 +8,7 @@ function CustomCursorContent() {
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isClicking, setIsClicking] = useState(false);
-  const [velocityAngle, setVelocityAngle] = useState(0);
-  const [velocityScale, setVelocityScale] = useState(1);
+  const ringElementRef = useRef<HTMLDivElement>(null);
   const lastPosRef = useRef({ x: -100, y: -100, time: 0 });
 
   // 1. Snappy Laser Core (stiffness 1200, damping 35)
@@ -34,10 +33,10 @@ function CustomCursorContent() {
       const dist = Math.sqrt(dx * dx + dy * dy);
       const speed = dist / dt;
 
-      if (dist > 2) {
+      if (dist > 2 && ringElementRef.current) {
         const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-        setVelocityAngle(angle);
-        setVelocityScale(Math.min(1.22, 1 + speed * 0.05));
+        const scale = Math.min(1.22, 1 + speed * 0.05);
+        ringElementRef.current.style.transform = `rotate(${angle}deg) scale(${scale}, ${2 - scale})`;
       }
 
       lastPosRef.current = { x: e.clientX, y: e.clientY, time: now };
@@ -111,8 +110,9 @@ function CustomCursorContent() {
       >
         {/* Outer Ring Border with Velocity Squash & Glassmorphic Backdrop */}
         <div
+          ref={ringElementRef}
           style={{
-            transform: `rotate(${velocityAngle}deg) scale(${velocityScale}, ${2 - velocityScale})`,
+            transform: 'rotate(0deg) scale(1, 1)',
             transition: 'transform 0.12s ease-out',
           }}
           className={`w-full h-full rounded-full transition-colors duration-200 ${

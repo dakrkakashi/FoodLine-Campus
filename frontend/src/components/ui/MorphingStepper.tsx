@@ -15,7 +15,7 @@ interface MorphingStepperProps {
   size?: 'sm' | 'md';
 }
 
-export function MorphingStepper({
+function MorphingStepperComponent({
   quantity,
   onAdd,
   onRemove,
@@ -126,3 +126,13 @@ export function MorphingStepper({
     </div>
   );
 }
+
+export const MorphingStepper = React.memo(MorphingStepperComponent, (prev, next) => {
+  return (
+    prev.quantity === next.quantity &&
+    prev.isMaxReached === next.isMaxReached &&
+    prev.disabled === next.disabled &&
+    prev.itemName === next.itemName &&
+    prev.size === next.size
+  );
+});

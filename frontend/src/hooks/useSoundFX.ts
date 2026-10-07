@@ -27,22 +27,40 @@ function triggerHaptic(pattern: number | number[]) {
   }
 }
 
+let globalMutedState: boolean | null = null;
+const muteListeners = new Set<(muted: boolean) => void>();
+
+function getInitialMuted(): boolean {
+  if (globalMutedState !== null) return globalMutedState;
+  if (typeof window === 'undefined') return false;
+  try {
+    const saved = localStorage.getItem('foodline-muted');
+    globalMutedState = saved === 'true';
+  } catch {
+    globalMutedState = false;
+  }
+  return globalMutedState;
+}
+
 export function useSoundFX() {
-  const [muted, setMuted] = useState(false);
+  const [muted, setMuted] = useState(getInitialMuted);
 
   useEffect(() => {
-    const saved = localStorage.getItem('foodline-muted');
-    if (saved !== null) {
-      setMuted(saved === 'true');
-    }
+    muteListeners.add(setMuted);
+    return () => {
+      muteListeners.delete(setMuted);
+    };
   }, []);
 
   const toggleMute = () => {
-    setMuted((prev) => {
-      const next = !prev;
+    const next = !getInitialMuted();
+    globalMutedState = next;
+    try {
       localStorage.setItem('foodline-muted', String(next));
-      return next;
-    });
+    } catch {
+      // Ignore storage errors in restricted contexts
+    }
+    muteListeners.forEach((fn) => fn(next));
   };
 
   const unlockAudio = async (): Promise<boolean> => {
