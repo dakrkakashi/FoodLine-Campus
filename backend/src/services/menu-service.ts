@@ -13,9 +13,65 @@ interface CacheEntry {
 // 30-Second TTL in-memory read-through cache for sub-10ms response times
 let cachedMenu: CacheEntry | null = null;
 const CACHE_TTL_MS = 30 * 1000;
+let menuRefreshPromise: Promise<MenuItem[]> | null = null;
+
+async function fetchAllMenuRaw(): Promise<MenuItem[]> {
+  const now = Date.now();
+  let items: MenuItem[] = [];
+
+  if (isSupabaseConfigured) {
+    try {
+      let data: any[] | null;
+      let error: { message?: string } | null;
+      ({ data, error } = await supabase
+        .from('menu_items')
+        .select('id, name, tag, price, prep_time_mins, is_available, is_veg, image_url, cafeteria_id, categories(name)')
+        .order('name', { ascending: true }));
+
+      // Keep menu reads available during rolling deployments where the
+      // is_veg migration has not reached the active database yet.
+      if (error?.message?.includes('is_veg')) {
+        const fallback = await supabase
+          .from('menu_items')
+          .select('id, name, tag, price, prep_time_mins, is_available, image_url, cafeteria_id, categories(name)')
+          .order('name', { ascending: true });
+        data = fallback.data;
+        error = fallback.error;
+      }
+
+      if (!error && data && data.length > 0) {
+        items = data.map(MenuService.mapMenuItem);
+      } else if (error) {
+        console.error('[MenuService] Supabase menu query error:', error.message);
+      }
+    } catch (err: any) {
+      console.error('[MenuService] Failed to query menu_items from Supabase:', err?.message || err);
+    }
+  }
+
+  // Resilient fallback to local seed menu data if Supabase was empty or unreachable
+  if (items.length === 0) {
+    items = ((initialMenuData as any[]) || []).map((d) => ({
+      id: d.id,
+      name: d.name,
+      category: d.category || 'Quick Bites & Chaat',
+      price: Number(d.price),
+      prepTime: d.prepTime || 5,
+      tag: d.tag || '',
+      isVeg: d.isVeg !== false,
+      isAvailable: d.isAvailable !== false,
+      image: d.image || null,
+      cafeteriaId: d.cafeteriaId || PRIMARY_CAFETERIA_ID,
+      cafeteria_id: d.cafeteriaId || PRIMARY_CAFETERIA_ID,
+    }));
+  }
+
+  cachedMenu = { items, timestamp: now };
+  return items;
+}
 
 export class MenuService {
-  private static mapMenuItem(d: any): MenuItem {
+  public static mapMenuItem(d: any): MenuItem {
     return {
       id: d.id,
       name: d.name,
@@ -48,40 +104,25 @@ export class MenuService {
     const targetCafeteria = MenuService.resolveCafeteriaId(cafeteriaId);
     const now = Date.now();
 
-    // Check high-speed cache
     let allItems: MenuItem[] = [];
-    if (!forceRefresh && cachedMenu && now - cachedMenu.timestamp < CACHE_TTL_MS) {
+
+    if (forceRefresh) {
+      allItems = await fetchAllMenuRaw();
+    } else if (cachedMenu) {
       allItems = cachedMenu.items;
-    } else if (isSupabaseConfigured) {
-      try {
-        let data: any[] | null;
-        let error: { message?: string } | null;
-        ({ data, error } = await supabase
-          .from('menu_items')
-          .select('id, name, tag, price, prep_time_mins, is_available, is_veg, image_url, cafeteria_id, categories(name)')
-          .order('name', { ascending: true }));
-
-        // Keep menu reads available during rolling deployments where the
-        // is_veg migration has not reached the active database yet.
-        if (error?.message?.includes('is_veg')) {
-          const fallback = await supabase
-            .from('menu_items')
-            .select('id, name, tag, price, prep_time_mins, is_available, image_url, cafeteria_id, categories(name)')
-            .order('name', { ascending: true });
-          data = fallback.data;
-          error = fallback.error;
-        }
-
-        if (!error && data && data.length > 0) {
-          allItems = data.map(MenuService.mapMenuItem);
-
-          cachedMenu = { items: allItems, timestamp: now };
-        } else if (error) {
-          console.error('[MenuService] Supabase menu query error:', error.message);
-        }
-      } catch (err: any) {
-        console.error('[MenuService] Failed to query menu_items from Supabase:', err?.message || err);
+      // Stale-While-Revalidate background refresh
+      if (now - cachedMenu.timestamp >= CACHE_TTL_MS && !menuRefreshPromise) {
+        menuRefreshPromise = fetchAllMenuRaw().finally(() => {
+          menuRefreshPromise = null;
+        });
       }
+    } else {
+      if (!menuRefreshPromise) {
+        menuRefreshPromise = fetchAllMenuRaw().finally(() => {
+          menuRefreshPromise = null;
+        });
+      }
+      allItems = await menuRefreshPromise;
     }
 
     // If cache was populated, filter by cafeteria and category

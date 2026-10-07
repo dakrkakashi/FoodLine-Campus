@@ -394,12 +394,20 @@ h1, h2, h3, .font-heading {
   background: rgba(4, 28, 22, 0.7);
   border: 2px solid rgba(0, 212, 170, 0.45);
   backdrop-filter: blur(24px);
+  contain: layout style paint;
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .marquee-track {
   display: flex;
   width: max-content;
   animation: marquee-scroll 32s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
 }
 
 .marquee-track:hover {
@@ -407,8 +415,8 @@ h1, h2, h3, .font-heading {
 }
 
 @keyframes marquee-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }
 
 .spotlight-flare {

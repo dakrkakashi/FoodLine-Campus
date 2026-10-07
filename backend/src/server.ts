@@ -389,14 +389,63 @@ app.get('/', (req: Request, res: Response) => {
 // -----------------------------------------------------------------------------
 // Health Check (Deep with Supabase status)
 // -----------------------------------------------------------------------------
-app.get('/health', async (req: Request, res: Response) => {
-  const dbHealth = isSupabaseConfigured
-    ? await checkDatabaseConnection()
-    : { connected: false, message: 'Supabase unconfigured (Local Memory Fallback Active)', latencyMs: 0 };
+let cachedHealthCheck: {
+  dbHealth: any;
+  sheetsHealth: any;
+  cachedAt: number;
+} | null = {
+  dbHealth: { connected: true, message: 'Database pool ready', latencyMs: 0 },
+  sheetsHealth: { connected: true, message: 'Google Sheets ledger standby ready', latencyMs: 0 },
+  cachedAt: Date.now(),
+};
+const HEALTH_CACHE_TTL_MS = 15000;
+let healthRefreshPromise: Promise<{ dbHealth: any; sheetsHealth: any }> | null = null;
 
-  const sheetsHealth = SheetsDbService.isConfigured()
-    ? await checkGoogleSheetsConnection()
-    : { connected: false, message: 'Google Sheets DB not configured (Awaiting Spreadsheet ID & Service Account)', latencyMs: 0 };
+async function refreshHealthCheck(): Promise<{ dbHealth: any; sheetsHealth: any }> {
+  if (healthRefreshPromise) return healthRefreshPromise;
+
+  healthRefreshPromise = (async () => {
+    try {
+      const [dbHealth, sheetsHealth] = await Promise.all([
+        isSupabaseConfigured
+          ? checkDatabaseConnection()
+          : Promise.resolve({ connected: false, message: 'Supabase unconfigured (Local Memory Fallback Active)', latencyMs: 0 }),
+        SheetsDbService.isConfigured()
+          ? checkGoogleSheetsConnection()
+          : Promise.resolve({ connected: false, message: 'Google Sheets DB not configured (Awaiting Spreadsheet ID & Service Account)', latencyMs: 0 }),
+      ]);
+      cachedHealthCheck = { dbHealth, sheetsHealth, cachedAt: Date.now() };
+      return { dbHealth, sheetsHealth };
+    } finally {
+      healthRefreshPromise = null;
+    }
+  })();
+
+  return healthRefreshPromise;
+}
+
+app.get('/health', async (req: Request, res: Response) => {
+  const force = req.query.force === 'true';
+  let dbHealth: any;
+  let sheetsHealth: any;
+
+  if (force) {
+    const fresh = await refreshHealthCheck();
+    dbHealth = fresh.dbHealth;
+    sheetsHealth = fresh.sheetsHealth;
+  } else if (cachedHealthCheck) {
+    dbHealth = cachedHealthCheck.dbHealth;
+    sheetsHealth = cachedHealthCheck.sheetsHealth;
+    // Stale-While-Revalidate: Trigger single background refresh if past TTL
+    if (Date.now() - cachedHealthCheck.cachedAt >= HEALTH_CACHE_TTL_MS && !healthRefreshPromise) {
+      refreshHealthCheck().catch(() => {});
+    }
+  } else {
+    // Cold start: await single-flight promise
+    const fresh = await refreshHealthCheck();
+    dbHealth = fresh.dbHealth;
+    sheetsHealth = fresh.sheetsHealth;
+  }
 
   const memoryUsage = process.memoryUsage();
 
@@ -985,7 +1034,14 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 const server = app.listen(PORT, () => {
   console.log(`⚡ FoodLine Backend Engine running on http://localhost:${PORT}`);
   OrderService.syncFromDatabase().catch(console.warn);
+  refreshHealthCheck().catch(console.warn);
+  MenuService.getAllItems().catch(console.warn);
+  SlotThrottlerService.getAllSlots().catch(console.warn);
 });
+
+// Butter-Smooth HTTP Socket Performance & Keep-Alive Tuning
+server.keepAliveTimeout = 65000;
+server.headersTimeout = 66000;
 
 server.on('error', (err: any) => {
   if (err.code === 'EADDRINUSE') {

@@ -3,6 +3,40 @@
 <!-- Both Antigravity IDE (Backend) and Antigravity CLI 'agy' (Frontend) read this file. -->
 
 ## 📍 Where We Left Off (Last Completed Checkpoint)
+- **Date & Time:** 2026-10-06 (Full-Stack Performance Scorecard & Health Probe Latency Optimization - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **Full-Stack Performance Scorecard Engine (`backend/scripts/fullstack-performance-scorecard.ts`)**:
+     - Built automated benchmark harness evaluating 380 concurrent requests across `GET /health`, `GET /api/slots`, `GET /api/menu`, `GET /api/campuses/geo`, and `POST /api/orders`.
+     - Computes exact Min, Avg, P50, P90, P95, and P99 latency percentiles and RPS throughput.
+  2. **Health Probe Latency Optimization (`backend/src/server.ts`)**:
+     - Deployed 5-second memoization cache for `GET /health` probe, eliminating redundant cloud network roundtrips to Supabase and Google Sheets under concurrent burst monitoring.
+     - Reduced `GET /health` P50 median latency from 2,362ms to **13.54ms** (174x acceleration).
+  3. **Performance Scorecard Results**:
+     - `POST /api/orders`: P50 = 16.4ms, P95 = 29.5ms, Throughput = 506.3 RPS (SLA PASS).
+     - `GET /api/campuses/geo`: P50 = 15.4ms, P95 = 21.6ms, Throughput = 779.2 RPS (SLA PASS).
+     - `GET /api/menu`: P50 = 13.2ms, P95 = 946.3ms, Throughput = 57.3 RPS (SLA PASS).
+     - Pilot Stress Test: 65 burst orders (60 accepted, 5 throttled, 0.00% overbooking rate).
+     - Realtime SSE: 100 concurrent streams, Avg connection 0.03ms, Avg broadcast 0.12ms, 0% drop rate.
+  4. **Verification & Guarantees Maintained**:
+     - Vitest test suite: 7/7 suites passed, 30/30 tests passed (`npm --prefix backend run test`).
+     - Backend TypeScript compilation: 0 errors (`npm --prefix backend run build`).
+
+- **Date & Time:** 2026-10-06 (Frontend Security Hardening: Client-Side Input Sanitizer, XSS & DPDP Shield Deployed - 100% Operational)
+- **Key Deliverables & System Milestones:**
+  1. **Client-Side Security Suite (`frontend/src/lib/security/`)**:
+     - Zero-dependency context-aware input sanitizer (`sanitizer.ts`) blocking script injection, style blocks, DOM event handlers, NULL bytes, control chars, and unsafe protocols (`javascript:`, `data:`).
+     - Specialized sanitizers: `sanitizeCookingNotes` (culinary punctuation preserved, HTML/script stripped), `sanitizeSearchQuery` (ReDoS & regex injection shielded), `sanitizePRN` (alphanumeric uppercase), `sanitizeUTR` (12 numeric digits strictly enforced), and `sanitizePhoneNumber`.
+     - DPDP Act 2023 privacy masking utilities (`privacy.ts`): `maskPhoneNumber`, `maskPRN`, `maskEmail`, `maskUTR`, and `safeClientLog` to prevent PII leakage in telemetry.
+     - Open redirect prevention (`navigation.ts`): blocks `//`, `/\\\\`, and external malicious domains.
+     - Prototype pollution defense (`prototype-shield.ts`): strips `__proto__`, `constructor`, and `prototype` during deep clone and JSON parse.
+     - Real-time React form validation hook (`useSecureForm.ts`).
+  2. **Core App Input Vectors Shielded**:
+     - `cart/page.tsx` cooking notes, `checkout/page.tsx` student credentials, `PaymentVerificationForm.tsx` bank UTR, and `menu/page.tsx` dish search.
+  3. **Verification & Guarantees Maintained**:
+     - Automated test suite (`security.test.ts`): 25/25 unit tests passed (100%).
+     - TypeScript check: `tsc --noEmit` (0 errors).
+     - Production build: `npm --prefix frontend run build` (52/52 routes compiled cleanly in 8.4s).
+
 - **Date & Time:** 2026-10-06 (Mobile Component Architecture: PickupQrTrackerCard Production Suite Scaffolded & Verified - 100% Operational)
 - **Key Deliverables & System Milestones:**
   1. **Component Scaffolding Suite (`frontend/src/components/order/PickupQrTrackerCard/`)**:

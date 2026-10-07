@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useDeferredValue } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
@@ -50,6 +50,7 @@ const CampusCounterMap = dynamic(
 );
 import { BudgetAndTimetableBar } from '@/components/menu/BudgetAndTimetableBar';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { sanitizeSearchQuery } from '@/lib/security';
 
 interface MenuItem {
   id: string;
@@ -87,6 +88,7 @@ export default function MenuPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [search, setSearch] = useState('');
+  const deferredSearch = useDeferredValue(search);
   const [loading, setLoading] = useState(true);
   const [inspectingDish, setInspectingDish] = useState<DishInspectItem | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -309,17 +311,19 @@ export default function MenuPage() {
   );
 
   const filteredItems = useMemo(() => {
+    const cleanSearch = deferredSearch.toLowerCase().trim();
     return menuItems.filter((item) => {
       const matchesCat = isCategoryMatch(item, selectedCategory);
       const matchesSearch =
-        item.name.toLowerCase().includes(search.toLowerCase()) ||
-        (item.tag && item.tag.toLowerCase().includes(search.toLowerCase())) ||
-        (item.category && item.category.toLowerCase().includes(search.toLowerCase()));
+        !cleanSearch ||
+        item.name.toLowerCase().includes(cleanSearch) ||
+        (item.tag && item.tag.toLowerCase().includes(cleanSearch)) ||
+        (item.category && item.category.toLowerCase().includes(cleanSearch));
       const matchesBudget = !isUnderFifty || Number(item.price) <= 50;
       const matchesVeg = !isVegOnly || (item.isVeg !== false && item.is_veg !== false);
       return matchesCat && matchesSearch && matchesBudget && matchesVeg;
     });
-  }, [menuItems, selectedCategory, search, isUnderFifty, isVegOnly, isCategoryMatch]);
+  }, [menuItems, selectedCategory, deferredSearch, isUnderFifty, isVegOnly, isCategoryMatch]);
 
   const categoryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -431,7 +435,7 @@ export default function MenuPage() {
                 id="menu-search-input"
                 placeholder="Search 44+ dishes (Press '/' to focus)..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => setSearch(sanitizeSearchQuery(e.target.value))}
                 className="w-full bg-(--bg-card) border border-(--border-glass) rounded-2xl pl-11 pr-11 py-3 sm:py-3.5 text-xs sm:text-sm text-(--text-primary) placeholder-(--text-muted) focus:outline-none focus:border-accent-orange focus:ring-2 focus:ring-accent-orange/20 transition-all shadow-inner"
               />
               <AnimatePresence>
@@ -668,7 +672,7 @@ export default function MenuPage() {
             </motion.button>
           </motion.div>
         ) : (
-          <div className={gridMode === 'grid' ? "grid grid-cols-2 gap-2.5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-5" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"}>
+          <div className={`content-visibility-auto ${gridMode === 'grid' ? "grid grid-cols-2 gap-2.5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-5" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"}`}>
             {filteredItems.map((dish) => {
               const qty = getCartQuantity(dish.id);
               const isAvailable = getEffectiveAvailability(dish);

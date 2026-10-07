@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { sanitizeUTR } from '@/lib/security';
 import Link from 'next/link';
 
 export function PaymentVerificationForm() {
@@ -9,7 +10,8 @@ export function PaymentVerificationForm() {
   const [verified, setVerified] = useState(false);
 
   const handleVerify = () => {
-    if (utr.length < 6) {
+    const { isValid, sanitized } = sanitizeUTR(utr);
+    if (!isValid) {
       alert('Please enter a valid 12-digit bank UTR reference number.');
       return;
     }

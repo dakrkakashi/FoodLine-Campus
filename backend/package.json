@@ -12,7 +12,8 @@
     "test:api": "node ./node_modules/tsx/dist/cli.mjs scripts/verify-api.ts",
     "test:security": "node ./node_modules/tsx/dist/cli.mjs scripts/verify-security.ts",
     "test:stress": "node ./node_modules/tsx/dist/cli.mjs scripts/stress-test.ts",
-    "test:benchmark": "node ./node_modules/tsx/dist/cli.mjs scripts/benchmark-realtime.ts"
+    "test:benchmark": "node ./node_modules/tsx/dist/cli.mjs scripts/benchmark-realtime.ts",
+    "test:scorecard": "node ./node_modules/tsx/dist/cli.mjs scripts/fullstack-performance-scorecard.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.47.0",

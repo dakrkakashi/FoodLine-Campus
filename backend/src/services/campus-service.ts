@@ -3,11 +3,33 @@ import campusesGeoData from '../data/campuses-geo.json';
 import canteensData from '../data/canteens.json';
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js';
 
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+}
+
+let cachedGeoHierarchy: CacheEntry<CampusGeoHierarchy> | null = null;
+const cachedCanteensMap = new Map<string, CacheEntry<{ campus: any; canteens: Canteen[] }>>();
+const GEO_CACHE_TTL_MS = 60 * 1000;
+let geoRefreshPromise: Promise<CampusGeoHierarchy> | null = null;
+const canteensRefreshPromises = new Map<string, Promise<{ campus: any; canteens: Canteen[] }>>();
+
 export class CampusService {
   /**
    * Get 4-tier geographic hierarchy of campuses (State -> District -> Town -> Campus)
    */
-  public static async getGeoHierarchy(): Promise<CampusGeoHierarchy> {
+  public static async getGeoHierarchy(forceRefresh = false): Promise<CampusGeoHierarchy> {
+    const now = Date.now();
+    if (!forceRefresh && cachedGeoHierarchy && now - cachedGeoHierarchy.timestamp < GEO_CACHE_TTL_MS) {
+      return cachedGeoHierarchy.data;
+    }
+
+    if (geoRefreshPromise) {
+      return geoRefreshPromise;
+    }
+
+    geoRefreshPromise = (async () => {
+      try {
     if (isSupabaseConfigured) {
       try {
         const { data, error } = await supabase
@@ -69,6 +91,7 @@ export class CampusService {
           };
 
           if (hierarchy.states.length > 0) {
+            cachedGeoHierarchy = { data: hierarchy, timestamp: Date.now() };
             return hierarchy;
           }
         }
@@ -78,66 +101,99 @@ export class CampusService {
     }
 
     // Fallback to local memory cache
-    return campusesGeoData as CampusGeoHierarchy;
+    const fallback = campusesGeoData as CampusGeoHierarchy;
+    cachedGeoHierarchy = { data: fallback, timestamp: Date.now() };
+    return fallback;
+    } finally {
+      geoRefreshPromise = null;
+    }
+  })();
+
+  return geoRefreshPromise;
   }
 
   /**
    * Get all registered canteens for a specific campus with live operational metrics
    */
-  public static async getCanteensByCampus(campusId: string): Promise<{ campus: any; canteens: Canteen[] }> {
+  public static async getCanteensByCampus(campusId: string, forceRefresh = false): Promise<{ campus: any; canteens: Canteen[] }> {
     const defaultCampus = {
       id: campusId || 'a1111111-1111-1111-1111-111111111111',
       name: 'Sanjivani University',
       slug: 'sanjivani',
       location: 'Kopargaon, Maharashtra',
     };
+    const targetKey = defaultCampus.id;
+    const now = Date.now();
 
-    if (isSupabaseConfigured) {
-      try {
-        const { data, error } = await supabase
-          .from('cafeterias')
-          .select('*, campuses(id, name, slug, location)')
-          .eq('campus_id', defaultCampus.id);
-
-        if (!error && data && data.length > 0) {
-          const canteens: Canteen[] = data.map((c: any) => ({
-            id: c.id,
-            campus_id: c.campus_id,
-            name: c.name,
-            slug: c.slug,
-            tagline: c.tagline || (c.slug === 'cafe7' ? 'Main Academic Canteen' : 'Campus Express'),
-            location: c.location || 'Campus Quad',
-            upiId: c.upi_id || '9960091371@slc',
-            upi_id: c.upi_id || '9960091371@slc',
-            isPureVeg: c.is_pure_veg !== undefined ? c.is_pure_veg : true,
-            is_pure_veg: c.is_pure_veg !== undefined ? c.is_pure_veg : true,
-            isOpen: c.is_open !== undefined ? c.is_open : true,
-            is_active: c.is_active !== undefined ? c.is_active : true,
-            prepTimeMins: c.prep_time_mins || 5,
-            prep_time_mins: c.prep_time_mins || 5,
-            activeSlotsCount: 4,
-            dishesCount: c.slug === 'cafe7' ? 44 : 15,
-            imageUrl: c.image_url || `/images/canteens/${c.slug}.webp`,
-            image_url: c.image_url || `/images/canteens/${c.slug}.webp`,
-          }));
-
-          const campusMeta = data[0]?.campuses || defaultCampus;
-          return { campus: campusMeta, canteens };
-        }
-      } catch (err) {
-        console.warn('Supabase canteens fetch fallback to local cache:', err);
-      }
+    const cached = cachedCanteensMap.get(targetKey);
+    if (!forceRefresh && cached && now - cached.timestamp < GEO_CACHE_TTL_MS) {
+      return cached.data;
     }
 
-    // Fallback to local memory cache
-    const canteens = (canteensData as any[]).filter(
-      (c) => c.campus_id === defaultCampus.id || defaultCampus.id.includes('a1111111')
-    );
+    const inFlight = canteensRefreshPromises.get(targetKey);
+    if (inFlight) {
+      return inFlight;
+    }
 
-    return {
-      campus: defaultCampus,
-      canteens,
-    };
+    const refreshPromise = (async () => {
+      try {
+        if (isSupabaseConfigured) {
+          try {
+            const { data, error } = await supabase
+              .from('cafeterias')
+              .select('*, campuses(id, name, slug, location)')
+              .eq('campus_id', defaultCampus.id);
+
+            if (!error && data && data.length > 0) {
+              const canteens: Canteen[] = data.map((c: any) => ({
+                id: c.id,
+                campus_id: c.campus_id,
+                name: c.name,
+                slug: c.slug,
+                tagline: c.tagline || (c.slug === 'cafe7' ? 'Main Academic Canteen' : 'Campus Express'),
+                location: c.location || 'Campus Quad',
+                upiId: c.upi_id || '9960091371@slc',
+                upi_id: c.upi_id || '9960091371@slc',
+                isPureVeg: c.is_pure_veg !== undefined ? c.is_pure_veg : true,
+                is_pure_veg: c.is_pure_veg !== undefined ? c.is_pure_veg : true,
+                isOpen: c.is_open !== undefined ? c.is_open : true,
+                is_active: c.is_active !== undefined ? c.is_active : true,
+                prepTimeMins: c.prep_time_mins || 5,
+                prep_time_mins: c.prep_time_mins || 5,
+                activeSlotsCount: 4,
+                dishesCount: c.slug === 'cafe7' ? 44 : 15,
+                imageUrl: c.image_url || `/images/canteens/${c.slug}.webp`,
+                image_url: c.image_url || `/images/canteens/${c.slug}.webp`,
+              }));
+
+              const campusMeta = data[0]?.campuses || defaultCampus;
+              const result = { campus: campusMeta, canteens };
+              cachedCanteensMap.set(targetKey, { data: result, timestamp: Date.now() });
+              return result;
+            }
+          } catch (err) {
+            console.warn('Supabase canteens fetch fallback to local cache:', err);
+          }
+        }
+
+        // Fallback to local memory cache
+        const canteens = (canteensData as any[]).filter(
+          (c) => c.campus_id === defaultCampus.id || defaultCampus.id.includes('a1111111')
+        );
+
+        const result = {
+          campus: defaultCampus,
+          canteens,
+        };
+        cachedCanteensMap.set(targetKey, { data: result, timestamp: Date.now() });
+        return result;
+      } finally {
+        canteensRefreshPromises.delete(targetKey);
+      }
+    })();
+
+    canteensRefreshPromises.set(targetKey, refreshPromise);
+    return refreshPromise;
   }
 
   /**

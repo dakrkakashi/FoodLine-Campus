@@ -34,6 +34,7 @@ import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import { EmptyCartIllustration } from '@/components/illustrations';
 import { formatINR } from '@/lib/utils';
 import { VegIcon } from '@/components/icons';
+import { sanitizeCookingNotes } from '@/lib/security';
 
 export default function CartReviewPage() {
   const router = useRouter();
@@ -303,7 +304,7 @@ export default function CartReviewPage() {
               </div>
               <textarea
                 value={cookingNotes}
-                onChange={(e) => setCookingNotes(e.target.value)}
+                onChange={(e) => setCookingNotes(sanitizeCookingNotes(e.target.value))}
                 placeholder="e.g. Less spicy, extra green chutney, no onions..."
                 maxLength={180}
                 rows={2}

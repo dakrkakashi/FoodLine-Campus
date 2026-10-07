@@ -62,6 +62,10 @@ const nextConfig = {
       '@react-three/drei',
       'three',
       'canvas-confetti',
+      '@tanstack/react-virtual',
+      'qrcode.react',
+      'clsx',
+      'tailwind-merge',
     ],
   },
   images: {

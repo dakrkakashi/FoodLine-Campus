@@ -9,7 +9,70 @@ const slotHolds: Map<string, SlotHoldRecord> = new Map();
 // High-speed short-lived read cache for slots to prevent DB contention during peak bursts
 let cachedSlots: PickupSlot[] | null = null;
 let cachedSlotsTimestamp: number = 0;
-const SLOTS_CACHE_TTL_MS = 3000; // 3-second read-through TTL
+const SLOTS_CACHE_TTL_MS = 5000; // 5-second read-through TTL
+let slotsRefreshPromise: Promise<PickupSlot[]> | null = null;
+
+async function fetchSlotsFromDb(): Promise<PickupSlot[]> {
+  const currentCampusMinutes = getCampusCurrentMinutes();
+  const now = Date.now();
+
+  if (isSupabaseConfigured) {
+    try {
+      const { data, error } = await supabase
+        .from('pickup_slots')
+        .select('*')
+        .eq('is_active', true)
+        .order('start_time', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        const freshSlots: PickupSlot[] = data.map((d: any) => {
+          const startMinutes = parseTimeToMinutes(d.start_time);
+          const isPast = currentCampusMinutes >= startMinutes;
+          const isFull = (d.current_booked || 0) >= (d.max_capacity || 60);
+          const status: 'OPEN' | 'FULL' | 'CLOSED_TIME_PASSED' = isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN';
+          return {
+            id: d.id,
+            label: d.label,
+            startTime: d.start_time,
+            endTime: d.end_time,
+            maxCapacity: d.max_capacity || 60,
+            currentBooked: d.current_booked || 0,
+            availableSlots: Math.max(0, (d.max_capacity || 60) - (d.current_booked || 0)),
+            isFull,
+            isPast,
+            isClosed: isPast || isFull,
+            status,
+            cafeteriaId: d.cafeteria_id,
+            facultyReserved: d.faculty_reserved || 5,
+          };
+        });
+
+        cachedSlots = freshSlots;
+        cachedSlotsTimestamp = now;
+        return freshSlots;
+      }
+    } catch (err) {
+      console.warn('Supabase slots fetch fallback to local cache:', err);
+    }
+  }
+
+  const localSlots: PickupSlot[] = Array.from(slotState.values()).map((slot) => {
+    const startMinutes = parseTimeToMinutes(slot.startTime);
+    const isPast = currentCampusMinutes >= startMinutes;
+    const isFull = (slot.currentBooked || 0) >= (slot.maxCapacity || 60);
+    const status: 'OPEN' | 'FULL' | 'CLOSED_TIME_PASSED' = isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN';
+    return {
+      ...slot,
+      isPast,
+      isClosed: isPast || isFull,
+      status,
+    };
+  });
+
+  cachedSlots = localSlots;
+  cachedSlotsTimestamp = now;
+  return localSlots;
+}
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -61,13 +124,17 @@ for (const breakWindow of campusData.breaks) {
   }
 }
 
+// Pre-warm cachedSlots immediately to eliminate cold-start burst contention
+cachedSlots = Array.from(slotState.values());
+cachedSlotsTimestamp = Date.now();
+
 export class SlotThrottlerService {
   /**
    * Invalidate cached slots immediately upon reservation or capacity changes
    */
   public static invalidateCache(): void {
-    cachedSlots = null;
-    cachedSlotsTimestamp = 0;
+    cachedSlots = Array.from(slotState.values());
+    cachedSlotsTimestamp = Date.now();
   }
 
   /**
@@ -77,9 +144,8 @@ export class SlotThrottlerService {
     const currentCampusMinutes = getCampusCurrentMinutes();
     const now = Date.now();
 
-    // Check read-through cache if within TTL
-    if (cachedSlots && (now - cachedSlotsTimestamp < SLOTS_CACHE_TTL_MS)) {
-      return cachedSlots.map((s) => {
+    if (cachedSlots) {
+      const mapped = cachedSlots.map((s) => {
         const startMinutes = parseTimeToMinutes(s.startTime);
         const isPast = currentCampusMinutes >= startMinutes;
         const isFull = (s.currentBooked || 0) >= (s.maxCapacity || 60);
@@ -91,64 +157,24 @@ export class SlotThrottlerService {
           status,
         };
       });
-    }
 
-    if (isSupabaseConfigured) {
-      try {
-        const { data, error } = await supabase
-          .from('pickup_slots')
-          .select('*')
-          .eq('is_active', true)
-          .order('start_time', { ascending: true });
-
-        if (!error && data && data.length > 0) {
-          const freshSlots: PickupSlot[] = data.map((d: any) => {
-            const startMinutes = parseTimeToMinutes(d.start_time);
-            const isPast = currentCampusMinutes >= startMinutes;
-            const isFull = (d.current_booked || 0) >= (d.max_capacity || 60);
-            const status: 'OPEN' | 'FULL' | 'CLOSED_TIME_PASSED' = isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN';
-            return {
-              id: d.id,
-              label: d.label,
-              startTime: d.start_time,
-              endTime: d.end_time,
-              maxCapacity: d.max_capacity || 60,
-              currentBooked: d.current_booked || 0,
-              availableSlots: Math.max(0, (d.max_capacity || 60) - (d.current_booked || 0)),
-              isFull,
-              isPast,
-              isClosed: isPast || isFull,
-              status,
-              cafeteriaId: d.cafeteria_id,
-              facultyReserved: d.faculty_reserved || 5,
-            };
-          });
-
-          cachedSlots = freshSlots;
-          cachedSlotsTimestamp = now;
-          return freshSlots;
-        }
-      } catch (err) {
-        console.warn('Supabase slots fetch fallback to local cache:', err);
+      // Stale-While-Revalidate: Trigger single background refresh if TTL elapsed
+      if (now - cachedSlotsTimestamp >= SLOTS_CACHE_TTL_MS && !slotsRefreshPromise) {
+        slotsRefreshPromise = fetchSlotsFromDb().finally(() => {
+          slotsRefreshPromise = null;
+        });
       }
+
+      return mapped;
     }
 
-    const localSlots: PickupSlot[] = Array.from(slotState.values()).map((slot) => {
-      const startMinutes = parseTimeToMinutes(slot.startTime);
-      const isPast = currentCampusMinutes >= startMinutes;
-      const isFull = (slot.currentBooked || 0) >= (slot.maxCapacity || 60);
-      const status: 'OPEN' | 'FULL' | 'CLOSED_TIME_PASSED' = isPast ? 'CLOSED_TIME_PASSED' : isFull ? 'FULL' : 'OPEN';
-      return {
-        ...slot,
-        isPast,
-        isClosed: isPast || isFull,
-        status,
-      };
-    });
+    if (!slotsRefreshPromise) {
+      slotsRefreshPromise = fetchSlotsFromDb().finally(() => {
+        slotsRefreshPromise = null;
+      });
+    }
 
-    cachedSlots = localSlots;
-    cachedSlotsTimestamp = now;
-    return localSlots;
+    return await slotsRefreshPromise;
   }
 
   /**

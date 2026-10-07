@@ -40,6 +40,7 @@ import { EmptyCartIllustration, OrderSuccessIllustration } from '@/components/il
 import { saveOrderToHistory } from '@/lib/order-history-store';
 import { getCampusTimeIST, parseTimeToMinutes } from '@/lib/campus-time';
 import { CampusClockBadge } from '@/components/checkout/CampusClockBadge';
+import { sanitizeText, sanitizeCookingNotes, sanitizePRN } from '@/lib/security';
 
 interface Slot {
   id: string;
@@ -875,7 +876,7 @@ export default function CheckoutPage() {
                       type="text"
                       placeholder="e.g. Shivam"
                       value={studentName}
-                      onChange={(e) => setStudentName(e.target.value)}
+                      onChange={(e) => setStudentName(sanitizeText(e.target.value, { maxLength: 60, stripHtml: true, encodeEntities: false }))}
                       className="w-full bg-(--bg-card) border border-(--border-glass) rounded-xl px-3 py-2.5 text-xs text-(--text-primary) placeholder-(--text-muted) focus:outline-none focus:border-accent-orange transition shadow-inner"
                     />
                   </div>
@@ -885,7 +886,7 @@ export default function CheckoutPage() {
                       type="text"
                       placeholder="e.g. 23BBA042"
                       value={studentPrn}
-                      onChange={(e) => setStudentPrn(e.target.value.toUpperCase())}
+                      onChange={(e) => setStudentPrn(sanitizePRN(e.target.value).sanitized)}
                       className="w-full bg-(--bg-card) border border-(--border-glass) rounded-xl px-3 py-2.5 text-xs text-(--text-primary) font-mono uppercase placeholder-(--text-muted) focus:outline-none focus:border-accent-orange transition shadow-inner"
                     />
                   </div>

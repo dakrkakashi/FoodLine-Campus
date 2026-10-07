@@ -2,10 +2,85 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle2, Sparkles, BellRing, PackageCheck, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, Sparkles, PackageCheck } from 'lucide-react';
 import { DisplayOrder } from '@/lib/types';
 import { getCounterLabel } from '@/lib/display-utils';
 import { PaymentBadge } from './PaymentBadge';
+
+interface ReadyOrderCardProps {
+  order: DisplayOrder;
+}
+
+const ReadyOrderCard = React.memo(function ReadyOrderCard({ order }: ReadyOrderCardProps) {
+  const counterInfo = getCounterLabel(order.counter || 1);
+  const itemsSummary = (order.order_items || [])
+    .map((i) => `${i.quantity}x ${i.item_name || 'Item'}`)
+    .join(', ');
+  const isCollected = order.status === 'COLLECTED';
+
+  return (
+    <motion.div
+      layout
+      initial={{ scale: 0.88, opacity: 0, y: 25 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      exit={{ scale: 0.85, opacity: 0, transition: { duration: 0.3 } }}
+      transition={{ type: 'spring', stiffness: 320, damping: 25 }}
+      className={`display-card-ready rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-all ${
+        order.isJustReady ? 'spotlight-flare' : ''
+      } ${isCollected ? 'opacity-40 grayscale border-zinc-700' : ''}`}
+    >
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Left: Giant Token Display */}
+        <div>
+          <div className="flex items-center gap-3">
+            <span className="text-5xl md:text-7xl font-black text-white font-mono tracking-tight drop-shadow-[0_0_25px_rgba(0,212,170,0.5)]">
+              {order.order_token}
+            </span>
+
+            <PaymentBadge />
+
+            {order.isJustReady && (
+              <span className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-[#FF6B2C]/30 animate-pulse">
+                <Sparkles size={12} />
+                <span>JUST READY</span>
+              </span>
+            )}
+
+            {isCollected && (
+              <span className="px-2.5 py-1 rounded-xl bg-zinc-800 text-zinc-400 font-black text-[11px] uppercase tracking-wider flex items-center gap-1">
+                <CheckCircle2 size={12} />
+                <span>Collected</span>
+              </span>
+            )}
+          </div>
+
+          <p className="text-xs md:text-sm text-zinc-300 font-medium line-clamp-1 mt-1.5">
+            {itemsSummary || 'Standard Chef Platter'}
+          </p>
+        </div>
+
+        {/* Right: Counter Destination Badge */}
+        <div className="flex flex-col md:items-end gap-1.5 flex-shrink-0">
+          <div className="px-4 py-2 rounded-2xl bg-[#00D4AA]/20 border border-[#00D4AA]/40 text-[#00D4AA] flex flex-col md:items-end shadow-md">
+            <span className="font-black text-base md:text-lg uppercase tracking-tight">
+              {counterInfo.title}
+            </span>
+            <span className="text-[10px] text-zinc-400 font-semibold">
+              {counterInfo.subtitle}
+            </span>
+          </div>
+
+          <span className="text-xs font-bold text-zinc-400 flex items-center gap-1">
+            <span>Show 4-digit OTP</span>
+            <span className="text-[#00D4AA] font-mono font-black">
+              {order.pickup_otp || '****'}
+            </span>
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+});
 
 interface ReadyColumnProps {
   orders: DisplayOrder[];
@@ -60,77 +135,9 @@ export function ReadyColumn({ orders }: ReadyColumnProps) {
               </p>
             </motion.div>
           ) : (
-            orders.map((order) => {
-              const counterInfo = getCounterLabel(order.counter || 1);
-              const itemsSummary = (order.order_items || [])
-                .map((i) => `${i.quantity}x ${i.item_name || 'Item'}`)
-                .join(', ');
-              const isCollected = order.status === 'COLLECTED';
-
-              return (
-                <motion.div
-                  key={order.id}
-                  layout
-                  initial={{ scale: 0.88, opacity: 0, y: 25 }}
-                  animate={{ scale: 1, opacity: 1, y: 0 }}
-                  exit={{ scale: 0.85, opacity: 0, transition: { duration: 0.3 } }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 25 }}
-                  className={`display-card-ready rounded-3xl p-5 shadow-2xl relative overflow-hidden transition-all ${
-                    order.isJustReady ? 'spotlight-flare' : ''
-                  } ${isCollected ? 'opacity-40 grayscale border-zinc-700' : ''}`}
-                >
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    {/* Left: Giant Token Display */}
-                    <div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-5xl md:text-7xl font-black text-white font-mono tracking-tight drop-shadow-[0_0_25px_rgba(0,212,170,0.5)]">
-                          {order.order_token}
-                        </span>
-
-                        <PaymentBadge />
-
-                        {order.isJustReady && (
-                          <span className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-[#FF6B2C] to-[#FFB347] text-black font-black text-[11px] uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-[#FF6B2C]/30 animate-pulse">
-                            <Sparkles size={12} />
-                            <span>JUST READY</span>
-                          </span>
-                        )}
-
-                        {isCollected && (
-                          <span className="px-2.5 py-1 rounded-xl bg-zinc-800 text-zinc-400 font-black text-[11px] uppercase tracking-wider flex items-center gap-1">
-                            <CheckCircle2 size={12} />
-                            <span>Collected</span>
-                          </span>
-                        )}
-                      </div>
-
-                      <p className="text-xs md:text-sm text-zinc-300 font-medium line-clamp-1 mt-1.5">
-                        {itemsSummary || 'Standard Chef Platter'}
-                      </p>
-                    </div>
-
-                    {/* Right: Counter Destination Badge */}
-                    <div className="flex flex-col md:items-end gap-1.5 flex-shrink-0">
-                      <div className="px-4 py-2 rounded-2xl bg-[#00D4AA]/20 border border-[#00D4AA]/40 text-[#00D4AA] flex flex-col md:items-end shadow-md">
-                        <span className="font-black text-base md:text-lg uppercase tracking-tight">
-                          {counterInfo.title}
-                        </span>
-                        <span className="text-[10px] text-zinc-400 font-semibold">
-                          {counterInfo.subtitle}
-                        </span>
-                      </div>
-
-                      <span className="text-xs font-bold text-zinc-400 flex items-center gap-1">
-                        <span>Show 4-digit OTP</span>
-                        <span className="text-[#00D4AA] font-mono font-black">
-                          {order.pickup_otp || '****'}
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })
+            orders.map((order) => (
+              <ReadyOrderCard key={order.id} order={order} />
+            ))
           )}
         </AnimatePresence>
       </div>
